@@ -1,5 +1,6 @@
 # solid-planner-app
 This is an inital setup used for the solid planner app
+
 Tech stack used:
 
 Bundler:

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "regenerator-runtime/runtime";
+import 'bootstrap/dist/css/bootstrap.min.css';
 import {
   login,
   logout,
@@ -28,19 +29,10 @@ const LogInPage = ({ logInStatus, setLogInStatus }: Props) => {
     });
   };
 
-  const handleLogout = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    e.preventDefault();
-    logout();
-    setWebId(undefined);
-    setResource("");
-    setLogInStatus(false);
-  };
-
   return (
-    <div>
+    <div className="d-flex align-items-center justify-content-center min-vh-100">
       <main>
         <h1>Solid Planner App</h1>
-        <p>{logInStatus ? "You are logged in!" : "Not logged in yet"}</p>
         <div>
           <form>
             <input
@@ -51,7 +43,6 @@ const LogInPage = ({ logInStatus, setLogInStatus }: Props) => {
               }}
             />
             <button onClick={(e) => handleLogin(e)}>Log In</button>
-            <button onClick={(e) => handleLogout(e)}>Log Out</button>
           </form>
         </div>
       </main>

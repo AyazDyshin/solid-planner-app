@@ -39,7 +39,7 @@ const LogInPage = ({ logInStatus, setLogInStatus }: Props) => {
   return (
     <div>
       <main>
-        <h1>Sandbox app</h1>
+        <h1>Solid Planner App</h1>
         <p>{logInStatus ? "You are logged in!" : "Not logged in yet"}</p>
         <div>
           <form>
@@ -53,16 +53,6 @@ const LogInPage = ({ logInStatus, setLogInStatus }: Props) => {
             <button onClick={(e) => handleLogin(e)}>Log In</button>
             <button onClick={(e) => handleLogout(e)}>Log Out</button>
           </form>
-        </div>
-        <hr />
-        <div>
-          <input
-            type="text"
-            value={resource}
-            onChange={(e) => {
-              setResource(e.target.value);
-            }}
-          />
         </div>
       </main>
     </div>

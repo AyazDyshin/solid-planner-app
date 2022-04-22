@@ -14,7 +14,7 @@ interface Props {
 const LogInPage = ({ logInStatus, setLogInStatus }: Props) => {
 
   const [webId, setWebId] = useState<string | undefined>(getDefaultSession().info.webId);
-  const [issuer, setIssuer] = useState<string>("");
+  const [issuer, setIssuer] = useState<string>("https://");
   const [resource, setResource] = useState<string | undefined>(webId);
 
   function handleLogin(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
@@ -30,37 +30,46 @@ const LogInPage = ({ logInStatus, setLogInStatus }: Props) => {
   };
 
   return (
-      <div>
-        <h3 className="display-3 text-center mt-4">Solid Planner App</h3>
-      <div className="position-absolute top-50 start-50 translate-middle ">
-
+    <div className="container">
+      
+      <div className="container w-50 px-5 pt-5 pb-5 border border-3 mt-5 rounded border-secondary shadow-lg">
+      <h3 className="display-3 text-center mb-5">Solid Planner App</h3>
         <InputGroup>
-          <div className="row">
           <DropdownButton
             variant="outline-secondary"
             title="Choose a provider"
             id="input-group-dropdown-1"
           >
             <Dropdown.Item href="#" onClick={() => {
-              setIssuer("https://inrupt.net");
+              setIssuer("https://inrupt.net")
             }}>inrupt.net</Dropdown.Item>
-            <Dropdown.Item href="#">Another action</Dropdown.Item>
-            <Dropdown.Item href="#">Something else here</Dropdown.Item>
-            <Dropdown.Item href="#">Separated link</Dropdown.Item>
+            <Dropdown.Item href="#" onClick={() => {
+              setIssuer("https://broker.pod.inrupt.com")
+            }}>Broker Pod Inrupt (Entreprise Solid Server)</Dropdown.Item>
+            <Dropdown.Item href="#" onClick={() => {
+              setIssuer("https://dev.inrupt.net")
+            }}>dev.inrupt.net</Dropdown.Item>
+            <Dropdown.Item href="#" onClick={() => {
+              setIssuer("https://solidcommunity.net")
+            }}>SolidCommunity.net</Dropdown.Item>
+            <Dropdown.Item href="#" onClick={() => {
+              setIssuer("https://solidweb.org")
+            }}>Solidweb.org</Dropdown.Item>
+            <Dropdown.Item href="#" onClick={() => {
+              setIssuer("https://trinpod.us/")
+            }}>Trinpod.us</Dropdown.Item>
           </DropdownButton>
           <FormControl aria-label="Text input with dropdown button" value={issuer}
             onChange={(e) => {
               setIssuer(e.target.value);
             }} />
-            </div>
         </InputGroup>
+        <div className="d-grid gap-2 mt-2">
+        <Button onClick={(e) => handleLogin(e)}>Log In</Button>
+        </div>
+      </div>
+    </div>
 
-        <div className="row">
-          <Button onClick={(e) => handleLogin(e)}>Log In</Button>
-          </div>
-      </div>
-      </div>
-    
   )
 }
 

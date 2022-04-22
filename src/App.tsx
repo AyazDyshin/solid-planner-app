@@ -2,7 +2,7 @@ import "regenerator-runtime/runtime";
 import React, { useEffect, useState } from "react";
 import LogInPage from "./components/LogInPage";
 import { handleIncomingRedirect, getDefaultSession } from "@inrupt/solid-client-authn-browser";
-import Test from "./Test";
+import MainContent from "./components/MainContent";
 import { render } from "react-dom";
 const App: React.FC = () => {
   const [logInStatus, setLogInStatus] = useState<boolean>(false);
@@ -32,7 +32,7 @@ const App: React.FC = () => {
       else {
         return (
 
-          <Test logInStatus={logInStatus} setLogInStatus={setLogInStatus} />)
+          <MainContent logInStatus={logInStatus} setLogInStatus={setLogInStatus} />)
       }
     }
   }

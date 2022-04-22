@@ -3,7 +3,6 @@ import "regenerator-runtime/runtime";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {
   login,
-  logout,
   getDefaultSession,
 } from "@inrupt/solid-client-authn-browser";
 import { Button, Card, InputGroup, Dropdown, DropdownButton, FormControl } from 'react-bootstrap';

@@ -13,8 +13,8 @@ const MainContent = ({logInStatus, setLogInStatus} : Props) => {
     const handleLogout = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     logout();
-    // The following has no impact on the logout, it just resets the UI.
     setLogInStatus(false);
+    window.location.reload();
   };
     return (
         <div>

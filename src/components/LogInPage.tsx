@@ -5,7 +5,7 @@ import {
   login,
   getDefaultSession,
 } from "@inrupt/solid-client-authn-browser";
-import { Button, Card, InputGroup, Dropdown, DropdownButton, FormControl } from 'react-bootstrap';
+import { Button, Card, InputGroup, Dropdown, DropdownButton, FormControl, Form} from 'react-bootstrap';
 interface Props {
   logInStatus: boolean;
   setLogInStatus: React.Dispatch<React.SetStateAction<boolean>>;
@@ -31,7 +31,7 @@ const LogInPage = ({ logInStatus, setLogInStatus }: Props) => {
   return (
     <div className="container">
       
-      <div className="container w-50 px-5 pt-5 pb-5 border border-3 mt-5 rounded border-secondary shadow-lg">
+      <Form className="container w-50 px-5 pt-5 pb-5 border border-3 mt-5 rounded border-secondary shadow-lg">
       <h3 className="display-3 text-center mb-5">Solid Planner App</h3>
         <InputGroup>
           <DropdownButton
@@ -66,7 +66,7 @@ const LogInPage = ({ logInStatus, setLogInStatus }: Props) => {
         <div className="d-grid gap-2 mt-2">
         <Button onClick={(e) => handleLogin(e)}>Log In</Button>
         </div>
-      </div>
+      </Form>
     </div>
 
   )

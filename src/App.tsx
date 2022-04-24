@@ -4,9 +4,10 @@ import LogInPage from "./components/LogInPage";
 import { handleIncomingRedirect, getDefaultSession } from "@inrupt/solid-client-authn-browser";
 import MainContent from "./components/MainContent";
 import { render } from "react-dom";
+import InputField from "./components/InputField";
 const App: React.FC = () => {
   const [logInStatus, setLogInStatus] = useState<boolean>(false);
-  const [isLoading, setLoading] = React.useState(true);
+  const [isLoading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const handle = async () => {
@@ -31,8 +32,8 @@ const App: React.FC = () => {
       }
       else {
         return (
-
-          <MainContent logInStatus={logInStatus} setLogInStatus={setLogInStatus} />)
+          <MainContent logInStatus={logInStatus} setLogInStatus={setLogInStatus} />
+          )
       }
     }
   }
@@ -41,3 +42,4 @@ const App: React.FC = () => {
 }
 
 export default App;
+

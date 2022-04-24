@@ -15,6 +15,7 @@ module.exports = {
     filename: "bundle.[hash].js",
     path: path.resolve(__dirname, "build"),
     publicPath: '/',
+    clean: true,
   },
   plugins: [
     new HtmlWebpackPlugin({

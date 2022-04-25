@@ -1,5 +1,4 @@
-import React from 'react';
-import { Form, InputGroup } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 
 const InputField = () => {
     return (

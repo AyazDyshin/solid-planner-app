@@ -14,7 +14,6 @@ module.exports = {
   output: {
     filename: "bundle.[hash].js",
     path: path.resolve(__dirname, "build"),
-    publicPath: '/',
     clean: true,
   },
   plugins: [
@@ -42,8 +41,5 @@ module.exports = {
         use: ["file-loader"],
       },
     ],
-  },
-  devServer: {
-    historyApiFallback: true,
   },
 };

@@ -21,7 +21,7 @@
   "bugs": {
     "url": "https://github.com/AyazDyshin/solid-planner-app/issues"
   },
-  "homepage": "https://github.com/AyazDyshin/solid-planner-app#readme",
+  "homepage": "https://github.com/AyazDyshin/solid-planner-app",
   "devDependencies": {
     "@babel/core": "^7.17.9",
     "@babel/preset-env": "^7.16.11",

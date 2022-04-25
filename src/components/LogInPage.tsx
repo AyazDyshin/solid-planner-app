@@ -5,7 +5,7 @@ import {
   login,
   getDefaultSession,
 } from "@inrupt/solid-client-authn-browser";
-import { Button, Card, InputGroup, Dropdown, DropdownButton, FormControl, Form} from 'react-bootstrap';
+import { Button, InputGroup, Dropdown, DropdownButton, FormControl, Form} from 'react-bootstrap';
 interface Props {
   logInStatus: boolean;
   setLogInStatus: React.Dispatch<React.SetStateAction<boolean>>;

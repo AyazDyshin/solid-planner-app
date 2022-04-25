@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
-    logout,
-    getDefaultSession,
+    logout
   } from "@inrupt/solid-client-authn-browser";
 import { notEqual } from "assert";
 import { Note } from './types';

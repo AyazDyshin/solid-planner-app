@@ -25,12 +25,12 @@ const MainContent = ({ logInStatus, setLogInStatus }: Props) => {
 
   const handleAdd = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-      console.log(e);
-    if (note) {
+    
+    if(note){ 
       setNotes([...notes, {id:  Date.now(), title: note.title, content: note.content}]);
+      setNote({id:0, title:"", content:""});
     }
   };
-
   return (
     <div>
       <h1>Hello there!</h1>

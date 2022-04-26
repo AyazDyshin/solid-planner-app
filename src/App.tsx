@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import LogInPage from "./components/LogInPage";
 import { handleIncomingRedirect, getDefaultSession } from "@inrupt/solid-client-authn-browser";
 import MainContent from "./components/MainContent";
+import { useSession } from "@inrupt/solid-ui-react";
 
 const App: React.FC = () => {
   const [logInStatus, setLogInStatus] = useState<boolean>(false);

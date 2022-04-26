@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import "regenerator-runtime/runtime";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useSession } from "@inrupt/solid-ui-react";
 import {
   login,
   getDefaultSession,
 } from "@inrupt/solid-client-authn-browser";
 import { Button, InputGroup, Dropdown, DropdownButton, FormControl, Form} from 'react-bootstrap';
+
 interface Props {
   logInStatus: boolean;
   setLogInStatus: React.Dispatch<React.SetStateAction<boolean>>;

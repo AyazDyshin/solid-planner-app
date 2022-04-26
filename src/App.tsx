@@ -19,7 +19,7 @@ const App: React.FC = () => {
     }
     handle();
   }, [logInStatus]);
-  
+
   const render = () => {
     if (isLoading) return <div></div>;
     else {

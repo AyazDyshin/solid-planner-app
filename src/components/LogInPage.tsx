@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "regenerator-runtime/runtime";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useSession } from "@inrupt/solid-ui-react";
+import { LoginButton, useSession } from "@inrupt/solid-ui-react";
 import {
   login,
   getDefaultSession,
@@ -9,10 +9,9 @@ import {
 import { Button, InputGroup, Dropdown, DropdownButton, FormControl, Form} from 'react-bootstrap';
 
 interface Props {
-  logInStatus: boolean;
-  setLogInStatus: React.Dispatch<React.SetStateAction<boolean>>;
+  
 }
-const LogInPage = ({ logInStatus, setLogInStatus }: Props) => {
+const LogInPage = () => {
 
   const [webId, setWebId] = useState<string | undefined>(getDefaultSession().info.webId);
   const [issuer, setIssuer] = useState<string>("https://");
@@ -66,7 +65,12 @@ const LogInPage = ({ logInStatus, setLogInStatus }: Props) => {
             }} />
         </InputGroup>
         <div className="d-grid gap-2 mt-2">
-        <Button onClick={(e) => handleLogin(e)}>Log In</Button>
+          <LoginButton
+          oidcIssuer={issuer}
+          redirectUrl={window.location.href}
+          onError={console.error}
+          ><Button className="w-100">Log in</Button></LoginButton>
+
         </div>
       </Form>
     </div>

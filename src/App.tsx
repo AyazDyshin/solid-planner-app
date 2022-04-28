@@ -8,32 +8,33 @@ import { useSession } from "@inrupt/solid-ui-react";
 const App: React.FC = () => {
   const [logInStatus, setLogInStatus] = useState<boolean>(false);
   const [isLoading, setLoading] = useState<boolean>(true);
+  const { session,sessionRequestInProgress } = useSession();
 
-  useEffect(() => {
-    const handle = async () => {
-      await handleIncomingRedirect({
-        restorePreviousSession: true,
-      }).then((info) => {
-        setLogInStatus(info?.isLoggedIn ?? false);
-        setLoading(false);
-      });
-    }
-    handle();
-  }, [logInStatus]);
+  // useEffect(() => {
+  //   const handle = async () => {
+  //     await handleIncomingRedirect({
+  //       restorePreviousSession: true,
+  //     }).then((info) => {
+  //      // setLogInStatus(info?.isLoggedIn ?? false);
+  //       setLoading(false);
+  //     });
+  //   }
+  //   handle();
+  // }, [logInStatus]);
 
   const render = () => {
-    if (isLoading) return <div></div>;
+    if (sessionRequestInProgress) return <div></div>;
     else {
-      if (!logInStatus) {
+      if (!session.info.isLoggedIn) {
         return (
           <div>
-            <LogInPage logInStatus={logInStatus} setLogInStatus={setLogInStatus} />
+            <LogInPage />
           </div>
         );
       }
       else {
         return (
-          <MainContent logInStatus={logInStatus} setLogInStatus={setLogInStatus} />
+          <MainContent />
           )
       }
     }

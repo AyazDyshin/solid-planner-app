@@ -1,28 +1,24 @@
 import React, { useState, useEffect } from "react";
-import {
-  logout
-} from "@inrupt/solid-client-authn-browser";
 import { notEqual } from "assert";
 import { Note } from './types';
 import InputField from "./InputField";
 import { Button } from "react-bootstrap";
+import { LogoutButton, useSession } from "@inrupt/solid-ui-react";
+
 interface Props {
-  logInStatus: boolean;
-  setLogInStatus: React.Dispatch<React.SetStateAction<boolean>>;
+  
 }
 
-const MainContent = ({ logInStatus, setLogInStatus }: Props) => {
+const MainContent = () => {
   // is there a better practice to handle this passing of an empty note?
   const [note, setNote] = useState<Note>({id:0, title:"", content:""});
   const [notes, setNotes] = useState<Note[]>([]);
+  const { session } = useSession();
 
-  const handleLogout = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    e.preventDefault();
-    logout();
-    setLogInStatus(false);
-    window.location.reload();
-  };
-
+ 
+  const onError = (error: Error) => {
+    console.log(error);
+  }
   const handleAdd = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
@@ -35,7 +31,9 @@ const MainContent = ({ logInStatus, setLogInStatus }: Props) => {
     <div>
       <h1>Hello there!</h1>
       <InputField note={note} setNote={setNote} handleAdd={handleAdd}/>
-      <Button onClick={(e) => handleLogout(e)}>Log Out</Button>
+      <LogoutButton  onError={onError} >
+        <Button>Log Out</Button>
+      </LogoutButton>        
     </div>
 
   );

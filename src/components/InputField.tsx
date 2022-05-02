@@ -4,7 +4,6 @@ import { Note } from './types';
 import { FOAF, VCARD } from "@inrupt/lit-generated-vocab-common";
 import { useState } from 'react';
 import { buildThing, createContainerInContainer, createSolidDataset, createThing, saveSolidDatasetAt, saveSolidDatasetInContainer, setThing } from '@inrupt/solid-client';
-//import { rdf } from '@inrupt/solid-client/dist/constants';
 import {SCHEMA_INRUPT, RDF} from '@inrupt/vocab-common-rdf';
 
 interface Props {
@@ -19,7 +18,6 @@ const InputField = ({ note, setNote, handleAdd }: Props) => {
     const { dataset, error } = useDataset();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        // e.persist();
         setNote(note => ({ ...note, [e.target.name]: e.target.value }));
     }
     const handleSubmit = () => {
@@ -31,23 +29,20 @@ const InputField = ({ note, setNote, handleAdd }: Props) => {
   .build();
     const dts = createSolidDataset();
     const dtsFull= setThing(dts,me);
-    saveSolidDatasetAt("https://ayazdyshin.inrupt.net/public/test", dtsFull, {fetch: fetch});
-    //console.log(dts);
-    //console.log(dtsFull);
-
+   // saveSolidDatasetAt("https://ayazdyshin.inrupt.net/public/test", dtsFull, {fetch: fetch});
+    console.log(webId);
     if (typeof webId === 'string'){
         return (
         
             <CombinedDataProvider
-            datasetUrl="https://ayazdyshin.inrupt.net/public"
-            thingUrl="https://ayazdyshin.inrupt.net/public"
+            datasetUrl={webId}
+            thingUrl={webId}
           >
                 <div>Your web id: {webId}</div>
                 <Text
       autosave
       edit={true}
       property={FOAF.name.iri.value}
-      saveDatasetTo="https://ayazdyshin.inrupt.net/public"
     />
                 <Text property={FOAF.name.iri.value}  edit={editing}/>
                 

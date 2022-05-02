@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { notEqual } from "assert";
 import { Note } from './types';
-import InputField from "./InputField";
 import { Button } from "react-bootstrap";
 import { LogoutButton, useSession } from "@inrupt/solid-ui-react";
-
+import Navbar from "./Navbar";
 interface Props {
   
 }
@@ -29,8 +28,7 @@ const MainContent = () => {
   };
   return (
     <div>
-      <h1>Hello there!</h1>
-      <InputField note={note} setNote={setNote} handleAdd={handleAdd}/>
+      <Navbar />
       <LogoutButton  onError={onError} >
         <Button>Log Out</Button>
       </LogoutButton>        

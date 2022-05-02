@@ -1,31 +1,42 @@
 import { useState } from "react";
+import { LogoutButton, useSession } from "@inrupt/solid-ui-react";
+import { Button } from "react-bootstrap";
+interface Props{
+    links : string[];
+    active: string;
+    setActive: React.Dispatch<React.SetStateAction<string>>;
+}
 
-
-const Navbar = () => {
-    const links = ['notes', 'link2', 'link3'];
-    const [active, setActive] = useState("notes");
+const Navbar = ({links, active, setActive}: Props) => {
+   
+    const onError = (error: Error) => {
+        console.log(error);
+      }
     return (
-    
-            <nav className="navbar navbar-expand-lg navbar-light bg-light">
-                <div className="container-fluid">
 
-                    <div className="navbar-nav d-flex justify-content-around w-100">
+        <nav className="navbar navbar-expand-lg navbar-light bg-light">
+            <div className="container-fluid">
+
+                <div className="navbar-nav d-flex justify-content-around w-100">
 
 
-                        {links.map((link) => (
-                            <a
-                                href=""
-                                className={`nav-link ${active === link ? 'active' : ''}`}
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    setActive(link)
-                                }}
-                            >{link}</a>
-                        ))}
+                    {links.map((link) => (
+                        <a
+                            href=""
+                            className={`nav-link ${active === link ? 'active' : ''}`}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                setActive(link)
+                            }}
+                        >{link}</a>
+                    ))}
 
-                    </div>
+                    <LogoutButton onError={onError} >
+                        <Button>Log Out</Button>
+                    </LogoutButton>
                 </div>
-            </nav>
+            </div>
+        </nav>
 
     )
 }

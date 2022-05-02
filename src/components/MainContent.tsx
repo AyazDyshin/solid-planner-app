@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { notEqual } from "assert";
 import { Note } from './types';
-import { Button } from "react-bootstrap";
 import { LogoutButton, useSession } from "@inrupt/solid-ui-react";
 import Navbar from "./Navbar";
 interface Props {
@@ -12,12 +11,9 @@ const MainContent = () => {
   // is there a better practice to handle this passing of an empty note?
   const [note, setNote] = useState<Note>({id:0, title:"", content:""});
   const [notes, setNotes] = useState<Note[]>([]);
-  const { session } = useSession();
-
+  const links = ['notes', 'link2', 'link3'];
+  const [active, setActive] = useState("notes");
  
-  const onError = (error: Error) => {
-    console.log(error);
-  }
   const handleAdd = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
@@ -28,10 +24,7 @@ const MainContent = () => {
   };
   return (
     <div>
-      <Navbar />
-      <LogoutButton  onError={onError} >
-        <Button>Log Out</Button>
-      </LogoutButton>        
+      <Navbar links={links} active={active} setActive={setActive} />     
     </div>
 
   );

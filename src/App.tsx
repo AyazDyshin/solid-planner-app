@@ -9,7 +9,6 @@ const App: React.FC = () => {
   const [logInStatus, setLogInStatus] = useState<boolean>(false);
   const [isLoading, setLoading] = useState<boolean>(true);
   const { session,sessionRequestInProgress } = useSession();
-
   const render = () => {
     if (sessionRequestInProgress) return <div></div>;
     else {

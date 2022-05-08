@@ -3,6 +3,9 @@ import { notEqual } from "assert";
 import { Note } from './types';
 import { LogoutButton, useSession } from "@inrupt/solid-ui-react";
 import Navbar from "./Navbar";
+import ContentToRender from "./ContentToRender";
+import Test from "./Test";
+
 interface Props {
   
 }
@@ -13,7 +16,9 @@ const MainContent = () => {
   const [notes, setNotes] = useState<Note[]>([]);
   const links = ['notes', 'link2', 'link3'];
   const [active, setActive] = useState("notes");
- 
+  const { session, fetch} = useSession();
+  const { webId } = session.info;
+  
   const handleAdd = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
@@ -22,9 +27,12 @@ const MainContent = () => {
       setNote({id:0, title:"", content:""});
     }
   };
+
   return (
     <div>
-      <Navbar links={links} active={active} setActive={setActive} />     
+      <Test />
+      <Navbar links={links} active={active} setActive={setActive} /> 
+      <ContentToRender active={active}/>   
     </div>
 
   );

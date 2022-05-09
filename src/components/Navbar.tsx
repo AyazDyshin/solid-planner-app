@@ -32,7 +32,7 @@ const Navbar = ({links, active, setActive}: Props) => {
                     ))}
 
                     <LogoutButton onError={onError} >
-                        <Button>Log Out</Button>
+                        <Button variant="secondary">Log Out</Button>
                     </LogoutButton>
                 </div>
             </div>

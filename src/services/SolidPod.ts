@@ -1,4 +1,5 @@
 import { buildThing, createThing, getSolidDataset, getThing, getThingAll, getUrl, ThingPersisted, addUrl, setThing, saveSolidDatasetAt } from '@inrupt/solid-client';
+import { pim } from '@inrupt/solid-client/dist/constants';
 import { useSession } from '@inrupt/solid-ui-react';
 import { solid, schema, space } from 'rdf-namespaces';
 
@@ -43,5 +44,15 @@ export const recordDefaultFolder = async (webId: string, fetch: fetcher) => {
   let dataSet = await getSolidDataset(prefFileLocation!, {
     fetch: fetch
   });
-  console.log(dataSet);
+  //console.log(dataSet);
+  let allThings = await getThingAll(dataSet);
+  console.log(allThings);
+  const aThing = await getThing(dataSet, webId);
+  try {
+  const testingError = await getThing(dataSet,"sgsdgrt????///");
+  } catch(error){
+    console.log(error);
+  }
+  
+  //console.log(aThing);
 }

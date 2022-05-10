@@ -20,19 +20,19 @@ const Test = () => {
   const { dataset, error } = useDataset();
   const [stat, setStat] = useState<string | null>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  useEffect(() => {
-    async function fetchData() {
-      await checkAndCreatePrefLink(webId ?? "", fetch);
-      const stata = await getPrefLink(webId ?? "", fetch);
-      setStat(stata);
-      setIsLoading(false);
-      await recordDefaultFolder(webId??"", fetch);
-    }
-    fetchData();
-  }, [])
+  // useEffect(() => {
+  //   async function fetchData() {
+  //     await checkAndCreatePrefLink(webId ?? "", fetch);
+  //     const stata = await getPrefLink(webId ?? "", fetch);
+  //     setStat(stata);
+  //     setIsLoading(false);
+  //     await recordDefaultFolder(webId??"", fetch,"https://ayazdyshin.inrupt.net/test");
+  //   }
+  //   fetchData();
+  // }, [])
 
 
-  console.log(stat);
+  // console.log(stat);
 
   // const getDataset = async () => {
   //   if (typeof webId === 'string') {

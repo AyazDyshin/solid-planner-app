@@ -2,6 +2,7 @@ import { buildThing, createThing, getSolidDataset, getThing, getThingAll, getUrl
 import { pim } from '@inrupt/solid-client/dist/constants';
 import { useSession } from '@inrupt/solid-ui-react';
 import { solid, schema, space } from 'rdf-namespaces';
+import { dataset } from 'rdf-namespaces/dist/schema';
 
 type fetcher = ((input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>) & ((input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>);
 
@@ -28,8 +29,8 @@ export const createPrefLink = async (webId: string, fetch: fetcher) => {
   console.log(aThing);
   const urlToPrefs = `${modifyWebId(webId)}settings/prefs.ttl`;
   aThing = addUrl(aThing!, space.preferencesFile, urlToPrefs);
-  dataSet = setThing(dataSet,aThing);
-  const updDataSet = saveSolidDatasetAt(webId, dataSet, {fetch : fetch});
+  dataSet = setThing(dataSet, aThing);
+  const updDataSet = saveSolidDatasetAt(webId, dataSet, { fetch: fetch });
 }
 
 export const checkAndCreatePrefLink = async (webId: string, fetch: fetcher) => {
@@ -39,20 +40,25 @@ export const checkAndCreatePrefLink = async (webId: string, fetch: fetcher) => {
   }
 }
 
-export const recordDefaultFolder = async (webId: string, fetch: fetcher) => {
+export const recordDefaultFolder = async (webId: string, fetch: fetcher, defaultFolderPath: string) => {
   const prefFileLocation = await getPrefLink(webId, fetch);
   let dataSet = await getSolidDataset(prefFileLocation!, {
     fetch: fetch
   });
-  //console.log(dataSet);
-  let allThings = await getThingAll(dataSet);
-  console.log(allThings);
-  const aThing = await getThing(dataSet, webId);
-  try {
-  const testingError = await getThing(dataSet,"sgsdgrt????///");
-  } catch(error){
-    console.log(error);
-  }
-  
-  //console.log(aThing);
+  let aThing = await getThing(dataSet, webId);
+  console.log(`this is aThing: ${aThing}`);
+  aThing = addUrl(aThing!, "https://ayazdyshin.inrupt.net/public/plannerAppVocab.ttl#defaultFolder", defaultFolderPath);
+  dataSet = setThing(dataSet, aThing);
+  const updDataSet = saveSolidDatasetAt(prefFileLocation!, dataSet, { fetch: fetch });
 }
+
+export const getDefaultFolder = async (webId: string, fetch: fetcher): Promise<string | null> => {
+  const prefFileLocation = await getPrefLink(webId, fetch);
+  let dataSet = await getSolidDataset(prefFileLocation!, {
+    fetch: fetch
+  });
+  let aThing = await getThing(dataSet, webId);
+  let defFolderUrl = await getUrl(aThing!, "https://ayazdyshin.inrupt.net/public/plannerAppVocab.ttl#defaultFolder");
+  return defFolderUrl;
+}
+

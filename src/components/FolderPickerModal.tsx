@@ -5,11 +5,11 @@ import { modifyWebId } from "../services/SolidPod";
 interface Props {
     modalState: boolean;
     setModalState: React.Dispatch<React.SetStateAction<boolean>>;
-    defaultFolderUrl: string;
-    setDefaultFolderUrl: React.Dispatch<React.SetStateAction<string>>;
+    defFolderUrlToUp: string;
+    setDefFolderUrlToUp: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const FolderPickerModal = ({ modalState, setModalState, defaultFolderUrl, setDefaultFolderUrl }: Props) => {
+const FolderPickerModal = ({ modalState, setModalState, defFolderUrlToUp, setDefFolderUrlToUp }: Props) => {
     const { session } = useSession();
     const { webId } = session.info;
     const [input, setInput] = useState<string>("");
@@ -28,7 +28,7 @@ const FolderPickerModal = ({ modalState, setModalState, defaultFolderUrl, setDef
             <Modal.Footer>
                 <Button variant="secondary" value={input} onClick={() => setModalState(false)}>Close</Button>
                 <Button variant="primary" onClick={() => {
-                    setDefaultFolderUrl(`${urlToShow}${input}`);
+                    setDefFolderUrlToUp(`${urlToShow}${input}`);
                     setModalState(false);
                 }}>Save changes</Button>
             </Modal.Footer>

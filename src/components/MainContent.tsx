@@ -14,7 +14,7 @@ const MainContent = () => {
   // is there a better practice to handle this passing of an empty note?
   const [note, setNote] = useState<Note>({id:0, title:"", content:""});
   const [notes, setNotes] = useState<Note[]>([]);
-  const links = ['notes', 'link2', 'link3'];
+  const links = ['notes', 'categories', 'habits'];
   const [active, setActive] = useState("notes");
   const { session, fetch} = useSession();
   const { webId } = session.info;
@@ -22,10 +22,10 @@ const MainContent = () => {
   const handleAdd = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    if(note){ 
-      setNotes([...notes, {id:  Date.now(), title: note.title, content: note.content}]);
-      setNote({id:0, title:"", content:""});
-    }
+    // if(note){ 
+    //   setNotes([...notes, {id:  Date.now(), title: note.title, content: note.content}]);
+    //   setNote({id:0, title:"", content:""});
+    // }
   };
 
   return (

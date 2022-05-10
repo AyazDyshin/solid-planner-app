@@ -7,9 +7,10 @@ interface Props {
     setModalState: React.Dispatch<React.SetStateAction<boolean>>;
     defFolderUrlToUp: string;
     setDefFolderUrlToUp: React.Dispatch<React.SetStateAction<string>>;
+    setDefFolderStatus : React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const FolderPickerModal = ({ modalState, setModalState, defFolderUrlToUp, setDefFolderUrlToUp }: Props) => {
+const FolderPickerModal = ({ modalState, setModalState, defFolderUrlToUp, setDefFolderUrlToUp,setDefFolderStatus }: Props) => {
     const { session } = useSession();
     const { webId } = session.info;
     const [input, setInput] = useState<string>("");
@@ -29,6 +30,7 @@ const FolderPickerModal = ({ modalState, setModalState, defFolderUrlToUp, setDef
                 <Button variant="secondary" value={input} onClick={() => setModalState(false)}>Close</Button>
                 <Button variant="primary" onClick={() => {
                     setDefFolderUrlToUp(`${urlToShow}${input}`);
+                    setDefFolderStatus(true);
                     setModalState(false);
                 }}>Save changes</Button>
             </Modal.Footer>

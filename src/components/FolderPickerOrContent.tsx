@@ -4,7 +4,7 @@ import { Spinner } from "react-bootstrap";
 import { checkAndCreatePrefLink, getDefaultFolder, getPrefLink, recordDefaultFolder } from "../services/SolidPod";
 import FolderPickerModal from "./FolderPickerModal";
 
-const NotesList = () => {
+const FolderPickerOrContent = () => {
     const [modalState, setModalState] = useState<boolean>(false);
     const { session, fetch } = useSession();
     const { webId } = session.info;
@@ -15,9 +15,10 @@ const NotesList = () => {
     const [defFolderUrl, setDefFolderUrl] = useState<string>("");
     // const [defaultFolderUrlValue, setDefaultFolderUrlValue] = useState(false);
     useEffect(() => {
+        setIsLoading(true);
         async function checkDef() {
             const defFolderUpd = await getDefaultFolder(webId ?? "", fetch);
-            console.log(`this is def folder: ${defFolderUpd}`);
+            //console.log(`this is def folder: ${defFolderUpd}`);
             if (defFolderUpd !== null) {
                 setDefFolderUrl(defFolderUpd);
                 setDefFolderStatus(true);
@@ -26,7 +27,7 @@ const NotesList = () => {
         }
         async function fetchData() {
             await recordDefaultFolder(webId ?? "", fetch, defFolderUrlToUp);
-            setDefFolderUrl(defFolderUrlToUp);
+            await setDefFolderUrl(defFolderUrlToUp);
             setIsLoading(false);
         }
         if (defFolderUrlToUp !== "") {
@@ -58,7 +59,8 @@ const NotesList = () => {
                         <p className="card-text">Please pick a default folder, where your notes will be stored</p>
                         <a href="#" className="btn btn-primary" onClick={() => { setModalState(true) }}>Pick a folder</a>
                     </div>
-                    <FolderPickerModal modalState={modalState} setModalState={setModalState} defFolderUrlToUp={defFolderUrlToUp} setDefFolderUrlToUp={setDefFolderUrlToUp} />
+                    <FolderPickerModal modalState={modalState} setModalState={setModalState} defFolderUrlToUp={defFolderUrlToUp} setDefFolderUrlToUp={setDefFolderUrlToUp}
+                    setDefFolderStatus={setDefFolderStatus} />
                 </div>
 
             );
@@ -67,4 +69,4 @@ const NotesList = () => {
 
 }
 
-export default NotesList;
+export default FolderPickerOrContent;

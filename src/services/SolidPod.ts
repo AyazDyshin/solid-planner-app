@@ -1,4 +1,4 @@
-import { buildThing, createThing, getSolidDataset, getThing, getThingAll, getUrl, ThingPersisted, addUrl, setThing, saveSolidDatasetAt } from '@inrupt/solid-client';
+import { buildThing, createThing, getSolidDataset, getThing, getThingAll, getUrl, ThingPersisted, addUrl, setThing, saveSolidDatasetAt, createContainerAt, createSolidDataset } from '@inrupt/solid-client';
 import { pim } from '@inrupt/solid-client/dist/constants';
 import { useSession } from '@inrupt/solid-ui-react';
 import { solid, schema, space } from 'rdf-namespaces';
@@ -12,6 +12,10 @@ export const modifyWebId = (webId: string): string => {
   return `${updArr.join("/")}/`;
 }
 
+export const updUrlForFolder = (url: string) => {
+  if (url.charAt(url.length-1) !== '/') return url += '/'
+  return url;
+}
 export const getPrefLink = async (webId: string, fetch: fetcher) => {
   const dataSet = await getSolidDataset(webId, {
     fetch: fetch
@@ -49,16 +53,28 @@ export const recordDefaultFolder = async (webId: string, fetch: fetcher, default
   console.log(`this is aThing: ${aThing}`);
   aThing = addUrl(aThing!, "https://ayazdyshin.inrupt.net/public/plannerAppVocab.ttl#defaultFolder", defaultFolderPath);
   dataSet = setThing(dataSet, aThing);
+  createDefFolder(defaultFolderPath, fetch);
   const updDataSet = saveSolidDatasetAt(prefFileLocation!, dataSet, { fetch: fetch });
 }
 
 export const getDefaultFolder = async (webId: string, fetch: fetcher): Promise<string | null> => {
   const prefFileLocation = await getPrefLink(webId, fetch);
+  //handle
   let dataSet = await getSolidDataset(prefFileLocation!, {
     fetch: fetch
   });
   let aThing = await getThing(dataSet, webId);
+  //handle
   let defFolderUrl = await getUrl(aThing!, "https://ayazdyshin.inrupt.net/public/plannerAppVocab.ttl#defaultFolder");
   return defFolderUrl;
 }
 
+export const createDefFolder = async (defFolderUrl: string, fetch: fetcher) => {
+
+    saveSolidDatasetAt(`${updUrlForFolder(defFolderUrl)}notes.ttl`,createSolidDataset(), {
+      fetch : fetch
+    });
+    saveSolidDatasetAt(`${updUrlForFolder(defFolderUrl)}habits.ttl`,createSolidDataset(), {
+      fetch : fetch
+    });
+}

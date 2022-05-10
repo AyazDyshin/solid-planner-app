@@ -22,12 +22,13 @@ const Navbar = ({links, active, setActive}: Props) => {
 
                     {links.map((link) => (
                         <a
-                            href=""
+                            key={`${link}${Date.now()}`}
                             className={`nav-link ${active === link ? 'active' : ''}`}
                             onClick={(e) => {
                                 e.preventDefault();
                                 setActive(link)
                             }}
+                
                         >{link}</a>
                     ))}
 

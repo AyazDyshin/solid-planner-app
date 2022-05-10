@@ -1,4 +1,4 @@
-import NotesPage from "./NotesPage";
+import ContentPageRender from "./ContentPageRender";
 
 interface Props {
     active: string;
@@ -7,8 +7,10 @@ const ContentToRender = ({active}:Props) => {
 
     switch (active){
         case "notes":
-            return (<NotesPage />);
+            return (<ContentPageRender whatToRender={"notes"}/>);
             break;
+        case "habits":
+            return (<ContentPageRender whatToRender={"habits"}/>);
         default:
             return (<div>Error</div>);
     }

@@ -30,7 +30,6 @@ export const createPrefLink = async (webId: string, fetch: fetcher) => {
     fetch: fetch
   });
   let aThing = getThing(dataSet, webId);
-  console.log(aThing);
   const urlToPrefs = `${modifyWebId(webId)}settings/prefs.ttl`;
   aThing = addUrl(aThing!, space.preferencesFile, urlToPrefs);
   dataSet = setThing(dataSet, aThing);
@@ -50,8 +49,7 @@ export const recordDefaultFolder = async (webId: string, fetch: fetcher, default
     fetch: fetch
   });
   let aThing = await getThing(dataSet, webId);
-  console.log(`this is aThing: ${aThing}`);
-  aThing = addUrl(aThing!, "https://ayazdyshin.inrupt.net/public/plannerAppVocab.ttl#defaultFolder", defaultFolderPath);
+  aThing = addUrl(aThing!, "https://ayazdyshin.inrupt.net/public/plannerAppVocab.ttl#defaultFolder", updUrlForFolder(defaultFolderPath));
   dataSet = setThing(dataSet, aThing);
   createDefFolder(defaultFolderPath, fetch);
   const updDataSet = saveSolidDatasetAt(prefFileLocation!, dataSet, { fetch: fetch });
@@ -70,11 +68,22 @@ export const getDefaultFolder = async (webId: string, fetch: fetcher): Promise<s
 }
 
 export const createDefFolder = async (defFolderUrl: string, fetch: fetcher) => {
-
     saveSolidDatasetAt(`${updUrlForFolder(defFolderUrl)}notes.ttl`,createSolidDataset(), {
       fetch : fetch
     });
     saveSolidDatasetAt(`${updUrlForFolder(defFolderUrl)}habits.ttl`,createSolidDataset(), {
       fetch : fetch
     });
+}
+
+export const fetchAllNotes = async (webId: string, fetch: fetcher) => {
+  const defFolder = await getDefaultFolder(webId, fetch);
+  console.log(defFolder);
+  //handle
+  console.log(`${defFolder}notes.ttl`);
+  const dataSet = await getSolidDataset(`${defFolder}notes.ttl`, {
+    fetch: fetch
+  });
+  const allNotes = await getThingAll(dataSet);
+  return allNotes;  
 }

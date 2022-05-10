@@ -8,7 +8,7 @@ import { SCHEMA_INRUPT, RDF } from '@inrupt/vocab-common-rdf';
 import { first } from 'lodash';
 import { space, vcard } from 'rdf-namespaces';
 import { pim } from '@inrupt/solid-client/dist/constants';
-import { getPrefLink, checkAndCreatePrefLink, recordDefaultFolder } from '../services/SolidPod';
+import { getPrefLink, checkAndCreatePrefLink, recordDefaultFolder, fetchAllNotes } from '../services/SolidPod';
 interface Props {
 
 }
@@ -20,16 +20,13 @@ const Test = () => {
   const { dataset, error } = useDataset();
   const [stat, setStat] = useState<string | null>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  // useEffect(() => {
-  //   async function fetchData() {
-  //     await checkAndCreatePrefLink(webId ?? "", fetch);
-  //     const stata = await getPrefLink(webId ?? "", fetch);
-  //     setStat(stata);
-  //     setIsLoading(false);
-  //     await recordDefaultFolder(webId??"", fetch,"https://ayazdyshin.inrupt.net/test");
-  //   }
-  //   fetchData();
-  // }, [])
+  useEffect(() => {
+    async function fetchData() {
+      let heh = await fetchAllNotes(webId??"", fetch);
+      console.log(heh);
+    }
+    fetchData();
+  }, [])
 
 
   // console.log(stat);

@@ -3,8 +3,11 @@ import { useEffect, useState } from "react";
 import { Spinner } from "react-bootstrap";
 import { checkAndCreatePrefLink, getDefaultFolder, getPrefLink, recordDefaultFolder } from "../services/SolidPod";
 import FolderPickerModal from "./FolderPickerModal";
-
-const FolderPickerOrContent = () => {
+import NotesList from "./NotesList";
+interface Props {
+    active : string;
+}
+const FolderPickerOrContent = ({active}:Props) => {
     const [modalState, setModalState] = useState<boolean>(false);
     const { session, fetch } = useSession();
     const { webId } = session.info;
@@ -45,11 +48,20 @@ const FolderPickerOrContent = () => {
     }
     else {
         if (defFolderStatus) {
-            return (
-                <div>
-                    YOU HAVE DEF FOLDER!!
-                </div>
-            );
+            switch (active){
+                case "notes":
+                    return (<NotesList />);
+                    break;
+                case "habits":
+                    return (<div> this doesn't exist yet</div>);
+                default:
+                    return (<div>Error</div>);
+            }
+            // return (
+            //     <div>
+            //         YOU HAVE DEF FOLDER!!
+            //     </div>
+            // );
         }
         else {
             return (
@@ -57,7 +69,7 @@ const FolderPickerOrContent = () => {
                     <div className="card-body ">
                         <h5 className="card-title">No default folder selected</h5>
                         <p className="card-text">Please pick a default folder, where your notes will be stored</p>
-                        <a href="#" className="btn btn-primary" onClick={() => { setModalState(true) }}>Pick a folder</a>
+                        <a  className="btn btn-primary" onClick={() => { setModalState(true) }}>Pick a folder</a>
                     </div>
                     <FolderPickerModal modalState={modalState} setModalState={setModalState} defFolderUrlToUp={defFolderUrlToUp} setDefFolderUrlToUp={setDefFolderUrlToUp}
                     setDefFolderStatus={setDefFolderStatus} />

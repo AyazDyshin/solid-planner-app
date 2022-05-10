@@ -3,14 +3,13 @@ import ContentPageRender from "./ContentPageRender";
 interface Props {
     active: string;
 }
-const ContentToRender = ({active}:Props) => {
-
+const ContentToRender = ( {active} : Props ) => {
     switch (active){
         case "notes":
-            return (<ContentPageRender whatToRender={"notes"}/>);
+            return (<ContentPageRender active={active}/>);
             break;
         case "habits":
-            return (<ContentPageRender whatToRender={"habits"}/>);
+            return (<ContentPageRender active={active}/>);
         default:
             return (<div>Error</div>);
     }

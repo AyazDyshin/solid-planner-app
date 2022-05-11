@@ -1,41 +1,38 @@
-import { useDataset, useSession } from "@inrupt/solid-ui-react";
-import { useEffect, useState } from "react";
-import { checkAndCreatePrefLink, getPrefLink, recordDefaultFolder } from "../services/SolidPod";
+import { useState } from "react";
 import CreatorToRender from "./CreatorToRender";
 import FolderPickerOrContent from "./FolderPickerOrContent";
-import NoteCreator from "./NoteCreator";
+
 interface Props {
-    active : string;
+    active: string;
 }
-const ContentPageRender = ({active}:Props) => {
-    const { session, fetch } = useSession();
-    const { webId } = session.info;
-    const [editing, setEditing] = useState(true);
-    const { dataset, error } = useDataset();
-    const [prefLink, setPrefLink] = useState<string | null>("");
-    const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [defaultFolderUrl, setDefaultFolderUrl] = useState("");
-    const [defaultFolderUrlValue, setDefaultFolderUrlValue] = useState(false);
-    const [creator, setCreator] = useState("");
+// Component that is responsible for rendering content of notes and habits tab
+// splits the content in two halves, left half: "FolderPickerOrContent"
+// right half: "CreatorToRender"
+// "newEntryCr" and "setNewEntryCr" are indicating if a new entry was created
+// this is needed to update the left side view, ie list of entries existing in the user's pod
+// "creatorStatus" and "setCreatorStatus" are hooks to monitor if create button was pressed,
+// this is needed to render the respective creator component
+const ContentPageRender = ({ active }: Props) => {
+
     const [creatorStatus, setCreatorStatus] = useState<boolean>(false);
     const [newEntryCr, setNewEntryCr] = useState<boolean>(false);
-        return (
-            <div className="container-fluid">
-                <div className="row h-100">
-                    <div className="col h-100 border border-5 border-end-0 d-flex justify-content-center align-items-center">
-                        <FolderPickerOrContent active={active} creatorStatus={creatorStatus} 
+
+    return (
+        <div className="container-fluid">
+            <div className="row h-100">
+                <div className="col h-100 border border-5 border-end-0 d-flex justify-content-center align-items-center">
+                    <FolderPickerOrContent active={active} creatorStatus={creatorStatus}
                         setCreatorStatus={setCreatorStatus}
                         newEntryCr={newEntryCr}
-                        setNewEntryCr={setNewEntryCr}
-                        />
-                    </div>
-                    <div className="col h-100 border border-5">
-                        <CreatorToRender active={active} creatorStatus={creatorStatus} newEntryCr={newEntryCr} setNewEntryCr={setNewEntryCr}/>
-                    </div>
+                        setNewEntryCr={setNewEntryCr} />
+                </div>
+                <div className="col h-100 border border-5">
+                    <CreatorToRender active={active} creatorStatus={creatorStatus} newEntryCr={newEntryCr}
+                        setNewEntryCr={setNewEntryCr} />
                 </div>
             </div>
-        );
-    
+        </div>
+    );
 }
 
 export default ContentPageRender;

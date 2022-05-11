@@ -3,7 +3,7 @@ import { useSession } from "@inrupt/solid-ui-react";
 import { useEffect, useState } from "react";
 import { Spinner } from "react-bootstrap";
 import { fetchAllNotes } from "../services/SolidPod";
-
+// need to upgrade for habits case 
 interface Props {
     creatorStatus: boolean;
     setCreatorStatus: React.Dispatch<React.SetStateAction<boolean>>;

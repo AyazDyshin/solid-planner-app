@@ -4,36 +4,39 @@ import { Spinner } from "react-bootstrap";
 import { checkAndCreatePrefLink, getDefaultFolder, getPrefLink, recordDefaultFolder } from "../services/SolidPod";
 import FolderPickerModal from "./FolderPickerModal";
 import ContentsList from "./ContentsList";
-import { getFileWithAccessDatasets } from "@inrupt/solid-client/dist/acp/acp";
+
 interface Props {
-    active : string;
+    active: string;
     creatorStatus: boolean;
-    setCreatorStatus: React.Dispatch<React.SetStateAction<boolean>>;
     newEntryCr: boolean;
+    setCreatorStatus: React.Dispatch<React.SetStateAction<boolean>>;
     setNewEntryCr: React.Dispatch<React.SetStateAction<boolean>>;
 }
-const FolderPickerOrContent = ({ active, creatorStatus, setCreatorStatus,newEntryCr,setNewEntryCr } : Props) => {
+
+// component that checks if the user has setup default folder and links to default folder
+// if the default folder is setup renders content based on the active state 
+// if the default folder is not setup, notifies user and suggest ot set it up
+// "defFolderStatus" checks if default folder was created (needed to call a rerender)
+
+const FolderPickerOrContent = ({ active, creatorStatus, newEntryCr, setCreatorStatus, setNewEntryCr }: Props) => {
+
     const [modalState, setModalState] = useState<boolean>(false);
     const { session, fetch } = useSession();
     const { webId } = session.info;
-    const [prefLink, setPrefLink] = useState<string | null>("");
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [defFolderUrlToUp, setDefFolderUrlToUp] = useState("");
     const [defFolderStatus, setDefFolderStatus] = useState<boolean>(false);
     const [defFolderUrl, setDefFolderUrl] = useState<string>("");
-    
-    // const [defaultFolderUrlValue, setDefaultFolderUrlValue] = useState(false);
+
     useEffect(() => {
         setIsLoading(true);
         async function checkDef() {
             const defFolderUpd = await getDefaultFolder(webId ?? "", fetch);
-            //console.log(`this is def folder: ${defFolderUpd}`);
             if (defFolderUpd !== null) {
                 setDefFolderUrl(defFolderUpd);
                 setDefFolderStatus(true);
             }
             setIsLoading(false);
-            //setNewEntryCr(false);
         }
         async function fetchData() {
             await recordDefaultFolder(webId ?? "", fetch, defFolderUrlToUp);
@@ -44,8 +47,8 @@ const FolderPickerOrContent = ({ active, creatorStatus, setCreatorStatus,newEntr
             fetchData();
         }
         checkDef();
-        //setIsLoading(false);
     }, [defFolderUrlToUp, defFolderUrl]);
+
     if (isLoading) {
         return (
             <Spinner animation="border" role="status">
@@ -57,14 +60,14 @@ const FolderPickerOrContent = ({ active, creatorStatus, setCreatorStatus,newEntr
         if (defFolderStatus) {
             //case for when def folder exists
             // might need to move this part in ContentList, depends on further
-            switch (active){
+            switch (active) {
                 case "habits":
-                case  "notes":
-                    return (<ContentsList active={active} creatorStatus={creatorStatus} 
+                case "notes":
+                    return (<ContentsList active={active} creatorStatus={creatorStatus}
                         setCreatorStatus={setCreatorStatus}
                         newEntryCr={newEntryCr}
                         setNewEntryCr={setNewEntryCr}
-                        />);
+                    />);
                     break;
                 default:
                     return (<div>Error</div>);
@@ -76,10 +79,10 @@ const FolderPickerOrContent = ({ active, creatorStatus, setCreatorStatus,newEntr
                     <div className="card-body ">
                         <h5 className="card-title">No default folder selected</h5>
                         <p className="card-text">Please pick a default folder, where your notes will be stored</p>
-                        <a  className="btn btn-primary" onClick={() => { setModalState(true) }}>Pick a folder</a>
+                        <a className="btn btn-primary" onClick={() => { setModalState(true) }}>Pick a folder</a>
                     </div>
                     <FolderPickerModal modalState={modalState} setModalState={setModalState} defFolderUrlToUp={defFolderUrlToUp} setDefFolderUrlToUp={setDefFolderUrlToUp}
-                    setDefFolderStatus={setDefFolderStatus} />
+                        setDefFolderStatus={setDefFolderStatus} />
                 </div>
 
             );

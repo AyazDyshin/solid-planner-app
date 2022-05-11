@@ -1,45 +1,24 @@
 import React, { useState } from "react";
 import "regenerator-runtime/runtime";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { LoginButton, useSession } from "@inrupt/solid-ui-react";
-import {
-  login,
-  getDefaultSession,
-} from "@inrupt/solid-client-authn-browser";
-import { Button, InputGroup, Dropdown, DropdownButton, FormControl, Form} from 'react-bootstrap';
+import { LoginButton } from "@inrupt/solid-ui-react";
+import { Button, InputGroup, Dropdown, DropdownButton, FormControl, Form } from 'react-bootstrap';
 
-interface Props {
-  
-}
+// Login page, Dropdown menu for the user to choose the issuer
+// The login functionality itself is done by LoginButton component from @inrupt/solid-ui-react
 const LogInPage = () => {
 
-  const [webId, setWebId] = useState<string | undefined>(getDefaultSession().info.webId);
   const [issuer, setIssuer] = useState<string>("https://");
-  const [resource, setResource] = useState<string | undefined>(webId);
-
-  function handleLogin(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-    // The default behaviour of the button is to resubmit.
-    // This prevents the page from reloading.
-    e.preventDefault();
-    // Login will redirect the user away so that they can log in the OIDC issuer,
-    // and back to the provided redirect URL (which should be controlled by your app).
-    login({
-      oidcIssuer: issuer,
-      redirectUrl: window.location.href,
-    });
-  };
 
   return (
     <div className="container">
-      
       <Form className="container w-50 px-5 pt-5 pb-5 border border-3 mt-5 rounded border-secondary shadow-lg">
-      <h3 className="display-3 text-center mb-5">Solid Planner App</h3>
+        <h3 className="display-3 text-center mb-5">Solid Planner App</h3>
         <InputGroup>
           <DropdownButton
             variant="outline-secondary"
             title="Choose a provider"
-            id="input-group-dropdown-1"
-          >
+            id="input-group-dropdown-1">
             <Dropdown.Item href="#" onClick={() => {
               setIssuer("https://inrupt.net")
             }}>inrupt.net</Dropdown.Item>
@@ -66,18 +45,15 @@ const LogInPage = () => {
         </InputGroup>
         <div className="d-grid gap-2 mt-2">
           <LoginButton
-          oidcIssuer={issuer}
-          redirectUrl={window.location.href}
-          onError={console.error}
-          ><Button className="w-100">Log in</Button></LoginButton>
-
+            oidcIssuer={issuer}
+            redirectUrl={window.location.href}
+            onError={console.error}>
+            <Button className="w-100">Log in</Button></LoginButton>
         </div>
       </Form>
     </div>
-
   )
 }
-
 
 export default LogInPage;
 

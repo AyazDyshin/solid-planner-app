@@ -7,14 +7,15 @@ interface Props {
     setModalState: React.Dispatch<React.SetStateAction<boolean>>;
     defFolderUrlToUp: string;
     setDefFolderUrlToUp: React.Dispatch<React.SetStateAction<string>>;
-    setDefFolderStatus : React.Dispatch<React.SetStateAction<boolean>>;
+    setDefFolderStatus: React.Dispatch<React.SetStateAction<boolean>>;
 }
-
-const FolderPickerModal = ({ modalState, setModalState, defFolderUrlToUp, setDefFolderUrlToUp,setDefFolderStatus }: Props) => {
+//a popup window to prompt user to pick a folder
+const FolderPickerModal = ({ modalState, setModalState, defFolderUrlToUp, setDefFolderUrlToUp, setDefFolderStatus }: Props) => {
     const { session } = useSession();
     const { webId } = session.info;
     const [input, setInput] = useState<string>("");
     const urlToShow = modifyWebId(webId ?? "Error, no webId");
+
     return (
         <Modal show={modalState}>
             <Modal.Header closeButton onClick={() => { setModalState(false) }}>

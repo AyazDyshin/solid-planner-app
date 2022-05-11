@@ -3,11 +3,12 @@ import ContentPageRender from "./ContentPageRender";
 interface Props {
     active: string;
 }
-const ContentToRender = ( {active} : Props ) => {
+// this component decides what to render based on "active" property ie clicked tab
+// while seems redundant at the moment will be useful once other tabs will be implemented
+const ContentToRender = ( { active } : Props ) => {
+
     switch (active){
         case "notes":
-            return (<ContentPageRender active={active}/>);
-            break;
         case "habits":
             return (<ContentPageRender active={active}/>);
         default:

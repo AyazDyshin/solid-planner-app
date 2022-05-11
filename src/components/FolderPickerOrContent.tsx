@@ -6,8 +6,10 @@ import FolderPickerModal from "./FolderPickerModal";
 import NotesList from "./NotesList";
 interface Props {
     active : string;
+    creatorStatus: boolean;
+    setCreatorStatus: React.Dispatch<React.SetStateAction<boolean>>;
 }
-const FolderPickerOrContent = ({active}:Props) => {
+const FolderPickerOrContent = ({ active, creatorStatus, setCreatorStatus } : Props) => {
     const [modalState, setModalState] = useState<boolean>(false);
     const { session, fetch } = useSession();
     const { webId } = session.info;
@@ -50,7 +52,7 @@ const FolderPickerOrContent = ({active}:Props) => {
         if (defFolderStatus) {
             switch (active){
                 case "notes":
-                    return (<NotesList />);
+                    return (<NotesList creatorStatus={creatorStatus} setCreatorStatus={setCreatorStatus}/>);
                     break;
                 case "habits":
                     return (<div> this doesn't exist yet</div>);

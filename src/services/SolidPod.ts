@@ -78,9 +78,7 @@ export const createDefFolder = async (defFolderUrl: string, fetch: fetcher) => {
 
 export const fetchAllNotes = async (webId: string, fetch: fetcher) => {
   const defFolder = await getDefaultFolder(webId, fetch);
-  console.log(defFolder);
   //handle
-  console.log(`${defFolder}notes.ttl`);
   const dataSet = await getSolidDataset(`${defFolder}notes.ttl`, {
     fetch: fetch
   });

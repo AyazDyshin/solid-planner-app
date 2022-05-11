@@ -4,7 +4,11 @@ import { useEffect, useState } from "react";
 import { Spinner } from "react-bootstrap";
 import { fetchAllNotes } from "../services/SolidPod";
 
-const NotesList = () => {
+interface Props {
+    creatorStatus: boolean;
+    setCreatorStatus: React.Dispatch<React.SetStateAction<boolean>>;
+}
+const NotesList = ( {creatorStatus, setCreatorStatus} : Props ) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -20,9 +24,9 @@ const NotesList = () => {
     }, []);
     if (isLoading) {
         return (
-        <Spinner animation="border" role="status">
-            <span className="visually-hidden">Loading...</span>
-        </Spinner>
+            <Spinner animation="border" role="status">
+                <span className="visually-hidden">Loading...</span>
+            </Spinner>
         )
     }
     else {
@@ -32,7 +36,7 @@ const NotesList = () => {
                     <div className="card-body">
                         <h5 className="card-title">You don't have any notes yet!</h5>
                         <p className="card-text">Let's fix this</p>
-                        <a className="btn btn-primary" onClick={() => { }}>create a note</a>
+                        <a className="btn btn-primary" onClick={() => {setCreatorStatus(true)}}>create a note</a>
                     </div>
                 </div>
             );

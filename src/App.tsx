@@ -5,8 +5,8 @@ import MainContent from "./components/MainContent";
 import { useSession } from "@inrupt/solid-ui-react";
 import { Spinner } from "react-bootstrap";
 const App: React.FC = () => {
-  const [logInStatus, setLogInStatus] = useState<boolean>(false);
-  const [isLoading, setLoading] = useState<boolean>(true);
+ // const [logInStatus, setLogInStatus] = useState<boolean>(false);
+// const [isLoading, setLoading] = useState<boolean>(true);
   const { session,sessionRequestInProgress } = useSession();
   const render = () => {
     if (sessionRequestInProgress) {

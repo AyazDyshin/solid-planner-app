@@ -7,8 +7,11 @@ import { fetchAllNotes } from "../services/SolidPod";
 interface Props {
     creatorStatus: boolean;
     setCreatorStatus: React.Dispatch<React.SetStateAction<boolean>>;
+    active: string;
+    newEntryCr: boolean;
+    setNewEntryCr: React.Dispatch<React.SetStateAction<boolean>>;
 }
-const NotesList = ( {creatorStatus, setCreatorStatus} : Props ) => {
+const ContentsList = ( { creatorStatus, setCreatorStatus,active,newEntryCr,setNewEntryCr } : Props ) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -19,9 +22,10 @@ const NotesList = ( {creatorStatus, setCreatorStatus} : Props ) => {
             const updNotesArray = await fetchAllNotes(webId ?? "", fetch);
             setNotesArray(updNotesArray);
             setIsLoading(false);
+            setNewEntryCr(false);
         }
         fetchData();
-    }, []);
+    }, [newEntryCr]);
     if (isLoading) {
         return (
             <Spinner animation="border" role="status">
@@ -34,9 +38,9 @@ const NotesList = ( {creatorStatus, setCreatorStatus} : Props ) => {
             return (
                 <div className="card text-center">
                     <div className="card-body">
-                        <h5 className="card-title">You don't have any notes yet!</h5>
+                        <h5 className="card-title">You don't have any {active} yet!</h5>
                         <p className="card-text">Let's fix this</p>
-                        <a className="btn btn-primary" onClick={() => {setCreatorStatus(true)}}>create a note</a>
+                        <a className="btn btn-primary" onClick={() => {setCreatorStatus(true)}}>create</a>
                     </div>
                 </div>
             );
@@ -49,4 +53,4 @@ const NotesList = ( {creatorStatus, setCreatorStatus} : Props ) => {
     }
 }
 
-export default NotesList;
+export default ContentsList;

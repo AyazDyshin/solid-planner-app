@@ -18,15 +18,19 @@ const ContentPageRender = ({active}:Props) => {
     const [defaultFolderUrlValue, setDefaultFolderUrlValue] = useState(false);
     const [creator, setCreator] = useState("");
     const [creatorStatus, setCreatorStatus] = useState<boolean>(false);
-        
+    const [newEntryCr, setNewEntryCr] = useState<boolean>(false);
         return (
             <div className="container-fluid">
                 <div className="row h-100">
                     <div className="col h-100 border border-5 border-end-0 d-flex justify-content-center align-items-center">
-                        <FolderPickerOrContent active={active} creatorStatus={creatorStatus} setCreatorStatus={setCreatorStatus}/>
+                        <FolderPickerOrContent active={active} creatorStatus={creatorStatus} 
+                        setCreatorStatus={setCreatorStatus}
+                        newEntryCr={newEntryCr}
+                        setNewEntryCr={setNewEntryCr}
+                        />
                     </div>
                     <div className="col h-100 border border-5">
-                        <CreatorToRender active={active} creatorStatus={creatorStatus}/>
+                        <CreatorToRender active={active} creatorStatus={creatorStatus} newEntryCr={newEntryCr} setNewEntryCr={setNewEntryCr}/>
                     </div>
                 </div>
             </div>

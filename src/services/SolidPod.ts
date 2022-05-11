@@ -1,8 +1,10 @@
 import { buildThing, createThing, getSolidDataset, getThing, getThingAll, getUrl, ThingPersisted, addUrl, setThing, saveSolidDatasetAt, createContainerAt, createSolidDataset } from '@inrupt/solid-client';
 import { pim } from '@inrupt/solid-client/dist/constants';
 import { useSession } from '@inrupt/solid-ui-react';
+import { RDF } from '@inrupt/vocab-common-rdf';
 import { solid, schema, space } from 'rdf-namespaces';
 import { dataset } from 'rdf-namespaces/dist/schema';
+import { Note } from '../components/types';
 
 type fetcher = ((input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>) & ((input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>);
 
@@ -13,7 +15,7 @@ export const modifyWebId = (webId: string): string => {
 }
 
 export const updUrlForFolder = (url: string) => {
-  if (url.charAt(url.length-1) !== '/') return url += '/'
+  if (url.charAt(url.length - 1) !== '/') return url += '/'
   return url;
 }
 export const getPrefLink = async (webId: string, fetch: fetcher) => {
@@ -68,12 +70,12 @@ export const getDefaultFolder = async (webId: string, fetch: fetcher): Promise<s
 }
 
 export const createDefFolder = async (defFolderUrl: string, fetch: fetcher) => {
-    saveSolidDatasetAt(`${updUrlForFolder(defFolderUrl)}notes.ttl`,createSolidDataset(), {
-      fetch : fetch
-    });
-    saveSolidDatasetAt(`${updUrlForFolder(defFolderUrl)}habits.ttl`,createSolidDataset(), {
-      fetch : fetch
-    });
+  saveSolidDatasetAt(`${updUrlForFolder(defFolderUrl)}notes.ttl`, createSolidDataset(), {
+    fetch: fetch
+  });
+  saveSolidDatasetAt(`${updUrlForFolder(defFolderUrl)}habits.ttl`, createSolidDataset(), {
+    fetch: fetch
+  });
 }
 
 export const fetchAllNotes = async (webId: string, fetch: fetcher) => {
@@ -83,5 +85,18 @@ export const fetchAllNotes = async (webId: string, fetch: fetcher) => {
     fetch: fetch
   });
   const allNotes = await getThingAll(dataSet);
-  return allNotes;  
+  return allNotes;
+}
+
+export const saveNote = async (webId: string, fetch: fetcher, note: Note) => {
+  const defFolder = await getDefaultFolder(webId, fetch);
+  const notesFolder = `${defFolder}notes.ttl`;
+  const newNote = buildThing(createThing({ name: `${Date.now()}` })).addUrl(RDF.type, "https://schema.org/TextDigitalDocument")
+    .addStringNoLocale("http://purl.org/dc/terms/title", note.title)
+    .addStringNoLocale("https://schema.org/text", note.content).build();
+  let dataSet = await getSolidDataset(notesFolder, {
+    fetch: fetch
+  });
+  dataSet = setThing(dataSet, newNote);
+  const updDataSet = saveSolidDatasetAt(notesFolder, dataSet, { fetch: fetch });
 }

@@ -4,15 +4,17 @@ import NoteCreator from "./NoteCreator";
 interface Props {
     active : string;
     creatorStatus: boolean;
+    newEntryCr: boolean;
+    setNewEntryCr: React.Dispatch<React.SetStateAction<boolean>>;
 }
-const CreatorToRender = ({active,creatorStatus} : Props) => {
+const CreatorToRender = ({active,creatorStatus,newEntryCr,setNewEntryCr} : Props) => {
     useEffect (() => {
         console.log(creatorStatus);
     }, [creatorStatus]);
     if (creatorStatus) {
     switch (active) {
         case "notes":
-        return (<NoteCreator />);
+        return (<NoteCreator newEntryCr={newEntryCr} setNewEntryCr={setNewEntryCr} />);
         break;
         case "habits":
         return (<div>Ooopps, not here yet</div>);

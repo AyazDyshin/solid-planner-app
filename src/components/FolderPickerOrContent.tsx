@@ -3,13 +3,16 @@ import { useEffect, useState } from "react";
 import { Spinner } from "react-bootstrap";
 import { checkAndCreatePrefLink, getDefaultFolder, getPrefLink, recordDefaultFolder } from "../services/SolidPod";
 import FolderPickerModal from "./FolderPickerModal";
-import NotesList from "./NotesList";
+import ContentsList from "./ContentsList";
+import { getFileWithAccessDatasets } from "@inrupt/solid-client/dist/acp/acp";
 interface Props {
     active : string;
     creatorStatus: boolean;
     setCreatorStatus: React.Dispatch<React.SetStateAction<boolean>>;
+    newEntryCr: boolean;
+    setNewEntryCr: React.Dispatch<React.SetStateAction<boolean>>;
 }
-const FolderPickerOrContent = ({ active, creatorStatus, setCreatorStatus } : Props) => {
+const FolderPickerOrContent = ({ active, creatorStatus, setCreatorStatus,newEntryCr,setNewEntryCr } : Props) => {
     const [modalState, setModalState] = useState<boolean>(false);
     const { session, fetch } = useSession();
     const { webId } = session.info;
@@ -18,6 +21,7 @@ const FolderPickerOrContent = ({ active, creatorStatus, setCreatorStatus } : Pro
     const [defFolderUrlToUp, setDefFolderUrlToUp] = useState("");
     const [defFolderStatus, setDefFolderStatus] = useState<boolean>(false);
     const [defFolderUrl, setDefFolderUrl] = useState<string>("");
+    
     // const [defaultFolderUrlValue, setDefaultFolderUrlValue] = useState(false);
     useEffect(() => {
         setIsLoading(true);
@@ -29,6 +33,7 @@ const FolderPickerOrContent = ({ active, creatorStatus, setCreatorStatus } : Pro
                 setDefFolderStatus(true);
             }
             setIsLoading(false);
+            //setNewEntryCr(false);
         }
         async function fetchData() {
             await recordDefaultFolder(webId ?? "", fetch, defFolderUrlToUp);
@@ -50,20 +55,20 @@ const FolderPickerOrContent = ({ active, creatorStatus, setCreatorStatus } : Pro
     }
     else {
         if (defFolderStatus) {
+            //case for when def folder exists
+            // might need to move this part in ContentList, depends on further
             switch (active){
-                case "notes":
-                    return (<NotesList creatorStatus={creatorStatus} setCreatorStatus={setCreatorStatus}/>);
-                    break;
                 case "habits":
-                    return (<div> this doesn't exist yet</div>);
+                case  "notes":
+                    return (<ContentsList active={active} creatorStatus={creatorStatus} 
+                        setCreatorStatus={setCreatorStatus}
+                        newEntryCr={newEntryCr}
+                        setNewEntryCr={setNewEntryCr}
+                        />);
+                    break;
                 default:
                     return (<div>Error</div>);
             }
-            // return (
-            //     <div>
-            //         YOU HAVE DEF FOLDER!!
-            //     </div>
-            // );
         }
         else {
             return (

@@ -8,7 +8,7 @@ import { SCHEMA_INRUPT, RDF } from '@inrupt/vocab-common-rdf';
 import { first } from 'lodash';
 import { space, vcard } from 'rdf-namespaces';
 import { pim } from '@inrupt/solid-client/dist/constants';
-import { getPrefLink, checkAndCreatePrefLink, recordDefaultFolder, fetchAllNotes } from '../services/SolidPod';
+import { getPrefLink, checkAndCreatePrefLink, recordDefaultFolder, fetchAllNotes, saveNote } from '../services/SolidPod';
 interface Props {
 
 }
@@ -24,6 +24,7 @@ const Test = () => {
     async function fetchData() {
       let heh = await fetchAllNotes(webId??"", fetch);
       console.log(heh);
+      //let note = await saveNote(webId??"", fetch, {id: null , title:"heh", content:"fgdsfshdh"});
     }
     fetchData();
   }, [])

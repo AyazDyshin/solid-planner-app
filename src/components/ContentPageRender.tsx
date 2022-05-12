@@ -1,6 +1,8 @@
+import { Thing } from "@inrupt/solid-client";
 import { useState } from "react";
 import CreatorToRender from "./CreatorToRender";
 import FolderPickerOrContent from "./FolderPickerOrContent";
+import ViewerToRender from "./ViewerToRender";
 
 interface Props {
     active: string;
@@ -16,19 +18,34 @@ const ContentPageRender = ({ active }: Props) => {
 
     const [creatorStatus, setCreatorStatus] = useState<boolean>(false);
     const [newEntryCr, setNewEntryCr] = useState<boolean>(false);
-
+    const [viewerStatus, setViewerStatus] = useState<boolean>(false);
+    const [thingToView, setThingToView] = useState<Thing | null>(null);
     return (
         <div className="container-fluid">
             <div className="row h-100">
-                <div className="col h-100 border border-5 border-end-0 d-flex justify-content-center align-items-center">
+                <div className="col h-100 border border-5 border-end-0 d-flex justify-content-center align-items-center p-0">
                     <FolderPickerOrContent active={active} creatorStatus={creatorStatus}
                         setCreatorStatus={setCreatorStatus}
                         newEntryCr={newEntryCr}
-                        setNewEntryCr={setNewEntryCr} />
+                        setNewEntryCr={setNewEntryCr}
+                        thingToView={thingToView}
+                        setThingToView={setThingToView}
+                        viewerStatus={viewerStatus}
+                        setViewerStatus={setViewerStatus} />
                 </div>
                 <div className="col h-100 border border-5">
                     <CreatorToRender active={active} creatorStatus={creatorStatus} newEntryCr={newEntryCr}
-                        setNewEntryCr={setNewEntryCr} />
+                        setNewEntryCr={setNewEntryCr}
+                        thingToView={thingToView}
+                        setThingToView={setThingToView}
+                        viewerStatus={viewerStatus}
+                        setViewerStatus={setViewerStatus} />
+                    <ViewerToRender active={active}
+                        thingToView={thingToView}
+                        setThingToView={setThingToView}
+                        viewerStatus={viewerStatus}
+                        setViewerStatus={setViewerStatus}
+                    />
                 </div>
             </div>
         </div>

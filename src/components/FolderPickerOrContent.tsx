@@ -4,6 +4,7 @@ import { Spinner } from "react-bootstrap";
 import { checkAndCreatePrefLink, getDefaultFolder, getPrefLink, recordDefaultFolder } from "../services/SolidPod";
 import FolderPickerModal from "./FolderPickerModal";
 import ContentsList from "./ContentsList";
+import { Thing } from "@inrupt/solid-client";
 
 interface Props {
     active: string;
@@ -11,6 +12,10 @@ interface Props {
     newEntryCr: boolean;
     setCreatorStatus: React.Dispatch<React.SetStateAction<boolean>>;
     setNewEntryCr: React.Dispatch<React.SetStateAction<boolean>>;
+    thingToView: Thing | null;
+    setThingToView: React.Dispatch<React.SetStateAction<Thing | null>>;
+    viewerStatus: boolean;
+    setViewerStatus: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 // component that checks if the user has setup default folder and links to default folder
@@ -18,7 +23,8 @@ interface Props {
 // if the default folder is not setup, notifies user and suggest ot set it up
 // "defFolderStatus" checks if default folder was created (needed to call a rerender)
 
-const FolderPickerOrContent = ({ active, creatorStatus, newEntryCr, setCreatorStatus, setNewEntryCr }: Props) => {
+const FolderPickerOrContent = ({ active, creatorStatus, newEntryCr, setCreatorStatus,
+    setNewEntryCr, thingToView, setThingToView, viewerStatus, setViewerStatus }: Props) => {
 
     const [modalState, setModalState] = useState<boolean>(false);
     const { session, fetch } = useSession();
@@ -67,6 +73,10 @@ const FolderPickerOrContent = ({ active, creatorStatus, newEntryCr, setCreatorSt
                         setCreatorStatus={setCreatorStatus}
                         newEntryCr={newEntryCr}
                         setNewEntryCr={setNewEntryCr}
+                        thingToView={thingToView}
+                        setThingToView={setThingToView}
+                        viewerStatus={viewerStatus}
+                        setViewerStatus={setViewerStatus}
                     />);
                     break;
                 default:

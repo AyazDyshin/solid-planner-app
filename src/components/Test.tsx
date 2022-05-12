@@ -23,7 +23,7 @@ const Test = () => {
   useEffect(() => {
     async function fetchData() {
       let heh = await fetchAllNotes(webId??"", fetch);
-      console.log(heh);
+      //console.log(heh);
       //let note = await saveNote(webId??"", fetch, {id: null , title:"heh", content:"fgdsfshdh"});
     }
     fetchData();

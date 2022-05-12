@@ -1,13 +1,22 @@
-import { buildThing, createThing, getSolidDataset, getThing, getThingAll, getUrl, ThingPersisted, addUrl, setThing, saveSolidDatasetAt, createContainerAt, createSolidDataset } from '@inrupt/solid-client';
+import { buildThing, createThing, getSolidDataset, getThing, getThingAll, getUrl, ThingPersisted, addUrl, setThing, saveSolidDatasetAt, createContainerAt, createSolidDataset, Thing, getInteger, getStringNoLocale } from '@inrupt/solid-client';
 import { pim } from '@inrupt/solid-client/dist/constants';
 import { useSession } from '@inrupt/solid-ui-react';
-import { RDF } from '@inrupt/vocab-common-rdf';
+import { DCTERMS, RDF } from '@inrupt/vocab-common-rdf';
 import { solid, schema, space } from 'rdf-namespaces';
 import { dataset } from 'rdf-namespaces/dist/schema';
 import { Note } from '../components/types';
 
 type fetcher = ((input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>) & ((input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>);
 
+export const thingToNote = (toChange: Thing): Note => {
+  const note: Note = {
+    id: getInteger(toChange, schema.identifier),
+    //handle
+    title: getStringNoLocale(toChange, DCTERMS.title)!,
+    content: getStringNoLocale(toChange, schema.text)!
+  };
+  return note;
+}
 export const modifyWebId = (webId: string): string => {
   const arr = webId.split("/");
   const updArr = [...arr.slice(0, 3)];
@@ -18,6 +27,7 @@ export const updUrlForFolder = (url: string) => {
   if (url.charAt(url.length - 1) !== '/') return url += '/'
   return url;
 }
+
 export const getPrefLink = async (webId: string, fetch: fetcher) => {
   const dataSet = await getSolidDataset(webId, {
     fetch: fetch
@@ -89,14 +99,19 @@ export const fetchAllNotes = async (webId: string, fetch: fetcher) => {
 }
 
 export const saveNote = async (webId: string, fetch: fetcher, note: Note) => {
+
   const defFolder = await getDefaultFolder(webId, fetch);
   const notesFolder = `${defFolder}notes.ttl`;
-  const newNote = buildThing(createThing({ name: `${Date.now()}` })).addUrl(RDF.type, "https://schema.org/TextDigitalDocument")
-    .addStringNoLocale("http://purl.org/dc/terms/title", note.title)
-    .addStringNoLocale("https://schema.org/text", note.content).build();
   let dataSet = await getSolidDataset(notesFolder, {
     fetch: fetch
   });
-  dataSet = setThing(dataSet, newNote);
-  const updDataSet = saveSolidDatasetAt(notesFolder, dataSet, { fetch: fetch });
+
+    const id = note.id === null ? Date.now() : note.id;
+    const newNote = buildThing(createThing({ name: `${id}` })).addUrl(RDF.type, schema.TextDigitalDocument)
+      .addStringNoLocale(DCTERMS.title, note.title)
+      .addStringNoLocale(schema.text, note.content)
+      .addInteger(schema.identifier, id)
+      .build();
+    dataSet = setThing(dataSet, newNote);
+    const updDataSet = saveSolidDatasetAt(notesFolder, dataSet, { fetch: fetch });
 }

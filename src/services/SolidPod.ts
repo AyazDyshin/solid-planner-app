@@ -61,7 +61,7 @@ export const recordDefaultFolder = async (webId: string, fetch: fetcher, default
     fetch: fetch
   });
   let aThing = await getThing(dataSet, webId);
-  aThing = addUrl(aThing!, "https://ayazdyshin.inrupt.net/public/plannerAppVocab.ttl#defaultFolder", updUrlForFolder(defaultFolderPath));
+  aThing = addUrl(aThing!, "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#defaultFolder", updUrlForFolder(defaultFolderPath));
   dataSet = setThing(dataSet, aThing);
   createDefFolder(defaultFolderPath, fetch);
   const updDataSet = saveSolidDatasetAt(prefFileLocation!, dataSet, { fetch: fetch });
@@ -75,7 +75,7 @@ export const getDefaultFolder = async (webId: string, fetch: fetcher): Promise<s
   });
   let aThing = await getThing(dataSet, webId);
   //handle
-  let defFolderUrl = await getUrl(aThing!, "https://ayazdyshin.inrupt.net/public/plannerAppVocab.ttl#defaultFolder");
+  let defFolderUrl = await getUrl(aThing!, "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#defaultFolder");
   return defFolderUrl;
 }
 

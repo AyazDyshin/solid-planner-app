@@ -10,7 +10,6 @@ interface Props {
 // clicking on the links sets "active" to the links value
 // logout functionality is implemented using "LogoutButton" component from @inrupt/solid-ui-react
 const Navbar = ({ links, active, setActive }: Props) => {
-
     const onError = (error: Error) => {
         console.log(error);
     }
@@ -27,7 +26,6 @@ const Navbar = ({ links, active, setActive }: Props) => {
                                 e.preventDefault();
                                 setActive(link)
                             }}
-
                         >{link}</a>
                     ))}
                     <LogoutButton onError={onError} >

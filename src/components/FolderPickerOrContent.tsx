@@ -19,15 +19,12 @@ interface Props {
     isEdit: boolean;
     setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
 }
-
 // component that checks if the user has setup default folder and links to default folder
 // if the default folder is setup renders content based on the active state 
 // if the default folder is not setup, notifies user and suggest ot set it up
 // "defFolderStatus" checks if default folder was created (needed to call a rerender)
-
 const FolderPickerOrContent = ({ active, creatorStatus, newEntryCr, setCreatorStatus,
     setNewEntryCr, thingToView, setThingToView, viewerStatus, setViewerStatus, isEdit, setIsEdit }: Props) => {
-
     const [modalState, setModalState] = useState<boolean>(false);
     const { session, fetch } = useSession();
     const { webId } = session.info;

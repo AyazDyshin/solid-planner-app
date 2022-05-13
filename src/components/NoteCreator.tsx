@@ -19,6 +19,9 @@ interface Props {
 //component of creation and saving a note the user's pod
 const NoteCreator = ({ newEntryCr, setNewEntryCr, thingToView,
     setThingToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, setCreatorStatus }: Props) => {
+    const { session, fetch } = useSession();
+    const { webId } = session.info;
+    const [NoteInp, setNoteInp] = useState<Note>({ id: null, title: "", content: "" });
 
     useEffect(() => {
         if (viewerStatus) {
@@ -31,13 +34,9 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, thingToView,
         }
     }, [viewerStatus, thingToView]);
 
-    const { session, fetch } = useSession();
-    const { webId } = session.info;
-    const [NoteInp, setNoteInp] = useState<Note>({ id: null, title: "", content: "" });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setNoteInp(prevState => ({ ...prevState, [e.target.name]: e.target.value }))
-        console.log(NoteInp);
     };
 
     const handleSave = () => {
@@ -60,6 +59,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, thingToView,
         setViewerStatus(false);
         setCreatorStatus(false);
     }
+
     return (
         <div>
             <div className="h-100">
@@ -83,7 +83,6 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, thingToView,
                     onChange={handleChange}
                 />
             </div>
-
         </div>
     )
 }

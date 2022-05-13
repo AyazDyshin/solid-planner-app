@@ -17,6 +17,7 @@ export const thingToNote = (toChange: Thing): Note => {
   };
   return note;
 }
+
 export const modifyWebId = (webId: string): string => {
   const arr = webId.split("/");
   const updArr = [...arr.slice(0, 3)];
@@ -99,7 +100,6 @@ export const fetchAllNotes = async (webId: string, fetch: fetcher) => {
 }
 
 export const saveNote = async (webId: string, fetch: fetcher, note: Note) => {
-
   const defFolder = await getDefaultFolder(webId, fetch);
   const notesFolder = `${defFolder}notes.ttl`;
   let dataSet = await getSolidDataset(notesFolder, {

@@ -16,13 +16,14 @@ interface Props {
   isEdit: boolean;
   setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
 }
+
 const NotesList = ({ notesArray, setNotesArray, thingToView, setThingToView,
   viewerStatus, setViewerStatus, setCreatorStatus, isEdit, setIsEdit }: Props) => {
   const { session, fetch } = useSession();
   const { webId } = session.info;
   const [activeNote, setActiveNote] = useState<number | null>(null);
   const [saveModalState, setSaveModalState] = useState<boolean>(false);
-  //  console.log(getInteger(notesArray[0],schema.identifier));
+
   const handleCreate = () => {
     if (isEdit) {
       setSaveModalState(true);
@@ -32,6 +33,7 @@ const NotesList = ({ notesArray, setNotesArray, thingToView, setThingToView,
       setCreatorStatus(true);
     }
   }
+
   return (
     <div className="list-group w-100 h-100">
       {
@@ -52,8 +54,8 @@ const NotesList = ({ notesArray, setNotesArray, thingToView, setThingToView,
       }
       <a className="btn btn-primary" onClick={handleCreate}>create</a>
       <SaveModal saveModalState={saveModalState} setSaveModalState={setSaveModalState}
-       setCreatorStatus={setCreatorStatus}
-       setViewerStatus={setViewerStatus}/>
+        setCreatorStatus={setCreatorStatus}
+        setViewerStatus={setViewerStatus} />
     </div>
   )
 }

@@ -20,7 +20,6 @@ const CreatorToRender = ({ active, creatorStatus, newEntryCr, setNewEntryCr,
     thingToView, setThingToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, setCreatorStatus }: Props) => {
 
     useEffect(() => {
-
     }, [creatorStatus, viewerStatus]);
 
     if (creatorStatus || viewerStatus) {

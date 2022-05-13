@@ -18,6 +18,7 @@ interface Props {
     isEdit: boolean;
     setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
 }
+
 const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, setNewEntryCr,
     thingToView, setThingToView, viewerStatus, setViewerStatus, isEdit, setIsEdit }: Props) => {
     const { session, fetch } = useSession();
@@ -36,11 +37,8 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
             setNewEntryCr(false);
         }
         fetchData();
-        if (notesArray.length !== 0) {
-            console.log("here");
-        }
-
     }, [newEntryCr]);
+
     if (isLoading) {
         return (
             <Spinner animation="border" role="status">

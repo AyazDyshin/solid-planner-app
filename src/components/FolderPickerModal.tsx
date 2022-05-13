@@ -2,6 +2,7 @@ import { useSession } from "@inrupt/solid-ui-react";
 import { useState } from "react";
 import { Modal, Button, Form, FormControl, InputGroup } from "react-bootstrap";
 import { modifyWebId } from "../services/SolidPod";
+
 interface Props {
     modalState: boolean;
     setModalState: React.Dispatch<React.SetStateAction<boolean>>;
@@ -11,6 +12,7 @@ interface Props {
 }
 //a popup window to prompt user to pick a folder
 const FolderPickerModal = ({ modalState, setModalState, defFolderUrlToUp, setDefFolderUrlToUp, setDefFolderStatus }: Props) => {
+
     const { session } = useSession();
     const { webId } = session.info;
     const [input, setInput] = useState<string>("");

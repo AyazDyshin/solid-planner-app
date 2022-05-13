@@ -2,6 +2,7 @@ import { useSession } from "@inrupt/solid-ui-react";
 import { useState } from "react";
 import { Modal, Button, Form, FormControl, InputGroup } from "react-bootstrap";
 import { modifyWebId } from "../services/SolidPod";
+
 interface Props {
     saveModalState: boolean;
     setSaveModalState: React.Dispatch<React.SetStateAction<boolean>>;
@@ -9,7 +10,7 @@ interface Props {
     setViewerStatus: React.Dispatch<React.SetStateAction<boolean>>;
 }
 //a popup window to prompt user to pick a folder
-const SaveModal = ({ saveModalState, setSaveModalState, setCreatorStatus,setViewerStatus }: Props) => {
+const SaveModal = ({ saveModalState, setSaveModalState, setCreatorStatus, setViewerStatus }: Props) => {
     const { session } = useSession();
     const { webId } = session.info;
     const [input, setInput] = useState<string>("");
@@ -31,4 +32,5 @@ const SaveModal = ({ saveModalState, setSaveModalState, setCreatorStatus,setView
         </Modal>
     );
 }
+
 export default SaveModal;

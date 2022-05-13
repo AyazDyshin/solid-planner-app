@@ -6,7 +6,6 @@ import { useSession } from "@inrupt/solid-ui-react";
 import { Spinner } from "react-bootstrap";
 
 const App: React.FC = () => {
-
   const { session, sessionRequestInProgress } = useSession();
 
   const render = () => {

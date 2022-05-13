@@ -3,11 +3,9 @@ import "regenerator-runtime/runtime";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { LoginButton } from "@inrupt/solid-ui-react";
 import { Button, InputGroup, Dropdown, DropdownButton, FormControl, Form } from 'react-bootstrap';
-
 // Login page, Dropdown menu for the user to choose the issuer
 // The login functionality itself is done by LoginButton component from @inrupt/solid-ui-react
 const LogInPage = () => {
-
   const [issuer, setIssuer] = useState<string>("https://");
 
   return (

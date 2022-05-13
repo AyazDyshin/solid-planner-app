@@ -2,7 +2,6 @@ import { Thing } from "@inrupt/solid-client";
 import { useState } from "react";
 import CreatorToRender from "./CreatorToRender";
 import FolderPickerOrContent from "./FolderPickerOrContent";
-import ViewerToRender from "./ViewerToRender";
 
 interface Props {
     active: string;
@@ -20,6 +19,8 @@ const ContentPageRender = ({ active }: Props) => {
     const [newEntryCr, setNewEntryCr] = useState<boolean>(false);
     const [viewerStatus, setViewerStatus] = useState<boolean>(false);
     const [thingToView, setThingToView] = useState<Thing | null>(null);
+    const [isEdit, setIsEdit] = useState(false);
+
     return (
         <div className="container-fluid">
             <div className="row h-100">
@@ -31,7 +32,9 @@ const ContentPageRender = ({ active }: Props) => {
                         thingToView={thingToView}
                         setThingToView={setThingToView}
                         viewerStatus={viewerStatus}
-                        setViewerStatus={setViewerStatus} />
+                        setViewerStatus={setViewerStatus}
+                        isEdit={isEdit}
+                        setIsEdit={setIsEdit} />
                 </div>
                 <div className="col h-100 border border-5">
                     <CreatorToRender active={active} creatorStatus={creatorStatus} newEntryCr={newEntryCr}
@@ -39,13 +42,11 @@ const ContentPageRender = ({ active }: Props) => {
                         thingToView={thingToView}
                         setThingToView={setThingToView}
                         viewerStatus={viewerStatus}
-                        setViewerStatus={setViewerStatus} />
-                    <ViewerToRender active={active}
-                        thingToView={thingToView}
-                        setThingToView={setThingToView}
-                        viewerStatus={viewerStatus}
                         setViewerStatus={setViewerStatus}
-                    />
+                        isEdit={isEdit}
+                        setIsEdit={setIsEdit}
+                        setCreatorStatus={setCreatorStatus} />
+
                 </div>
             </div>
         </div>

@@ -16,6 +16,8 @@ interface Props {
     setThingToView: React.Dispatch<React.SetStateAction<Thing | null>>;
     viewerStatus: boolean;
     setViewerStatus: React.Dispatch<React.SetStateAction<boolean>>;
+    isEdit: boolean;
+    setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 // component that checks if the user has setup default folder and links to default folder
@@ -24,7 +26,7 @@ interface Props {
 // "defFolderStatus" checks if default folder was created (needed to call a rerender)
 
 const FolderPickerOrContent = ({ active, creatorStatus, newEntryCr, setCreatorStatus,
-    setNewEntryCr, thingToView, setThingToView, viewerStatus, setViewerStatus }: Props) => {
+    setNewEntryCr, thingToView, setThingToView, viewerStatus, setViewerStatus, isEdit, setIsEdit }: Props) => {
 
     const [modalState, setModalState] = useState<boolean>(false);
     const { session, fetch } = useSession();
@@ -77,6 +79,8 @@ const FolderPickerOrContent = ({ active, creatorStatus, newEntryCr, setCreatorSt
                         setThingToView={setThingToView}
                         viewerStatus={viewerStatus}
                         setViewerStatus={setViewerStatus}
+                        isEdit={isEdit}
+                        setIsEdit={setIsEdit}
                     />);
                     break;
                 default:

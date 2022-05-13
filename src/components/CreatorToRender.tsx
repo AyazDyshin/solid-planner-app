@@ -11,14 +11,17 @@ interface Props {
     setThingToView: React.Dispatch<React.SetStateAction<Thing | null>>;
     viewerStatus: boolean;
     setViewerStatus: React.Dispatch<React.SetStateAction<boolean>>;
+    isEdit: boolean;
+    setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
+    setCreatorStatus: React.Dispatch<React.SetStateAction<boolean>>;
 }
 // component that renders entry creator, based on the "active" value
 const CreatorToRender = ({ active, creatorStatus, newEntryCr, setNewEntryCr,
-    thingToView, setThingToView, viewerStatus, setViewerStatus }: Props) => {
+    thingToView, setThingToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, setCreatorStatus }: Props) => {
 
     useEffect(() => {
-        console.log(creatorStatus);
-    }, [creatorStatus]);
+
+    }, [creatorStatus, viewerStatus]);
 
     if (creatorStatus || viewerStatus) {
         switch (active) {
@@ -31,6 +34,9 @@ const CreatorToRender = ({ active, creatorStatus, newEntryCr, setNewEntryCr,
                         setThingToView={setThingToView}
                         viewerStatus={viewerStatus}
                         setViewerStatus={setViewerStatus}
+                        isEdit={isEdit}
+                        setIsEdit={setIsEdit}
+                        setCreatorStatus={setCreatorStatus}
                     />);
                 break;
             case "habits":

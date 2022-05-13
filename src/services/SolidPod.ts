@@ -1,4 +1,4 @@
-import { buildThing, createThing, getSolidDataset, getThing, getThingAll, getUrl, ThingPersisted, addUrl, setThing, saveSolidDatasetAt, createContainerAt, createSolidDataset, Thing, getInteger, getStringNoLocale } from '@inrupt/solid-client';
+import { buildThing, createThing, getSolidDataset, getThing, getThingAll, getUrl, ThingPersisted, addUrl, setThing, saveSolidDatasetAt, createContainerAt, createSolidDataset, Thing, getInteger, getStringNoLocale, removeThing } from '@inrupt/solid-client';
 import { pim } from '@inrupt/solid-client/dist/constants';
 import { useSession } from '@inrupt/solid-ui-react';
 import { DCTERMS, RDF } from '@inrupt/vocab-common-rdf';
@@ -106,12 +106,22 @@ export const saveNote = async (webId: string, fetch: fetcher, note: Note) => {
     fetch: fetch
   });
 
-    const id = note.id === null ? Date.now() : note.id;
-    const newNote = buildThing(createThing({ name: `${id}` })).addUrl(RDF.type, schema.TextDigitalDocument)
-      .addStringNoLocale(DCTERMS.title, note.title)
-      .addStringNoLocale(schema.text, note.content)
-      .addInteger(schema.identifier, id)
-      .build();
-    dataSet = setThing(dataSet, newNote);
-    const updDataSet = saveSolidDatasetAt(notesFolder, dataSet, { fetch: fetch });
+  const id = note.id === null ? Date.now() : note.id;
+  const newNote = buildThing(createThing({ name: `${id}` })).addUrl(RDF.type, schema.TextDigitalDocument)
+    .addStringNoLocale(DCTERMS.title, note.title)
+    .addStringNoLocale(schema.text, note.content)
+    .addInteger(schema.identifier, id)
+    .build();
+  dataSet = setThing(dataSet, newNote);
+  const updDataSet = saveSolidDatasetAt(notesFolder, dataSet, { fetch: fetch });
+}
+
+export const deleteNote = async (webId: string, fetch: fetcher, thing: Thing) => {
+  const defFolder = await getDefaultFolder(webId, fetch);
+  const notesFolder = `${defFolder}notes.ttl`;
+  let dataSet = await getSolidDataset(notesFolder, {
+    fetch: fetch
+  });
+  dataSet = removeThing(dataSet, thing);
+  const updDataSet = saveSolidDatasetAt(notesFolder, dataSet, { fetch: fetch });
 }

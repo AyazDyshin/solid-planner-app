@@ -15,9 +15,11 @@ interface Props {
     setThingToView: React.Dispatch<React.SetStateAction<Thing | null>>;
     viewerStatus: boolean;
     setViewerStatus: React.Dispatch<React.SetStateAction<boolean>>;
+    isEdit: boolean;
+    setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
 }
-const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, setNewEntryCr, 
-    thingToView, setThingToView, viewerStatus, setViewerStatus }: Props) => {
+const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, setNewEntryCr,
+    thingToView, setThingToView, viewerStatus, setViewerStatus, isEdit, setIsEdit }: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -55,13 +57,9 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
                             <h5 className="card-title">You don't have any {active} yet!</h5>
                             <p className="card-text">Let's fix this</p>
                             <a className="btn btn-primary" onClick={() => {
-                                //in case if note viewer was open and edit is active,
-                                // the edited content may not be saved, needs handling
-                                // might actually be redundant as this is the case when
-                                // notes don't exist => nothing to view
-                                 setCreatorStatus(true);
-                                 setViewerStatus(false);
-                                  }}>create</a>
+                                setCreatorStatus(true);
+                                setViewerStatus(false);
+                            }}>create</a>
                         </div>
                     </div>
                 );
@@ -74,7 +72,9 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
                         setThingToView={setThingToView}
                         viewerStatus={viewerStatus}
                         setViewerStatus={setViewerStatus}
-                        setCreatorStatus={setCreatorStatus} />
+                        setCreatorStatus={setCreatorStatus}
+                        isEdit={isEdit}
+                        setIsEdit={setIsEdit} />
                 )
             }
         }

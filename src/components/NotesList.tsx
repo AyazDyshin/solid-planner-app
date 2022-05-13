@@ -3,6 +3,7 @@ import { useSession } from "@inrupt/solid-ui-react";
 import { DCTERMS } from "@inrupt/vocab-common-rdf";
 import { schema } from "rdf-namespaces";
 import { useState } from "react";
+import SaveModal from "./SaveModal";
 
 interface Props {
   notesArray: Thing[];
@@ -12,14 +13,25 @@ interface Props {
   viewerStatus: boolean;
   setViewerStatus: React.Dispatch<React.SetStateAction<boolean>>;
   setCreatorStatus: React.Dispatch<React.SetStateAction<boolean>>;
+  isEdit: boolean;
+  setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
 }
 const NotesList = ({ notesArray, setNotesArray, thingToView, setThingToView,
-   viewerStatus, setViewerStatus,setCreatorStatus }: Props) => {
+  viewerStatus, setViewerStatus, setCreatorStatus, isEdit, setIsEdit }: Props) => {
   const { session, fetch } = useSession();
   const { webId } = session.info;
   const [activeNote, setActiveNote] = useState<number | null>(null);
+  const [saveModalState, setSaveModalState] = useState<boolean>(false);
   //  console.log(getInteger(notesArray[0],schema.identifier));
-
+  const handleCreate = () => {
+    if (isEdit) {
+      setSaveModalState(true);
+    }
+    else {
+      setViewerStatus(false);
+      setCreatorStatus(true);
+    }
+  }
   return (
     <div className="list-group w-100 h-100">
       {
@@ -29,6 +41,7 @@ const NotesList = ({ notesArray, setNotesArray, thingToView, setThingToView,
             className={`list-group-item list-group-item-action ${activeNote === getInteger(note, schema.identifier) ? 'active' : ''}`}
             onClick={(e) => {
               e.preventDefault();
+              setIsEdit(false);
               setActiveNote(getInteger(note, schema.identifier));
               setThingToView(note);
               setViewerStatus(true);
@@ -37,6 +50,10 @@ const NotesList = ({ notesArray, setNotesArray, thingToView, setThingToView,
           >{getStringNoLocale(note, DCTERMS.title)}</a>
         ))
       }
+      <a className="btn btn-primary" onClick={handleCreate}>create</a>
+      <SaveModal saveModalState={saveModalState} setSaveModalState={setSaveModalState}
+       setCreatorStatus={setCreatorStatus}
+       setViewerStatus={setViewerStatus}/>
     </div>
   )
 }

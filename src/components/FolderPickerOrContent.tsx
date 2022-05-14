@@ -31,28 +31,26 @@ const FolderPickerOrContent = ({ active, creatorStatus, newEntryCr, setCreatorSt
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [defFolderUrlToUp, setDefFolderUrlToUp] = useState("");
     const [defFolderStatus, setDefFolderStatus] = useState<boolean>(false);
-    const [defFolderUrl, setDefFolderUrl] = useState<string>("");
 
     useEffect(() => {
         setIsLoading(true);
         async function checkDef() {
             const defFolderUpd = await getDefaultFolder(webId ?? "", fetch);
             if (defFolderUpd !== null) {
-                setDefFolderUrl(defFolderUpd);
                 setDefFolderStatus(true);
             }
             setIsLoading(false);
         }
         async function fetchData() {
             await recordDefaultFolder(webId ?? "", fetch, defFolderUrlToUp);
-            await setDefFolderUrl(defFolderUrlToUp);
+            setDefFolderStatus(true);
             setIsLoading(false);
         }
         if (defFolderUrlToUp !== "") {
             fetchData();
         }
         checkDef();
-    }, [defFolderUrlToUp, defFolderUrl]);
+    }, [defFolderUrlToUp]);
 
     if (isLoading) {
         return (

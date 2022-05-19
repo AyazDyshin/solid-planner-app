@@ -6,8 +6,8 @@ import { useState } from "react";
 import SaveModal from "./SaveModal";
 
 interface Props {
-  notesArray: Thing[];
-  setNotesArray: React.Dispatch<React.SetStateAction<Thing[]>>;
+  notesArray: (Thing | null)[];
+  setNotesArray: React.Dispatch<React.SetStateAction<(Thing | null)[]>>;
   thingToView: Thing | null;
   setThingToView: React.Dispatch<React.SetStateAction<Thing | null>>;
   viewerStatus: boolean;
@@ -37,20 +37,22 @@ const NotesList = ({ notesArray, setNotesArray, thingToView, setThingToView,
   return (
     <div className="list-group w-100 h-100">
       {
-        notesArray.map((note) => (
-          <a
-            key={`${getInteger(note, schema.identifier)}${Date.now()}`}
-            className={`list-group-item list-group-item-action ${activeNote === getInteger(note, schema.identifier) ? 'active' : ''}`}
-            onClick={(e) => {
-              e.preventDefault();
-              setIsEdit(false);
-              setActiveNote(getInteger(note, schema.identifier));
-              setThingToView(note);
-              setViewerStatus(true);
-              setCreatorStatus(false);
-            }}
-          >{getStringNoLocale(note, DCTERMS.title)}</a>
-        ))
+        notesArray.map((note) => {
+          if (note) {
+            return <a
+              key={`${getInteger(note, schema.identifier)}${Date.now()}`}
+              className={`list-group-item list-group-item-action ${activeNote === getInteger(note, schema.identifier) ? 'active' : ''}`}
+              onClick={(e) => {
+                e.preventDefault();
+                setIsEdit(false);
+                setActiveNote(getInteger(note, schema.identifier));
+                setThingToView(note);
+                setViewerStatus(true);
+                setCreatorStatus(false);
+              }}
+            >{getStringNoLocale(note, DCTERMS.title)}</a>
+          }
+        })
       }
       <a className="btn btn-primary" onClick={handleCreate}>create</a>
       <SaveModal saveModalState={saveModalState} setSaveModalState={setSaveModalState}

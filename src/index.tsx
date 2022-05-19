@@ -6,7 +6,8 @@ const container = document.getElementById('root');
 const root = createRoot(container!);
 root.render(
     <SessionProvider
-    restorePreviousSession>
+        restorePreviousSession
+    >
         <App />
     </SessionProvider>
 );

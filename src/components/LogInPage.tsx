@@ -7,7 +7,7 @@ import { Button, InputGroup, Dropdown, DropdownButton, FormControl, Form } from 
 // The login functionality itself is done by LoginButton component from @inrupt/solid-ui-react
 const LogInPage = () => {
   const [issuer, setIssuer] = useState<string>("https://");
-
+  
   return (
     <div className="container">
       <Form className="container w-50 px-5 pt-5 pb-5 border border-3 mt-5 rounded border-secondary shadow-lg">
@@ -45,7 +45,7 @@ const LogInPage = () => {
           <LoginButton
             oidcIssuer={issuer}
             redirectUrl={window.location.href}
-            onError={console.error}>
+          >
             <Button className="w-100">Log in</Button></LoginButton>
         </div>
       </Form>

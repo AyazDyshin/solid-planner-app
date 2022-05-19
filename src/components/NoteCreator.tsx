@@ -2,7 +2,7 @@ import { Thing } from "@inrupt/solid-client";
 import { useSession } from "@inrupt/solid-ui-react";
 import { useEffect, useState } from "react";
 import { InputGroup, FormControl, Button, ButtonGroup } from "react-bootstrap";
-import { deleteNote, saveNote, thingToNote } from "../services/SolidPod";
+import { deleteNote, editNote, saveNote, thingToNote } from "../services/SolidPod";
 import { Note } from "./types";
 
 interface Props {
@@ -15,18 +15,20 @@ interface Props {
     isEdit: boolean;
     setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
     setCreatorStatus: React.Dispatch<React.SetStateAction<boolean>>;
+    creatorStatus: boolean;
 }
 //component of creation and saving a note the user's pod
 const NoteCreator = ({ newEntryCr, setNewEntryCr, thingToView,
-    setThingToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, setCreatorStatus }: Props) => {
+    setThingToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, setCreatorStatus,creatorStatus }: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
     const [NoteInp, setNoteInp] = useState<Note>({ id: null, title: "", content: "" });
+    const [arrOfChanges, setArrOfChanges] = useState<string[]>([]);
 
     useEffect(() => {
         if (viewerStatus) {
             // handle 
-            setNoteInp(thingToNote(thingToView!));
+            setNoteInp(thingToNote(thingToView!)!);
         }
         else {
             setNoteInp({ id: null, title: "", content: "" });
@@ -36,16 +38,25 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, thingToView,
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setNoteInp(prevState => ({ ...prevState, [e.target.name]: e.target.value }))
-    };
+        setNoteInp(prevState => ({ ...prevState, [e.target.name]: e.target.value }));
+        if (!arrOfChanges.includes(e.target.name)) {
+            setArrOfChanges((prevState) => ([...prevState, e.target.name]));
+        }
 
+    };
     const handleSave = () => {
-        saveNote(webId ?? "", fetch, NoteInp);
+        if (creatorStatus) {
+            saveNote(webId ?? "", fetch, NoteInp);
+        }
+        else if (arrOfChanges.length !== 0){
+            editNote(webId ?? "", fetch, NoteInp, arrOfChanges);
+        }
         setNoteInp({ id: null, title: "", content: "" });
         setNewEntryCr(true);
         setIsEdit(false);
         setViewerStatus(false);
         setCreatorStatus(false);
+        setArrOfChanges([]);
     };
 
     const handleEdit = () => {

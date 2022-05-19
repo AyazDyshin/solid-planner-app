@@ -35,6 +35,7 @@ const CreatorToRender = ({ active, creatorStatus, newEntryCr, setNewEntryCr,
                         setViewerStatus={setViewerStatus}
                         isEdit={isEdit}
                         setIsEdit={setIsEdit}
+                        creatorStatus={creatorStatus}
                         setCreatorStatus={setCreatorStatus}
                     />);
                 break;

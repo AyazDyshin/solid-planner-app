@@ -1,7 +1,7 @@
 import { useSession } from "@inrupt/solid-ui-react";
 import { useEffect, useState } from "react";
-import { Spinner } from "react-bootstrap";
-import { checkAndCreatePrefLink, getDefaultFolder, getPrefLink, recordDefaultFolder } from "../services/SolidPod";
+import { Button, Spinner } from "react-bootstrap";
+import { checkAndCreatePrefLink, getDefaultFolder, getPrefLink, getStoragePref, modifyWebId, recordDefaultFolder } from "../services/SolidPod";
 import FolderPickerModal from "./FolderPickerModal";
 import ContentsList from "./ContentsList";
 import { Thing } from "@inrupt/solid-client";
@@ -29,27 +29,35 @@ const FolderPickerOrContent = ({ active, creatorStatus, newEntryCr, setCreatorSt
     const { session, fetch } = useSession();
     const { webId } = session.info;
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [defFolderUrlToUp, setDefFolderUrlToUp] = useState("");
+    const [defFolderUrlToUp, setDefFolderUrlToUp] = useState("SolidPlannerApp");
     const [defFolderStatus, setDefFolderStatus] = useState<boolean>(false);
+    const [storagePref, setStoragePref] = useState<string>("");
 
     useEffect(() => {
+        if (typeof webId !== "string") {
+            console.log("error webId doesn't exist");
+            return;
+        }
+        let urlToShow;
         setIsLoading(true);
-        async function checkDef() {
-            const defFolderUpd = await getDefaultFolder(webId ?? "", fetch);
-            if (defFolderUpd !== null) {
+        async function fetchData() {
+            if (typeof webId !== "string") {
+                console.log("error webId doesn't exist");
+                return;
+            }
+
+            const defFolderUpd = await getDefaultFolder(webId, fetch);
+            const updStoragePref = await getStoragePref(webId, fetch);
+
+            updStoragePref ? urlToShow = updStoragePref : urlToShow = modifyWebId(webId);
+            if (!defFolderUpd) {
+                await recordDefaultFolder(webId, fetch, `${urlToShow}${defFolderUrlToUp}`);
                 setDefFolderStatus(true);
             }
             setIsLoading(false);
         }
-        async function fetchData() {
-            await recordDefaultFolder(webId ?? "", fetch, defFolderUrlToUp);
-            setDefFolderStatus(true);
-            setIsLoading(false);
-        }
-        if (defFolderUrlToUp !== "") {
-            fetchData();
-        }
-        checkDef();
+
+        fetchData();
     }, [defFolderUrlToUp]);
 
     if (isLoading) {
@@ -60,44 +68,34 @@ const FolderPickerOrContent = ({ active, creatorStatus, newEntryCr, setCreatorSt
         )
     }
     else {
-        if (defFolderStatus) {
-            //case for when def folder exists
-            // might need to move this part in ContentList, depends on further
-            switch (active) {
-                case "habits":
-                case "notes":
-                    return (<ContentsList active={active} creatorStatus={creatorStatus}
-                        setCreatorStatus={setCreatorStatus}
-                        newEntryCr={newEntryCr}
-                        setNewEntryCr={setNewEntryCr}
-                        thingToView={thingToView}
-                        setThingToView={setThingToView}
-                        viewerStatus={viewerStatus}
-                        setViewerStatus={setViewerStatus}
-                        isEdit={isEdit}
-                        setIsEdit={setIsEdit}
-                    />);
-                    break;
-                default:
-                    return (<div>Error</div>);
-            }
-        }
-        else {
-            return (
-                <div className="card text-center">
-                    <div className="card-body ">
-                        <h5 className="card-title">No default folder selected</h5>
-                        <p className="card-text">Please pick a default folder, where your notes will be stored</p>
-                        <a className="btn btn-primary" onClick={() => { setModalState(true) }}>Pick a folder</a>
+        //case for when def folder exists
+        // might need to move this part in ContentList, depends on further
+        switch (active) {
+            case "habits":
+            case "notes":
+                return (
+                    <div className="w-100 h-100 d-flex align-items-center justify-content-center">
+                        <ContentsList active={active} creatorStatus={creatorStatus}
+                            setCreatorStatus={setCreatorStatus}
+                            newEntryCr={newEntryCr}
+                            setNewEntryCr={setNewEntryCr}
+                            thingToView={thingToView}
+                            setThingToView={setThingToView}
+                            viewerStatus={viewerStatus}
+                            setViewerStatus={setViewerStatus}
+                            isEdit={isEdit}
+                            setIsEdit={setIsEdit}
+                            setModalState={setModalState}
+                        />
+                        <FolderPickerModal modalState={modalState} setModalState={setModalState} defFolderUrlToUp={defFolderUrlToUp} setDefFolderUrlToUp={setDefFolderUrlToUp}
+                            setDefFolderStatus={setDefFolderStatus} />
                     </div>
-                    <FolderPickerModal modalState={modalState} setModalState={setModalState} defFolderUrlToUp={defFolderUrlToUp} setDefFolderUrlToUp={setDefFolderUrlToUp}
-                        setDefFolderStatus={setDefFolderStatus} />
-                </div>
-
-            );
+                );
+                break;
+            default:
+                return (<div>Error</div>);
         }
     }
-
 }
 
 export default FolderPickerOrContent;

@@ -17,28 +17,28 @@ interface Props {
     setViewerStatus: React.Dispatch<React.SetStateAction<boolean>>;
     isEdit: boolean;
     setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
+    setModalState: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, setNewEntryCr,
-    thingToView, setThingToView, viewerStatus, setViewerStatus, isEdit, setIsEdit }: Props) => {
+    thingToView, setThingToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, setModalState }: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [notesArray, setNotesArray] = useState<Thing[]>([]);
+    const [notesArray, setNotesArray] = useState<(Thing | null)[]>([]);
     const [habitsArray, setHabitsArray] = useState<Thing[]>([]);
 
     useEffect(() => {
-        setIsLoading(true);
         const fetchData = async () => {
             const updNotesArray = await fetchAllNotes(webId ?? "", fetch);
             // add fetch all habits here
             setNotesArray(updNotesArray);
-            setIsLoading(false);
             setNewEntryCr(false);
+            setIsLoading(false);
         }
         fetchData();
     }, [newEntryCr]);
-
+    
     if (isLoading) {
         return (
             <Spinner animation="border" role="status">
@@ -101,3 +101,5 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
 }
 
 export default ContentsList;
+
+{/* <Button onClick={() => { setModalState(true) }}>Change Default Folder</Button> */ }

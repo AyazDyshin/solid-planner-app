@@ -37,7 +37,9 @@ const ContentPageRender = ({ active }: Props) => {
                         setIsEdit={setIsEdit} />
                 </div>
                 <div className="col h-100 border border-5">
-                    <CreatorToRender active={active} creatorStatus={creatorStatus} newEntryCr={newEntryCr}
+                    <CreatorToRender active={active}
+                        creatorStatus={creatorStatus}
+                        newEntryCr={newEntryCr}
                         setNewEntryCr={setNewEntryCr}
                         thingToView={thingToView}
                         setThingToView={setThingToView}

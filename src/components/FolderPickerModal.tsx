@@ -32,7 +32,7 @@ const FolderPickerModal = ({ modalState, setModalState, defFolderUrlToUp, setDef
             <Modal.Footer>
                 <Button variant="secondary" value={input} onClick={() => setModalState(false)}>Close</Button>
                 <Button variant="primary" onClick={() => {
-                    setDefFolderUrlToUp(`${urlToShow}${input}`);
+                    setDefFolderUrlToUp(input);
                     setDefFolderStatus(true);
                     setModalState(false);
                 }}>Save changes</Button>

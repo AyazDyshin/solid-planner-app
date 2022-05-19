@@ -19,7 +19,7 @@ interface Props {
 }
 //component of creation and saving a note the user's pod
 const NoteCreator = ({ newEntryCr, setNewEntryCr, thingToView,
-    setThingToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, setCreatorStatus,creatorStatus }: Props) => {
+    setThingToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, setCreatorStatus, creatorStatus }: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
     const [NoteInp, setNoteInp] = useState<Note>({ id: null, title: "", content: "" });
@@ -44,15 +44,16 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, thingToView,
         }
 
     };
-    const handleSave = () => {
+    const handleSave = async () => {
         if (creatorStatus) {
-            saveNote(webId ?? "", fetch, NoteInp);
+            await saveNote(webId ?? "", fetch, NoteInp);
+            newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
         }
-        else if (arrOfChanges.length !== 0){
-            editNote(webId ?? "", fetch, NoteInp, arrOfChanges);
+        else if (arrOfChanges.length !== 0) {
+            await editNote(webId ?? "", fetch, NoteInp, arrOfChanges);
+            newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
         }
         setNoteInp({ id: null, title: "", content: "" });
-        setNewEntryCr(true);
         setIsEdit(false);
         setViewerStatus(false);
         setCreatorStatus(false);
@@ -63,9 +64,9 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, thingToView,
         isEdit ? setIsEdit(false) : setIsEdit(true);
     }
 
-    const handleDelete = () => {
-        deleteNote(webId ?? "", fetch, thingToView!);
-        setNewEntryCr(true);
+    const handleDelete = async () => {
+        await deleteNote(webId ?? "", fetch, thingToView!);
+        newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
         setIsEdit(false);
         setViewerStatus(false);
         setCreatorStatus(false);

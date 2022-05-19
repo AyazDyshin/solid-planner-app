@@ -28,17 +28,19 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
     const [notesArray, setNotesArray] = useState<(Thing | null)[]>([]);
     const [habitsArray, setHabitsArray] = useState<Thing[]>([]);
 
+    // this procs twice due to setting newentrycr to false inside
     useEffect(() => {
+        console.log(`we are in useEffect value of newEntryCr is: ${newEntryCr}`);
         const fetchData = async () => {
+
             const updNotesArray = await fetchAllNotes(webId ?? "", fetch);
             // add fetch all habits here
             setNotesArray(updNotesArray);
-            setNewEntryCr(false);
             setIsLoading(false);
         }
         fetchData();
     }, [newEntryCr]);
-    
+
     if (isLoading) {
         return (
             <Spinner animation="border" role="status">

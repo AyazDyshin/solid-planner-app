@@ -181,17 +181,22 @@ export const fetchAllNotes = async (webId: string, fetch: fetcher) => {
   const dataSet = await getSolidDataset(`${defFolder}notes/`, {
     fetch: fetch
   });
+  console.log("this is dataset");
+  console.log(dataSet);
   let allNotes = getContainedResourceUrlAll(dataSet);
+ // console.log(`these are allNotes in fetch:`);
+ // console.log(allNotes);
   let updArr = await Promise.all(allNotes.map(async (url) => {
     try {
-      let info = await getResourceInfo(url, {fetch : fetch});
-      console.log(info);
+      //let info = await getResourceInfo(url, {fetch : fetch});
       let newDs = await getSolidDataset(url, { fetch: fetch });
+      let newThing = getThing(newDs, url);
+      console.log(`just fetched : ${getStringNoLocale(newThing!, DCTERMS.title)}`);
       //handle 
       return getThing(newDs, url)!;
     }
     catch (error) {
-     // console.log("error is here:");
+      // console.log("error is here:");
       //console.log(error);
       return null;
     }
@@ -257,6 +262,7 @@ export const deleteNote = async (webId: string, fetch: fetcher, thing: Thing) =>
     fetch: fetch
   });
   await deleteSolidDataset(dataSet, { fetch: fetch });
+  console.log("note was deleted");
   //dataSet = removeThing(dataSet, thing);
   //const updDataSet = saveSolidDatasetAt(`${defFolder}notes/`, dataSet, { fetch: fetch });
 }

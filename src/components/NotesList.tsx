@@ -39,6 +39,7 @@ const NotesList = ({ notesArray, setNotesArray, thingToView, setThingToView,
       {
         notesArray.map((note) => {
           if (note) {
+           // console.log(`note ${getStringNoLocale(note, DCTERMS.title)} was created`);
             return <a
               key={`${getInteger(note, schema.identifier)}${Date.now()}`}
               className={`list-group-item list-group-item-action ${activeNote === getInteger(note, schema.identifier) ? 'active' : ''}`}

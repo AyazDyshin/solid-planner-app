@@ -6,8 +6,8 @@ import { useSession } from "@inrupt/solid-ui-react";
 import { Spinner } from "react-bootstrap";
 
 const App: React.FC = () => {
- const { session, sessionRequestInProgress } = useSession();
- 
+  const { session, sessionRequestInProgress } = useSession();
+
   const render = () => {
     // Checks if data loading is in progress
     if (sessionRequestInProgress) {
@@ -25,13 +25,13 @@ const App: React.FC = () => {
       if (!session.info.isLoggedIn) {
         //case for when user is not logged in
         return (
-            <LogInPage />
+          <LogInPage />
         );
       }
       //case for when the user is logged in
       else {
         return (
-         
+
           <MainContent />
         )
       }

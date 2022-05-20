@@ -10,7 +10,7 @@ const LogInPage = () => {
   
   return (
     <div className="container">
-      <h1>Testing gh-actions</h1>
+      <h1>Testing</h1>
       <Form className="container w-50 px-5 pt-5 pb-5 border border-3 mt-5 rounded border-secondary shadow-lg">
         <h3 className="display-3 text-center mb-5">Solid Planner App</h3>
         <InputGroup>

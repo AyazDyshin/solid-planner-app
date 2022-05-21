@@ -38,6 +38,7 @@ const NotesList = ({ notesArray, setNotesArray, thingToView, setThingToView,
     <div className="list-group w-100 h-100">
       {
         notesArray.map((note) => {
+  
           if (note) {
            // console.log(`note ${getStringNoLocale(note, DCTERMS.title)} was created`);
             return <a

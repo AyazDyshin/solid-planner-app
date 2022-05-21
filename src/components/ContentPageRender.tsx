@@ -2,7 +2,7 @@ import { Thing } from "@inrupt/solid-client";
 import { useState } from "react";
 import CreatorToRender from "./CreatorToRender";
 import FolderPickerOrContent from "./FolderPickerOrContent";
-
+import  "../styles.css";
 interface Props {
     active: string;
 }
@@ -22,7 +22,7 @@ const ContentPageRender = ({ active }: Props) => {
     const [isEdit, setIsEdit] = useState(false);
 
     return (
-        <div className="container-fluid">
+        <div className="container-fluid pad">
             <div className="row h-100">
                 <div className="col h-100 border border-5 border-end-0 d-flex justify-content-center align-items-center p-0">
                     <FolderPickerOrContent active={active} creatorStatus={creatorStatus}

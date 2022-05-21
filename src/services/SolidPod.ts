@@ -13,7 +13,8 @@ export const thingToNote = (toChange: Thing): Note | null => {
   let updTitle = getStringNoLocale(toChange, DCTERMS.title);
   let updContent = getStringNoLocale(toChange, schema.text);
   let updId = getInteger(toChange, schema.identifier);
-  if (updTitle === null || updContent === null || updId === null) {
+  let updCategory = getStringNoLocale(toChange,"http://dbpedia.org/ontology/category");
+  if (updTitle === null || updContent === null || updId === null || updCategory === null) {
     console.log("error, Thing provided have required fileds as null");
     return null;
   }
@@ -21,7 +22,8 @@ export const thingToNote = (toChange: Thing): Note | null => {
     id: updId,
     //handle
     title: updTitle,
-    content: updContent
+    content: updContent,
+    category: updCategory
   };
   return note;
 }
@@ -181,8 +183,6 @@ export const fetchAllNotes = async (webId: string, fetch: fetcher) => {
   const dataSet = await getSolidDataset(`${defFolder}notes/`, {
     fetch: fetch
   });
-  console.log("this is dataset");
-  console.log(dataSet);
   let allNotes = getContainedResourceUrlAll(dataSet);
  // console.log(`these are allNotes in fetch:`);
  // console.log(allNotes);
@@ -191,26 +191,14 @@ export const fetchAllNotes = async (webId: string, fetch: fetcher) => {
       //let info = await getResourceInfo(url, {fetch : fetch});
       let newDs = await getSolidDataset(url, { fetch: fetch });
       let newThing = getThing(newDs, url);
-      console.log(`just fetched : ${getStringNoLocale(newThing!, DCTERMS.title)}`);
       //handle 
       return getThing(newDs, url)!;
     }
     catch (error) {
-      // console.log("error is here:");
-      //console.log(error);
       return null;
     }
   }));
   return updArr;
-  //const allNotes = await getThingAll(dataSet);
-  //console.log("we are here");
-  //allNotes.shift();
-  //console.log(allNotes);
-  //console.log(allNotes[0]);
-  //let test = getStringNoLocale(allNotes[0], DCTERMS.title);
-  //console.log("thisss");
-  //console.log(test);
-  //let testThing = getThingAll(allNotes[0]);
 }
 
 export const saveNote = async (webId: string, fetch: fetcher, note: Note) => {
@@ -226,6 +214,7 @@ export const saveNote = async (webId: string, fetch: fetcher, note: Note) => {
     .addStringNoLocale(DCTERMS.title, note.title)
     .addStringNoLocale(schema.text, note.content)
     .addInteger(schema.identifier, id)
+    .addStringNoLocale("http://dbpedia.org/ontology/category", note.category)
     .build();
   dataSet = setThing(dataSet, newNote);
   const updDataSet = saveSolidDatasetAt(noteUrl, dataSet, { fetch: fetch });

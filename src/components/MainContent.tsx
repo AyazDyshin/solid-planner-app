@@ -6,7 +6,7 @@ import Test from "./Test";
 // Passes active and setActive hooks, which represent the currently clicked tab
 const MainContent = () => {
 
-  const links = ['notes', 'categories', 'habits'];
+  const links = ['notes', 'categories', 'habits', 'settings'];
   const [active, setActive] = useState("notes");
 
   return (

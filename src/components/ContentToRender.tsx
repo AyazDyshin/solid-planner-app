@@ -1,4 +1,5 @@
 import ContentPageRender from "./ContentPageRender";
+import SettingsPage from "./SettingsPage";
 
 interface Props {
     active: string;
@@ -11,6 +12,8 @@ const ContentToRender = ({ active }: Props) => {
         case "notes":
         case "habits":
             return (<ContentPageRender active={active} />);
+        case "settings":
+            return (<SettingsPage />);
         default:
             return (<div>Error</div>);
     }

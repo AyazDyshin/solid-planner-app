@@ -1,4 +1,4 @@
-import { buildThing, createThing, getSolidDataset, getThing, getThingAll, getUrl, ThingPersisted, addUrl, setThing, saveSolidDatasetAt, createContainerAt, createSolidDataset, Thing, getInteger, getStringNoLocale, removeThing, saveSolidDatasetInContainer, setUrl, getContainedResourceUrlAll, deleteSolidDataset, setStringNoLocale, getResourceInfo } from '@inrupt/solid-client';
+import { buildThing, createThing, getSolidDataset, getThing, getThingAll, getUrl, ThingPersisted, addUrl, setThing, saveSolidDatasetAt, createContainerAt, createSolidDataset, Thing, getInteger, getStringNoLocale, removeThing, saveSolidDatasetInContainer, setUrl, getContainedResourceUrlAll, deleteSolidDataset, setStringNoLocale, getResourceInfo, addStringNoLocale, isContainer, getContentType, addInteger } from '@inrupt/solid-client';
 import { pim } from '@inrupt/solid-client/dist/constants';
 import { useSession } from '@inrupt/solid-ui-react';
 import { DCTERMS, RDF } from '@inrupt/vocab-common-rdf';
@@ -9,18 +9,17 @@ import { Note } from '../components/types';
 type fetcher = ((input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>) & ((input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>);
 
 //function that transforms var of type Thing to var of Type Note
-export const thingToNote = (toChange: Thing): Note | null => {
-  let updTitle = getStringNoLocale(toChange, DCTERMS.title);
-  let updContent = getStringNoLocale(toChange, schema.text);
-  let updId = getInteger(toChange, schema.identifier);
-  let updCategory = getStringNoLocale(toChange,"http://dbpedia.org/ontology/category");
-  if (updTitle === null || updContent === null || updId === null || updCategory === null) {
-    console.log("error, Thing provided have required fileds as null");
+export const thingToNote = (toChange: Thing | null): Note | null => {
+  if (!toChange) {
     return null;
   }
+  let updTitle = getStringNoLocale(toChange, DCTERMS.title) ? getStringNoLocale(toChange, DCTERMS.title) : "";
+  let updContent = getStringNoLocale(toChange, schema.text) ? getStringNoLocale(toChange, schema.text) : "";
+  let updId = getInteger(toChange, schema.identifier) ? getInteger(toChange, schema.identifier) : Date.now() + Math.floor(Math.random() * 1000);
+  let updCategory = getStringNoLocale(toChange, "http://dbpedia.org/ontology/category");
+
   const note: Note = {
     id: updId,
-    //handle
     title: updTitle,
     content: updContent,
     category: updCategory
@@ -50,17 +49,20 @@ export const getPrefLink = async (webId: string, fetch: fetcher) => {
     });
   }
   catch (error) {
-    console.log(`error, couldn't fetch a dataset at: ${webId}`);
-    return;
+    throw new Error("Error when fetching a dataset containing user's profile/card#me");
   }
 
   const aThing = getThing(dataSet, webId);
   if (aThing) {
     const firstData = getUrl(aThing, space.preferencesFile);
-    return firstData;
+    if (firstData) {
+      return firstData;
+    }
+    throw new Error("a link to preferred storage folder is missing from your profile");
   }
-  console.log("error, user's profile/card#me doesn't exist");
-  return null;
+  else {
+    throw new Error("error when trying to get data of your profile/card#me, the data is missing");
+  }
 }
 
 //returns user's storage preference url
@@ -72,68 +74,115 @@ export const getStoragePref = async (webId: string, fetch: fetcher) => {
     });
   }
   catch (error) {
-    console.log("error couldn't fetch dataset at user's webId");
-    return;
+    throw new Error("error occurred when trying to fetch user's webId");
   }
 
-  let aThing;
-  try {
-    aThing = getThing(dataSet, webId);
-  }
-  catch (error) {
-    console.log("error couldn't fetch a thing from user's webId dataset");
-    return;
-  }
+  let aThing = getThing(dataSet, webId);
+
   if (aThing) {
     const firstData = getUrl(aThing, space.storage);
-    return firstData;
+    if (firstData) {
+      return firstData;
+    }
+    throw new Error("error, for some reason you webId profile does not contain info about your preferred storage location");
   }
-
-  console.log("error, user's profile/card#me doesn't exist");
-  return null;
-
+  else {
+    throw new Error("error, user's profile/card#me doesn't exist");
+  }
 }
-// creates a link to preference file in user's webId card #here
-export const createPrefLink = async (webId: string, fetch: fetcher) => {
+
+export const getPublicTypeIndexUrl = async (webId: string, fetch: fetcher) => {
   let dataSet;
-  dataSet = await getSolidDataset(webId, {
-    fetch: fetch
-  });
-  let aThing = getThing(dataSet, webId);
-  const urlToPrefs = `${modifyWebId(webId)}settings/prefs.ttl`;
-  aThing = addUrl(aThing!, space.preferencesFile, urlToPrefs);
-  dataSet = setThing(dataSet, aThing);
-  const updDataSet = saveSolidDatasetAt(webId, dataSet, { fetch: fetch });
-}
-
-export const checkAndCreatePrefLink = async (webId: string, fetch: fetcher) => {
-  const checkedPrefLink = await getPrefLink(webId, fetch);
-  if (!checkedPrefLink) {
-    createPrefLink(webId, fetch);
-  }
-}
-
-export const recordDefaultFolder = async (webId: string, fetch: fetcher, defaultFolderPath: string) => {
-  checkAndCreatePrefLink(webId, fetch);
-  const prefFileLocation = await getPrefLink(webId, fetch);
-  //handle
-  let dataSet = await getSolidDataset(prefFileLocation!, {
-    fetch: fetch
-  });
-
-  let aThing: ThingPersisted | null;
   try {
-    //handle
-    aThing = await getThing(dataSet, prefFileLocation!);
+    dataSet = await getSolidDataset(webId, {
+      fetch: fetch
+    });
   }
   catch (error) {
-    console.log("error getting a thing w");
+    throw new Error("error occurred when trying to fetch user's webId");
   }
+
+  let aThing = getThing(dataSet, webId);
+
+  if (aThing) {
+    const firstData = getUrl(aThing, solid.publicTypeIndex);
+    if (firstData) {
+      return firstData;
+    }
+    throw new Error("error, for some reason you webId profile does not contain a link to public type index folder");
+  }
+  else {
+    throw new Error("error, user's profile/card#me doesn't exist");
+  }
+}
+// creates a link to preference file in user's webId card #here
+// export const createPrefLink = async (webId: string, fetch: fetcher) => {
+//   let dataSet;
+//   dataSet = await getSolidDataset(webId, {
+//     fetch: fetch
+//   });
+//   let aThing = getThing(dataSet, webId);
+//   const urlToPrefs = `${modifyWebId(webId)}settings/prefs.ttl`;
+//   aThing = addUrl(aThing!, space.preferencesFile, urlToPrefs);
+//   dataSet = setThing(dataSet, aThing);
+//   const updDataSet = saveSolidDatasetAt(webId, dataSet, { fetch: fetch });
+// }
+
+// export const checkAndCreatePrefLink = async (webId: string, fetch: fetcher) => {
+//   const checkedPrefLink = await getPrefLink(webId, fetch);
+//   if (!checkedPrefLink) {
+//     createPrefLink(webId, fetch);
+//   }
+// }
+
+export const recordDefaultFolder = async (webId: string, fetch: fetcher) => {
+  //const defFolderUpd = await getDefaultFolder(webId, fetch);
+  const storagePref = await getStoragePref(webId, fetch);
+  let defaultFolderPath = `${storagePref}SolidPlannerApp`;
+  let notesPath = `${defaultFolderPath}/notes/`;
+  const prefFileLocation = await getPrefLink(webId, fetch);
   //handle
-  aThing = addUrl(aThing!, "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#defaultFolder", updUrlForFolder(defaultFolderPath));
+  let dataSet;
+  try {
+    dataSet = await getSolidDataset(prefFileLocation, {
+      fetch: fetch
+    });
+  }
+  catch (error) {
+    throw new Error("error when fetching preference file, it either doesn't exist, or has different location from the one specified in the webId");
+  }
+  let aThing = getThing(dataSet, prefFileLocation);
+  //handle
+  if (!aThing) {
+    throw new Error("preference file does not exist");
+  }
+
+  //handle
+  aThing = addUrl(aThing, "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#defaultFolder", updUrlForFolder(defaultFolderPath));
   dataSet = setThing(dataSet, aThing);
   createDefFolder(defaultFolderPath, fetch);
-  const updDataSet = saveSolidDatasetAt(prefFileLocation!, dataSet, { fetch: fetch });
+  const updDataSet = await saveSolidDatasetAt(prefFileLocation!, dataSet, { fetch: fetch });
+  await createEntriesInTypeIndex(webId, fetch, notesPath);
+}
+
+export const createEntriesInTypeIndex = async (webId: string, fetch: fetcher, url: string) => {
+  const pubicTypeIndexUrl = await getPublicTypeIndexUrl(webId, fetch);
+  let dataSet;
+  try {
+    dataSet = await getSolidDataset(pubicTypeIndexUrl, {
+      fetch: fetch
+    });
+  }
+  catch (error) {
+    throw new Error("error when fetching public type index file, it either doesn't exist, or has different location from the one specified in the webId");
+  }
+
+  let aThing = buildThing(createThing())
+    .addIri(solid.forClass, schema.TextDigitalDocument)
+    .addIri(solid.instance, url)
+    .build();
+  dataSet = setThing(dataSet, aThing);
+  const updDataSet = await saveSolidDatasetAt(pubicTypeIndexUrl, dataSet, { fetch: fetch });
 }
 
 export const getDefaultFolder = async (webId: string, fetch: fetcher): Promise<string | null> => {
@@ -149,17 +198,10 @@ export const getDefaultFolder = async (webId: string, fetch: fetcher): Promise<s
   let defFolderUrl = await getUrl(aThing!, "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#defaultFolder");
   return defFolderUrl;
 }
-export const testing = async (webId: string, fetch: fetcher) => {
-  const prefFileLocation = await getPrefLink(webId, fetch);
-  console.log("location");
-  console.log(prefFileLocation);
-
-
-}
 
 export const createDefFolder = async (defFolderUrl: string, fetch: fetcher) => {
   try {
-    createContainerAt(`${updUrlForFolder(defFolderUrl)}notes/`, {
+    await createContainerAt(`${updUrlForFolder(defFolderUrl)}notes/`, {
       fetch: fetch
     });
 
@@ -168,7 +210,7 @@ export const createDefFolder = async (defFolderUrl: string, fetch: fetcher) => {
     console.log("error when trying to create a folder for notes in specified folder");
   }
   try {
-    createContainerAt(`${updUrlForFolder(defFolderUrl)}habits/`, {
+    await createContainerAt(`${updUrlForFolder(defFolderUrl)}habits/`, {
       fetch: fetch
     });
   }
@@ -177,28 +219,50 @@ export const createDefFolder = async (defFolderUrl: string, fetch: fetcher) => {
   }
 }
 
+export const getAllNotesUrlFromPublicIndex = async (webId: string, fetch: fetcher) => {
+  const publicTypeIndexUrl = await getPublicTypeIndexUrl(webId, fetch);
+  const dataSet = await getSolidDataset(publicTypeIndexUrl, { fetch: fetch });
+  let allThing = getThingAll(dataSet);
+  let updThings = allThing.filter((thing) => getUrl(thing, solid.forClass) === schema.TextDigitalDocument)
+    .map((thing) => getUrl(thing, solid.instance)).filter((url) => url) as string[];
+  if (updThings === []) {
+    throw new Error("error, it seems like something deleted a reference to solid planner app's folder from you public type index files ");
+  }
+  return updThings;
+}
+
 export const fetchAllNotes = async (webId: string, fetch: fetcher) => {
-  const defFolder = await getDefaultFolder(webId, fetch);
-  //handle
-  const dataSet = await getSolidDataset(`${defFolder}notes/`, {
-    fetch: fetch
-  });
-  let allNotes = getContainedResourceUrlAll(dataSet);
- // console.log(`these are allNotes in fetch:`);
- // console.log(allNotes);
-  let updArr = await Promise.all(allNotes.map(async (url) => {
-    try {
-      //let info = await getResourceInfo(url, {fetch : fetch});
-      let newDs = await getSolidDataset(url, { fetch: fetch });
-      let newThing = getThing(newDs, url);
-      //handle 
-      return getThing(newDs, url)!;
+
+  let urlsArr = await getAllNotesUrlFromPublicIndex(webId, fetch);
+  let updUrlsArr = await Promise.all(urlsArr.map(async (url) => {
+    const data = await getSolidDataset(url, { fetch: fetch });
+    if (isContainer(data)) {
+      let allNotes = getContainedResourceUrlAll(data);
+      let updArr = await Promise.all(allNotes.map(async (url) => {
+        try {
+          let newDs = await getSolidDataset(url, { fetch: fetch });
+          let newThing = getThing(newDs, url);
+          return getThing(newDs, url)!;
+        }
+        catch (error) {
+          return null;
+        }
+      }));
+      return updArr;
     }
-    catch (error) {
-      return null;
+    else {
+      let arrOf = getThingAll(data);
+      arrOf.forEach((thing) => {
+        if (!getInteger(thing, schema.identifier)) {
+          let newThing = addInteger(thing, schema.identifier, Date.now() + Math.floor(Math.random() * 1000));
+          let newData = setThing(data, newThing);
+          const updDataSet = saveSolidDatasetAt(url, newData, { fetch: fetch });
+        }
+      });
+      return arrOf;
     }
   }));
-  return updArr;
+  return updUrlsArr.flat();
 }
 
 export const saveNote = async (webId: string, fetch: fetcher, note: Note) => {
@@ -208,14 +272,20 @@ export const saveNote = async (webId: string, fetch: fetcher, note: Note) => {
     fetch: fetch
   });
 
-  const id = note.id === null ? Date.now() : note.id;
+  const id = note.id === null ? Date.now() + Math.floor(Math.random() * 1000) : note.id;
   const noteUrl = `${notesFolder}${id}.ttl`;
-  const newNote = buildThing(createThing({ url: noteUrl })).addUrl(RDF.type, schema.TextDigitalDocument)
-    .addStringNoLocale(DCTERMS.title, note.title)
-    .addStringNoLocale(schema.text, note.content)
+  const titleUpd = note.title === null ? "" : note.title;
+  const contentUpd = note.content === null ? "" : note.content;
+
+  let newNote = buildThing(createThing({ url: noteUrl })).addUrl(RDF.type, schema.TextDigitalDocument)
+    .addStringNoLocale(DCTERMS.title, titleUpd)
+    .addStringNoLocale(schema.text, contentUpd)
     .addInteger(schema.identifier, id)
-    .addStringNoLocale("http://dbpedia.org/ontology/category", note.category)
     .build();
+  if (note.category) {
+    newNote = addStringNoLocale(newNote, "http://dbpedia.org/ontology/category", note.category);
+  }
+
   dataSet = setThing(dataSet, newNote);
   const updDataSet = saveSolidDatasetAt(noteUrl, dataSet, { fetch: fetch });
 }
@@ -224,34 +294,128 @@ export const editNote = async (webId: string, fetch: fetcher, note: Note, change
   const notesFolder = `${defFolder}notes/`;
   const noteId = note.id;
 
-  let dataSet = await getSolidDataset(`${notesFolder}${noteId}.ttl`, {
-    fetch: fetch
-  });
-  let thingToChange = getThing(dataSet, `${notesFolder}${noteId}.ttl`);
-  let newThing = thingToChange;
-  let updArr = changes.map((change) => {
-    switch (change) {
-      case "title":
-        newThing = setStringNoLocale(newThing!, DCTERMS.title, note.title);
-        break;
-      case "content":
-        newThing = setStringNoLocale(newThing!, schema.text, note.content);
+  // if (note.title === null || note.content === null) {
+  //   throw new Error("null value on note's title or note's content on edit");
+  // }
+
+
+  let urlsArr = await getAllNotesUrlFromPublicIndex(webId, fetch);
+  let updUrlsArr = await Promise.all(urlsArr.map(async (url) => {
+
+    const data = await getSolidDataset(url, { fetch: fetch });
+    if (isContainer(data)) {
+      let allNotes = getContainedResourceUrlAll(data);
+      let updArr = await Promise.all(allNotes.map(async (url) => {
+
+        let newDs = await getSolidDataset(url, { fetch: fetch });
+        let newThing = getThing(newDs, url);
+        if (newThing) {
+          let thingId = getInteger(newThing, schema.identifier);
+          if (thingId === note.id) {
+            let updArr = changes.map((change) => {
+              switch (change) {
+                case "title":
+                  newThing = setStringNoLocale(newThing!, DCTERMS.title, note.title!);
+                  break;
+                case "content":
+                  newThing = setStringNoLocale(newThing!, schema.text, note.content!);
+              }
+            });
+            //handle?
+            let updDataSet = setThing(newDs, newThing!);
+            const savedDataSet = await saveSolidDatasetAt(url, updDataSet,
+              { fetch: fetch });
+          }
+        }
+      }));
+      return updArr;
     }
-  });
-  let updDataSet = setThing(dataSet, newThing!);
-  const savedDataSet = await saveSolidDatasetAt(`${notesFolder}${noteId}.ttl`, updDataSet,
-    { fetch: fetch });
+    else {
+      let newThingArr = getThingAll(data);
+      if (newThingArr) {
+        newThingArr.forEach(async (newThing) => {
+          let thingId = getInteger(newThing, schema.identifier);
+          if (thingId === note.id) {
+            let updArr = changes.map((change) => {
+              switch (change) {
+                case "title":
+                  newThing = setStringNoLocale(newThing!, DCTERMS.title, note.title!);
+                  break;
+                case "content":
+                  newThing = setStringNoLocale(newThing!, schema.text, note.content!);
+              }
+            });
+            let updDataSet = setThing(data, newThing!);
+            await saveSolidDatasetAt(url, updDataSet, { fetch: fetch });
+          }
+        });
+
+      }
+    }
+  }));
+
+
+  // let dataSet = await getSolidDataset(`${notesFolder}${noteId}.ttl`, {
+  //   fetch: fetch
+  // });
+  // let thingToChange = getThing(dataSet, `${notesFolder}${noteId}.ttl`);
+  // let newThing = thingToChange;
+  // let updArr = changes.map((change) => {
+  //   switch (change) {
+  //     case "title":
+  //       newThing = setStringNoLocale(newThing!, DCTERMS.title, note.title!);
+  //       break;
+  //     case "content":
+  //       newThing = setStringNoLocale(newThing!, schema.text, note.content!);
+  //   }
+  // });
+  // let updDataSet = setThing(dataSet, newThing!);
+  // const savedDataSet = await saveSolidDatasetAt(`${notesFolder}${noteId}.ttl`, updDataSet,
+  //   { fetch: fetch });
 }
-export const deleteNote = async (webId: string, fetch: fetcher, thing: Thing) => {
-  const defFolder = await getDefaultFolder(webId, fetch);
-  const notesFolder = `${defFolder}notes/`;
-  const noteId = await getInteger(thing, schema.identifier);
-  //handle id is null
-  let dataSet = await getSolidDataset(`${notesFolder}${noteId}.ttl`, {
-    fetch: fetch
-  });
-  await deleteSolidDataset(dataSet, { fetch: fetch });
-  console.log("note was deleted");
-  //dataSet = removeThing(dataSet, thing);
-  //const updDataSet = saveSolidDatasetAt(`${defFolder}notes/`, dataSet, { fetch: fetch });
+
+export const deleteNote = async (webId: string, fetch: fetcher, id: number) => {
+  let urlsArr = await getAllNotesUrlFromPublicIndex(webId, fetch);
+  let updUrlsArr = await Promise.all(urlsArr.map(async (url) => {
+    const data = await getSolidDataset(url, { fetch: fetch });
+    if (isContainer(data)) {
+      let allNotes = getContainedResourceUrlAll(data);
+      let updArr = await Promise.all(allNotes.map(async (url) => {
+
+        let newDs = await getSolidDataset(url, { fetch: fetch });
+        let newThing = getThing(newDs, url);
+        if (newThing) {
+          let thingId = getInteger(newThing, schema.identifier);
+          if (thingId === id) {
+            await deleteSolidDataset(newDs, { fetch: fetch });
+          }
+        }
+      }));
+      return updArr;
+    }
+    else {
+      let newThingArr = getThingAll(data);
+      if (newThingArr) {
+        newThingArr.forEach(async (newThing) => {
+          let thingId = getInteger(newThing, schema.identifier);
+          if (thingId === id) {
+            console.log("and here");
+            let newData = removeThing(data, newThing);
+            await saveSolidDatasetAt(url, newData, { fetch: fetch });
+          }
+        });
+
+      }
+    }
+  }));
+
+  // const defFolder = await getDefaultFolder(webId, fetch);
+  // const notesFolder = `${defFolder}notes/`;
+  // const noteId = await getInteger(thing, schema.identifier);
+  // //handle id is null
+  // let dataSet = await getSolidDataset(`${notesFolder}${noteId}.ttl`, {
+  //   fetch: fetch
+  // });
+  // await deleteSolidDataset(dataSet, { fetch: fetch });
+  // console.log("note was deleted");
 }

@@ -8,7 +8,7 @@ import { SCHEMA_INRUPT, RDF, DCTERMS } from '@inrupt/vocab-common-rdf';
 import { first } from 'lodash';
 import { schema, space, vcard } from 'rdf-namespaces';
 import { pim } from '@inrupt/solid-client/dist/constants';
-import { getPrefLink, checkAndCreatePrefLink, recordDefaultFolder, fetchAllNotes, saveNote, createDefFolder, testing } from '../services/SolidPod';
+import { getPrefLink, recordDefaultFolder, fetchAllNotes, saveNote, createDefFolder, createEntriesInTypeIndex, getAllNotesUrlFromPublicIndex } from '../services/SolidPod';
 interface Props {
 
 }
@@ -22,22 +22,8 @@ const Test = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const gets = async () => {
-    let dataSet = await getSolidDataset("https://pod.inrupt.com/ayazdyshin/SolidPlannerApp/notes/", { fetch: fetch });
-    let arrOfUrl = getContainedResourceUrlAll(dataSet);
-    // console.log(arrOfUrl);
-    let newDs = await getSolidDataset(arrOfUrl[0], { fetch: fetch });
-    // console.log(newDs);
-    let newT = getThing(newDs, arrOfUrl[0]);
-    //  console.log(newT);
-    //  console.log(getInteger(newT!, "http://schema.org/identifier"));
-
-    let newArr = await Promise.all(arrOfUrl.map(async (url) => {
-      let newDs = await getSolidDataset(url, { fetch: fetch });
-      return getThing(newDs, url);
-    }));
-    console.log(newArr);
+    await getAllNotesUrlFromPublicIndex(webId ?? "", fetch);
   }
-
 
 
 

@@ -1,14 +1,15 @@
 import { Thing } from "@inrupt/solid-client";
 import { useEffect } from "react";
 import NoteCreator from "./NoteCreator";
+import { Note } from "./types";
 
 interface Props {
     active: string;
     creatorStatus: boolean;
     newEntryCr: boolean;
     setNewEntryCr: React.Dispatch<React.SetStateAction<boolean>>;
-    thingToView: Thing | null;
-    setThingToView: React.Dispatch<React.SetStateAction<Thing | null>>;
+    noteToView: Note | null;
+    setNoteToView: React.Dispatch<React.SetStateAction<Note | null>>;
     viewerStatus: boolean;
     setViewerStatus: React.Dispatch<React.SetStateAction<boolean>>;
     isEdit: boolean;
@@ -17,7 +18,7 @@ interface Props {
 }
 // component that renders entry creator, based on the "active" value
 const CreatorToRender = ({ active, creatorStatus, newEntryCr, setNewEntryCr,
-    thingToView, setThingToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, setCreatorStatus }: Props) => {
+    noteToView, setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, setCreatorStatus }: Props) => {
 
     useEffect(() => {
     }, [creatorStatus, viewerStatus]);
@@ -29,8 +30,8 @@ const CreatorToRender = ({ active, creatorStatus, newEntryCr, setNewEntryCr,
                     <NoteCreator
                         newEntryCr={newEntryCr}
                         setNewEntryCr={setNewEntryCr}
-                        thingToView={thingToView}
-                        setThingToView={setThingToView}
+                        noteToView={noteToView}
+                        setNoteToView={setNoteToView}
                         viewerStatus={viewerStatus}
                         setViewerStatus={setViewerStatus}
                         isEdit={isEdit}

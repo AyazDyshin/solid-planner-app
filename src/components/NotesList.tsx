@@ -4,12 +4,13 @@ import { DCTERMS } from "@inrupt/vocab-common-rdf";
 import { schema } from "rdf-namespaces";
 import { useState } from "react";
 import SaveModal from "./SaveModal";
+import { Note } from "./types";
 
 interface Props {
-  notesArray: (Thing | null)[];
-  setNotesArray: React.Dispatch<React.SetStateAction<(Thing | null)[]>>;
-  thingToView: Thing | null;
-  setThingToView: React.Dispatch<React.SetStateAction<Thing | null>>;
+  notesArray: (Note | null)[];
+  setNotesArray: React.Dispatch<React.SetStateAction<(Note | null)[]>>;
+  noteToView: Note | null;
+  setNoteToView: React.Dispatch<React.SetStateAction<Note | null>>;
   viewerStatus: boolean;
   setViewerStatus: React.Dispatch<React.SetStateAction<boolean>>;
   setCreatorStatus: React.Dispatch<React.SetStateAction<boolean>>;
@@ -17,7 +18,7 @@ interface Props {
   setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const NotesList = ({ notesArray, setNotesArray, thingToView, setThingToView,
+const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView,
   viewerStatus, setViewerStatus, setCreatorStatus, isEdit, setIsEdit }: Props) => {
   const { session, fetch } = useSession();
   const { webId } = session.info;
@@ -38,21 +39,19 @@ const NotesList = ({ notesArray, setNotesArray, thingToView, setThingToView,
     <div className="list-group w-100 h-100">
       {
         notesArray.map((note) => {
-  
           if (note) {
-           // console.log(`note ${getStringNoLocale(note, DCTERMS.title)} was created`);
             return <a
-              key={`${getInteger(note, schema.identifier)}${Date.now()}`}
-              className={`list-group-item list-group-item-action ${activeNote === getInteger(note, schema.identifier) ? 'active' : ''}`}
+              key={`${note.id}${Date.now()}`}
+              className={`list-group-item list-group-item-action ${activeNote === note.id ? 'active' : ''}`}
               onClick={(e) => {
                 e.preventDefault();
                 setIsEdit(false);
-                setActiveNote(getInteger(note, schema.identifier));
-                setThingToView(note);
+                setActiveNote(note.id);
+                setNoteToView(note);
                 setViewerStatus(true);
                 setCreatorStatus(false);
               }}
-            >{getStringNoLocale(note, DCTERMS.title)}</a>
+            >{note.title}</a>
           }
         })
       }

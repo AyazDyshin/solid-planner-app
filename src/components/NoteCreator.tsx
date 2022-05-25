@@ -9,8 +9,8 @@ import { Note } from "./types";
 interface Props {
     newEntryCr: boolean;
     setNewEntryCr: React.Dispatch<React.SetStateAction<boolean>>;
-    thingToView: Thing | null;
-    setThingToView: React.Dispatch<React.SetStateAction<Thing | null>>;
+    noteToView: Note | null;
+    setNoteToView: React.Dispatch<React.SetStateAction<Note | null>>;
     viewerStatus: boolean;
     setViewerStatus: React.Dispatch<React.SetStateAction<boolean>>;
     isEdit: boolean;
@@ -19,8 +19,8 @@ interface Props {
     creatorStatus: boolean;
 }
 //component of creation and saving a note the user's pod
-const NoteCreator = ({ newEntryCr, setNewEntryCr, thingToView,
-    setThingToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, setCreatorStatus, creatorStatus }: Props) => {
+const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
+    setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, setCreatorStatus, creatorStatus }: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
     const [NoteInp, setNoteInp] = useState<Note>({ id: null, title: "", content: "", category: "" });
@@ -30,13 +30,13 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, thingToView,
     useEffect(() => {
         if (viewerStatus) {
             // handle 
-            setNoteInp(thingToNote(thingToView!)!);
+            setNoteInp(noteToView!);
         }
         else {
             setNoteInp({ id: null, title: "", content: "", category: "" });
             setIsEdit(true);
         }
-    }, [viewerStatus, thingToView]);
+    }, [viewerStatus, noteToView]);
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,7 +55,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, thingToView,
             await editNote(webId ?? "", fetch, NoteInp, arrOfChanges);
             newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
         }
-        setNoteInp({ id: null, title: "", content: "", category: ""});
+        setNoteInp({ id: null, title: "", content: "", category: "" });
         setIsEdit(false);
         setViewerStatus(false);
         setCreatorStatus(false);
@@ -67,7 +67,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, thingToView,
     }
 
     const handleDelete = async () => {
-        await deleteNote(webId ?? "", fetch, thingToView!);
+        await deleteNote(webId ?? "", fetch, NoteInp.id!);
         newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
         setIsEdit(false);
         setViewerStatus(false);
@@ -81,7 +81,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, thingToView,
                 <FormControl
                     name="title"
                     aria-label="title"
-                    value={NoteInp.title}
+                    value={NoteInp.title === null ? "" : NoteInp.title}
                     {...(!isEdit && { disabled: true })}
                     onChange={handleChange} />
                 <ButtonGroup aria-label="Basic example">
@@ -100,13 +100,13 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, thingToView,
             </InputGroup>
             <FormControl {...(!isEdit && { disabled: true })} as="textarea" aria-label="textarea" style={{ 'resize': 'none', 'height': '91%' }}
                 name="content"
-                value={NoteInp.content}
+                value={NoteInp.content === null ? "" : NoteInp.content}
                 onChange={handleChange}
             />
             <CategoryModal categoryModalState={categoryModalState}
-             setCategoryModalState={setCategoryModalState}
-             setNoteInp={setNoteInp} 
-             noteInp = {NoteInp}/>
+                setCategoryModalState={setCategoryModalState}
+                setNoteInp={setNoteInp}
+                noteInp={NoteInp} />
         </div>
     )
 }

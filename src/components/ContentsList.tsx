@@ -2,8 +2,9 @@ import { getStringNoLocale, Thing } from "@inrupt/solid-client";
 import { useSession } from "@inrupt/solid-ui-react";
 import { useEffect, useState } from "react";
 import { Spinner } from "react-bootstrap";
-import { fetchAllNotes } from "../services/SolidPod";
+import { fetchAllNotes, thingToNote } from "../services/SolidPod";
 import NotesList from "./NotesList";
+import { Note } from "./types";
 // need to upgrade for habits case
 interface Props {
     creatorStatus: boolean;
@@ -11,8 +12,8 @@ interface Props {
     active: string;
     newEntryCr: boolean;
     setNewEntryCr: React.Dispatch<React.SetStateAction<boolean>>;
-    thingToView: Thing | null;
-    setThingToView: React.Dispatch<React.SetStateAction<Thing | null>>;
+    noteToView: Note | null;
+    setNoteToView: React.Dispatch<React.SetStateAction<Note | null>>;
     viewerStatus: boolean;
     setViewerStatus: React.Dispatch<React.SetStateAction<boolean>>;
     isEdit: boolean;
@@ -21,11 +22,11 @@ interface Props {
 }
 
 const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, setNewEntryCr,
-    thingToView, setThingToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, setModalState }: Props) => {
+    noteToView, setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, setModalState }: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [notesArray, setNotesArray] = useState<(Thing | null)[]>([]);
+    const [notesArray, setNotesArray] = useState<(Note | null)[]>([]);
     const [habitsArray, setHabitsArray] = useState<Thing[]>([]);
 
     // this procs twice due to setting newentrycr to false inside
@@ -34,8 +35,12 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
         const fetchData = async () => {
 
             const updNotesArray = await fetchAllNotes(webId ?? "", fetch);
+            let transformedArr = updNotesArray.map((thing) => {
+                return thingToNote(thing);
+            });
+            //console.log(transformedArr);
             // add fetch all habits here
-            setNotesArray(updNotesArray);
+            setNotesArray(transformedArr);
             setIsLoading(false);
         }
         fetchData();
@@ -68,8 +73,8 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
                 return (
                     <NotesList notesArray={notesArray}
                         setNotesArray={setNotesArray}
-                        thingToView={thingToView}
-                        setThingToView={setThingToView}
+                        noteToView={noteToView}
+                        setNoteToView={setNoteToView}
                         viewerStatus={viewerStatus}
                         setViewerStatus={setViewerStatus}
                         setCreatorStatus={setCreatorStatus}

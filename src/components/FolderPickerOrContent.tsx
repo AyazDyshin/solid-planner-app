@@ -1,10 +1,11 @@
 import { useSession } from "@inrupt/solid-ui-react";
 import { useEffect, useState } from "react";
 import { Button, Spinner } from "react-bootstrap";
-import { checkAndCreatePrefLink, getDefaultFolder, getPrefLink, getStoragePref, modifyWebId, recordDefaultFolder } from "../services/SolidPod";
+import { getDefaultFolder, getPrefLink, getStoragePref, modifyWebId, recordDefaultFolder } from "../services/SolidPod";
 import FolderPickerModal from "./FolderPickerModal";
 import ContentsList from "./ContentsList";
 import { Thing } from "@inrupt/solid-client";
+import { Note } from "./types";
 
 interface Props {
     active: string;
@@ -12,8 +13,8 @@ interface Props {
     newEntryCr: boolean;
     setCreatorStatus: React.Dispatch<React.SetStateAction<boolean>>;
     setNewEntryCr: React.Dispatch<React.SetStateAction<boolean>>;
-    thingToView: Thing | null;
-    setThingToView: React.Dispatch<React.SetStateAction<Thing | null>>;
+    noteToView: Note | null;
+    setNoteToView: React.Dispatch<React.SetStateAction<Note | null>>;
     viewerStatus: boolean;
     setViewerStatus: React.Dispatch<React.SetStateAction<boolean>>;
     isEdit: boolean;
@@ -24,7 +25,7 @@ interface Props {
 // if the default folder is not setup, notifies user and suggest ot set it up
 // "defFolderStatus" checks if default folder was created (needed to call a rerender)
 const FolderPickerOrContent = ({ active, creatorStatus, newEntryCr, setCreatorStatus,
-    setNewEntryCr, thingToView, setThingToView, viewerStatus, setViewerStatus, isEdit, setIsEdit }: Props) => {
+    setNewEntryCr, noteToView, setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit }: Props) => {
     const [modalState, setModalState] = useState<boolean>(false);
     const { session, fetch } = useSession();
     const { webId } = session.info;
@@ -33,32 +34,23 @@ const FolderPickerOrContent = ({ active, creatorStatus, newEntryCr, setCreatorSt
     const [defFolderStatus, setDefFolderStatus] = useState<boolean>(false);
     const [storagePref, setStoragePref] = useState<string>("");
 
+    if (typeof webId !== "string") {
+        throw new Error("error, webId does not exist");
+    }
+
     useEffect(() => {
-        if (typeof webId !== "string") {
-            console.log("error webId doesn't exist");
-            return;
-        }
-        let urlToShow;
         setIsLoading(true);
         async function fetchData() {
-            if (typeof webId !== "string") {
-                console.log("error webId doesn't exist");
-                return;
-            }
-
-            const defFolderUpd = await getDefaultFolder(webId, fetch);
-            const updStoragePref = await getStoragePref(webId, fetch);
-
-            updStoragePref ? urlToShow = updStoragePref : urlToShow = modifyWebId(webId);
+            const defFolderUpd = await getDefaultFolder(webId ?? "", fetch);
             if (!defFolderUpd) {
-                await recordDefaultFolder(webId, fetch, `${urlToShow}${defFolderUrlToUp}`);
+                await recordDefaultFolder(webId ?? "", fetch);
                 setDefFolderStatus(true);
             }
             setIsLoading(false);
         }
 
         fetchData();
-    }, [defFolderUrlToUp]);
+    }, []);
 
     if (isLoading) {
         return (
@@ -79,8 +71,8 @@ const FolderPickerOrContent = ({ active, creatorStatus, newEntryCr, setCreatorSt
                             setCreatorStatus={setCreatorStatus}
                             newEntryCr={newEntryCr}
                             setNewEntryCr={setNewEntryCr}
-                            thingToView={thingToView}
-                            setThingToView={setThingToView}
+                            noteToView={noteToView}
+                            setNoteToView={setNoteToView}
                             viewerStatus={viewerStatus}
                             setViewerStatus={setViewerStatus}
                             isEdit={isEdit}

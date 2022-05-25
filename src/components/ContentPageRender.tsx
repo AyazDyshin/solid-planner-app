@@ -3,6 +3,7 @@ import { useState } from "react";
 import CreatorToRender from "./CreatorToRender";
 import FolderPickerOrContent from "./FolderPickerOrContent";
 import  "../styles.css";
+import { Note } from "./types";
 interface Props {
     active: string;
 }
@@ -18,7 +19,7 @@ const ContentPageRender = ({ active }: Props) => {
     const [creatorStatus, setCreatorStatus] = useState<boolean>(false);
     const [newEntryCr, setNewEntryCr] = useState<boolean>(false);
     const [viewerStatus, setViewerStatus] = useState<boolean>(false);
-    const [thingToView, setThingToView] = useState<Thing | null>(null);
+    const [noteToView, setNoteToView] = useState<Note | null>(null);
     const [isEdit, setIsEdit] = useState(false);
 
     return (
@@ -29,8 +30,8 @@ const ContentPageRender = ({ active }: Props) => {
                         setCreatorStatus={setCreatorStatus}
                         newEntryCr={newEntryCr}
                         setNewEntryCr={setNewEntryCr}
-                        thingToView={thingToView}
-                        setThingToView={setThingToView}
+                        noteToView={noteToView}
+                        setNoteToView={setNoteToView}
                         viewerStatus={viewerStatus}
                         setViewerStatus={setViewerStatus}
                         isEdit={isEdit}
@@ -41,8 +42,8 @@ const ContentPageRender = ({ active }: Props) => {
                         creatorStatus={creatorStatus}
                         newEntryCr={newEntryCr}
                         setNewEntryCr={setNewEntryCr}
-                        thingToView={thingToView}
-                        setThingToView={setThingToView}
+                        noteToView={noteToView}
+                        setNoteToView={setNoteToView}
                         viewerStatus={viewerStatus}
                         setViewerStatus={setViewerStatus}
                         isEdit={isEdit}

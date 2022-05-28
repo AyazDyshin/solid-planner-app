@@ -2,8 +2,9 @@ import { Thing } from "@inrupt/solid-client";
 import { useState } from "react";
 import CreatorToRender from "./CreatorToRender";
 import FolderPickerOrContent from "./FolderPickerOrContent";
-import  "../styles.css";
+import "../styles.css";
 import { Note } from "./types";
+import ContentsList from "./ContentsList";
 interface Props {
     active: string;
 }
@@ -14,7 +15,7 @@ interface Props {
 // this is needed to update the left side view, ie list of entries existing in the user's pod
 // "creatorStatus" and "setCreatorStatus" are hooks to monitor if create button was pressed,
 // this is needed to render the respective creator component
-const ContentPageRender = ({ active }: Props) => {
+const NotesHabitsRender = ({ active }: Props) => {
 
     const [creatorStatus, setCreatorStatus] = useState<boolean>(false);
     const [newEntryCr, setNewEntryCr] = useState<boolean>(false);
@@ -26,7 +27,9 @@ const ContentPageRender = ({ active }: Props) => {
         <div className="container-fluid pad">
             <div className="row h-100">
                 <div className="col h-100 border border-5 border-end-0 d-flex justify-content-center align-items-center p-0">
-                    <FolderPickerOrContent active={active} creatorStatus={creatorStatus}
+                    <ContentsList
+                        active={active}
+                        creatorStatus={creatorStatus}
                         setCreatorStatus={setCreatorStatus}
                         newEntryCr={newEntryCr}
                         setNewEntryCr={setNewEntryCr}
@@ -56,4 +59,4 @@ const ContentPageRender = ({ active }: Props) => {
     );
 }
 
-export default ContentPageRender;
+export default NotesHabitsRender;

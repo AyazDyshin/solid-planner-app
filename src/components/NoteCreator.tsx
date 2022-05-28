@@ -5,6 +5,9 @@ import { InputGroup, FormControl, Button, ButtonGroup, DropdownButton, Dropdown 
 import CategoryModal from "../modals/CategoryModal";
 import { deleteNote, editNote, saveNote, thingToNote } from "../services/SolidPod";
 import { Note } from "./types";
+import { BsThreeDots } from "react-icons/bs";
+import { FiEdit } from "react-icons/fi";
+import "../styles.css";
 
 interface Props {
     newEntryCr: boolean;
@@ -86,16 +89,16 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
                     onChange={handleChange} />
                 <ButtonGroup>
                     <Button onClick={handleSave}>save</Button>
-                    {!viewerStatus && <DropdownButton
+                    <DropdownButton className="dropNoIcon"
                         variant="outline-secondary"
-                        title="Dropdown"
+                        title={<BsThreeDots />}
                         id="input-group-dropdown-1"
                     >
+                        {viewerStatus && <Dropdown.Item onClick={handleEdit}><FiEdit /> edit</Dropdown.Item>}
+                        {viewerStatus && <Dropdown.Item onClick={handleDelete}>delete</Dropdown.Item>}
                         <Dropdown.Item href="" onClick={() => (setCategoryModalState(true))}>Set Category</Dropdown.Item>
                         <Dropdown.Item href="">Set Access type</Dropdown.Item>
-                    </DropdownButton>}
-                    {viewerStatus && <Button onClick={handleEdit}>edit</Button>}
-                    {viewerStatus && <Button variant="danger" onClick={handleDelete}>delete</Button>}
+                    </DropdownButton>
                 </ButtonGroup>
             </InputGroup>
             <FormControl {...(!isEdit && { disabled: true })} as="textarea" aria-label="textarea" style={{ 'resize': 'none', 'height': '91%' }}
@@ -106,7 +109,10 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
             <CategoryModal categoryModalState={categoryModalState}
                 setCategoryModalState={setCategoryModalState}
                 setNoteInp={setNoteInp}
-                noteInp={NoteInp} />
+                noteInp={NoteInp}
+                setArrOfChanges={setArrOfChanges}
+                viewerStatus={viewerStatus}
+                />
         </div>
     )
 }

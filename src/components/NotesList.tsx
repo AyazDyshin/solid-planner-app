@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Dropdown, DropdownButton, Badge } from "react-bootstrap";
 import SaveModal from "./SaveModal";
 import { Note } from "./types";
+import { RiArrowDropDownLine } from "react-icons/ri";
 
 interface Props {
   notesArray: (Note | null)[];
@@ -43,16 +44,21 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView,
 
   return (
     <div className="w-100 h-100">
-      <DropdownButton
-        variant="outline-secondary"
-        title="Dropdown"
-      >
-        {
-          categoryArray.map((category) => {
-            return <Dropdown.Item href="" onClick={() => setCurrentCategory(category)}>{category}</Dropdown.Item>
-          })
-        }
-      </DropdownButton>
+      {
+        categoryArray.length !== 0 && <DropdownButton
+          variant="outline-secondary"
+          title={<div>{currentCategory ? currentCategory : "All notes"} <RiArrowDropDownLine /></div>}
+        >
+          {
+            categoryArray.map((category) => {
+              return <Dropdown.Item href="" onClick={() => setCurrentCategory(category)}>{category}</Dropdown.Item>
+            })
+          }
+
+          {currentCategory && (
+            <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentCategory(null)}>Reset</Dropdown.Item></>)}
+        </DropdownButton>
+      }
       <div className="list-group w-100 h-100">
         {
           notesArray.map((note) => {

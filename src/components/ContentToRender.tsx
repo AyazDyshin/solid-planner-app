@@ -1,4 +1,4 @@
-import ContentPageRender from "./ContentPageRender";
+import NotesHabitsRender from "./NotesHabitsRender";
 import SettingsPage from "./SettingsPage";
 
 interface Props {
@@ -11,7 +11,7 @@ const ContentToRender = ({ active }: Props) => {
     switch (active) {
         case "notes":
         case "habits":
-            return (<ContentPageRender active={active} />);
+            return (<NotesHabitsRender active={active} />);
         case "settings":
             return (<SettingsPage />);
         default:

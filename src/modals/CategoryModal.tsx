@@ -9,14 +9,17 @@ interface Props {
     setCategoryModalState: React.Dispatch<React.SetStateAction<boolean>>;
     setNoteInp: React.Dispatch<React.SetStateAction<Note>>;
     noteInp: Note;
+    viewerStatus: boolean;
+    setArrOfChanges: React.Dispatch<React.SetStateAction<string[]>>;
 }
 //a popup window to prompt user to pick a folder
-const CategoryModal = ({ categoryModalState, setCategoryModalState, setNoteInp, noteInp }: Props) => {
+const CategoryModal = ({ categoryModalState, setCategoryModalState, setNoteInp, noteInp, viewerStatus, setArrOfChanges }: Props) => {
     const { session } = useSession();
     const { webId } = session.info;
     const [input, setInput] = useState<string>("");
     const handleSave = () => {
-        setNoteInp({ ...noteInp, category: input });
+        if (viewerStatus) setArrOfChanges((prevState) => ([...prevState, "category"]));
+        setNoteInp({ ...noteInp, category: input.trim()});
         setCategoryModalState(false);
     }
     return (
@@ -25,7 +28,6 @@ const CategoryModal = ({ categoryModalState, setCategoryModalState, setNoteInp, 
                 <Modal.Title>Enter Category Name:</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-
                 <FormControl className="mt-1" aria-describedby="basic-addon3" value={input} onChange={e => setInput(e.target.value)} />
             </Modal.Body>
             <Modal.Footer>

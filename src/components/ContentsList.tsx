@@ -2,7 +2,7 @@ import { getStringNoLocale, Thing, ThingPersisted } from "@inrupt/solid-client";
 import { useSession } from "@inrupt/solid-ui-react";
 import { useEffect, useState } from "react";
 import { Spinner } from "react-bootstrap";
-import { fetchAllNotes, thingToNote } from "../services/SolidPod";
+import { fetchAllNotes, getDefaultFolder, recordDefaultFolder, thingToNote } from "../services/SolidPod";
 import NotesList from "./NotesList";
 import { Note } from "./types";
 // need to upgrade for habits case
@@ -18,11 +18,10 @@ interface Props {
     setViewerStatus: React.Dispatch<React.SetStateAction<boolean>>;
     isEdit: boolean;
     setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
-    setModalState: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, setNewEntryCr,
-    noteToView, setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, setModalState }: Props) => {
+    noteToView, setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit }: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -33,9 +32,12 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
     useEffect(() => {
         setIsLoading(true);
         const fetchData = async () => {
+            const defFolderUpd = await getDefaultFolder(webId ?? "", fetch);
+            if (!defFolderUpd) {
+                await recordDefaultFolder(webId ?? "", fetch);
+            }
 
             const [updNotesArray, updCategoriesArray] = await fetchAllNotes(webId ?? "", fetch, ((currentCategory) ? currentCategory : undefined));
-            // console.log(updCategoriesArray);
             let transformedArr = updNotesArray.map((thing) => {
                 return thingToNote(thing);
             });

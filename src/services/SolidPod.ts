@@ -233,8 +233,7 @@ export const getAllNotesUrlFromPublicIndex = async (webId: string, fetch: fetche
 }
 
 export const fetchAllNotes = async (webId: string, fetch: fetcher, categoryFilter?: string) => {
-  console.log("we are here");
-  console.log(categoryFilter);
+ 
   let arrayOfCategories: string[] = [];
   let urlsArr = await getAllNotesUrlFromPublicIndex(webId, fetch);
   let updUrlsArr = await Promise.all(urlsArr.map(async (url) => {
@@ -318,11 +317,6 @@ export const editNote = async (webId: string, fetch: fetcher, note: Note, change
   const notesFolder = `${defFolder}notes/`;
   const noteId = note.id;
 
-  // if (note.title === null || note.content === null) {
-  //   throw new Error("null value on note's title or note's content on edit");
-  // }
-
-
   let urlsArr = await getAllNotesUrlFromPublicIndex(webId, fetch);
   let updUrlsArr = await Promise.all(urlsArr.map(async (url) => {
 
@@ -343,6 +337,8 @@ export const editNote = async (webId: string, fetch: fetcher, note: Note, change
                   break;
                 case "content":
                   newThing = setStringNoLocale(newThing!, schema.text, note.content!);
+                case "category":
+                  newThing = setStringNoLocale(newThing!, "http://dbpedia.org/ontology/category", note.category!);
               }
             });
             //handle?

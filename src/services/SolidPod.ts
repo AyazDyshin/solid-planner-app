@@ -3,6 +3,7 @@ import { pim } from '@inrupt/solid-client/dist/constants';
 import { useSession } from '@inrupt/solid-ui-react';
 import { DCTERMS, RDF } from '@inrupt/vocab-common-rdf';
 import { solid, schema, space } from 'rdf-namespaces';
+import { category } from 'rdf-namespaces/dist/qu';
 import { dataset } from 'rdf-namespaces/dist/schema';
 import { Note } from '../components/types';
 
@@ -231,38 +232,61 @@ export const getAllNotesUrlFromPublicIndex = async (webId: string, fetch: fetche
   return updThings;
 }
 
-export const fetchAllNotes = async (webId: string, fetch: fetcher) => {
-
+export const fetchAllNotes = async (webId: string, fetch: fetcher, categoryFilter?: string) => {
+  console.log("we are here");
+  console.log(categoryFilter);
+  let arrayOfCategories: string[] = [];
   let urlsArr = await getAllNotesUrlFromPublicIndex(webId, fetch);
   let updUrlsArr = await Promise.all(urlsArr.map(async (url) => {
     const data = await getSolidDataset(url, { fetch: fetch });
     if (isContainer(data)) {
       let allNotes = getContainedResourceUrlAll(data);
-      let updArr = await Promise.all(allNotes.map(async (url) => {
+      let updArr = await Promise.all(allNotes.map(async (noteUrl) => {
+        let newDs = await getSolidDataset(noteUrl, { fetch: fetch });
         try {
-          let newDs = await getSolidDataset(url, { fetch: fetch });
-          let newThing = getThing(newDs, url);
-          return getThing(newDs, url)!;
+          newDs = await getSolidDataset(noteUrl, { fetch: fetch });
         }
         catch (error) {
-          return null;
+          throw new Error(`error while fetching on of the notes in container: ${url} note url: ${noteUrl}`);
         }
+        let newThing = getThing(newDs, noteUrl);
+        if (newThing) {
+          let categoryOfCurrNote = getStringNoLocale(newThing, "http://dbpedia.org/ontology/category");
+          if (categoryOfCurrNote && !arrayOfCategories.includes(categoryOfCurrNote)) arrayOfCategories.push(categoryOfCurrNote);
+          if (categoryFilter) {
+            return categoryOfCurrNote === categoryFilter ? newThing : null;
+          }
+        }
+
+        return newThing;
+
       }));
       return updArr;
     }
     else {
       let arrOf = getThingAll(data);
       arrOf.forEach((thing) => {
+        let categoryOfCurrNote = getStringNoLocale(thing, "http://dbpedia.org/ontology/category");
+        if (categoryOfCurrNote && !arrayOfCategories.includes(categoryOfCurrNote)) arrayOfCategories.push(categoryOfCurrNote);
         if (!getInteger(thing, schema.identifier)) {
           let newThing = addInteger(thing, schema.identifier, Date.now() + Math.floor(Math.random() * 1000));
           let newData = setThing(data, newThing);
           const updDataSet = saveSolidDatasetAt(url, newData, { fetch: fetch });
         }
       });
+      if (categoryFilter) {
+        let newArr = arrOf.map((thing) => {
+          let categoryOfCurrNote = getStringNoLocale(thing, "http://dbpedia.org/ontology/category");
+          if (categoryFilter) {
+            return categoryOfCurrNote === categoryFilter ? thing : null;
+          }
+        });
+      }
       return arrOf;
     }
   }));
-  return updUrlsArr.flat();
+  let retValue: [(ThingPersisted | null)[], string[]] = [updUrlsArr.flat(), arrayOfCategories]
+  return retValue;
 }
 
 export const saveNote = async (webId: string, fetch: fetcher, note: Note) => {
@@ -353,25 +377,6 @@ export const editNote = async (webId: string, fetch: fetcher, note: Note, change
       }
     }
   }));
-
-
-  // let dataSet = await getSolidDataset(`${notesFolder}${noteId}.ttl`, {
-  //   fetch: fetch
-  // });
-  // let thingToChange = getThing(dataSet, `${notesFolder}${noteId}.ttl`);
-  // let newThing = thingToChange;
-  // let updArr = changes.map((change) => {
-  //   switch (change) {
-  //     case "title":
-  //       newThing = setStringNoLocale(newThing!, DCTERMS.title, note.title!);
-  //       break;
-  //     case "content":
-  //       newThing = setStringNoLocale(newThing!, schema.text, note.content!);
-  //   }
-  // });
-  // let updDataSet = setThing(dataSet, newThing!);
-  // const savedDataSet = await saveSolidDatasetAt(`${notesFolder}${noteId}.ttl`, updDataSet,
-  //   { fetch: fetch });
 }
 
 export const deleteNote = async (webId: string, fetch: fetcher, id: number) => {
@@ -408,14 +413,4 @@ export const deleteNote = async (webId: string, fetch: fetcher, id: number) => {
       }
     }
   }));
-
-  // const defFolder = await getDefaultFolder(webId, fetch);
-  // const notesFolder = `${defFolder}notes/`;
-  // const noteId = await getInteger(thing, schema.identifier);
-  // //handle id is null
-  // let dataSet = await getSolidDataset(`${notesFolder}${noteId}.ttl`, {
-  //   fetch: fetch
-  // });
-  // await deleteSolidDataset(dataSet, { fetch: fetch });
-  // console.log("note was deleted");
 }

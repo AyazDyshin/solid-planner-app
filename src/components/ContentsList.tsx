@@ -1,4 +1,4 @@
-import { getStringNoLocale, Thing } from "@inrupt/solid-client";
+import { getStringNoLocale, Thing, ThingPersisted } from "@inrupt/solid-client";
 import { useSession } from "@inrupt/solid-ui-react";
 import { useEffect, useState } from "react";
 import { Spinner } from "react-bootstrap";
@@ -28,23 +28,24 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [notesArray, setNotesArray] = useState<(Note | null)[]>([]);
     const [habitsArray, setHabitsArray] = useState<Thing[]>([]);
-
-    // this procs twice due to setting newentrycr to false inside
+    const [categoryArray, setCategoryArray] = useState<string[]>([]);
+    const [currentCategory, setCurrentCategory] = useState<string | null>(null);
     useEffect(() => {
-        console.log(`we are in useEffect value of newEntryCr is: ${newEntryCr}`);
+        setIsLoading(true);
         const fetchData = async () => {
 
-            const updNotesArray = await fetchAllNotes(webId ?? "", fetch);
+            const [updNotesArray, updCategoriesArray] = await fetchAllNotes(webId ?? "", fetch, ((currentCategory) ? currentCategory : undefined));
+            // console.log(updCategoriesArray);
             let transformedArr = updNotesArray.map((thing) => {
                 return thingToNote(thing);
             });
-            //console.log(transformedArr);
             // add fetch all habits here
             setNotesArray(transformedArr);
+            setCategoryArray(updCategoriesArray);
             setIsLoading(false);
         }
         fetchData();
-    }, [newEntryCr]);
+    }, [newEntryCr, currentCategory]);
 
     if (isLoading) {
         return (
@@ -79,7 +80,12 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
                         setViewerStatus={setViewerStatus}
                         setCreatorStatus={setCreatorStatus}
                         isEdit={isEdit}
-                        setIsEdit={setIsEdit} />
+                        setIsEdit={setIsEdit}
+                        categoryArray={categoryArray}
+                        setCategoryArray={setCategoryArray}
+                        setCurrentCategory={setCurrentCategory}
+                        currentCategory={currentCategory}
+                    />
                 )
             }
         }

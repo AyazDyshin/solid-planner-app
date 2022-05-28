@@ -38,6 +38,9 @@
     "webpack-dev-server": "^4.8.1"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.1.1",
+    "@fortawesome/free-solid-svg-icons": "^6.1.1",
+    "@fortawesome/react-fontawesome": "^0.1.18",
     "@inrupt/lit-generated-vocab-common": "^0.3.11",
     "@inrupt/solid-client": "^1.22.0",
     "@inrupt/solid-client-authn-browser": "^1.11.7",

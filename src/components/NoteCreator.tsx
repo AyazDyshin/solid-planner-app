@@ -84,7 +84,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
                     value={NoteInp.title === null ? "" : NoteInp.title}
                     {...(!isEdit && { disabled: true })}
                     onChange={handleChange} />
-                <ButtonGroup aria-label="Basic example">
+                <ButtonGroup>
                     <Button onClick={handleSave}>save</Button>
                     {!viewerStatus && <DropdownButton
                         variant="outline-secondary"

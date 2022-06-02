@@ -11,7 +11,6 @@ const MainContent = () => {
 
   return (
     <div>
-      <Test />
       <Navbar links={links} active={active} setActive={setActive} />
       <ContentToRender active={active} />
     </div>

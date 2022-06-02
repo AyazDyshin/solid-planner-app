@@ -20,13 +20,16 @@ interface Props {
     setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
     setCreatorStatus: React.Dispatch<React.SetStateAction<boolean>>;
     creatorStatus: boolean;
+    categoryArray: string[];
+    setCategoryArray: React.Dispatch<React.SetStateAction<string[]>>;
 }
 //component of creation and saving a note the user's pod
 const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
-    setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, setCreatorStatus, creatorStatus }: Props) => {
+    setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit,
+    setCreatorStatus, creatorStatus, categoryArray, setCategoryArray }: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
-    const [NoteInp, setNoteInp] = useState<Note>({ id: null, title: "", content: "", category: "" });
+    const [NoteInp, setNoteInp] = useState<Note>({ id: null, title: "", content: "", category: "", url: ""});
     const [arrOfChanges, setArrOfChanges] = useState<string[]>([]);
     const [categoryModalState, setCategoryModalState] = useState<boolean>(false);
 
@@ -36,7 +39,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
             setNoteInp(noteToView!);
         }
         else {
-            setNoteInp({ id: null, title: "", content: "", category: "" });
+            setNoteInp({ id: null, title: "", content: "", category: "", url: ""});
             setIsEdit(true);
         }
     }, [viewerStatus, noteToView]);
@@ -58,7 +61,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
             await editNote(webId ?? "", fetch, NoteInp, arrOfChanges);
             newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
         }
-        setNoteInp({ id: null, title: "", content: "", category: "" });
+        setNoteInp({ id: null, title: "", content: "", category: "", url: ""});
         setIsEdit(false);
         setViewerStatus(false);
         setCreatorStatus(false);
@@ -112,7 +115,9 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
                 noteInp={NoteInp}
                 setArrOfChanges={setArrOfChanges}
                 viewerStatus={viewerStatus}
-                />
+                categoryArray={categoryArray}
+                setCategoryArray={setCategoryArray}
+            />
         </div>
     )
 }

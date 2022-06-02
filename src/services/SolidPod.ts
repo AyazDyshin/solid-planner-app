@@ -1,4 +1,11 @@
-import { buildThing, createThing, getSolidDataset, getThing, getThingAll, getUrl, ThingPersisted, addUrl, setThing, saveSolidDatasetAt, createContainerAt, createSolidDataset, Thing, getInteger, getStringNoLocale, removeThing, saveSolidDatasetInContainer, setUrl, getContainedResourceUrlAll, deleteSolidDataset, setStringNoLocale, getResourceInfo, addStringNoLocale, isContainer, getContentType, addInteger } from '@inrupt/solid-client';
+import {
+  createThing, getSolidDataset, getThing, getThingAll, getUrl, ThingPersisted,
+  addUrl, setThing, saveSolidDatasetAt, createContainerAt, createSolidDataset, Thing, getInteger,
+  getStringNoLocale, removeThing, saveSolidDatasetInContainer, setUrl, getContainedResourceUrlAll, deleteSolidDataset,
+  setStringNoLocale, getResourceInfo, addStringNoLocale, isContainer, getContentType, addInteger,
+  buildThing, getSolidDatasetWithAcl, hasResourceAcl, hasAccessibleAcl, hasFallbackAcl, createAclFromFallbackAcl,
+  getResourceAcl, saveAclFor, setPublicResourceAccess, getPublicAccess
+} from '@inrupt/solid-client';
 import { pim } from '@inrupt/solid-client/dist/constants';
 import { useSession } from '@inrupt/solid-ui-react';
 import { DCTERMS, RDF } from '@inrupt/vocab-common-rdf';
@@ -6,11 +13,14 @@ import { solid, schema, space } from 'rdf-namespaces';
 import { category } from 'rdf-namespaces/dist/qu';
 import { dataset } from 'rdf-namespaces/dist/schema';
 import { Note } from '../components/types';
-
+import { access } from "@inrupt/solid-client";
+// import {  } from '@inrupt/solid-client/dist/access/universal';
 type fetcher = ((input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>) & ((input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>);
 
 //function that transforms var of type Thing to var of Type Note
 export const thingToNote = (toChange: Thing | null): Note | null => {
+
+  console.log(toChange);
   if (!toChange) {
     return null;
   }
@@ -23,7 +33,8 @@ export const thingToNote = (toChange: Thing | null): Note | null => {
     id: updId,
     title: updTitle,
     content: updContent,
-    category: updCategory
+    category: updCategory,
+    url: toChange.url
   };
   return note;
 }
@@ -177,7 +188,6 @@ export const createEntriesInTypeIndex = async (webId: string, fetch: fetcher, ur
   catch (error) {
     throw new Error("error when fetching public type index file, it either doesn't exist, or has different location from the one specified in the webId");
   }
-
   let aThing = buildThing(createThing())
     .addIri(solid.forClass, schema.TextDigitalDocument)
     .addIri(solid.instance, url)
@@ -200,16 +210,93 @@ export const getDefaultFolder = async (webId: string, fetch: fetcher): Promise<s
   return defFolderUrl;
 }
 
+export const initializeAcl = async (url: string, fetch: fetcher) => {
+  
+  let myDatasetWithAcl = await getSolidDatasetWithAcl(url, { fetch: fetch });
+  let resourceAcl;
+  if (!hasResourceAcl(myDatasetWithAcl)) {
+    if (!hasAccessibleAcl(myDatasetWithAcl)) {
+      throw new Error(
+        "The current user does not have permission to change access rights to this Resource."
+      );
+    }
+    if (!hasFallbackAcl(myDatasetWithAcl)) {
+      throw new Error(
+        "The current user does not have permission to see who currently has access to this Resource."
+      );
+    }
+    resourceAcl = createAclFromFallbackAcl(myDatasetWithAcl);
+  } else {
+    resourceAcl = getResourceAcl(myDatasetWithAcl);
+  }
+  await saveAclFor(myDatasetWithAcl, resourceAcl, { fetch: fetch });
+  const myDatasetWithAcl2 = await getSolidDatasetWithAcl(url, { fetch: fetch });
+  console.log("this is the acl");
+  console.log(myDatasetWithAcl2);
+}
+
+export const setAccess = async (accessType: string, url: string, shareWith?: string[]) => {
+  // let myDatasetWithAcl = await getSolidDatasetWithAcl(url, { fetch: fetch });
+  // if (!hasAccessibleAcl(myDatasetWithAcl)) {
+  //   throw new Error(
+  //     "The current user does not have permission to change access rights to this Resource."
+  //   );
+  // }
+  // let resourceAcl = getResourceAcl(myDatasetWithAcl);
+  // if (!resourceAcl) {
+  //   throw new Error("the resource you are trying to set doesn't have acl setup");
+  // }
+  switch (accessType) {
+    case "public": {
+      let upd = await access.setPublicAccess(url, {
+        read: true,
+        append: false,
+        write: false,
+        controlRead: false,
+        controlWrite: false
+      }, { fetch: fetch });
+      if (!upd) {
+        throw new Error("You don't have permissions to changes the access type of this resource");
+      }
+      // const updatedAcl = setPublicResourceAccess(
+      //   resourceAcl,
+      //   { read: true, append: true, write: false, control: false },
+      // );
+      // await saveAclFor(myDatasetWithAcl, updatedAcl, { fetch: fetch });
+    };
+      break;
+    case "private": {
+
+    }
+  }
+}
+
 export const createDefFolder = async (defFolderUrl: string, fetch: fetcher) => {
   try {
     await createContainerAt(`${updUrlForFolder(defFolderUrl)}notes/`, {
       fetch: fetch
     });
-
   }
   catch (error) {
-    console.log("error when trying to create a folder for notes in specified folder");
+    throw new Error("error when trying to create a folder for notes in specified folder");
   }
+  // console.log("we are here");
+  // await initializeAcl(`${updUrlForFolder(defFolderUrl)}`, fetch);
+  // let upd = await access.setPublicAccess(`${updUrlForFolder(defFolderUrl)}`, {
+  //   read: true,
+  //   append: false,
+  //   write: false,
+  //   controlRead: false,
+  //   controlWrite: false
+  // }, { fetch: fetch });
+  // if (!upd) {
+  //   throw new Error("You don't have permissions to changes the access type of this resource");
+  // }
+  // // initializeAcl(`${updUrlForFolder(defFolderUrl)}`, fetch);
+  // // initializeAcl(`${updUrlForFolder(defFolderUrl)}notes/`, fetch);
+  // setAccess("public", `${updUrlForFolder(defFolderUrl)}`);
+  // setAccess("public", `${updUrlForFolder(defFolderUrl)}notes/`);
+
   try {
     await createContainerAt(`${updUrlForFolder(defFolderUrl)}habits/`, {
       fetch: fetch
@@ -233,7 +320,7 @@ export const getAllNotesUrlFromPublicIndex = async (webId: string, fetch: fetche
 }
 
 export const fetchAllNotes = async (webId: string, fetch: fetcher, categoryFilter?: string) => {
- 
+
   let arrayOfCategories: string[] = [];
   let urlsArr = await getAllNotesUrlFromPublicIndex(webId, fetch);
   let updUrlsArr = await Promise.all(urlsArr.map(async (url) => {
@@ -256,7 +343,8 @@ export const fetchAllNotes = async (webId: string, fetch: fetcher, categoryFilte
             return categoryOfCurrNote === categoryFilter ? newThing : null;
           }
         }
-
+        // let hh = await access.getPublicAccess(newThing!.url, { fetch: fetch });
+        // console.log(hh);
         return newThing;
 
       }));
@@ -310,12 +398,16 @@ export const saveNote = async (webId: string, fetch: fetcher, note: Note) => {
   }
 
   dataSet = setThing(dataSet, newNote);
-  const updDataSet = saveSolidDatasetAt(noteUrl, dataSet, { fetch: fetch });
+
+  const updDataSet = await saveSolidDatasetAt(noteUrl, dataSet, { fetch: fetch });
+  console.log("before set");
+  await setAccess("public", noteUrl);
+  console.log("after set");
+  let hh = await access.getPublicAccess(noteUrl, { fetch: fetch });
+  console.log(hh);
 }
+
 export const editNote = async (webId: string, fetch: fetcher, note: Note, changes: string[]) => {
-  const defFolder = await getDefaultFolder(webId, fetch);
-  const notesFolder = `${defFolder}notes/`;
-  const noteId = note.id;
 
   let urlsArr = await getAllNotesUrlFromPublicIndex(webId, fetch);
   let updUrlsArr = await Promise.all(urlsArr.map(async (url) => {
@@ -326,10 +418,22 @@ export const editNote = async (webId: string, fetch: fetcher, note: Note, change
       let updArr = await Promise.all(allNotes.map(async (url) => {
 
         let newDs = await getSolidDataset(url, { fetch: fetch });
+        // let testDs = await getSolidDatasetWithAcl(url, { fetch: fetch });
         let newThing = getThing(newDs, url);
         if (newThing) {
+
           let thingId = getInteger(newThing, schema.identifier);
           if (thingId === note.id) {
+            // console.log(testDs);
+            // let gg = setPublicAccess();
+            // let acc = await access.getPublicAccess(url, { fetch: fetch });
+            // console.log(acc);
+            // let lul = access.setPublicAccess(
+            //   url,  // Resource
+            //   { read: true, write: false },    // Access object
+            //   { fetch: fetch })
+            // console.log("we are here");
+            // console.log(huh);
             let updArr = changes.map((change) => {
               switch (change) {
                 case "title":
@@ -410,3 +514,4 @@ export const deleteNote = async (webId: string, fetch: fetcher, id: number) => {
     }
   }));
 }
+

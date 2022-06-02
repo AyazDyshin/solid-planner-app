@@ -22,6 +22,7 @@ const NotesHabitsRender = ({ active }: Props) => {
     const [viewerStatus, setViewerStatus] = useState<boolean>(false);
     const [noteToView, setNoteToView] = useState<Note | null>(null);
     const [isEdit, setIsEdit] = useState(false);
+    const [categoryArray, setCategoryArray] = useState<string[]>([]);
 
     return (
         <div className="container-fluid pad">
@@ -38,7 +39,9 @@ const NotesHabitsRender = ({ active }: Props) => {
                         viewerStatus={viewerStatus}
                         setViewerStatus={setViewerStatus}
                         isEdit={isEdit}
-                        setIsEdit={setIsEdit} />
+                        setIsEdit={setIsEdit}
+                        categoryArray={categoryArray}
+                        setCategoryArray={setCategoryArray} />
                 </div>
                 <div className="col h-100 border border-5">
                     <CreatorToRender active={active}
@@ -51,7 +54,9 @@ const NotesHabitsRender = ({ active }: Props) => {
                         setViewerStatus={setViewerStatus}
                         isEdit={isEdit}
                         setIsEdit={setIsEdit}
-                        setCreatorStatus={setCreatorStatus} />
+                        setCreatorStatus={setCreatorStatus}
+                        categoryArray={categoryArray}
+                        setCategoryArray={setCategoryArray} />
 
                 </div>
             </div>

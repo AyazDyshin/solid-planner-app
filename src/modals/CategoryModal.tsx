@@ -1,6 +1,6 @@
 import { useSession } from "@inrupt/solid-ui-react";
 import { useState } from "react";
-import { Modal, Button, Form, FormControl, InputGroup } from "react-bootstrap";
+import { Modal, Button, Form, FormControl, InputGroup, DropdownButton, Dropdown } from "react-bootstrap";
 import { Note } from "../components/types";
 import { modifyWebId } from "../services/SolidPod";
 
@@ -11,23 +11,42 @@ interface Props {
     noteInp: Note;
     viewerStatus: boolean;
     setArrOfChanges: React.Dispatch<React.SetStateAction<string[]>>;
+    categoryArray: string[];
+    setCategoryArray: React.Dispatch<React.SetStateAction<string[]>>;
 }
 //a popup window to prompt user to pick a folder
-const CategoryModal = ({ categoryModalState, setCategoryModalState, setNoteInp, noteInp, viewerStatus, setArrOfChanges }: Props) => {
+const CategoryModal = ({ categoryModalState, setCategoryModalState, setNoteInp,
+    noteInp, viewerStatus, setArrOfChanges, categoryArray, setCategoryArray }: Props) => {
     const { session } = useSession();
     const { webId } = session.info;
     const [input, setInput] = useState<string>("");
     const handleSave = () => {
-        if (viewerStatus) setArrOfChanges((prevState) => ([...prevState, "category"]));
-        setNoteInp({ ...noteInp, category: input.trim()});
+        if (noteInp.category !== input.trim()) {
+            if (viewerStatus) setArrOfChanges((prevState) => ([...prevState, "category"]));
+            setNoteInp({ ...noteInp, category: input.trim() });
+        }
         setCategoryModalState(false);
     }
+
     return (
         <Modal show={categoryModalState}>
             <Modal.Header closeButton onClick={() => { setCategoryModalState(false) }}>
                 <Modal.Title>Enter Category Name:</Modal.Title>
             </Modal.Header>
             <Modal.Body>
+                {
+                    categoryArray.length !== 0 && <DropdownButton
+                        variant="outline-secondary"
+                        title="choose category"
+                    >
+                        {
+                            categoryArray.map((category) => {
+                                return <Dropdown.Item href="" onClick={() => setInput(category)}>{category}</Dropdown.Item>
+                            })
+                        }
+
+                    </DropdownButton>
+                }
                 <FormControl className="mt-1" aria-describedby="basic-addon3" value={input} onChange={e => setInput(e.target.value)} />
             </Modal.Body>
             <Modal.Footer>

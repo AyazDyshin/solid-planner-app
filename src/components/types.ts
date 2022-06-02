@@ -3,5 +3,6 @@ export interface Note {
     title: string | null;
     content: string | null;
     category: string | null;
+    url: string;
   //  [key: string]: string | number;
 }

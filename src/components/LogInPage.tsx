@@ -31,10 +31,7 @@ const LogInPage = () => {
             }}>SolidCommunity.net</Dropdown.Item>
             <Dropdown.Item href="#" onClick={() => {
               setIssuer("https://solidweb.org")
-            }}>Solidweb.org</Dropdown.Item>
-            <Dropdown.Item href="#" onClick={() => {
-              setIssuer("https://trinpod.us/")
-            }}>Trinpod.us</Dropdown.Item>
+            }}>Solidweb.org</Dropdown.Item> 
           </DropdownButton>
           <FormControl aria-label="Text input with dropdown button" value={issuer}
             onChange={(e) => {

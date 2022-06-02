@@ -15,10 +15,12 @@ interface Props {
     isEdit: boolean;
     setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
     setCreatorStatus: React.Dispatch<React.SetStateAction<boolean>>;
+    categoryArray: string[];
+    setCategoryArray: React.Dispatch<React.SetStateAction<string[]>>;
 }
 // component that renders entry creator, based on the "active" value
 const CreatorToRender = ({ active, creatorStatus, newEntryCr, setNewEntryCr,
-    noteToView, setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, setCreatorStatus }: Props) => {
+    noteToView, setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, setCreatorStatus, categoryArray, setCategoryArray }: Props) => {
 
     useEffect(() => {
     }, [creatorStatus, viewerStatus]);
@@ -38,6 +40,8 @@ const CreatorToRender = ({ active, creatorStatus, newEntryCr, setNewEntryCr,
                         setIsEdit={setIsEdit}
                         creatorStatus={creatorStatus}
                         setCreatorStatus={setCreatorStatus}
+                        categoryArray={categoryArray}
+                        setCategoryArray={setCategoryArray}
                     />);
                 break;
             case "habits":

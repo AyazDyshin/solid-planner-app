@@ -67,7 +67,7 @@ const FolderPickerOrContent = ({ active, creatorStatus, newEntryCr, setCreatorSt
             case "notes":
                 return (
                     <div className="w-100 h-100 d-flex align-items-center justify-content-center">
-                        <ContentsList
+                        {/* <ContentsList
                             active={active}
                             creatorStatus={creatorStatus}
                             setCreatorStatus={setCreatorStatus}
@@ -79,7 +79,7 @@ const FolderPickerOrContent = ({ active, creatorStatus, newEntryCr, setCreatorSt
                             setViewerStatus={setViewerStatus}
                             isEdit={isEdit}
                             setIsEdit={setIsEdit}
-                        />
+                            categoryArray={categoryArray} */}
                         <FolderPickerModal modalState={modalState} setModalState={setModalState} defFolderUrlToUp={defFolderUrlToUp} setDefFolderUrlToUp={setDefFolderUrlToUp}
                             setDefFolderStatus={setDefFolderStatus} />
                     </div>

@@ -18,16 +18,17 @@ interface Props {
     setViewerStatus: React.Dispatch<React.SetStateAction<boolean>>;
     isEdit: boolean;
     setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
+    categoryArray: string[];
+    setCategoryArray: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, setNewEntryCr,
-    noteToView, setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit }: Props) => {
+    noteToView, setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, categoryArray, setCategoryArray }: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [notesArray, setNotesArray] = useState<(Note | null)[]>([]);
     const [habitsArray, setHabitsArray] = useState<Thing[]>([]);
-    const [categoryArray, setCategoryArray] = useState<string[]>([]);
     const [currentCategory, setCurrentCategory] = useState<string | null>(null);
     useEffect(() => {
         setIsLoading(true);

@@ -35,9 +35,12 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
         const fetchData = async () => {
             const defFolderUpd = await getDefaultFolder(webId ?? "", fetch);
             if (!defFolderUpd) {
-                await recordDefaultFolder(webId ?? "", fetch);
+                console.log("recording folder");
+              let heh =  await recordDefaultFolder(webId ?? "", fetch);
+              console.log("result1:");
+              console.log(heh);
             }
-
+            console.log("fetching notes");
             const [updNotesArray, updCategoriesArray] = await fetchAllNotes(webId ?? "", fetch, ((currentCategory) ? currentCategory : undefined));
             let transformedArr = updNotesArray.map((thing) => {
                 return thingToNote(thing);

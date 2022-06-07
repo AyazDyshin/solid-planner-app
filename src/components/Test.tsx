@@ -20,6 +20,8 @@ import {
 import { access } from "@inrupt/solid-client";
 import { getSolidDatasetWithAccessDatasets } from '@inrupt/solid-client/dist/acp/acp';
 import { updated } from 'rdf-namespaces/dist/as';
+import { universalAccess } from "@inrupt/solid-client";
+
 interface Props {
 
 }
@@ -69,6 +71,7 @@ const Test = () => {
     // console.log("this is uniAgent");
     // console.log(uniAgent);
 
+   // await initializeAcl(`https://inrtester2.inrupt.net/t/`, fetch);
 
     try {
       await createContainerAt(`https://inrtester2.inrupt.net/test/`, {
@@ -78,24 +81,43 @@ const Test = () => {
     catch (error) {
       throw new Error("error when trying to create a container");
     }
-
-     await initializeAcl(`https://inrtester2.inrupt.net/test/`, fetch);
-    console.log("we are here");
-    let upd = await access.setPublicAccess(`https://inrtester2.inrupt.net/test/`, {
-      read: true,
-      append: false,
-      write: false,
-      controlRead: false,
-      controlWrite: false
-    }, { fetch: fetch });
-    if (!upd) {
-      throw new Error("You don't have permissions to changes the access type of this resource");
+    let myDatasetWithAcl
+    try {
+      myDatasetWithAcl = await getSolidDatasetWithAcl(`https://inrtester2.inrupt.net/test/`, {fetch : fetch});
     }
-    console.log("this is upd:");
-    console.log(upd);
+    catch (error){
+      console.log("error when fetching dataset with acl");
+    }
+    console.log(myDatasetWithAcl);
+
+
+    // let heh = await universalAccess.setPublicAccess(`https://inrtester2.inrupt.net/t/`, { read: true, write: false }, {
+    //   fetch: fetch
+    // });
+
+    // let acc = universalAccess.getPublicAccess(`https://inrtester2.inrupt.net/t/`, {
+    //   fetch: fetch
+    // });
+    // console.log("this is acc");
+    // console.log(acc);
+
+  
+    //   console.log("we are here");
+    //   let upd = await access.setPublicAccess(`https://inrtester2.inrupt.net/t/`, {
+    //     read: true,
+    //     append: false,
+    //     write: false,
+    //     controlRead: false,
+    //     controlWrite: false
+    //   }, { fetch: fetch });
+    //   if (!upd) {
+    //     throw new Error("You don't have permissions to changes the access type of this resource");
+    //   }
+    //   console.log("this is upd:");
+    //   console.log(upd);
   }
 
-  gets();
+//  gets();
 
 
   return (

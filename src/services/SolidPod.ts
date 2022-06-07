@@ -13,14 +13,13 @@ import { solid, schema, space } from 'rdf-namespaces';
 import { category } from 'rdf-namespaces/dist/qu';
 import { dataset } from 'rdf-namespaces/dist/schema';
 import { Note } from '../components/types';
-import { access } from "@inrupt/solid-client";
-// import {  } from '@inrupt/solid-client/dist/access/universal';
+import { universalAccess } from "@inrupt/solid-client";
+
 type fetcher = ((input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>) & ((input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>);
 
 //function that transforms var of type Thing to var of Type Note
 export const thingToNote = (toChange: Thing | null): Note | null => {
 
-  console.log(toChange);
   if (!toChange) {
     return null;
   }
@@ -172,7 +171,7 @@ export const recordDefaultFolder = async (webId: string, fetch: fetcher) => {
   //handle
   aThing = addUrl(aThing, "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#defaultFolder", updUrlForFolder(defaultFolderPath));
   dataSet = setThing(dataSet, aThing);
-  createDefFolder(defaultFolderPath, fetch);
+  await createDefFolder(defaultFolderPath, fetch);
   const updDataSet = await saveSolidDatasetAt(prefFileLocation!, dataSet, { fetch: fetch });
   await createEntriesInTypeIndex(webId, fetch, notesPath);
 }
@@ -211,8 +210,14 @@ export const getDefaultFolder = async (webId: string, fetch: fetcher): Promise<s
 }
 
 export const initializeAcl = async (url: string, fetch: fetcher) => {
-  
-  let myDatasetWithAcl = await getSolidDatasetWithAcl(url, { fetch: fetch });
+  console.log(`we are initializing: ${url}`);
+  let myDatasetWithAcl
+  try {
+   myDatasetWithAcl = await getSolidDatasetWithAcl(url, { fetch: fetch });
+  }
+  catch (error){
+    throw new Error("Could fetch a dataset with Acl");
+  }
   let resourceAcl;
   if (!hasResourceAcl(myDatasetWithAcl)) {
     if (!hasAccessibleAcl(myDatasetWithAcl)) {
@@ -231,8 +236,8 @@ export const initializeAcl = async (url: string, fetch: fetcher) => {
   }
   await saveAclFor(myDatasetWithAcl, resourceAcl, { fetch: fetch });
   const myDatasetWithAcl2 = await getSolidDatasetWithAcl(url, { fetch: fetch });
-  console.log("this is the acl");
-  console.log(myDatasetWithAcl2);
+  console.log("here it is:");
+  console.log(getResourceAcl(myDatasetWithAcl2));
 }
 
 export const setAccess = async (accessType: string, url: string, shareWith?: string[]) => {
@@ -248,7 +253,7 @@ export const setAccess = async (accessType: string, url: string, shareWith?: str
   // }
   switch (accessType) {
     case "public": {
-      let upd = await access.setPublicAccess(url, {
+      let upd = await universalAccess.setPublicAccess(url, {
         read: true,
         append: false,
         write: false,
@@ -273,6 +278,17 @@ export const setAccess = async (accessType: string, url: string, shareWith?: str
 
 export const createDefFolder = async (defFolderUrl: string, fetch: fetcher) => {
   try {
+    await createContainerAt(`${updUrlForFolder(defFolderUrl)}`, {
+      fetch: fetch
+    });
+  }
+  catch (error) {
+    throw new Error("error when trying to create a folder for notes in specified folder");
+  }
+  
+   await initializeAcl(`${updUrlForFolder(defFolderUrl)}`, fetch);
+  //  await setAccess("public", `${updUrlForFolder(defFolderUrl)}`);
+  try {
     await createContainerAt(`${updUrlForFolder(defFolderUrl)}notes/`, {
       fetch: fetch
     });
@@ -280,31 +296,20 @@ export const createDefFolder = async (defFolderUrl: string, fetch: fetcher) => {
   catch (error) {
     throw new Error("error when trying to create a folder for notes in specified folder");
   }
-  // console.log("we are here");
-  // await initializeAcl(`${updUrlForFolder(defFolderUrl)}`, fetch);
-  // let upd = await access.setPublicAccess(`${updUrlForFolder(defFolderUrl)}`, {
-  //   read: true,
-  //   append: false,
-  //   write: false,
-  //   controlRead: false,
-  //   controlWrite: false
-  // }, { fetch: fetch });
-  // if (!upd) {
-  //   throw new Error("You don't have permissions to changes the access type of this resource");
-  // }
-  // // initializeAcl(`${updUrlForFolder(defFolderUrl)}`, fetch);
-  // // initializeAcl(`${updUrlForFolder(defFolderUrl)}notes/`, fetch);
-  // setAccess("public", `${updUrlForFolder(defFolderUrl)}`);
-  // setAccess("public", `${updUrlForFolder(defFolderUrl)}notes/`);
+ 
+    await initializeAcl(`${updUrlForFolder(defFolderUrl)}notes/`, fetch); 
+  //  await setAccess("public", `${updUrlForFolder(defFolderUrl)}notes/`);
 
-  try {
-    await createContainerAt(`${updUrlForFolder(defFolderUrl)}habits/`, {
-      fetch: fetch
-    });
-  }
-  catch (error) {
-    console.log("error when trying to create a folder for habits in specified folder");
-  }
+
+
+  // try {
+  //   await createContainerAt(`${updUrlForFolder(defFolderUrl)}habits/`, {
+  //     fetch: fetch
+  //   });
+  // }
+  // catch (error) {
+  //   console.log("error when trying to create a folder for habits in specified folder");
+  // }
 }
 
 export const getAllNotesUrlFromPublicIndex = async (webId: string, fetch: fetcher) => {
@@ -322,9 +327,22 @@ export const getAllNotesUrlFromPublicIndex = async (webId: string, fetch: fetche
 export const fetchAllNotes = async (webId: string, fetch: fetcher, categoryFilter?: string) => {
 
   let arrayOfCategories: string[] = [];
-  let urlsArr = await getAllNotesUrlFromPublicIndex(webId, fetch);
+  let urlsArr
+  try {
+   urlsArr = await getAllNotesUrlFromPublicIndex(webId, fetch);
+  }
+  catch (error) {
+    throw new Error("Couldn't fetch notes from your public type index");
+  }
   let updUrlsArr = await Promise.all(urlsArr.map(async (url) => {
-    const data = await getSolidDataset(url, { fetch: fetch });
+    let data : any;
+    try {
+     data = await getSolidDataset(url, { fetch: fetch });
+    }
+    catch (error) {
+      throw new Error(`Couldn't fetch a resource that is listed in your Public type index ${url} this might happen because it 
+      is listed in public type index, but doesn't exist in your POD`);
+    }
     if (isContainer(data)) {
       let allNotes = getContainedResourceUrlAll(data);
       let updArr = await Promise.all(allNotes.map(async (noteUrl) => {
@@ -403,7 +421,7 @@ export const saveNote = async (webId: string, fetch: fetcher, note: Note) => {
   console.log("before set");
   await setAccess("public", noteUrl);
   console.log("after set");
-  let hh = await access.getPublicAccess(noteUrl, { fetch: fetch });
+  let hh = await universalAccess.getPublicAccess(noteUrl, { fetch: fetch });
   console.log(hh);
 }
 

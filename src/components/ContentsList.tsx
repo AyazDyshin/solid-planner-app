@@ -1,8 +1,9 @@
 import { getStringNoLocale, Thing, ThingPersisted } from "@inrupt/solid-client";
 import { useSession } from "@inrupt/solid-ui-react";
+//import { Note } from "rdf-namespaces/dist/as";
 import { useEffect, useState } from "react";
 import { Spinner } from "react-bootstrap";
-import { fetchAllNotes, getDefaultFolder, recordDefaultFolder, thingToNote } from "../services/SolidPod";
+import { fetchAllNotes, getDefaultFolder, recordDefaultFolder, thingToNote, saveNote, editNote } from "../services/SolidPod";
 import NotesList from "./NotesList";
 import { Note } from "./types";
 // need to upgrade for habits case
@@ -20,37 +21,62 @@ interface Props {
     setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
     categoryArray: string[];
     setCategoryArray: React.Dispatch<React.SetStateAction<string[]>>;
+    doNoteSave: boolean;
+    setDoNoteSave: React.Dispatch<React.SetStateAction<boolean>>;
+    NoteInp: Note;
+    setNoteInp: React.Dispatch<React.SetStateAction<Note>>;
+    arrOfChanges: string[];
+    setArrOfChanges: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, setNewEntryCr,
-    noteToView, setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, categoryArray, setCategoryArray }: Props) => {
+    noteToView, setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, categoryArray, setCategoryArray, doNoteSave,
+    setDoNoteSave, NoteInp, setNoteInp, arrOfChanges, setArrOfChanges }: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
-    const [isLoading, setIsLoading] = useState<boolean>(true);
+
     const [notesArray, setNotesArray] = useState<(Note | null)[]>([]);
     const [habitsArray, setHabitsArray] = useState<Thing[]>([]);
     const [currentCategory, setCurrentCategory] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
     useEffect(() => {
-        setIsLoading(true);
-        const fetchData = async () => {
+        const perfSave = async () => {
+            if (doNoteSave || arrOfChanges.length !== 0) {
+                if (creatorStatus) {
+                    await saveNote(webId ?? "", fetch, NoteInp);
+                }
+                else if (arrOfChanges.length !== 0) {
+                    await editNote(webId ?? "", fetch, NoteInp, arrOfChanges);
+                }
+                setCreatorStatus(false);
+                setNoteInp({ id: null, title: "", content: "", category: "", url: "" });
+                setIsEdit(false);
+                setArrOfChanges([]);
+                setDoNoteSave(false);
+            }
+        }
+        const fetchNotes = async () => {
+            setIsLoading(true);
             const defFolderUpd = await getDefaultFolder(webId ?? "", fetch);
             if (!defFolderUpd) {
-                console.log("recording folder");
-              let heh =  await recordDefaultFolder(webId ?? "", fetch);
-              console.log("result1:");
-              console.log(heh);
+                let heh = await recordDefaultFolder(webId ?? "", fetch);
             }
-            console.log("fetching notes");
-            const [updNotesArray, updCategoriesArray] = await fetchAllNotes(webId ?? "", fetch, ((currentCategory) ? currentCategory : undefined));
+            await perfSave();
+            const [updNotesArray, updCategoriesArray] = await fetchAllNotes(webId ?? "", fetch,
+                ((currentCategory) ? currentCategory : undefined));
+
             let transformedArr = updNotesArray.map((thing) => {
                 return thingToNote(thing);
             });
             // add fetch all habits here
             setNotesArray(transformedArr);
             setCategoryArray(updCategoriesArray);
+            setDoNoteSave(false);
             setIsLoading(false);
         }
-        fetchData();
+        if (active === "notes") {
+            fetchNotes();
+        }
     }, [newEntryCr, currentCategory]);
 
     if (isLoading) {

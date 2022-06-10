@@ -17,10 +17,17 @@ interface Props {
     setCreatorStatus: React.Dispatch<React.SetStateAction<boolean>>;
     categoryArray: string[];
     setCategoryArray: React.Dispatch<React.SetStateAction<string[]>>;
+    doNoteSave: boolean;
+    setDoNoteSave: React.Dispatch<React.SetStateAction<boolean>>;
+    NoteInp : Note;
+    setNoteInp : React.Dispatch<React.SetStateAction<Note>>;
+    arrOfChanges: string[];
+    setArrOfChanges: React.Dispatch<React.SetStateAction<string[]>>;
 }
 // component that renders entry creator, based on the "active" value
 const CreatorToRender = ({ active, creatorStatus, newEntryCr, setNewEntryCr,
-    noteToView, setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, setCreatorStatus, categoryArray, setCategoryArray }: Props) => {
+    noteToView, setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, setCreatorStatus, categoryArray,
+    setCategoryArray, doNoteSave, setDoNoteSave,NoteInp, setNoteInp, arrOfChanges, setArrOfChanges}: Props) => {
 
     useEffect(() => {
     }, [creatorStatus, viewerStatus]);
@@ -42,6 +49,12 @@ const CreatorToRender = ({ active, creatorStatus, newEntryCr, setNewEntryCr,
                         setCreatorStatus={setCreatorStatus}
                         categoryArray={categoryArray}
                         setCategoryArray={setCategoryArray}
+                        doNoteSave={doNoteSave}
+                        setDoNoteSave={setDoNoteSave}
+                        NoteInp={NoteInp}
+                        setNoteInp={setNoteInp}
+                        arrOfChanges={arrOfChanges}
+                        setArrOfChanges={setArrOfChanges}
                     />);
                 break;
             case "habits":

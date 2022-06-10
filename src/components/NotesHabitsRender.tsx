@@ -23,7 +23,9 @@ const NotesHabitsRender = ({ active }: Props) => {
     const [noteToView, setNoteToView] = useState<Note | null>(null);
     const [isEdit, setIsEdit] = useState(false);
     const [categoryArray, setCategoryArray] = useState<string[]>([]);
-
+    const [doNoteSave, setDoNoteSave] = useState<boolean>(false);
+    const [NoteInp, setNoteInp] = useState<Note>({ id: null, title: "", content: "", category: "", url: "" });
+    const [arrOfChanges, setArrOfChanges] = useState<string[]>([]);
     return (
         <div className="container-fluid pad">
             <div className="row h-100">
@@ -41,7 +43,14 @@ const NotesHabitsRender = ({ active }: Props) => {
                         isEdit={isEdit}
                         setIsEdit={setIsEdit}
                         categoryArray={categoryArray}
-                        setCategoryArray={setCategoryArray} />
+                        setCategoryArray={setCategoryArray}
+                        doNoteSave={doNoteSave}
+                        setDoNoteSave={setDoNoteSave}
+                        NoteInp={NoteInp}
+                        setNoteInp={setNoteInp}
+                        arrOfChanges={arrOfChanges}
+                        setArrOfChanges={setArrOfChanges}
+                    />
                 </div>
                 <div className="col h-100 border border-5">
                     <CreatorToRender active={active}
@@ -56,7 +65,13 @@ const NotesHabitsRender = ({ active }: Props) => {
                         setIsEdit={setIsEdit}
                         setCreatorStatus={setCreatorStatus}
                         categoryArray={categoryArray}
-                        setCategoryArray={setCategoryArray} />
+                        setCategoryArray={setCategoryArray}
+                        doNoteSave={doNoteSave}
+                        setDoNoteSave={setDoNoteSave}
+                        NoteInp={NoteInp}
+                        setNoteInp={setNoteInp}
+                        arrOfChanges={arrOfChanges}
+                        setArrOfChanges={setArrOfChanges} />
 
                 </div>
             </div>

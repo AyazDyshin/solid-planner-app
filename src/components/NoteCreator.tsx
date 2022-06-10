@@ -22,50 +22,56 @@ interface Props {
     creatorStatus: boolean;
     categoryArray: string[];
     setCategoryArray: React.Dispatch<React.SetStateAction<string[]>>;
+    doNoteSave: boolean;
+    setDoNoteSave: React.Dispatch<React.SetStateAction<boolean>>;
+    NoteInp: Note;
+    setNoteInp: React.Dispatch<React.SetStateAction<Note>>;
+    arrOfChanges: string[];
+    setArrOfChanges: React.Dispatch<React.SetStateAction<string[]>>;
 }
 //component of creation and saving a note the user's pod
 const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
     setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit,
-    setCreatorStatus, creatorStatus, categoryArray, setCategoryArray }: Props) => {
+    setCreatorStatus, creatorStatus, categoryArray, setCategoryArray, doNoteSave, setDoNoteSave, NoteInp,
+    setNoteInp, arrOfChanges, setArrOfChanges }: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
-    const [NoteInp, setNoteInp] = useState<Note>({ id: null, title: "", content: "", category: "", url: ""});
-    const [arrOfChanges, setArrOfChanges] = useState<string[]>([]);
     const [categoryModalState, setCategoryModalState] = useState<boolean>(false);
 
     useEffect(() => {
-        if (viewerStatus) {
-            // handle 
-            setNoteInp(noteToView!);
+        // console.log("first");
+        //console.log(arrOfChanges);
+        if (arrOfChanges.length !== 0 ) {
+           handleSave();
         }
-        else {
-            setNoteInp({ id: null, title: "", content: "", category: "", url: ""});
-            setIsEdit(true);
+        console.log(viewerStatus);
+        if (arrOfChanges.length === 0) {
+            if (viewerStatus) {
+                // handle 
+                setNoteInp(noteToView!);
+            }
+            else {
+                setNoteInp({ id: null, title: "", content: "", category: "", url: "" });
+                setIsEdit(true);
+            }
         }
+
     }, [viewerStatus, noteToView]);
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setNoteInp(prevState => ({ ...prevState, [e.target.name]: e.target.value }));
         if (!arrOfChanges.includes(e.target.name)) {
+            console.log("we changed arr!");
             setArrOfChanges((prevState) => ([...prevState, e.target.name]));
         }
 
     };
-    const handleSave = async () => {
-        if (creatorStatus) {
-            await saveNote(webId ?? "", fetch, NoteInp);
-            newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
-        }
-        else if (arrOfChanges.length !== 0) {
-            await editNote(webId ?? "", fetch, NoteInp, arrOfChanges);
-            newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
-        }
-        setNoteInp({ id: null, title: "", content: "", category: "", url: ""});
-        setIsEdit(false);
+
+    const handleSave = () => {
         setViewerStatus(false);
-        setCreatorStatus(false);
-        setArrOfChanges([]);
+        setDoNoteSave(true);
+        newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
     };
 
     const handleEdit = () => {

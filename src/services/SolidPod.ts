@@ -213,10 +213,10 @@ export const initializeAcl = async (url: string, fetch: fetcher) => {
   console.log(`we are initializing: ${url}`);
   let myDatasetWithAcl
   try {
-   myDatasetWithAcl = await getSolidDatasetWithAcl(url, { fetch: fetch });
+    myDatasetWithAcl = await getSolidDatasetWithAcl(url, { fetch: fetch });
   }
-  catch (error){
-    throw new Error("Could fetch a dataset with Acl");
+  catch (error) {
+    throw new Error("Couldn't fetch a dataset with Acl");
   }
   let resourceAcl;
   if (!hasResourceAcl(myDatasetWithAcl)) {
@@ -235,22 +235,13 @@ export const initializeAcl = async (url: string, fetch: fetcher) => {
     resourceAcl = getResourceAcl(myDatasetWithAcl);
   }
   await saveAclFor(myDatasetWithAcl, resourceAcl, { fetch: fetch });
-  const myDatasetWithAcl2 = await getSolidDatasetWithAcl(url, { fetch: fetch });
-  console.log("here it is:");
-  console.log(getResourceAcl(myDatasetWithAcl2));
+  // const myDatasetWithAcl2 = await getSolidDatasetWithAcl(url, { fetch: fetch });
+  // console.log("here it is:");
+  // console.log(getResourceAcl(myDatasetWithAcl2));
 }
 
-export const setAccess = async (accessType: string, url: string, shareWith?: string[]) => {
-  // let myDatasetWithAcl = await getSolidDatasetWithAcl(url, { fetch: fetch });
-  // if (!hasAccessibleAcl(myDatasetWithAcl)) {
-  //   throw new Error(
-  //     "The current user does not have permission to change access rights to this Resource."
-  //   );
-  // }
-  // let resourceAcl = getResourceAcl(myDatasetWithAcl);
-  // if (!resourceAcl) {
-  //   throw new Error("the resource you are trying to set doesn't have acl setup");
-  // }
+export const setAccess = async (accessType: string, url: string, fetch: fetcher) => {
+
   switch (accessType) {
     case "public": {
       let upd = await universalAccess.setPublicAccess(url, {
@@ -263,19 +254,67 @@ export const setAccess = async (accessType: string, url: string, shareWith?: str
       if (!upd) {
         throw new Error("You don't have permissions to changes the access type of this resource");
       }
-      // const updatedAcl = setPublicResourceAccess(
-      //   resourceAcl,
-      //   { read: true, append: true, write: false, control: false },
-      // );
-      // await saveAclFor(myDatasetWithAcl, updatedAcl, { fetch: fetch });
+
     };
       break;
     case "private": {
-
+      let upd = await universalAccess.setPublicAccess(url, {
+        read: false,
+        append: false,
+        write: false,
+        controlRead: false,
+        controlWrite: false
+      }, { fetch: fetch });
+      if (!upd) {
+        throw new Error("You don't have permissions to changes the access type of this resource");
+      }
+      console.log(upd);
     }
   }
 }
 
+export const shareWith = async (url: string, fetch: fetcher, shareWith: string[]) => {
+  let newShare = await Promise.all(shareWith.map(async (user) => {
+    let upd = await universalAccess.setAgentAccess(url, user, {
+      read: true,
+      append: false,
+      write: false,
+      controlRead: false,
+      controlWrite: false
+    }, { fetch: fetch });
+    if (!upd) {
+      throw new Error("You don't have permissions to changes the access type of this resource");
+    }
+    return upd;
+  }));
+}
+
+export const unShareWith = async (url: string, fetch: fetcher, shareWith: string[]) => {
+  let newShare = await Promise.all(shareWith.map(async (user) => {
+    let upd = await universalAccess.setAgentAccess(url, user, {
+      read: false,
+      append: false,
+      write: false,
+      controlRead: false,
+      controlWrite: false
+    }, { fetch: fetch });
+    if (!upd) {
+      throw new Error("You don't have permissions to changes the access type of this resource");
+    }
+  }));
+}
+// export const makePrivate = async (url: string, fetch: fetcher) => {
+//   let upd = await universalAccess.setPublicAccess(url, {
+//     read: false,
+//     append: false,
+//     write: false,
+//     controlRead: false,
+//     controlWrite: false
+//   }, { fetch: fetch });
+//   if (!upd) {
+//     throw new Error("You don't have permissions to changes the access type of this resource");
+//   }
+// }
 export const createDefFolder = async (defFolderUrl: string, fetch: fetcher) => {
   try {
     await createContainerAt(`${updUrlForFolder(defFolderUrl)}`, {
@@ -285,9 +324,10 @@ export const createDefFolder = async (defFolderUrl: string, fetch: fetcher) => {
   catch (error) {
     throw new Error("error when trying to create a folder for notes in specified folder");
   }
-  
-   await initializeAcl(`${updUrlForFolder(defFolderUrl)}`, fetch);
-  //  await setAccess("public", `${updUrlForFolder(defFolderUrl)}`);
+
+  await initializeAcl(`${updUrlForFolder(defFolderUrl)}`, fetch);
+  await setAccess("public", `${updUrlForFolder(defFolderUrl)}`, fetch);
+
   try {
     await createContainerAt(`${updUrlForFolder(defFolderUrl)}notes/`, {
       fetch: fetch
@@ -296,9 +336,9 @@ export const createDefFolder = async (defFolderUrl: string, fetch: fetcher) => {
   catch (error) {
     throw new Error("error when trying to create a folder for notes in specified folder");
   }
- 
-    await initializeAcl(`${updUrlForFolder(defFolderUrl)}notes/`, fetch); 
-  //  await setAccess("public", `${updUrlForFolder(defFolderUrl)}notes/`);
+
+  await initializeAcl(`${updUrlForFolder(defFolderUrl)}notes/`, fetch);
+  await setAccess("public", `${updUrlForFolder(defFolderUrl)}notes/`, fetch);
 
 
 
@@ -329,15 +369,15 @@ export const fetchAllNotes = async (webId: string, fetch: fetcher, categoryFilte
   let arrayOfCategories: string[] = [];
   let urlsArr
   try {
-   urlsArr = await getAllNotesUrlFromPublicIndex(webId, fetch);
+    urlsArr = await getAllNotesUrlFromPublicIndex(webId, fetch);
   }
   catch (error) {
     throw new Error("Couldn't fetch notes from your public type index");
   }
   let updUrlsArr = await Promise.all(urlsArr.map(async (url) => {
-    let data : any;
+    let data: any;
     try {
-     data = await getSolidDataset(url, { fetch: fetch });
+      data = await getSolidDataset(url, { fetch: fetch });
     }
     catch (error) {
       throw new Error(`Couldn't fetch a resource that is listed in your Public type index ${url} this might happen because it 
@@ -418,11 +458,11 @@ export const saveNote = async (webId: string, fetch: fetcher, note: Note) => {
   dataSet = setThing(dataSet, newNote);
 
   const updDataSet = await saveSolidDatasetAt(noteUrl, dataSet, { fetch: fetch });
-  console.log("before set");
-  await setAccess("public", noteUrl);
-  console.log("after set");
-  let hh = await universalAccess.getPublicAccess(noteUrl, { fetch: fetch });
-  console.log(hh);
+  // console.log("before set");
+  // await setAccess("public", noteUrl);
+  // console.log("after set");
+  // let hh = await universalAccess.getPublicAccess(noteUrl, { fetch: fetch });
+  // console.log(hh);
 }
 
 export const editNote = async (webId: string, fetch: fetcher, note: Note, changes: string[]) => {
@@ -459,6 +499,7 @@ export const editNote = async (webId: string, fetch: fetcher, note: Note, change
                   break;
                 case "content":
                   newThing = setStringNoLocale(newThing!, schema.text, note.content!);
+                  break;
                 case "category":
                   newThing = setStringNoLocale(newThing!, "http://dbpedia.org/ontology/category", note.category!);
               }

@@ -39,6 +39,7 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
     const [habitsArray, setHabitsArray] = useState<Thing[]>([]);
     const [currentCategory, setCurrentCategory] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [currentAccess, setCurrentAccess] = useState<string | null>(null);
     useEffect(() => {
         const perfSave = async () => {
             if (doNoteSave || arrOfChanges.length !== 0) {
@@ -63,7 +64,7 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
             }
             await perfSave();
             const [updNotesArray, updCategoriesArray] = await fetchAllNotes(webId ?? "", fetch,
-                ((currentCategory) ? currentCategory : undefined));
+                ((currentCategory) ? currentCategory : undefined), ((currentAccess) ? currentAccess : undefined));
 
             let transformedArr = updNotesArray.map((thing) => {
                 return thingToNote(thing);
@@ -77,7 +78,7 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
         if (active === "notes") {
             fetchNotes();
         }
-    }, [newEntryCr, currentCategory]);
+    }, [newEntryCr, currentCategory, currentAccess]);
 
     if (isLoading) {
         return (
@@ -117,6 +118,8 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
                         setCategoryArray={setCategoryArray}
                         setCurrentCategory={setCurrentCategory}
                         currentCategory={currentCategory}
+                        currentAccess={currentAccess}
+                        setCurrentAccess={setCurrentAccess}
                     />
                 )
             }

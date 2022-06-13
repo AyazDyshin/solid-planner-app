@@ -1,13 +1,15 @@
 import "regenerator-runtime/runtime";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import LogInPage from "./components/LogInPage";
 import MainContent from "./components/MainContent";
 import { useSession } from "@inrupt/solid-ui-react";
 import { Spinner } from "react-bootstrap";
+import { checkPermissions } from "./services/access";
 
 const App: React.FC = () => {
-  const { session, sessionRequestInProgress } = useSession();
 
+  const { session, sessionRequestInProgress } = useSession();
+  //console.log("here");
   const render = () => {
     // Checks if data loading is in progress
     if (sessionRequestInProgress) {
@@ -30,8 +32,8 @@ const App: React.FC = () => {
       }
       //case for when the user is logged in
       else {
+        
         return (
-
           <MainContent />
         )
       }

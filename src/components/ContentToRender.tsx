@@ -1,3 +1,4 @@
+import ContactsRender from "./ContactsRender";
 import NotesHabitsRender from "./NotesHabitsRender";
 import SettingsPage from "./SettingsPage";
 
@@ -12,6 +13,8 @@ const ContentToRender = ({ active }: Props) => {
         case "notes":
         case "habits":
             return (<NotesHabitsRender active={active} />);
+        case "contacts":
+            return (<ContactsRender/>);
         case "settings":
             return (<SettingsPage />);
         default:

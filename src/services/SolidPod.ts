@@ -4,18 +4,20 @@ import {
   getStringNoLocale, removeThing, saveSolidDatasetInContainer, setUrl, getContainedResourceUrlAll, deleteSolidDataset,
   setStringNoLocale, getResourceInfo, addStringNoLocale, isContainer, getContentType, addInteger,
   buildThing, getSolidDatasetWithAcl, hasResourceAcl, hasAccessibleAcl, hasFallbackAcl, createAclFromFallbackAcl,
-  getResourceAcl, saveAclFor, setPublicResourceAccess, getPublicAccess
+  getResourceAcl, saveAclFor, setPublicResourceAccess, getPublicAccess, getStringNoLocaleAll
 } from '@inrupt/solid-client';
 import { pim } from '@inrupt/solid-client/dist/constants';
 import { useSession } from '@inrupt/solid-ui-react';
 import { DCTERMS, RDF } from '@inrupt/vocab-common-rdf';
-import { solid, schema, space } from 'rdf-namespaces';
+import { solid, schema, space, foaf } from 'rdf-namespaces';
 import { category } from 'rdf-namespaces/dist/qu';
 import { dataset } from 'rdf-namespaces/dist/schema';
 import { Note } from '../components/types';
 import { universalAccess } from "@inrupt/solid-client";
+import { getPubAccess, initializeAcl, isWacOrAcp, setPubAccess } from './access';
+import { fetchWithVc } from '@inrupt/solid-client-access-grants';
 
-type fetcher = ((input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>) & ((input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>);
+type fetcher = (((input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>) & ((input: RequestInfo | URL, init?: RequestInit | undefined) => Promise<Response>)) | undefined;
 
 //function that transforms var of type Thing to var of Type Note
 export const thingToNote = (toChange: Thing | null): Note | null => {
@@ -171,7 +173,7 @@ export const recordDefaultFolder = async (webId: string, fetch: fetcher) => {
   //handle
   aThing = addUrl(aThing, "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#defaultFolder", updUrlForFolder(defaultFolderPath));
   dataSet = setThing(dataSet, aThing);
-  await createDefFolder(defaultFolderPath, fetch);
+  await createDefFolder(webId, defaultFolderPath, fetch);
   const updDataSet = await saveSolidDatasetAt(prefFileLocation!, dataSet, { fetch: fetch });
   await createEntriesInTypeIndex(webId, fetch, notesPath);
 }
@@ -209,99 +211,56 @@ export const getDefaultFolder = async (webId: string, fetch: fetcher): Promise<s
   return defFolderUrl;
 }
 
-export const initializeAcl = async (url: string, fetch: fetcher) => {
-  console.log(`we are initializing: ${url}`);
-  let myDatasetWithAcl
+
+export const recordAccessType = async (webId: string, fetch: fetcher, type: string) => {
+  const prefFileLocation = await getPrefLink(webId, fetch);
+  //handle
+  let dataSet;
   try {
-    myDatasetWithAcl = await getSolidDatasetWithAcl(url, { fetch: fetch });
+    dataSet = await getSolidDataset(prefFileLocation, {
+      fetch: fetch
+    });
   }
   catch (error) {
-    throw new Error("Couldn't fetch a dataset with Acl");
+    throw new Error("error when fetching preference file, it either doesn't exist, or has different location from the one specified in the webId");
   }
-  let resourceAcl;
-  if (!hasResourceAcl(myDatasetWithAcl)) {
-    if (!hasAccessibleAcl(myDatasetWithAcl)) {
-      throw new Error(
-        "The current user does not have permission to change access rights to this Resource."
-      );
-    }
-    if (!hasFallbackAcl(myDatasetWithAcl)) {
-      throw new Error(
-        "The current user does not have permission to see who currently has access to this Resource."
-      );
-    }
-    resourceAcl = createAclFromFallbackAcl(myDatasetWithAcl);
-  } else {
-    resourceAcl = getResourceAcl(myDatasetWithAcl);
+  let aThing = getThing(dataSet, prefFileLocation);
+  //handle
+  if (!aThing) {
+    throw new Error("preference file does not exist");
   }
-  await saveAclFor(myDatasetWithAcl, resourceAcl, { fetch: fetch });
-  // const myDatasetWithAcl2 = await getSolidDatasetWithAcl(url, { fetch: fetch });
-  // console.log("here it is:");
-  // console.log(getResourceAcl(myDatasetWithAcl2));
+
+  //handle
+  aThing = addStringNoLocale(aThing, "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#accessType", type);
+  dataSet = setThing(dataSet, aThing);
+  const updDataSet = await saveSolidDatasetAt(prefFileLocation!, dataSet, { fetch: fetch });
 }
 
-export const setAccess = async (accessType: string, url: string, fetch: fetcher) => {
-
-  switch (accessType) {
-    case "public": {
-      let upd = await universalAccess.setPublicAccess(url, {
-        read: true,
-        append: false,
-        write: false,
-        controlRead: false,
-        controlWrite: false
-      }, { fetch: fetch });
-      if (!upd) {
-        throw new Error("You don't have permissions to changes the access type of this resource");
-      }
-
-    };
-      break;
-    case "private": {
-      let upd = await universalAccess.setPublicAccess(url, {
-        read: false,
-        append: false,
-        write: false,
-        controlRead: false,
-        controlWrite: false
-      }, { fetch: fetch });
-      if (!upd) {
-        throw new Error("You don't have permissions to changes the access type of this resource");
-      }
-      console.log(upd);
-    }
+export const getAccessType = async (webId: string, fetch: fetcher) => {
+  const prefFileLocation = await getPrefLink(webId, fetch);
+  let dataSet
+  try {
+    dataSet = await getSolidDataset(prefFileLocation, {
+      fetch: fetch
+    });
   }
-}
-
-export const shareWith = async (url: string, fetch: fetcher, shareWith: string[]) => {
-  let newShare = await Promise.all(shareWith.map(async (user) => {
-    let upd = await universalAccess.setAgentAccess(url, user, {
-      read: true,
-      append: false,
-      write: false,
-      controlRead: false,
-      controlWrite: false
-    }, { fetch: fetch });
-    if (!upd) {
-      throw new Error("You don't have permissions to changes the access type of this resource");
-    }
-    return upd;
-  }));
-}
-
-export const unShareWith = async (url: string, fetch: fetcher, shareWith: string[]) => {
-  let newShare = await Promise.all(shareWith.map(async (user) => {
-    let upd = await universalAccess.setAgentAccess(url, user, {
-      read: false,
-      append: false,
-      write: false,
-      controlRead: false,
-      controlWrite: false
-    }, { fetch: fetch });
-    if (!upd) {
-      throw new Error("You don't have permissions to changes the access type of this resource");
-    }
-  }));
+  catch {
+    throw new Error("couldn't fetch preference file, this might be due to the fact that it doesn't exist");
+  }
+  //handle
+  let aThing = await getThing(dataSet, prefFileLocation);
+  console.log("pref file");
+  console.log(aThing);
+  if (aThing === null) {
+    throw new Error("preference file is empty");
+  }
+  //handle
+  let type = await getStringNoLocale(aThing, "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#accessType");
+  if (type === null) {
+    // add try repair here
+    throw new Error("access type is not recorded in pref file");
+  }
+  return type;
 }
 // export const makePrivate = async (url: string, fetch: fetcher) => {
 //   let upd = await universalAccess.setPublicAccess(url, {
@@ -315,7 +274,7 @@ export const unShareWith = async (url: string, fetch: fetcher, shareWith: string
 //     throw new Error("You don't have permissions to changes the access type of this resource");
 //   }
 // }
-export const createDefFolder = async (defFolderUrl: string, fetch: fetcher) => {
+export const createDefFolder = async (webId: string, defFolderUrl: string, fetch: fetcher) => {
   try {
     await createContainerAt(`${updUrlForFolder(defFolderUrl)}`, {
       fetch: fetch
@@ -324,9 +283,13 @@ export const createDefFolder = async (defFolderUrl: string, fetch: fetcher) => {
   catch (error) {
     throw new Error("error when trying to create a folder for notes in specified folder");
   }
+  let type = await isWacOrAcp(`${updUrlForFolder(defFolderUrl)}`, fetch);
+  await recordAccessType(webId, fetch, type);
+  if (type === "wac") {
+    console.log("after wac 1");
+  }
 
-  await initializeAcl(`${updUrlForFolder(defFolderUrl)}`, fetch);
-  await setAccess("public", `${updUrlForFolder(defFolderUrl)}`, fetch);
+  await setPubAccess(webId, { read: true, write: false }, `${updUrlForFolder(defFolderUrl)}`, fetch);
 
   try {
     await createContainerAt(`${updUrlForFolder(defFolderUrl)}notes/`, {
@@ -337,8 +300,10 @@ export const createDefFolder = async (defFolderUrl: string, fetch: fetcher) => {
     throw new Error("error when trying to create a folder for notes in specified folder");
   }
 
-  await initializeAcl(`${updUrlForFolder(defFolderUrl)}notes/`, fetch);
-  await setAccess("public", `${updUrlForFolder(defFolderUrl)}notes/`, fetch);
+  if (type === "wac") {
+    await initializeAcl(`${updUrlForFolder(defFolderUrl)}notes/`, fetch);
+  }
+  await setPubAccess(webId, { read: true, write: false }, `${updUrlForFolder(defFolderUrl)}notes/`, fetch);
 
 
 
@@ -364,7 +329,7 @@ export const getAllNotesUrlFromPublicIndex = async (webId: string, fetch: fetche
   return updThings;
 }
 
-export const fetchAllNotes = async (webId: string, fetch: fetcher, categoryFilter?: string) => {
+export const fetchAllNotes = async (webId: string, fetch: fetcher, categoryFilter?: string, accessFilter?: string) => {
 
   let arrayOfCategories: string[] = [];
   let urlsArr
@@ -397,9 +362,40 @@ export const fetchAllNotes = async (webId: string, fetch: fetcher, categoryFilte
         if (newThing) {
           let categoryOfCurrNote = getStringNoLocale(newThing, "http://dbpedia.org/ontology/category");
           if (categoryOfCurrNote && !arrayOfCategories.includes(categoryOfCurrNote)) arrayOfCategories.push(categoryOfCurrNote);
-          if (categoryFilter) {
-            return categoryOfCurrNote === categoryFilter ? newThing : null;
+          if (categoryFilter || accessFilter) {
+            let toReturn: ThingPersisted | null;
+            toReturn = newThing;
+            if (categoryFilter) {
+              toReturn = (categoryOfCurrNote === categoryFilter ? newThing : null);
+            }
+            if (accessFilter) {
+              switch (accessFilter) {
+                case "public": {
+                  const acc = await getPubAccess(webId, noteUrl, fetch);
+                  if (!toReturn) {
+                    break;
+                  }
+                  else {
+                    toReturn = (acc!.read ? newThing : null);
+                    break;
+                  }
+
+                }
+                case "private": {
+                  const acc = await getPubAccess(webId, noteUrl, fetch);
+                  if (!toReturn) {
+                    break;
+                  }
+                  else {
+                    toReturn = (acc!.read ? null : newThing);
+                    break;
+                  }
+                }
+              }
+            }
+            return toReturn;
           }
+
         }
         // let hh = await access.getPublicAccess(newThing!.url, { fetch: fetch });
         // console.log(hh);
@@ -458,6 +454,12 @@ export const saveNote = async (webId: string, fetch: fetcher, note: Note) => {
   dataSet = setThing(dataSet, newNote);
 
   const updDataSet = await saveSolidDatasetAt(noteUrl, dataSet, { fetch: fetch });
+  let type = await getAccessType(webId, fetch);
+  if (type === "wac") {
+    await initializeAcl(noteUrl, fetch);
+  }
+  await setPubAccess(webId, { read: false, write: false }, noteUrl, fetch);
+  let p = await getPubAccess(webId, noteUrl, fetch);
   // console.log("before set");
   // await setAccess("public", noteUrl);
   // console.log("after set");
@@ -574,3 +576,20 @@ export const deleteNote = async (webId: string, fetch: fetcher, id: number) => {
   }));
 }
 
+export const fetchContacts = async (webId: string, fetch: fetcher) => {
+  const storage = await getStoragePref(webId, fetch);
+  const contactsUrl = `${storage}contacts/Person/`;
+  const ds = await getSolidDataset(contactsUrl, { fetch: fetch });
+ // console.log(ds);
+  const allUrl = getContainedResourceUrlAll(ds);
+  console.log(allUrl);
+  const newDs = await getSolidDataset(`${storage}contacts/people.ttl`, { fetch: fetch });
+  const allPeople = getThingAll(newDs);
+  const names = allPeople.map((thing) => {
+    let name = getStringNoLocale(thing, foaf.name);
+    return name;
+  });
+ // console.log(allPeople);
+  console.log(names);
+  return [allUrl, names];
+}

@@ -22,15 +22,18 @@ interface Props {
   setCategoryArray: React.Dispatch<React.SetStateAction<string[]>>;
   setCurrentCategory: React.Dispatch<React.SetStateAction<string | null>>;
   currentCategory: string | null;
+  setCurrentAccess: React.Dispatch<React.SetStateAction<string | null>>;
+  currentAccess: string | null;
 }
 
 const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView,
   viewerStatus, setViewerStatus, setCreatorStatus, isEdit, setIsEdit, categoryArray, setCategoryArray,
-  setCurrentCategory, currentCategory }: Props) => {
+  setCurrentCategory, currentCategory, setCurrentAccess, currentAccess }: Props) => {
   const { session, fetch } = useSession();
   const { webId } = session.info;
   const [activeNote, setActiveNote] = useState<number | null>(null);
   const [saveModalState, setSaveModalState] = useState<boolean>(false);
+  let accessArray = ["public", "private", "shared"];
 
   const handleCreate = () => {
     if (isEdit) {
@@ -44,27 +47,48 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView,
 
   return (
     <div className="w-100 h-100">
-      {
-        categoryArray.length !== 0 && <DropdownButton
+      <div className="d-flex">
+
+
+        <DropdownButton
           variant="outline-secondary"
-          title={<div>{currentCategory ? currentCategory : "All notes"} <RiArrowDropDownLine /></div>}
+          title={<div>{currentAccess ? currentAccess : "access type"} <RiArrowDropDownLine /></div>}
         >
           {
-            categoryArray.map((category) => {
-              return <Dropdown.Item href="" onClick={() => setCurrentCategory(category)}>{category}</Dropdown.Item>
+            accessArray.map((access) => {
+              return <Dropdown.Item href="" key={Date.now() + Math.floor(Math.random() * 1000)} onClick={() => setCurrentAccess(access)}>{access}</Dropdown.Item>
             })
           }
 
-          {currentCategory && (
-            <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentCategory(null)}>Reset</Dropdown.Item></>)}
+          {currentAccess && (
+            <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentAccess(null)}>Reset</Dropdown.Item></>)}
         </DropdownButton>
-      }
+
+
+        {
+          categoryArray.length !== 0 && <DropdownButton
+            variant="outline-secondary"
+            title={<div>{currentCategory ? currentCategory : "All notes"} <RiArrowDropDownLine /></div>}
+          >
+            {
+              categoryArray.map((category) => {
+                return <Dropdown.Item href="" key={Date.now() + Math.floor(Math.random() * 1000)} onClick={() => setCurrentCategory(category)}>{category}</Dropdown.Item>
+              })
+            }
+
+            {currentCategory && (
+              <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentCategory(null)}>Reset</Dropdown.Item></>)}
+          </DropdownButton>
+        }
+
+
+      </div>
       <div className="list-group w-100 h-100">
         {
           notesArray.map((note) => {
             if (note) {
               return <a
-                key={`${note.id}${Date.now()}`}
+                key={`${note.id}${Date.now() + Math.floor(Math.random() * 1000)}`}
                 className={`list-group-item list-group-item-action ${activeNote === note.id ? 'active' : ''}`}
                 onClick={(e) => {
                   e.preventDefault();

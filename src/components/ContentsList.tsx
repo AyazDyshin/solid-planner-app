@@ -3,7 +3,9 @@ import { useSession } from "@inrupt/solid-ui-react";
 //import { Note } from "rdf-namespaces/dist/as";
 import { useEffect, useState } from "react";
 import { Spinner } from "react-bootstrap";
-import { fetchAllNotes, getDefaultFolder, recordDefaultFolder, thingToNote, saveNote, editNote } from "../services/SolidPod";
+import { fetchAllNotes, getDefaultFolder, recordDefaultFolder, thingToNote, saveNote, editNote, fetchContacts, checkContacts } from "../services/SolidPod";
+import ContactsList from "./ContactsList";
+import NoContacts from "./NoContacts";
 import NotesList from "./NotesList";
 import { Note } from "./types";
 // need to upgrade for habits case
@@ -34,12 +36,16 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
     setDoNoteSave, NoteInp, setNoteInp, arrOfChanges, setArrOfChanges }: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
-
+    if (webId === undefined) {
+        throw new Error("error when trying to get webId");
+    }
     const [notesArray, setNotesArray] = useState<(Note | null)[]>([]);
     const [habitsArray, setHabitsArray] = useState<Thing[]>([]);
     const [currentCategory, setCurrentCategory] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [currentAccess, setCurrentAccess] = useState<string | null>(null);
+    const [contactsFdrStatus, setContactsFdrStatus] = useState<boolean>(false);
+
     useEffect(() => {
         const perfSave = async () => {
             if (doNoteSave || arrOfChanges.length !== 0) {
@@ -75,10 +81,25 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
             setDoNoteSave(false);
             setIsLoading(false);
         }
+
+        const getContacts = async () => {
+            setIsLoading(true);
+            let contactsStatus = await checkContacts(webId, fetch);
+            console.log("this is frd start");
+            console.log(contactsStatus);
+            setContactsFdrStatus(contactsStatus);
+            if (contactsStatus) {
+                const [updURls, updNames] = await fetchContacts(webId, fetch);
+            }
+            setIsLoading(false);
+        }
         if (active === "notes") {
             fetchNotes();
         }
-    }, [newEntryCr, currentCategory, currentAccess]);
+        else if (active === "contacts") {
+            getContacts();
+        }
+    }, [newEntryCr, currentCategory, currentAccess, active]);
 
     if (isLoading) {
         return (
@@ -127,7 +148,7 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
         // might need to make it else if(active==="habits")
         // fetch of habitsArray is not implemented yet, so it will always fall in the 
         // habitsArray.length === 0 case
-        else {
+        else if (active === "habits") {
             if (habitsArray.length === 0) {
                 return (
                     <div className="card text-center">
@@ -144,6 +165,18 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
                     <div>Not implemented yet (case for when habits exist)</div>
                 )
             }
+        }
+
+        else if (active === "contacts") {
+            if (contactsFdrStatus) {
+                return (<ContactsList />);
+            }
+            else {
+                return (<NoContacts />);
+            }
+        }
+        else {
+            return (<div>Error</div>);
         }
     }
 }

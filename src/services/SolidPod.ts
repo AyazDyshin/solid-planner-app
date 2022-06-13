@@ -575,12 +575,24 @@ export const deleteNote = async (webId: string, fetch: fetcher, id: number) => {
     }
   }));
 }
+export const checkContacts = async (webId: string, fetch: fetcher) => {
+  try {
+    const storage = await getStoragePref(webId, fetch);
+    let ds = await getSolidDataset(`${storage}contacts/`, { fetch: fetch });
+    return true;
+  }
+  catch (error)
+  { 
+    console.log(error);
+    return false;
+  }
+}
 
 export const fetchContacts = async (webId: string, fetch: fetcher) => {
   const storage = await getStoragePref(webId, fetch);
   const contactsUrl = `${storage}contacts/Person/`;
   const ds = await getSolidDataset(contactsUrl, { fetch: fetch });
- // console.log(ds);
+  // console.log(ds);
   const allUrl = getContainedResourceUrlAll(ds);
   console.log(allUrl);
   const newDs = await getSolidDataset(`${storage}contacts/people.ttl`, { fetch: fetch });
@@ -589,7 +601,7 @@ export const fetchContacts = async (webId: string, fetch: fetcher) => {
     let name = getStringNoLocale(thing, foaf.name);
     return name;
   });
- // console.log(allPeople);
+  // console.log(allPeople);
   console.log(names);
   return [allUrl, names];
 }

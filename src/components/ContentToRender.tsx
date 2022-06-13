@@ -12,9 +12,8 @@ const ContentToRender = ({ active }: Props) => {
     switch (active) {
         case "notes":
         case "habits":
-            return (<NotesHabitsRender active={active} />);
         case "contacts":
-            return (<ContactsRender/>);
+            return (<NotesHabitsRender active={active} />);
         case "settings":
             return (<SettingsPage />);
         default:

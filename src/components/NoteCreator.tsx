@@ -8,6 +8,7 @@ import { Note } from "./types";
 import { BsThreeDots } from "react-icons/bs";
 import { FiEdit } from "react-icons/fi";
 import "../styles.css";
+import AccessModal from "../modals/AccessModal";
 
 interface Props {
     newEntryCr: boolean;
@@ -37,12 +38,13 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
     const { session, fetch } = useSession();
     const { webId } = session.info;
     const [categoryModalState, setCategoryModalState] = useState<boolean>(false);
+    const [accessModalState, setAccessModalState] = useState<boolean>(false);
 
     useEffect(() => {
         // console.log("first");
         //console.log(arrOfChanges);
-        if (arrOfChanges.length !== 0 ) {
-           handleSave();
+        if (arrOfChanges.length !== 0) {
+            handleSave();
         }
         console.log(viewerStatus);
         if (arrOfChanges.length === 0) {
@@ -51,7 +53,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
                 setNoteInp(noteToView!);
             }
             else {
-                setNoteInp({ id: null, title: "", content: "", category: "", url: "" });
+                setNoteInp({ id: null, title: "", content: "", category: "", url: "", access: null });
                 setIsEdit(true);
             }
         }
@@ -106,7 +108,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
                         {viewerStatus && <Dropdown.Item onClick={handleEdit}><FiEdit /> edit</Dropdown.Item>}
                         {viewerStatus && <Dropdown.Item onClick={handleDelete}>delete</Dropdown.Item>}
                         <Dropdown.Item href="" onClick={() => (setCategoryModalState(true))}>Set Category</Dropdown.Item>
-                        <Dropdown.Item href="">Set Access type</Dropdown.Item>
+                        <Dropdown.Item href="" onClick={() => (setAccessModalState(true))}>Set Access type</Dropdown.Item>
                     </DropdownButton>
                 </ButtonGroup>
             </InputGroup>
@@ -123,6 +125,14 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
                 viewerStatus={viewerStatus}
                 categoryArray={categoryArray}
                 setCategoryArray={setCategoryArray}
+            />
+            <AccessModal
+                accessModalState={accessModalState}
+                setAccessModalState={setAccessModalState}
+                setNoteInp={setNoteInp}
+                noteInp={NoteInp}
+                setArrOfChanges={setArrOfChanges}
+                viewerStatus={viewerStatus}
             />
         </div>
     )

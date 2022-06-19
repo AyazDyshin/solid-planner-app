@@ -41,7 +41,8 @@ const CategoryModal = ({ categoryModalState, setCategoryModalState, setNoteInp,
                     >
                         {
                             categoryArray.map((category) => {
-                                return <Dropdown.Item href="" onClick={() => setInput(category)}>{category}</Dropdown.Item>
+                                return <Dropdown.Item href="" key={Date.now() + Math.floor(Math.random() * 1000)}
+                                    onClick={() => setInput(category)}>{category}</Dropdown.Item>
                             })
                         }
 

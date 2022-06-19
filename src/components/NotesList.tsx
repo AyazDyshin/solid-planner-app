@@ -1,9 +1,10 @@
+import 'bootstrap/dist/css/bootstrap.css';
 import { getInteger, getStringNoLocale, Thing } from "@inrupt/solid-client";
 import { useSession } from "@inrupt/solid-ui-react";
 import { DCTERMS } from "@inrupt/vocab-common-rdf";
 import { schema } from "rdf-namespaces";
-import { useState } from "react";
-import { Dropdown, DropdownButton, Badge } from "react-bootstrap";
+import { RefAttributes, useState } from "react";
+import { Dropdown, DropdownButton, Badge, Overlay, Tooltip, OverlayTrigger, TooltipProps, Popover, PopoverProps } from "react-bootstrap";
 import SaveModal from "./SaveModal";
 import { Note } from "./types";
 import { RiArrowDropDownLine } from "react-icons/ri";
@@ -34,6 +35,16 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView,
   const [activeNote, setActiveNote] = useState<number | null>(null);
   const [saveModalState, setSaveModalState] = useState<boolean>(false);
   let accessArray = ["public", "private", "shared"];
+  const renderTooltip = (props: JSX.IntrinsicAttributes & PopoverProps & RefAttributes<HTMLDivElement>) => (
+    <Popover id="popover-basic" {...props}>
+    <Popover.Header as="h3">Popover right</Popover.Header>
+    <Popover.Body>
+      And here's some <strong>amazing</strong> content. It's very engaging.
+      right?
+    </Popover.Body>
+  </Popover>
+  );
+
 
   const handleCreate = () => {
     if (isEdit) {
@@ -49,21 +60,22 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView,
     <div className="w-100 h-100">
       <div className="d-flex">
 
+      <OverlayTrigger placement="right" overlay={renderTooltip}>
+          <DropdownButton
+            variant="outline-secondary"
+            title={<div>{currentAccess ? currentAccess : "access type"} <RiArrowDropDownLine /></div>}
+          >
+            {
+              accessArray.map((access) => {
+                return <Dropdown.Item href="" key={Date.now() + Math.floor(Math.random() * 1000)}
+                 onClick={() => setCurrentAccess(access)}>{access}</Dropdown.Item>
+              })
+            }
 
-        <DropdownButton
-          variant="outline-secondary"
-          title={<div>{currentAccess ? currentAccess : "access type"} <RiArrowDropDownLine /></div>}
-        >
-          {
-            accessArray.map((access) => {
-              return <Dropdown.Item href="" key={Date.now() + Math.floor(Math.random() * 1000)} onClick={() => setCurrentAccess(access)}>{access}</Dropdown.Item>
-            })
-          }
-
-          {currentAccess && (
-            <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentAccess(null)}>Reset</Dropdown.Item></>)}
-        </DropdownButton>
-
+            {currentAccess && (
+              <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentAccess(null)}>Reset</Dropdown.Item></>)}
+          </DropdownButton>
+        </OverlayTrigger>
 
         {
           categoryArray.length !== 0 && <DropdownButton
@@ -72,7 +84,8 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView,
           >
             {
               categoryArray.map((category) => {
-                return <Dropdown.Item href="" key={Date.now() + Math.floor(Math.random() * 1000)} onClick={() => setCurrentCategory(category)}>{category}</Dropdown.Item>
+                return <Dropdown.Item href="" key={Date.now() + Math.floor(Math.random() * 1000)}
+                 onClick={() => setCurrentCategory(category)}>{category}</Dropdown.Item>
               })
             }
 
@@ -81,6 +94,7 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView,
           </DropdownButton>
         }
 
+        <a className="btn btn-primary ms-auto" onClick={handleCreate}>create</a>
 
       </div>
       <div className="list-group w-100 h-100">
@@ -89,7 +103,7 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView,
             if (note) {
               return <a
                 key={`${note.id}${Date.now() + Math.floor(Math.random() * 1000)}`}
-                className={`list-group-item list-group-item-action ${activeNote === note.id ? 'active' : ''}`}
+                className={`list-group-item px-1 list-group-item-action ${activeNote === note.id ? 'active' : ''}`}
                 onClick={(e) => {
                   e.preventDefault();
                   setIsEdit(false);
@@ -98,13 +112,16 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView,
                   setViewerStatus(true);
                   setCreatorStatus(false);
                 }}
-              >{note.category && <Badge pill bg="primary" className="me-3">
-                {note.category}</Badge>}{!note.category && <Badge pill bg="secondary" className="me-3">
-                  no category</Badge>}{note.title} </a>
+              >
+                {note.category && <Badge pill bg="primary" className="me-1">{note.category}</Badge>}
+                {!note.category && <Badge pill bg="secondary" className="me-1">no category</Badge>}
+                {note.access && <Badge pill bg="secondary" className="me-1">{Object.keys(note.access)[0]}</Badge>}
+                {note.shareList && <Badge pill bg="secondary" className="me-1">shared</Badge>}
+                {note.title}
+              </a>
             }
           })
         }
-        <a className="btn btn-primary" onClick={handleCreate}>create</a>
         <SaveModal saveModalState={saveModalState} setSaveModalState={setSaveModalState}
           setCreatorStatus={setCreatorStatus}
           setViewerStatus={setViewerStatus} />

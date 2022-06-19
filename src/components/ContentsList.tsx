@@ -1,9 +1,12 @@
-import { getStringNoLocale, Thing, ThingPersisted } from "@inrupt/solid-client";
+import { Thing } from "@inrupt/solid-client";
 import { useSession } from "@inrupt/solid-ui-react";
 //import { Note } from "rdf-namespaces/dist/as";
 import { useEffect, useState } from "react";
 import { Spinner } from "react-bootstrap";
-import { fetchAllNotes, getDefaultFolder, recordDefaultFolder, thingToNote, saveNote, editNote, fetchContacts, checkContacts } from "../services/SolidPod";
+import {
+    fetchAllNotes, getDefaultFolder, recordDefaultFolder, thingToNote, saveNote,
+    editNote, fetchContacts, checkContacts
+} from "../services/SolidPod";
 import ContactsList from "./ContactsList";
 import NoContacts from "./NoContacts";
 import NotesList from "./NotesList";
@@ -45,36 +48,43 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [currentAccess, setCurrentAccess] = useState<string | null>(null);
     const [contactsFdrStatus, setContactsFdrStatus] = useState<boolean>(false);
+    const [contactsArr, setContactsArr] = useState<(string | null)[][]>([]);
+    const [otherWebId, setOtherWebId] = useState<string | null>(null);
 
     useEffect(() => {
+        console.log("this is other");
+        console.log(otherWebId);
         const perfSave = async () => {
             if (doNoteSave || arrOfChanges.length !== 0) {
                 if (creatorStatus) {
-                    await saveNote(webId ?? "", fetch, NoteInp);
+                    await saveNote(webId, fetch, NoteInp);
                 }
                 else if (arrOfChanges.length !== 0) {
-                    await editNote(webId ?? "", fetch, NoteInp, arrOfChanges);
+                    await editNote(webId, fetch, NoteInp, arrOfChanges);
                 }
                 setCreatorStatus(false);
-                setNoteInp({ id: null, title: "", content: "", category: "", url: "" });
+                setNoteInp({ id: null, title: "", content: "", category: "", url: "", access: null });
                 setIsEdit(false);
                 setArrOfChanges([]);
                 setDoNoteSave(false);
             }
         }
-        const fetchNotes = async () => {
+        const fetchNotes = async (otherId?: string) => {
             setIsLoading(true);
-            const defFolderUpd = await getDefaultFolder(webId ?? "", fetch);
-            if (!defFolderUpd) {
-                let heh = await recordDefaultFolder(webId ?? "", fetch);
-            }
+            let currentWebId = otherId ? otherId : webId;
+            // const defFolderUpd = await getDefaultFolder(currentWebId, fetch);
+            // if (!defFolderUpd) {
+            //     let heh = await recordDefaultFolder(currentWebId, fetch);
+            // }
             await perfSave();
-            const [updNotesArray, updCategoriesArray] = await fetchAllNotes(webId ?? "", fetch,
+            const [updNotesArray, updCategoriesArray] = await fetchAllNotes(currentWebId, fetch,
                 ((currentCategory) ? currentCategory : undefined), ((currentAccess) ? currentAccess : undefined));
 
-            let transformedArr = updNotesArray.map((thing) => {
-                return thingToNote(thing);
-            });
+            let transformedArr = await Promise.all(updNotesArray.map(async (thing) => {
+                return await thingToNote(thing, currentWebId, fetch);
+            }));
+            console.log("this is notes array:")
+            console.log(transformedArr);
             // add fetch all habits here
             setNotesArray(transformedArr);
             setCategoryArray(updCategoriesArray);
@@ -89,7 +99,10 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
             console.log(contactsStatus);
             setContactsFdrStatus(contactsStatus);
             if (contactsStatus) {
-                const [updURls, updNames] = await fetchContacts(webId, fetch);
+                const namesAndIds = await fetchContacts(webId, fetch);
+                setContactsArr(namesAndIds);
+                const namesArr = namesAndIds.map((pair) => pair[0]);
+
             }
             setIsLoading(false);
         }
@@ -97,9 +110,14 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
             fetchNotes();
         }
         else if (active === "contacts") {
-            getContacts();
+            if (!otherWebId) {
+                getContacts();
+            }
+            else {
+                fetchNotes(otherWebId);
+            }
         }
-    }, [newEntryCr, currentCategory, currentAccess, active]);
+    }, [newEntryCr, currentCategory, currentAccess, active, otherWebId]);
 
     if (isLoading) {
         return (
@@ -109,7 +127,7 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
         )
     }
     else {
-        if (active === "notes") {
+        if (active === "notes" || (active === "contacts" && otherWebId)) {
             if (notesArray.length === 0) {
                 return (
                     <div className="card text-center">
@@ -169,7 +187,12 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
 
         else if (active === "contacts") {
             if (contactsFdrStatus) {
-                return (<ContactsList />);
+                return (<ContactsList
+                    contactsArr={contactsArr}
+                    setContactsArr={setContactsArr}
+                    otherWebId={otherWebId}
+                    setOtherWebId={setOtherWebId}
+                />);
             }
             else {
                 return (<NoContacts />);
@@ -182,5 +205,3 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
 }
 
 export default ContentsList;
-
-{/* <Button onClick={() => { setModalState(true) }}>Change Default Folder</Button> */ }

@@ -24,7 +24,7 @@ const NotesHabitsRender = ({ active }: Props) => {
     const [isEdit, setIsEdit] = useState(false);
     const [categoryArray, setCategoryArray] = useState<string[]>([]);
     const [doNoteSave, setDoNoteSave] = useState<boolean>(false);
-    const [NoteInp, setNoteInp] = useState<Note>({ id: null, title: "", content: "", category: "", url: "" });
+    const [NoteInp, setNoteInp] = useState<Note>({ id: null, title: "", content: "", category: "", url: "", access: null});
     const [arrOfChanges, setArrOfChanges] = useState<string[]>([]);
     return (
         <div className="container-fluid pad">

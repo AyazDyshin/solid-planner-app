@@ -6,6 +6,7 @@ import { checkPermissions } from "../services/access";
 import { useSession } from "@inrupt/solid-ui-react";
 import { Spinner } from "react-bootstrap";
 import { ControlledStorage } from "rdf-namespaces/dist/space";
+import { getDefaultFolder, recordDefaultFolder } from "../services/SolidPod";
 // This is the root component that first renders NavBar and then other content
 // Passes active and setActive hooks, which represent the currently clicked tab
 const MainContent = () => {
@@ -19,12 +20,19 @@ const MainContent = () => {
   const [permissionStatus, setPermissionStatus] = useState<boolean>(false);
 
   const { webId } = session.info;
+
+  if (!webId) {
+    throw new Error("Error, couldn't get your webId");
+  }
   useEffect(() => {
     let check = async () => {
       setIsLoading(true);
+      const defFolderUpd = await getDefaultFolder(webId, fetch);
+      if (!defFolderUpd) {
+        let heh = await recordDefaultFolder(webId, fetch);
+      }
       //handle
-      let result = await checkPermissions(webId ?? "", fetch);
-      console.log("after result");
+      let result = await checkPermissions(webId, fetch);
       setPermissionStatus(result);
       setIsLoading(false);
     }

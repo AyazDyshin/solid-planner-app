@@ -1,26 +1,20 @@
 import {
   createThing, getSolidDataset, getThing, getThingAll, getUrl, ThingPersisted,
-  addUrl, setThing, saveSolidDatasetAt, createContainerAt, createSolidDataset, Thing, getInteger,
-  getStringNoLocale, removeThing, saveSolidDatasetInContainer, setUrl, getContainedResourceUrlAll, deleteSolidDataset,
-  setStringNoLocale, getResourceInfo, addStringNoLocale, isContainer, getContentType, addInteger,
-  buildThing, getSolidDatasetWithAcl, hasResourceAcl, hasAccessibleAcl, hasFallbackAcl, createAclFromFallbackAcl,
-  getResourceAcl, saveAclFor, setPublicResourceAccess, getPublicAccess, getStringNoLocaleAll
+  addUrl, setThing, saveSolidDatasetAt, createContainerAt, Thing, getInteger,
+  getStringNoLocale, removeThing, getContainedResourceUrlAll, deleteSolidDataset,
+  setStringNoLocale, addStringNoLocale, isContainer, addInteger,
+  buildThing
 } from '@inrupt/solid-client';
-import { pim } from '@inrupt/solid-client/dist/constants';
-import { useSession } from '@inrupt/solid-ui-react';
-import { DCTERMS, RDF } from '@inrupt/vocab-common-rdf';
-import { solid, schema, space, foaf } from 'rdf-namespaces';
-import { category } from 'rdf-namespaces/dist/qu';
-import { dataset } from 'rdf-namespaces/dist/schema';
+import { DCTERMS, RDF, VCARD } from '@inrupt/vocab-common-rdf';
+import { solid, schema, space, foaf, vcard } from 'rdf-namespaces';
+import { VCard } from 'rdf-namespaces/dist/vcard';
 import { Note } from '../components/types';
-import { universalAccess } from "@inrupt/solid-client";
-import { getPubAccess, initializeAcl, isWacOrAcp, setPubAccess } from './access';
-import { fetchWithVc } from '@inrupt/solid-client-access-grants';
+import { determineAccess, getPubAccess, getSharedList, initializeAcl, isWacOrAcp, setPubAccess } from './access';
 
 type fetcher = (((input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>) & ((input: RequestInfo | URL, init?: RequestInit | undefined) => Promise<Response>)) | undefined;
 
 //function that transforms var of type Thing to var of Type Note
-export const thingToNote = (toChange: Thing | null): Note | null => {
+export const thingToNote = async (toChange: Thing | null, webId: string, fetch: fetcher) => {
 
   if (!toChange) {
     return null;
@@ -29,13 +23,15 @@ export const thingToNote = (toChange: Thing | null): Note | null => {
   let updContent = getStringNoLocale(toChange, schema.text) ? getStringNoLocale(toChange, schema.text) : "";
   let updId = getInteger(toChange, schema.identifier) ? getInteger(toChange, schema.identifier) : Date.now() + Math.floor(Math.random() * 1000);
   let updCategory = getStringNoLocale(toChange, "http://dbpedia.org/ontology/category");
-
+  let getAcc = await determineAccess(webId, toChange.url, fetch);
   const note: Note = {
     id: updId,
     title: updTitle,
     content: updContent,
     category: updCategory,
-    url: toChange.url
+    url: toChange.url,
+    access: getAcc[0],
+    ...(getAcc[1] && { shareList: getAcc[1] })
   };
   return note;
 }
@@ -149,7 +145,6 @@ export const getPublicTypeIndexUrl = async (webId: string, fetch: fetcher) => {
 // }
 
 export const recordDefaultFolder = async (webId: string, fetch: fetcher) => {
-  //const defFolderUpd = await getDefaultFolder(webId, fetch);
   const storagePref = await getStoragePref(webId, fetch);
   let defaultFolderPath = `${storagePref}SolidPlannerApp`;
   let notesPath = `${defaultFolderPath}/notes/`;
@@ -165,7 +160,6 @@ export const recordDefaultFolder = async (webId: string, fetch: fetcher) => {
     throw new Error("error when fetching preference file, it either doesn't exist, or has different location from the one specified in the webId");
   }
   let aThing = getThing(dataSet, prefFileLocation);
-  //handle
   if (!aThing) {
     throw new Error("preference file does not exist");
   }
@@ -249,8 +243,6 @@ export const getAccessType = async (webId: string, fetch: fetcher) => {
   }
   //handle
   let aThing = await getThing(dataSet, prefFileLocation);
-  console.log("pref file");
-  console.log(aThing);
   if (aThing === null) {
     throw new Error("preference file is empty");
   }
@@ -262,18 +254,7 @@ export const getAccessType = async (webId: string, fetch: fetcher) => {
   }
   return type;
 }
-// export const makePrivate = async (url: string, fetch: fetcher) => {
-//   let upd = await universalAccess.setPublicAccess(url, {
-//     read: false,
-//     append: false,
-//     write: false,
-//     controlRead: false,
-//     controlWrite: false
-//   }, { fetch: fetch });
-//   if (!upd) {
-//     throw new Error("You don't have permissions to changes the access type of this resource");
-//   }
-// }
+
 export const createDefFolder = async (webId: string, defFolderUrl: string, fetch: fetcher) => {
   try {
     await createContainerAt(`${updUrlForFolder(defFolderUrl)}`, {
@@ -285,11 +266,9 @@ export const createDefFolder = async (webId: string, defFolderUrl: string, fetch
   }
   let type = await isWacOrAcp(`${updUrlForFolder(defFolderUrl)}`, fetch);
   await recordAccessType(webId, fetch, type);
-  if (type === "wac") {
-    console.log("after wac 1");
-  }
 
-  await setPubAccess(webId, { read: true, write: false }, `${updUrlForFolder(defFolderUrl)}`, fetch);
+
+  await setPubAccess(webId, { read: true, append: true, write: true }, `${updUrlForFolder(defFolderUrl)}`, fetch);
 
   try {
     await createContainerAt(`${updUrlForFolder(defFolderUrl)}notes/`, {
@@ -303,18 +282,8 @@ export const createDefFolder = async (webId: string, defFolderUrl: string, fetch
   if (type === "wac") {
     await initializeAcl(`${updUrlForFolder(defFolderUrl)}notes/`, fetch);
   }
-  await setPubAccess(webId, { read: true, write: false }, `${updUrlForFolder(defFolderUrl)}notes/`, fetch);
+  await setPubAccess(webId, { read: true, append: true, write: true }, `${updUrlForFolder(defFolderUrl)}notes/`, fetch);
 
-
-
-  // try {
-  //   await createContainerAt(`${updUrlForFolder(defFolderUrl)}habits/`, {
-  //     fetch: fetch
-  //   });
-  // }
-  // catch (error) {
-  //   console.log("error when trying to create a folder for habits in specified folder");
-  // }
 }
 
 export const getAllNotesUrlFromPublicIndex = async (webId: string, fetch: fetcher) => {
@@ -329,8 +298,8 @@ export const getAllNotesUrlFromPublicIndex = async (webId: string, fetch: fetche
   return updThings;
 }
 
-export const fetchAllNotes = async (webId: string, fetch: fetcher, categoryFilter?: string, accessFilter?: string) => {
-
+export const fetchAllNotes = async (webId: string, fetch: fetcher, categoryFilter?: string, accessFilter?: string, other?: boolean) => {
+  console.log("we are here");
   let arrayOfCategories: string[] = [];
   let urlsArr
   try {
@@ -341,6 +310,8 @@ export const fetchAllNotes = async (webId: string, fetch: fetcher, categoryFilte
   }
   let updUrlsArr = await Promise.all(urlsArr.map(async (url) => {
     let data: any;
+    console.log("this is url");
+    console.log(url);
     try {
       data = await getSolidDataset(url, { fetch: fetch });
     }
@@ -397,11 +368,11 @@ export const fetchAllNotes = async (webId: string, fetch: fetcher, categoryFilte
           }
 
         }
-        // let hh = await access.getPublicAccess(newThing!.url, { fetch: fetch });
-        // console.log(hh);
         return newThing;
 
       }));
+      console.log("we are here suka");
+      console.log(updArr);
       return updArr;
     }
     else {
@@ -458,13 +429,8 @@ export const saveNote = async (webId: string, fetch: fetcher, note: Note) => {
   if (type === "wac") {
     await initializeAcl(noteUrl, fetch);
   }
-  await setPubAccess(webId, { read: false, write: false }, noteUrl, fetch);
+  await setPubAccess(webId, { read: true, append: true, write: true }, noteUrl, fetch);
   let p = await getPubAccess(webId, noteUrl, fetch);
-  // console.log("before set");
-  // await setAccess("public", noteUrl);
-  // console.log("after set");
-  // let hh = await universalAccess.getPublicAccess(noteUrl, { fetch: fetch });
-  // console.log(hh);
 }
 
 export const editNote = async (webId: string, fetch: fetcher, note: Note, changes: string[]) => {
@@ -478,22 +444,11 @@ export const editNote = async (webId: string, fetch: fetcher, note: Note, change
       let updArr = await Promise.all(allNotes.map(async (url) => {
 
         let newDs = await getSolidDataset(url, { fetch: fetch });
-        // let testDs = await getSolidDatasetWithAcl(url, { fetch: fetch });
         let newThing = getThing(newDs, url);
         if (newThing) {
 
           let thingId = getInteger(newThing, schema.identifier);
           if (thingId === note.id) {
-            // console.log(testDs);
-            // let gg = setPublicAccess();
-            // let acc = await access.getPublicAccess(url, { fetch: fetch });
-            // console.log(acc);
-            // let lul = access.setPublicAccess(
-            //   url,  // Resource
-            //   { read: true, write: false },    // Access object
-            //   { fetch: fetch })
-            // console.log("we are here");
-            // console.log(huh);
             let updArr = changes.map((change) => {
               switch (change) {
                 case "title":
@@ -565,7 +520,6 @@ export const deleteNote = async (webId: string, fetch: fetcher, id: number) => {
         newThingArr.forEach(async (newThing) => {
           let thingId = getInteger(newThing, schema.identifier);
           if (thingId === id) {
-            console.log("and here");
             let newData = removeThing(data, newThing);
             await saveSolidDatasetAt(url, newData, { fetch: fetch });
           }
@@ -575,33 +529,57 @@ export const deleteNote = async (webId: string, fetch: fetcher, id: number) => {
     }
   }));
 }
+// add case for when contacts folder exist but it has no contacts
 export const checkContacts = async (webId: string, fetch: fetcher) => {
   try {
     const storage = await getStoragePref(webId, fetch);
-    let ds = await getSolidDataset(`${storage}contacts/`, { fetch: fetch });
+    await getSolidDataset(`${storage}contacts/`, { fetch: fetch });
+    const contactsUrl = `${storage}contacts/Person/`;
+    await getSolidDataset(contactsUrl, { fetch: fetch });
     return true;
   }
-  catch (error)
-  { 
-    console.log(error);
+  catch (error) {
     return false;
   }
 }
 
 export const fetchContacts = async (webId: string, fetch: fetcher) => {
   const storage = await getStoragePref(webId, fetch);
-  const contactsUrl = `${storage}contacts/Person/`;
-  const ds = await getSolidDataset(contactsUrl, { fetch: fetch });
-  // console.log(ds);
-  const allUrl = getContainedResourceUrlAll(ds);
-  console.log(allUrl);
-  const newDs = await getSolidDataset(`${storage}contacts/people.ttl`, { fetch: fetch });
+  let newDs
+  try {
+    newDs = await getSolidDataset(`${storage}contacts/people.ttl`, { fetch: fetch });
+  }
+  catch {
+    throw new Error("couldn't fetch file with contacts");
+  }
   const allPeople = getThingAll(newDs);
-  const names = allPeople.map((thing) => {
-    let name = getStringNoLocale(thing, foaf.name);
-    return name;
-  });
-  // console.log(allPeople);
-  console.log(names);
-  return [allUrl, names];
+  let finalArr = await Promise.all(allPeople.map(async (personThing) => {
+    let personThingUrl = personThing.url;
+    if (personThingUrl.slice(-5) === "#this") {
+      const personDsUrl = personThingUrl.slice(0, -5);
+      let personDs;
+      try {
+        personDs = await getSolidDataset(personDsUrl, { fetch: fetch });
+      }
+      catch {
+        throw new Error(`couldn't fetch on of the contacts, file url: ${personDsUrl}`);
+      }
+      const allThingsPersonDs = getThingAll(personDs);
+      const personWebId = allThingsPersonDs.map((thing) => {
+        return getUrl(thing, vcard.value);
+      }).find((item) => {
+        return item !== null;
+      });
+
+      let name = getStringNoLocale(personThing, foaf.name);
+      if (name && personWebId) return [name, personWebId];
+      if (!name && personWebId) return [null, personWebId];
+      return null;
+    }
+  })
+  );
+  finalArr = finalArr.filter((item) => (item));
+  finalArr = finalArr as ((string | null)[])[]
+  let ret : ((string | null)[])[] = finalArr as ((string | null)[])[];;
+  return ret;
 }

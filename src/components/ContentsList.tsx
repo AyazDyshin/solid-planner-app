@@ -101,7 +101,7 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
             if (contactsStatus) {
                 const namesAndIds = await fetchContacts(webId, fetch);
                 setContactsArr(namesAndIds);
-                const namesArr = namesAndIds.map((pair) => pair[0]);
+                const namesArr = namesAndIds.map((pair) => pair[0] ? pair[0] : pair[1]);
 
             }
             setIsLoading(false);

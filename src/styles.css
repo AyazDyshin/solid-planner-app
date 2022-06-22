@@ -10,3 +10,6 @@
 .dropdown-toggle::after {
     display:none !important;
 }
+.center {
+    margin: 0 auto;
+}

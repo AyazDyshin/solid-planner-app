@@ -3,7 +3,7 @@ import {
     hasResourceAcl, universalAccess, getResourceAcl, saveAclFor, acp_ess_2, createContainerAt, deleteContainer
 } from "@inrupt/solid-client";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
-import { getAccessType, getStoragePref } from "./SolidPod";
+import { getAccessType, getPrefLink, getStoragePref } from "./SolidPod";
 import { ACP } from "@inrupt/vocab-solid";
 import { accessObject, fetcher } from "../components/types";
 import { changeAccessAcp, getAcpAccess } from "./helperAccess";
@@ -92,7 +92,7 @@ export const setPubAccess = async (webId: string, accessObj: accessObject, url: 
             let upd = await universalAccess.setPublicAccess(url, {
                 read: accessObj.read,
                 append: accessObj.append,
-                write: accessObj.write,
+                write: accessObj.write
             }, { fetch: fetch });
             if (!upd) {
                 throw new Error("You don't have permissions to changes the access type of this resource");
@@ -103,7 +103,8 @@ export const setPubAccess = async (webId: string, accessObj: accessObject, url: 
                 await initializeAcl(url, fetch);
                 let upd = await universalAccess.setPublicAccess(url, {
                     read: accessObj.read,
-                    write: accessObj.write,
+                    append: accessObj.append,
+                    write: accessObj.write
                 }, { fetch: fetch });
                 if (!upd) {
                     throw new Error("You don't have permissions to changes the access type of this resource");
@@ -120,35 +121,37 @@ export const setPubAccess = async (webId: string, accessObj: accessObject, url: 
 }
 
 // this function is used to give read permission to specific Agents. Used for both WAC and ACP PODs
-export const shareWith = async (webId: string, url: string, fetch: fetcher, accessObj: accessObject, shareWith: string[]) => {
+export const shareWith = async (webId: string, url: string, fetch: fetcher, accessObj: accessObject, shareWith: string) => {
     let type = await getAccessType(webId, fetch);
 
     if (type === "wac") {
         try {
-            let newShare = await Promise.all(shareWith.map(async (user) => {
-                let upd = await universalAccess.setAgentAccess(url, user, {
+
+            let upd = await universalAccess.setAgentAccess(url, shareWith, {
+                read: accessObj.read,
+                append: accessObj.append,
+                write: accessObj.write
+            }, { fetch: fetch });
+            if (!upd) {
+                throw new Error("You don't have permissions to changes the access type of this resource");
+            }
+            // return upd;
+
+        }
+        catch {
+            try {
+                await initializeAcl(url, fetch);
+
+                let upd = await universalAccess.setAgentAccess(url, shareWith, {
                     read: accessObj.read,
-                    write: accessObj.write,
+                    append: accessObj.append,
+                    write: accessObj.write
                 }, { fetch: fetch });
                 if (!upd) {
                     throw new Error("You don't have permissions to changes the access type of this resource");
                 }
                 // return upd;
-            }));
-        }
-        catch {
-            try {
-                await initializeAcl(url, fetch);
-                let newShare = await Promise.all(shareWith.map(async (agent) => {
-                    let upd = await universalAccess.setAgentAccess(url, agent, {
-                        read: accessObj.read,
-                        write: accessObj.write,
-                    }, { fetch: fetch });
-                    if (!upd) {
-                        throw new Error("You don't have permissions to changes the access type of this resource");
-                    }
-                    // return upd;
-                }));
+
             }
 
             catch {
@@ -158,55 +161,16 @@ export const shareWith = async (webId: string, url: string, fetch: fetcher, acce
     }
 
     else {
-        await Promise.all(shareWith.map(async (agent) => {
-            await changeAccessAcp(url, accessObj, agent, fetch);
-        }));
+
+        await changeAccessAcp(url, accessObj, shareWith, fetch);
+
     }
 }
 
 
 
 
-// this function is used to revoke access to 
-export const unShareWith = async (webId: string, url: string, fetch: fetcher, shareWith: string[]) => {
-    let type = await getAccessType(webId, fetch);
-    if (type === "wac") {
-        try {
-            let newShare = await Promise.all(shareWith.map(async (user) => {
-                let upd = await universalAccess.setAgentAccess(url, user, {
-                    read: false,
-                    append: false,
-                    write: false,
-                    controlRead: false,
-                    controlWrite: false
-                }, { fetch: fetch });
-                if (!upd) {
-                    throw new Error("You don't have permissions to changes the access type of this resource");
-                }
-            }));
-        }
-        catch {
-            try {
-                await initializeAcl(url, fetch);
-                let newShare = await Promise.all(shareWith.map(async (user) => {
-                    let upd = await universalAccess.setAgentAccess(url, user, {
-                        read: false,
-                        append: false,
-                        write: false,
-                        controlRead: false,
-                        controlWrite: false
-                    }, { fetch: fetch });
-                    if (!upd) {
-                        throw new Error("You don't have permissions to changes the access type of this resource");
-                    }
-                }));
-            }
-            catch {
-                throw new Error("You don't have permissions to change the access type of this resource");
-            }
-        }
-    }
-}
+
 
 export const getSharedList = async (webId: string, url: string, fetch: fetcher) => {
     let type = await getAccessType(webId, fetch);
@@ -272,7 +236,7 @@ export const getPubAccess = async (webId: string, url: string, fetch: fetcher) =
                 }
                 return pubAcc;
             }
-            catch {
+            catch (error) {
                 throw new Error(`you don't have right to read access object of ${url}`);
             }
         }

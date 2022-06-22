@@ -12,4 +12,4 @@ export interface Note {
 }
 export type fetcher = (((input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>) & ((input: RequestInfo | URL, init?: RequestInit | undefined) => Promise<Response>)) | undefined;
 
-export type accessObject = { read?: boolean, append?: boolean, write?: boolean };
+export type accessObject = { read: boolean, append: boolean, write: boolean };

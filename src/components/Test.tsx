@@ -23,7 +23,7 @@ import { universalAccess } from "@inrupt/solid-client";
 import { AccessControlResource } from '@inrupt/solid-client/dist/acp/control';
 import {
   checkPermissions, getPubAccess, getSharedList, initializeAcl,
-  isWacOrAcp, setPubAccess, shareWith, unShareWith
+  isWacOrAcp, setPubAccess, shareWith
 } from '../services/access';
 import { getPolicyAll } from '@inrupt/solid-client/dist/acp/policy';
 import { ACP } from '@inrupt/vocab-solid';
@@ -41,35 +41,12 @@ const Test = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const gets = async () => {
-   // await createContainerAt("https://pod.inrupt.com/podsptester/tee/", { fetch: fetch });
-    // await setAccessForResource(webId ?? "", fetch, "https://pod.inrupt.com/podsptester/tee/", { read: true, append: false, write: false }, ACP.PublicAgent);
-    // let ds = await acp_ess_1.getSolidDatasetWithAcr("https://pod.inrupt.com/podsptester/tee/", { fetch: fetch });
-    // console.log(bob);
-    //   await setPubAccess(webId ?? "", { read: true, append: true }, "https://pod.inrupt.com/podsptester/testyy/", fetch);
-    //  // let ds = await getSolidDataset("https://pod.inrupt.com/podsptester/testy/", {fetch: fetch});
-    //   let resourceWithAcr = await acp_ess_2.getSolidDatasetWithAcr(
-    //     "https://pod.inrupt.com/podsptester/testyy/",              // Resource for which to set up the policies1
-    //     { fetch: fetch }          // fetch from the authenticated session
-    //   );
-    //   console.log("heehhehehe");
-    //    console.log(resourceWithAcr);
-    // let b = await getStoragePref(webId ?? "", fetch);
-    // let url = `${b}policies/`;
-    // let myRulesAndPoliciesSolidDataset = await getSolidDataset(
-    //   url,
-    //   { fetch: fetch }      // fetch from the authenticated session
-    // );
-    // let publicRule = acp_ess_1.createRule(`${url}#defaultAccessControlAgentMatcherAppendPolicyMatcher`);
-    // publicRule = acp_ess_1.setPublic(publicRule);
-    // myRulesAndPoliciesSolidDataset = acp_ess_1.setRule(myRulesAndPoliciesSolidDataset, publicRule);
-    // const savedSolidDataset = await saveSolidDatasetAt(
-    //   url,
-    //   myRulesAndPoliciesSolidDataset,
-    //   { fetch: fetch }        // fetch from the authenticated session
-    // );
-    // await initializePolicies(webId ?? "", fetch);
-    // await getAllRules(webId ?? "", fetch);
+    // await createContainerAt("https://inrtester2.inrupt.net/bob/", {fetch: fetch});
+    let b =await getPubAccess(webId ?? "", "https://inrtester2.inrupt.net/SolidPlannerApp/notes/1655570018660.ttl", fetch);
+    console.log("this is b");
+    console.log(b);
   }
+
   gets();
 
 

@@ -299,25 +299,30 @@ export const getAllNotesUrlFromPublicIndex = async (webId: string, fetch: fetche
 }
 
 export const fetchAllNotes = async (webId: string, fetch: fetcher, categoryFilter?: string, accessFilter?: string, other?: boolean) => {
-  console.log("we are here");
   let arrayOfCategories: string[] = [];
   let urlsArr
   try {
     urlsArr = await getAllNotesUrlFromPublicIndex(webId, fetch);
   }
   catch (error) {
-    throw new Error("Couldn't fetch notes from your public type index");
+    if (other) {
+      return null;
+    }
+    else {
+      throw new Error("Couldn't fetch notes from your public type index");
+    }
   }
   let updUrlsArr = await Promise.all(urlsArr.map(async (url) => {
     let data: any;
-    console.log("this is url");
-    console.log(url);
     try {
       data = await getSolidDataset(url, { fetch: fetch });
     }
     catch (error) {
-      throw new Error(`Couldn't fetch a resource that is listed in your Public type index ${url} this might happen because it 
+      if (other) return null;
+      else {
+        throw new Error(`Couldn't fetch a resource that is listed in your Public type index ${url} this might happen because it 
       is listed in public type index, but doesn't exist in your POD`);
+      }
     }
     if (isContainer(data)) {
       let allNotes = getContainedResourceUrlAll(data);
@@ -327,7 +332,10 @@ export const fetchAllNotes = async (webId: string, fetch: fetcher, categoryFilte
           newDs = await getSolidDataset(noteUrl, { fetch: fetch });
         }
         catch (error) {
-          throw new Error(`error while fetching on of the notes in container: ${url} note url: ${noteUrl}`);
+          if (other) return null;
+          else {
+            throw new Error(`error while fetching on of the notes in container: ${url} note url: ${noteUrl}`);
+          }
         }
         let newThing = getThing(newDs, noteUrl);
         if (newThing) {
@@ -371,8 +379,7 @@ export const fetchAllNotes = async (webId: string, fetch: fetcher, categoryFilte
         return newThing;
 
       }));
-      console.log("we are here suka");
-      console.log(updArr);
+
       return updArr;
     }
     else {
@@ -562,7 +569,7 @@ export const fetchContacts = async (webId: string, fetch: fetcher) => {
         personDs = await getSolidDataset(personDsUrl, { fetch: fetch });
       }
       catch {
-        throw new Error(`couldn't fetch on of the contacts, file url: ${personDsUrl}`);
+        throw new Error(`couldn't fetch one of the contacts, file url: ${personDsUrl}`);
       }
       const allThingsPersonDs = getThingAll(personDs);
       const personWebId = allThingsPersonDs.map((thing) => {
@@ -580,6 +587,6 @@ export const fetchContacts = async (webId: string, fetch: fetcher) => {
   );
   finalArr = finalArr.filter((item) => (item));
   finalArr = finalArr as ((string | null)[])[]
-  let ret : ((string | null)[])[] = finalArr as ((string | null)[])[];;
+  let ret: ((string | null)[])[] = finalArr as ((string | null)[])[];;
   return ret;
 }

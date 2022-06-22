@@ -41,12 +41,9 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
     const [accessModalState, setAccessModalState] = useState<boolean>(false);
 
     useEffect(() => {
-        // console.log("first");
-        //console.log(arrOfChanges);
         if (arrOfChanges.length !== 0) {
             handleSave();
         }
-        console.log(viewerStatus);
         if (arrOfChanges.length === 0) {
             if (viewerStatus) {
                 // handle 
@@ -133,6 +130,8 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
                 noteInp={NoteInp}
                 setArrOfChanges={setArrOfChanges}
                 viewerStatus={viewerStatus}
+                noteToView={noteToView}
+                setNoteToView={setNoteToView}
             />
         </div>
     )

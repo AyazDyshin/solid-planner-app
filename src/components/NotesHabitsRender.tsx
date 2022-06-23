@@ -47,12 +47,16 @@ const NotesHabitsRender = ({ active, otherWebId, setOtherWebId,
     const [sharedList, setSharedList] = useState<Record<string, AccessModes>>({});
     const [fullContacts, setFullContacts] = useState<{ [x: string]: string | null; }>({});
     const [accUpdObj, setAccUpdObj] = useState<{ [x: string]: boolean; }>({});
+    const [agentsToUpd, setAgentsToUpd] = useState<{ [x: string]: AccessModes; }>({});
+
 
     return (
         <div className="container-fluid pad">
             <div className="row h-100">
                 <div className="col h-100 border border-5 border-end-0 d-flex justify-content-center align-items-center p-0">
                     <ContentsList
+                        agentsToUpd={agentsToUpd}
+                        setAgentsToUpd={setAgentsToUpd}
                         accUpdObj={accUpdObj}
                         setAccUpdObj={setAccUpdObj}
                         fullContacts={fullContacts}
@@ -96,6 +100,8 @@ const NotesHabitsRender = ({ active, otherWebId, setOtherWebId,
                 </div>
                 <div className="col h-100 border border-5">
                     <CreatorToRender
+                    agentsToUpd={agentsToUpd}
+                    setAgentsToUpd={setAgentsToUpd}
                         accUpdObj={accUpdObj}
                         setAccUpdObj={setAccUpdObj}
                         fullContacts={fullContacts}

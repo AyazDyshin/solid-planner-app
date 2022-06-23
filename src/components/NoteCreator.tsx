@@ -10,7 +10,7 @@ import { FiEdit } from "react-icons/fi";
 import "../styles.css";
 import AccessModal from "../modals/AccessModal";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
-
+import SharedModal from "../modals/SharedModal";
 interface Props {
     newEntryCr: boolean;
     setNewEntryCr: React.Dispatch<React.SetStateAction<boolean>>;
@@ -60,12 +60,18 @@ interface Props {
     setAccUpdObj: React.Dispatch<React.SetStateAction<{
         [x: string]: boolean;
     }>>;
+    agentsToUpd: {
+        [x: string]: AccessModes;
+    };
+    setAgentsToUpd: React.Dispatch<React.SetStateAction<{
+        [x: string]: AccessModes;
+    }>>;
 }
 //component of creation and saving a note the user's pod
 const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
     setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit,
     setCreatorStatus, creatorStatus, categoryArray, setCategoryArray, doNoteSave, setDoNoteSave, NoteInp,
-    setNoteInp, arrOfChanges, setArrOfChanges, otherWebId, setOtherWebId, accUpdObj, setAccUpdObj,
+    setNoteInp, arrOfChanges, setArrOfChanges, otherWebId, setOtherWebId, accUpdObj, setAccUpdObj, agentsToUpd, setAgentsToUpd,
     publicAccess, setPublicAccess, contactsList, setContactsList, webIdToSave, setWebIdToSave, sharedList, setSharedList,
     fullContacts, setFullContacts
 }: Props) => {
@@ -74,15 +80,17 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
     const { webId } = session.info;
     const [categoryModalState, setCategoryModalState] = useState<boolean>(false);
     const [accessModalState, setAccessModalState] = useState<boolean>(false);
-
+    const [sharedModalState, setSharedModalState] = useState<boolean>(false);
 
     useEffect(() => {
+        
         if (arrOfChanges.length !== 0) {
             handleSave();
         }
         if (arrOfChanges.length === 0) {
             if (viewerStatus) {
                 // handle 
+                console.log(noteToView);
                 setNoteInp(noteToView!);
             }
             else {
@@ -140,7 +148,9 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
                             {viewerStatus && <Dropdown.Item onClick={handleEdit}><FiEdit /> edit</Dropdown.Item>}
                             {viewerStatus && <Dropdown.Item onClick={handleDelete}>delete</Dropdown.Item>}
                             <Dropdown.Item href="" onClick={() => (setCategoryModalState(true))}>Set Category</Dropdown.Item>
-                            <Dropdown.Item href="" onClick={() => (setAccessModalState(true))}>Set Access type</Dropdown.Item>
+                            <Dropdown.Item href="" onClick={() => (setAccessModalState(true))}>Set Access Type</Dropdown.Item>
+                            {viewerStatus && noteToView?.shareList &&
+                                <Dropdown.Item href="" onClick={() => (setSharedModalState(true))}>Shared List</Dropdown.Item>}
                         </DropdownButton>
                     </ButtonGroup>
                 }
@@ -161,6 +171,8 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
                 setCategoryArray={setCategoryArray}
             />
             <AccessModal
+                agentsToUpd={agentsToUpd}
+                setAgentsToUpd={setAgentsToUpd}
                 accUpdObj={accUpdObj}
                 setAccUpdObj={setAccUpdObj}
                 fullContacts={fullContacts}
@@ -181,6 +193,26 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
                 viewerStatus={viewerStatus}
                 noteToView={noteToView}
                 setNoteToView={setNoteToView}
+            />
+            <SharedModal
+                agentsToUpd={agentsToUpd}
+                setAgentsToUpd={setAgentsToUpd}
+                accUpdObj={accUpdObj}
+                setAccUpdObj={setAccUpdObj}
+                sharedList={sharedList}
+                setSharedList={setSharedList}
+                publicAccess={publicAccess}
+                setPublicAccess={setPublicAccess}
+                noteToView={noteToView}
+                setNoteToView={setNoteToView}
+                sharedModalState={sharedModalState}
+                setSharedModalState={setSharedModalState}
+                setNoteInp={setNoteInp}
+                noteInp={NoteInp}
+                setArrOfChanges={setArrOfChanges}
+                viewerStatus={viewerStatus}
+                categoryArray={categoryArray}
+                setCategoryArray={setCategoryArray}
             />
         </div>
     )

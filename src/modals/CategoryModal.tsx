@@ -34,6 +34,7 @@ const CategoryModal = ({ categoryModalState, setCategoryModalState, setNoteInp,
                 <Modal.Title>Enter Category Name:</Modal.Title>
             </Modal.Header>
             <Modal.Body>
+                <div className="d-flex justify-content-center mb-3">
                 {
                     categoryArray.length !== 0 && <DropdownButton
                         variant="outline-secondary"
@@ -48,6 +49,7 @@ const CategoryModal = ({ categoryModalState, setCategoryModalState, setNoteInp,
 
                     </DropdownButton>
                 }
+                </div>
                 <FormControl className="mt-1" aria-describedby="basic-addon3" value={input} onChange={e => setInput(e.target.value)} />
             </Modal.Body>
             <Modal.Footer>

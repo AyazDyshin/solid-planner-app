@@ -54,9 +54,15 @@ interface Props {
     setAccUpdObj: React.Dispatch<React.SetStateAction<{
         [x: string]: boolean;
     }>>;
+    agentsToUpd: {
+        [x: string]: AccessModes;
+    };
+    setAgentsToUpd: React.Dispatch<React.SetStateAction<{
+        [x: string]: AccessModes;
+    }>>;
 }
 // component that renders entry creator, based on the "active" value
-const CreatorToRender = ({ active, creatorStatus, newEntryCr, setNewEntryCr,
+const CreatorToRender = ({ active, creatorStatus, newEntryCr, setNewEntryCr, agentsToUpd, setAgentsToUpd,
     noteToView, setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, setCreatorStatus, categoryArray,
     setCategoryArray, doNoteSave, setDoNoteSave, NoteInp, setNoteInp, arrOfChanges, setArrOfChanges, otherWebId, setOtherWebId,
     publicAccess, setPublicAccess, contactsList, setContactsList, webIdToSave, setWebIdToSave, sharedList, setSharedList,
@@ -72,6 +78,8 @@ const CreatorToRender = ({ active, creatorStatus, newEntryCr, setNewEntryCr,
             case "contacts":
                 return (
                     <NoteCreator
+                        agentsToUpd={agentsToUpd}
+                        setAgentsToUpd={setAgentsToUpd}
                         accUpdObj={accUpdObj}
                         setAccUpdObj={setAccUpdObj}
                         fullContacts={fullContacts}

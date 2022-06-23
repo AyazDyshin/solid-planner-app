@@ -41,7 +41,7 @@ const Navbar = ({ links, active, setActive, viewerStatus, setViewerStatus,
                             className={`nav-link ${active === link ? 'active' : ''} nav`}
                             onClick={(e) => {
                                 e.preventDefault();
-                                setNotesArray([]);
+                               // setNotesArray([]);
                                 setIsLoadingContents(true);
                                 setViewerStatus(false);
                                 setCreatorStatus(false);

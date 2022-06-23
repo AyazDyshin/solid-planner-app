@@ -19,6 +19,7 @@ const NoContacts = () => {
                         onClick={() => setOpen(!open)}
                         aria-controls="example-collapse-text"
                         aria-expanded={open}
+                        className="my-3"
                     >
                         How to fix this?
                     </Button>

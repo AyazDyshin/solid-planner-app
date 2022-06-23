@@ -1,6 +1,6 @@
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import { useSession } from "@inrupt/solid-ui-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, SetStateAction } from "react";
 import { Modal, Button, Form, FormControl, InputGroup, DropdownButton, Dropdown, Collapse, Spinner } from "react-bootstrap";
 import { Note } from "../components/types";
 import { getPubAccess, getSharedList, setPubAccess, shareWith } from "../services/access";
@@ -8,6 +8,7 @@ import { checkContacts, fetchContacts, modifyWebId } from "../services/SolidPod"
 import "../styles.css";
 import AccessElement from "./AccessElement";
 import { accessObject } from "../components/types";
+import NoContacts from "../components/NoContacts";
 
 interface Props {
     accessModalState: boolean;
@@ -46,11 +47,17 @@ interface Props {
     setAccUpdObj: React.Dispatch<React.SetStateAction<{
         [x: string]: boolean;
     }>>;
+    agentsToUpd: {
+        [x: string]: AccessModes;
+    };
+    setAgentsToUpd: React.Dispatch<React.SetStateAction<{
+        [x: string]: AccessModes;
+    }>>;
 }
 //a popup window to prompt user to set access type
 const AccessModal = ({ accessModalState, setAccessModalState, setNoteInp, contactsList, setContactsList, accUpdObj, setAccUpdObj,
     noteInp, viewerStatus, setArrOfChanges, noteToView, setNoteToView, publicAccess, setPublicAccess,
-    sharedList, setSharedList, webIdToSave, setWebIdToSave, fullContacts, setFullContacts }: Props) => {
+    sharedList, setSharedList, webIdToSave, setWebIdToSave, fullContacts, setFullContacts, agentsToUpd, setAgentsToUpd }: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
     if (!webId) {
@@ -65,7 +72,7 @@ const AccessModal = ({ accessModalState, setAccessModalState, setNoteInp, contac
     const [currentWebId, setCurrentWebId] = useState<string>("");
     const [webIdReady, setWebIdReady] = useState<boolean>(false);
     const [workingWebId, setWorkingWebId] = useState<string>("");
-    const [reload, setReload] = useState<boolean>(false);
+
     useEffect(() => {
         const fetchAccess = async () => {
 
@@ -75,9 +82,13 @@ const AccessModal = ({ accessModalState, setAccessModalState, setNoteInp, contac
             setContactsOpen(false);
             setWebIdOpen(false);
             //handle
-            let pubAccess = await getPubAccess(webId, noteToView!.url, fetch);
+            let key = Object.keys(noteToView!.access!)[0];
+            let pubAccess = noteToView!.access![key];
             setPublicAccess({ read: pubAccess.read, append: pubAccess.append, write: pubAccess.write });
-            let shList = await getSharedList(webId, noteToView!.url, fetch);
+            //let shList = await getSharedList(webId, noteToView!.url, fetch);
+            let shList: Record<string, AccessModes>;
+            if (noteToView!.shareList) shList = noteToView!.shareList;
+            else shList = {};
             setSharedList(shList);
             let contactsStatus = await checkContacts(webId, fetch);
             setContactsStat(contactsStatus);
@@ -111,7 +122,7 @@ const AccessModal = ({ accessModalState, setAccessModalState, setNoteInp, contac
         }
         if (accessModalState) fetchAccess();
 
-    }, [accessModalState, reload]);
+    }, [accessModalState]);
 
 
 
@@ -155,146 +166,107 @@ const AccessModal = ({ accessModalState, setAccessModalState, setNoteInp, contac
                         />
 
                         <div>
+                            <div className="d-flex justify-content-center"><h5>Set Access:</h5></div>
                             <div className="d-flex justify-content-around my-3">
                                 <Button
                                     onClick={() => {
-                                        setSharedOpen(!sharedOpen);
-                                        setSharingOpen(false);
+                                        setContactsOpen(!contactsOpen);
+                                        setWebIdOpen(false);
                                     }}
                                     aria-controls="example-collapse-text"
                                 >
-                                    Shared with:
+                                    By Contacts:
                                 </Button>
                                 <Button
                                     onClick={() => {
-                                        setSharingOpen(!sharingOpen);
-                                        setSharedOpen(false);
+                                        setWebIdOpen(!webIdOpen);
+                                        setContactsOpen(false);
                                     }}
                                     aria-controls="example-collapse-text"
                                 >
-                                    Share:
+                                    By  WebId:
                                 </Button>
                             </div>
-                            <Collapse in={sharedOpen}>
+                            <Collapse in={contactsOpen}>
                                 <div>
+                                    {!contactsStat && <div>
+                                        {
+                                            Object.entries(contactsList).map(([key, value]) => {
+                                                return (
+                                                    <AccessElement
+                                                        key={Date.now() + Math.floor(Math.random() * 1000)}
+                                                        title={key}
+                                                        readOnChange={() => {
+                                                            let wId = (fullContacts[key]) ? fullContacts[key] : key;
+                                                            setAgentsToUpd(prevState => ({ ...prevState, [wId!]: { read: !value.read, append: value.append, write: value.write } }));
+                                                            setContactsList(prevState => ({ ...prevState, [key]: { read: !value.read, append: value.append, write: value.write } }));
+                                                            setAccUpdObj(prevState => ({ ...prevState, "agent": true }));
+                                                        }}
+                                                        appendOnChange={() => {
+                                                            let wId = (fullContacts[key]) ? fullContacts[key] : key;
+                                                            setAgentsToUpd(prevState => ({ ...prevState, [wId!]: { read: value.read, append: !value.append, write: value.write } }));
+                                                            setContactsList(prevState => ({ ...prevState, [key]: { read: value.read, append: !value.append, write: value.write } }));
+                                                            setAccUpdObj(prevState => ({ ...prevState, "agent": true }));
+                                                        }}
+                                                        writeOnChange={() => {
+                                                            let wId = (fullContacts[key]) ? fullContacts[key] : key;
+                                                            setAgentsToUpd(prevState => ({ ...prevState, [wId!]: { read: value.read, append: value.append, write: !value.write } }));
+                                                            setContactsList(prevState => ({ ...prevState, [key]: { read: value.read, append: value.append, write: !value.write } }));
+                                                            setAccUpdObj(prevState => ({ ...prevState, "agent": true }));
+                                                        }}
+                                                        readStatus={contactsList[key].read}
+                                                        appendStatus={contactsList[key].append}
+                                                        writeStatus={contactsList[key].write}
+                                                    />
+                                                )
+                                            })
+                                        }
+                                    </div>}
                                     {
-                                        Object.entries(sharedList).map(([key, value]) => {
-                                            return (
-                                                <AccessElement
-                                                    key={Date.now() + Math.floor(Math.random() * 1000)}
-                                                    title={key}
-                                                    readOnChange={() => {
-                                                        setSharedList(prevState => ({ ...prevState, [key]: { read: !value.read, append: value.append, write: value.write } }));
-                                                        setAccUpdObj(prevState => ({ ...prevState, "shared": true }));
-                                                    }}
-                                                    appendOnChange={() => {
-                                                        setSharedList(prevState => ({ ...prevState, [key]: { read: value.read, append: !value.append, write: value.write } }));
-                                                        setAccUpdObj(prevState => ({ ...prevState, "shared": true }));
-                                                    }}
-                                                    writeOnChange={() => {
-                                                        setSharedList(prevState => ({ ...prevState, [key]: { read: value.read, append: value.append, write: !value.write } }));
-                                                        setAccUpdObj(prevState => ({ ...prevState, "shared": true }));
-                                                    }}
-                                                    readStatus={sharedList[key].read}
-                                                    appendStatus={sharedList[key].append}
-                                                    writeStatus={sharedList[key].write}
-                                                />
-                                            )
-                                        })
+                                        contactsStat && <NoContacts />
+                                    }
+                                </div>
+                            </Collapse>
+                            <Collapse in={webIdOpen}>
+                                <div>
+
+                                    <InputGroup>
+                                        <FormControl aria-label="Text input with dropdown button" value={currentWebId}
+                                            onChange={(e) => {
+                                                setCurrentWebId(e.target.value);
+                                            }} />
+                                        <Button onClick={() => {
+                                            setWorkingWebId(currentWebId);
+                                            if (sharedList[currentWebId]) {
+                                                setWebIdToSave({ [currentWebId]: sharedList[currentWebId] });
+                                            }
+                                            else setWebIdToSave({ [currentWebId]: { read: false, append: false, write: false } });
+                                            setCurrentWebId("");
+                                            setWebIdReady(true);
+                                        }}>Ok</Button>
+                                    </InputGroup>
+                                    {
+                                        webIdReady &&
+                                        <div>
+                                            <AccessElement
+                                                title={workingWebId}
+                                                readOnChange={() => setWebIdToSave(prevState => ({ ...prevState, [workingWebId]: { read: !webIdToSave[workingWebId].read, append: webIdToSave[workingWebId].append, write: webIdToSave[workingWebId].write } }))}
+                                                appendOnChange={() => setWebIdToSave(prevState => ({ ...prevState, [workingWebId]: { read: webIdToSave[workingWebId].read, append: !webIdToSave[workingWebId].append, write: webIdToSave[workingWebId].write } }))}
+                                                writeOnChange={() => setWebIdToSave(prevState => ({ ...prevState, [workingWebId]: { read: webIdToSave[workingWebId].read, append: webIdToSave[workingWebId].append, write: !webIdToSave[workingWebId].write } }))}
+                                                readStatus={webIdToSave[workingWebId].read}
+                                                appendStatus={webIdToSave[workingWebId].append}
+                                                writeStatus={webIdToSave[workingWebId].write}
+                                            />
+                                            <Button onClick={() => {
+                                                setAgentsToUpd(prevState => ({ ...prevState, ...webIdToSave }));
+                                                setAccUpdObj(prevState => ({ ...prevState, "agent": true }));
+                                                setWebIdReady(false);
+                                            }}>Save</Button>
+                                        </div>
                                     }
                                 </div>
                             </Collapse>
 
-                            <Collapse in={sharingOpen}>
-                                <div>
-                                    <div className="d-flex justify-content-around my-3">
-                                        <Button
-                                            onClick={() => {
-                                                setContactsOpen(!contactsOpen);
-                                                setWebIdOpen(false);
-                                            }}
-                                            aria-controls="example-collapse-text"
-                                        >
-                                            Contacts:
-                                        </Button>
-                                        <Button
-                                            onClick={() => {
-                                                setWebIdOpen(!webIdOpen);
-                                                setContactsOpen(false);
-                                            }}
-                                            aria-controls="example-collapse-text"
-                                        >
-                                            WebId:
-                                        </Button>
-                                    </div>
-                                    <Collapse in={contactsOpen}>
-                                        <div id="example-collapse-text">
-                                            {
-                                                Object.entries(contactsList).map(([key, value]) => {
-                                                    return (
-                                                        <AccessElement
-                                                            key={Date.now() + Math.floor(Math.random() * 1000)}
-                                                            title={key}
-                                                            readOnChange={() => {
-                                                                setContactsList(prevState => ({ ...prevState, [key]: { read: !value.read, append: value.append, write: value.write } }));
-                                                                setAccUpdObj(prevState => ({ ...prevState, "contact": true }));
-                                                            }}
-                                                            appendOnChange={() => {
-                                                                setContactsList(prevState => ({ ...prevState, [key]: { read: value.read, append: !value.append, write: value.write } }));
-                                                                setAccUpdObj(prevState => ({ ...prevState, "contact": true }));
-                                                            }}
-                                                            writeOnChange={() => {
-                                                                setContactsList(prevState => ({ ...prevState, [key]: { read: value.read, append: value.append, write: !value.write } }));
-                                                                setAccUpdObj(prevState => ({ ...prevState, "contact": true }));
-                                                            }}
-                                                            readStatus={contactsList[key].read}
-                                                            appendStatus={contactsList[key].append}
-                                                            writeStatus={contactsList[key].write}
-                                                        />
-                                                    )
-                                                })
-                                            }
-                                        </div>
-                                    </Collapse>
-                                    <Collapse in={webIdOpen}>
-                                        <div>
-
-                                            <InputGroup>
-                                                <FormControl aria-label="Text input with dropdown button" value={currentWebId}
-                                                    onChange={(e) => {
-                                                        setCurrentWebId(e.target.value);
-                                                    }} />
-                                                <Button onClick={() => {
-                                                    setWorkingWebId(currentWebId);
-                                                    console.log(workingWebId);
-                                                    setWebIdToSave({ [currentWebId]: { read: false, append: false, write: false } })
-                                                    console.log("suk");
-                                                    console.log(webIdToSave);
-                                                    setCurrentWebId("");
-                                                    setWebIdReady(true);
-                                                }}>Ok</Button>
-                                            </InputGroup>
-                                            {
-                                                webIdReady &&
-                                                <div>
-                                                    <AccessElement
-                                                        title={workingWebId}
-                                                        readOnChange={() => setWebIdToSave(prevState => ({ ...prevState, [workingWebId]: { read: !webIdToSave[workingWebId].read, append: webIdToSave[workingWebId].append, write: webIdToSave[workingWebId].write } }))}
-                                                        appendOnChange={() => setWebIdToSave(prevState => ({ ...prevState, [workingWebId]: { read: webIdToSave[workingWebId].read, append: !webIdToSave[workingWebId].append, write: webIdToSave[workingWebId].write } }))}
-                                                        writeOnChange={() => setWebIdToSave(prevState => ({ ...prevState, [workingWebId]: { read: webIdToSave[workingWebId].read, append: webIdToSave[workingWebId].append, write: !webIdToSave[workingWebId].write } }))}
-                                                        readStatus={webIdToSave[workingWebId].read}
-                                                        appendStatus={webIdToSave[workingWebId].append}
-                                                        writeStatus={webIdToSave[workingWebId].write}
-                                                    />
-                                                    <Button onClick={() => {
-                                                        setReload(!reload);
-                                                    }}>Save</Button>
-                                                </div>
-                                            }
-                                        </div>
-                                    </Collapse>
-                                </div>
-                            </Collapse>
                         </div>
                     </Modal.Body>
                     <Modal.Footer>

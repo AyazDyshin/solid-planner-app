@@ -94,9 +94,6 @@ const AccessModal = ({ accessModalState, setAccessModalState, setNoteInp,
         await setPubAccess(webId, publicAccess, noteToView!.url, fetch);
         for (let item in contactsList) {
             if (fullContacts[item]) {
-                //console.log("here");
-                // console.log(contactsList[item]);
-                // console.log(fullContacts[item]);
                 await shareWith(webId, noteToView!.url, fetch, contactsList[item], fullContacts[item]!);
             }
             else {
@@ -104,18 +101,10 @@ const AccessModal = ({ accessModalState, setAccessModalState, setNoteInp,
             }
         }
         for (let item in sharedList) {
-
-            //   console.log("here");
-            //  console.log(contactsList[item]);
-            //   console.log(fullContacts[item]);
             await shareWith(webId, noteToView!.url, fetch, sharedList[item], item);
 
         }
         for (let item in webIdToSave) {
-
-            //   console.log("here");
-            //  console.log(contactsList[item]);
-            //   console.log(fullContacts[item]);
             await shareWith(webId, noteToView!.url, fetch, webIdToSave[item], item);
 
         }

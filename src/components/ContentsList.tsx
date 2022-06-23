@@ -2,7 +2,7 @@ import { Thing } from "@inrupt/solid-client";
 import { useSession } from "@inrupt/solid-ui-react";
 //import { Note } from "rdf-namespaces/dist/as";
 import { useEffect, useState } from "react";
-import { Spinner } from "react-bootstrap";
+import { Button, Spinner } from "react-bootstrap";
 import {
     fetchAllNotes, getDefaultFolder, recordDefaultFolder, thingToNote, saveNote,
     editNote, fetchContacts, checkContacts
@@ -32,28 +32,39 @@ interface Props {
     setNoteInp: React.Dispatch<React.SetStateAction<Note>>;
     arrOfChanges: string[];
     setArrOfChanges: React.Dispatch<React.SetStateAction<string[]>>;
+    otherWebId: string | null;
+    setOtherWebId: React.Dispatch<React.SetStateAction<string | null>>;
+    notesArray: (Note | null)[];
+    setNotesArray: React.Dispatch<React.SetStateAction<(Note | null)[]>>;
+    contactsArr: (string | null)[][];
+    setContactsArr: React.Dispatch<React.SetStateAction<(string | null)[][]>>;
+    isLoadingContents: boolean;
+    setIsLoadingContents: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, setNewEntryCr,
     noteToView, setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, categoryArray, setCategoryArray, doNoteSave,
-    setDoNoteSave, NoteInp, setNoteInp, arrOfChanges, setArrOfChanges }: Props) => {
+    setDoNoteSave, NoteInp, setNoteInp, arrOfChanges, setArrOfChanges,
+    otherWebId, setOtherWebId, notesArray, setNotesArray, contactsArr, setContactsArr, isLoadingContents, setIsLoadingContents }: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
     if (webId === undefined) {
         throw new Error("error when trying to get webId");
     }
-    const [notesArray, setNotesArray] = useState<(Note | null)[]>([]);
     const [habitsArray, setHabitsArray] = useState<Thing[]>([]);
     const [currentCategory, setCurrentCategory] = useState<string | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
     const [currentAccess, setCurrentAccess] = useState<string | null>(null);
     const [contactsFdrStatus, setContactsFdrStatus] = useState<boolean>(false);
-    const [contactsArr, setContactsArr] = useState<(string | null)[][]>([]);
-    const [otherWebId, setOtherWebId] = useState<string | null>(null);
+    const [otherStatus, setOtherStatus] = useState<boolean>(false);
 
     useEffect(() => {
-        console.log("this is other");
+        console.log("we are in use effect");
+        console.log("active:");
+        console.log(active);
+        console.log("otherWebId:");
         console.log(otherWebId);
+        console.log("notesArray");
+        console.log(notesArray);
         const perfSave = async () => {
             if (doNoteSave || arrOfChanges.length !== 0) {
                 if (creatorStatus) {
@@ -70,33 +81,30 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
             }
         }
         const fetchNotes = async (otherId?: string) => {
-            setIsLoading(true);
+
             let currentWebId = otherId ? otherId : webId;
             // const defFolderUpd = await getDefaultFolder(currentWebId, fetch);
             // if (!defFolderUpd) {
             //     let heh = await recordDefaultFolder(currentWebId, fetch);
             // }
             await perfSave();
-            const [updNotesArray, updCategoriesArray] = await fetchAllNotes(currentWebId, fetch,
-                ((currentCategory) ? currentCategory : undefined), ((currentAccess) ? currentAccess : undefined));
-
+            let ret = await fetchAllNotes(currentWebId, fetch,
+                ((currentCategory) ? currentCategory : undefined), ((currentAccess) ? currentAccess : undefined), ((otherId) ? true : undefined));
+            const [updNotesArray, updCategoriesArray] = ret!;
             let transformedArr = await Promise.all(updNotesArray.map(async (thing) => {
                 return await thingToNote(thing, currentWebId, fetch);
             }));
-            console.log("this is notes array:")
-            console.log(transformedArr);
             // add fetch all habits here
-            setNotesArray(transformedArr);
+            setNotesArray(transformedArr.filter((item) => item !== null));
             setCategoryArray(updCategoriesArray);
             setDoNoteSave(false);
-            setIsLoading(false);
+            setIsLoadingContents(false);
+
         }
 
         const getContacts = async () => {
-            setIsLoading(true);
+            setIsLoadingContents(true);
             let contactsStatus = await checkContacts(webId, fetch);
-            console.log("this is frd start");
-            console.log(contactsStatus);
             setContactsFdrStatus(contactsStatus);
             if (contactsStatus) {
                 const namesAndIds = await fetchContacts(webId, fetch);
@@ -104,12 +112,15 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
                 const namesArr = namesAndIds.map((pair) => pair[0] ? pair[0] : pair[1]);
 
             }
-            setIsLoading(false);
+            setIsLoadingContents(false);
         }
         if (active === "notes") {
+            setIsLoadingContents(true);
             fetchNotes();
         }
         else if (active === "contacts") {
+            setIsLoadingContents(true);
+           // setNotesArray([]);
             if (!otherWebId) {
                 getContacts();
             }
@@ -117,9 +128,10 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
                 fetchNotes(otherWebId);
             }
         }
+        
     }, [newEntryCr, currentCategory, currentAccess, active, otherWebId]);
 
-    if (isLoading) {
+    if (isLoadingContents) {    
         return (
             <Spinner animation="border" role="status">
                 <span className="visually-hidden">Loading...</span>
@@ -129,22 +141,46 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
     else {
         if (active === "notes" || (active === "contacts" && otherWebId)) {
             if (notesArray.length === 0) {
-                return (
-                    <div className="card text-center">
-                        <div className="card-body">
-                            <h5 className="card-title">You don't have any {active} yet!</h5>
-                            <p className="card-text">Let's fix this</p>
-                            <a className="btn btn-primary" onClick={() => {
-                                setCreatorStatus(true);
-                                setViewerStatus(false);
-                            }}>create</a>
+                if (active === "contacts") {
+                    return (
+                        <div>
+
+                            <div className="card text-center">
+                                <div className="card-body">
+                                    <h5 className="card-title">Oooops...</h5>
+                                    <p className="card-text">Seems like there is no content that you can view</p>
+                                    <Button onClick={() => {
+                                        setOtherWebId(null);
+                                        setIsLoadingContents(true);
+                                    }}>Go Back</Button>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                );
+                    );
+                }
+                else {
+                    return (
+                        <div className="card text-center">
+                            <div className="card-body">
+                                <h5 className="card-title">You don't have any {active} yet!</h5>
+                                <p className="card-text">Let's fix this</p>
+                                <a className="btn btn-primary" onClick={() => {
+                                    setCreatorStatus(true);
+                                    setViewerStatus(false);
+                                }}>create</a>
+                            </div>
+                        </div>
+                    );
+                }
             }
             else {
                 return (
-                    <NotesList notesArray={notesArray}
+                    <NotesList
+                        isLoadingContents={isLoadingContents}
+                        setIsLoadingContents={setIsLoadingContents}
+                        otherWebId={otherWebId}
+                        setOtherWebId={setOtherWebId}
+                        notesArray={notesArray}
                         setNotesArray={setNotesArray}
                         noteToView={noteToView}
                         setNoteToView={setNoteToView}
@@ -187,12 +223,17 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
 
         else if (active === "contacts") {
             if (contactsFdrStatus) {
-                return (<ContactsList
-                    contactsArr={contactsArr}
-                    setContactsArr={setContactsArr}
-                    otherWebId={otherWebId}
-                    setOtherWebId={setOtherWebId}
-                />);
+                return (
+                    <ContactsList
+                        notesArray={notesArray}
+                        setNotesArray={setNotesArray}
+                        isLoadingContents={isLoadingContents}
+                        setIsLoadingContents={setIsLoadingContents}
+                        contactsArr={contactsArr}
+                        setContactsArr={setContactsArr}
+                        otherWebId={otherWebId}
+                        setOtherWebId={setOtherWebId}
+                    />);
             }
             else {
                 return (<NoContacts />);

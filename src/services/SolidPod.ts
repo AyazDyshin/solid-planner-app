@@ -23,14 +23,20 @@ export const thingToNote = async (toChange: Thing | null, webId: string, fetch: 
   let updContent = getStringNoLocale(toChange, schema.text) ? getStringNoLocale(toChange, schema.text) : "";
   let updId = getInteger(toChange, schema.identifier) ? getInteger(toChange, schema.identifier) : Date.now() + Math.floor(Math.random() * 1000);
   let updCategory = getStringNoLocale(toChange, "http://dbpedia.org/ontology/category");
-  let getAcc = await determineAccess(webId, toChange.url, fetch);
+  let getAcc;
+  try {
+    getAcc = await determineAccess(webId, toChange.url, fetch);
+  }
+  catch {
+    getAcc = [null];
+  }
   const note: Note = {
     id: updId,
     title: updTitle,
     content: updContent,
     category: updCategory,
     url: toChange.url,
-    access: getAcc[0],
+    access: getAcc[0] ? getAcc[0] : null,
     ...(getAcc[1] && { shareList: getAcc[1] })
   };
   return note;
@@ -299,6 +305,7 @@ export const getAllNotesUrlFromPublicIndex = async (webId: string, fetch: fetche
 }
 
 export const fetchAllNotes = async (webId: string, fetch: fetcher, categoryFilter?: string, accessFilter?: string, other?: boolean) => {
+  console.log("we are lul");
   let arrayOfCategories: string[] = [];
   let urlsArr
   try {
@@ -306,7 +313,7 @@ export const fetchAllNotes = async (webId: string, fetch: fetcher, categoryFilte
   }
   catch (error) {
     if (other) {
-      return null;
+      return [];
     }
     else {
       throw new Error("Couldn't fetch notes from your public type index");
@@ -379,7 +386,7 @@ export const fetchAllNotes = async (webId: string, fetch: fetcher, categoryFilte
         return newThing;
 
       }));
-
+      console.log("bub");
       return updArr;
     }
     else {
@@ -401,9 +408,12 @@ export const fetchAllNotes = async (webId: string, fetch: fetcher, categoryFilte
           }
         });
       }
+      console.log("gg");
       return arrOf;
     }
   }));
+  console.log("kkkk");
+
   let retValue: [(ThingPersisted | null)[], string[]] = [updUrlsArr.flat(), arrayOfCategories]
   return retValue;
 }
@@ -437,6 +447,8 @@ export const saveNote = async (webId: string, fetch: fetcher, note: Note) => {
     await initializeAcl(noteUrl, fetch);
   }
   await setPubAccess(webId, { read: true, append: true, write: true }, noteUrl, fetch);
+  console.log("this6?");
+
   let p = await getPubAccess(webId, noteUrl, fetch);
 }
 

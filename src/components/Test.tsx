@@ -47,7 +47,7 @@ const Test = () => {
     console.log(b);
   }
 
-  gets();
+ // gets();
 
 
   return (

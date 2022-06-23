@@ -19,15 +19,17 @@ interface Props {
     setCategoryArray: React.Dispatch<React.SetStateAction<string[]>>;
     doNoteSave: boolean;
     setDoNoteSave: React.Dispatch<React.SetStateAction<boolean>>;
-    NoteInp : Note;
-    setNoteInp : React.Dispatch<React.SetStateAction<Note>>;
+    NoteInp: Note;
+    setNoteInp: React.Dispatch<React.SetStateAction<Note>>;
     arrOfChanges: string[];
     setArrOfChanges: React.Dispatch<React.SetStateAction<string[]>>;
+    otherWebId: string | null;
+    setOtherWebId: React.Dispatch<React.SetStateAction<string | null>>;
 }
 // component that renders entry creator, based on the "active" value
 const CreatorToRender = ({ active, creatorStatus, newEntryCr, setNewEntryCr,
     noteToView, setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, setCreatorStatus, categoryArray,
-    setCategoryArray, doNoteSave, setDoNoteSave,NoteInp, setNoteInp, arrOfChanges, setArrOfChanges}: Props) => {
+    setCategoryArray, doNoteSave, setDoNoteSave, NoteInp, setNoteInp, arrOfChanges, setArrOfChanges, otherWebId, setOtherWebId }: Props) => {
 
     useEffect(() => {
     }, [creatorStatus, viewerStatus]);
@@ -35,8 +37,11 @@ const CreatorToRender = ({ active, creatorStatus, newEntryCr, setNewEntryCr,
     if (creatorStatus || viewerStatus) {
         switch (active) {
             case "notes":
+            case "contacts":
                 return (
                     <NoteCreator
+                        otherWebId={otherWebId}
+                        setOtherWebId={setOtherWebId}
                         newEntryCr={newEntryCr}
                         setNewEntryCr={setNewEntryCr}
                         noteToView={noteToView}

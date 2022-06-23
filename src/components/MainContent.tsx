@@ -7,6 +7,7 @@ import { useSession } from "@inrupt/solid-ui-react";
 import { Spinner } from "react-bootstrap";
 import { ControlledStorage } from "rdf-namespaces/dist/space";
 import { getDefaultFolder, recordDefaultFolder } from "../services/SolidPod";
+import { Note } from "./types";
 // This is the root component that first renders NavBar and then other content
 // Passes active and setActive hooks, which represent the currently clicked tab
 const MainContent = () => {
@@ -18,6 +19,14 @@ const MainContent = () => {
   const [active, setActive] = useState("notes");
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [permissionStatus, setPermissionStatus] = useState<boolean>(false);
+  const [otherWebId, setOtherWebId] = useState<string | null>(null);
+  const [viewerStatus, setViewerStatus] = useState<boolean>(false);
+  const [creatorStatus, setCreatorStatus] = useState<boolean>(false);
+  const [isEdit, setIsEdit] = useState(false);
+  const [notesArray, setNotesArray] = useState<(Note | null)[]>([]);
+  const [contactsArr, setContactsArr] = useState<(string | null)[][]>([]);
+  const [isLoadingContents, setIsLoadingContents] = useState<boolean>(true);
+
 
   const { webId } = session.info;
 
@@ -52,8 +61,42 @@ const MainContent = () => {
       return (
         <div>
           <Test />
-          <Navbar links={links} active={active} setActive={setActive} />
-          <ContentToRender active={active} />
+          <Navbar
+            isLoadingContents={isLoadingContents}
+            setIsLoadingContents={setIsLoadingContents}
+            contactsArr={contactsArr}
+            setContactsArr={setContactsArr}
+            notesArray={notesArray}
+            setNotesArray={setNotesArray}
+            creatorStatus={creatorStatus}
+            setCreatorStatus={setCreatorStatus}
+            viewerStatus={viewerStatus}
+            setViewerStatus={setViewerStatus}
+            otherWebId={otherWebId}
+            setOtherWebId={setOtherWebId}
+            links={links}
+            active={active}
+            setActive={setActive}
+            isEdit={isEdit}
+            setIsEdit={setIsEdit}
+          />
+          <ContentToRender
+            isLoadingContents={isLoadingContents}
+            setIsLoadingContents={setIsLoadingContents}
+            contactsArr={contactsArr}
+            setContactsArr={setContactsArr}
+            notesArray={notesArray}
+            setNotesArray={setNotesArray}
+            creatorStatus={creatorStatus}
+            setCreatorStatus={setCreatorStatus}
+            viewerStatus={viewerStatus}
+            setViewerStatus={setViewerStatus}
+            otherWebId={otherWebId}
+            setOtherWebId={setOtherWebId}
+            active={active}
+            isEdit={isEdit}
+            setIsEdit={setIsEdit}
+          />
         </div>
       );
     }

@@ -4,7 +4,7 @@ import { useSession } from "@inrupt/solid-ui-react";
 import { DCTERMS } from "@inrupt/vocab-common-rdf";
 import { schema } from "rdf-namespaces";
 import { RefAttributes, useState } from "react";
-import { Dropdown, DropdownButton, Badge, Overlay, Tooltip, OverlayTrigger, TooltipProps, Popover, PopoverProps } from "react-bootstrap";
+import { Dropdown, DropdownButton, Badge, Overlay, Tooltip, OverlayTrigger, TooltipProps, Popover, PopoverProps, Button } from "react-bootstrap";
 import SaveModal from "./SaveModal";
 import { Note } from "./types";
 import { RiArrowDropDownLine } from "react-icons/ri";
@@ -25,24 +25,30 @@ interface Props {
   currentCategory: string | null;
   setCurrentAccess: React.Dispatch<React.SetStateAction<string | null>>;
   currentAccess: string | null;
+  otherWebId: string | null;
+  setOtherWebId: React.Dispatch<React.SetStateAction<string | null>>;
+  isLoadingContents: boolean;
+  setIsLoadingContents: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView,
   viewerStatus, setViewerStatus, setCreatorStatus, isEdit, setIsEdit, categoryArray, setCategoryArray,
-  setCurrentCategory, currentCategory, setCurrentAccess, currentAccess }: Props) => {
+  setCurrentCategory, currentCategory, setCurrentAccess, currentAccess, otherWebId,
+  setOtherWebId, isLoadingContents, setIsLoadingContents }: Props) => {
   const { session, fetch } = useSession();
   const { webId } = session.info;
   const [activeNote, setActiveNote] = useState<number | null>(null);
   const [saveModalState, setSaveModalState] = useState<boolean>(false);
+
   let accessArray = ["public", "private", "shared"];
   const renderTooltip = (props: JSX.IntrinsicAttributes & PopoverProps & RefAttributes<HTMLDivElement>) => (
     <Popover id="popover-basic" {...props}>
-    <Popover.Header as="h3">Popover right</Popover.Header>
-    <Popover.Body>
-      And here's some <strong>amazing</strong> content. It's very engaging.
-      right?
-    </Popover.Body>
-  </Popover>
+      <Popover.Header as="h3">Popover right</Popover.Header>
+      <Popover.Body>
+        And here's some <strong>amazing</strong> content. It's very engaging.
+        right?
+      </Popover.Body>
+    </Popover>
   );
 
 
@@ -59,33 +65,39 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView,
   return (
     <div className="w-100 h-100">
       <div className="d-flex">
-
-      <OverlayTrigger placement="right" overlay={renderTooltip}>
+        {otherWebId && <Button onClick={() => {
+           setOtherWebId(null);
+           setIsLoadingContents(true);
+            }}>Go Back</Button>}
+        {!otherWebId && <OverlayTrigger placement="right" overlay={renderTooltip}>
           <DropdownButton
             variant="outline-secondary"
             title={<div>{currentAccess ? currentAccess : "access type"} <RiArrowDropDownLine /></div>}
           >
             {
-              accessArray.map((access) => {
-                return <Dropdown.Item href="" key={Date.now() + Math.floor(Math.random() * 1000)}
-                 onClick={() => setCurrentAccess(access)}>{access}</Dropdown.Item>
-              })
-            }
 
+
+              !otherWebId && accessArray.map((access) => {
+                return <Dropdown.Item href="" key={Date.now() + Math.floor(Math.random() * 1000)}
+                  onClick={() => setCurrentAccess(access)}>{access}</Dropdown.Item>
+              })
+
+            }
             {currentAccess && (
               <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentAccess(null)}>Reset</Dropdown.Item></>)}
           </DropdownButton>
         </OverlayTrigger>
+        }
 
         {
-          categoryArray.length !== 0 && <DropdownButton
+          categoryArray.length !== 0 && !otherWebId && <DropdownButton
             variant="outline-secondary"
             title={<div>{currentCategory ? currentCategory : "All notes"} <RiArrowDropDownLine /></div>}
           >
             {
               categoryArray.map((category) => {
                 return <Dropdown.Item href="" key={Date.now() + Math.floor(Math.random() * 1000)}
-                 onClick={() => setCurrentCategory(category)}>{category}</Dropdown.Item>
+                  onClick={() => setCurrentCategory(category)}>{category}</Dropdown.Item>
               })
             }
 
@@ -94,7 +106,7 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView,
           </DropdownButton>
         }
 
-        <a className="btn btn-primary ms-auto" onClick={handleCreate}>create</a>
+        {!otherWebId && <a className="btn btn-primary ms-auto" onClick={handleCreate}>create</a>}
 
       </div>
       <div className="list-group w-100 h-100">
@@ -105,6 +117,7 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView,
                 key={`${note.id}${Date.now() + Math.floor(Math.random() * 1000)}`}
                 className={`list-group-item px-1 list-group-item-action ${activeNote === note.id ? 'active' : ''}`}
                 onClick={(e) => {
+                  console.log(viewerStatus);
                   e.preventDefault();
                   setIsEdit(false);
                   setActiveNote(note.id);
@@ -115,8 +128,8 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView,
               >
                 {note.category && <Badge pill bg="primary" className="me-1">{note.category}</Badge>}
                 {!note.category && <Badge pill bg="secondary" className="me-1">no category</Badge>}
-                {note.access && <Badge pill bg="secondary" className="me-1">{Object.keys(note.access)[0]}</Badge>}
-                {note.shareList && <Badge pill bg="secondary" className="me-1">shared</Badge>}
+                {note.access && !otherWebId && <Badge pill bg="secondary" className="me-1">{Object.keys(note.access)[0]}</Badge>}
+                {note.shareList && !otherWebId && <Badge pill bg="secondary" className="me-1">shared</Badge>}
                 {note.title}
               </a>
             }

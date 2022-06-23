@@ -29,12 +29,14 @@ interface Props {
     setNoteInp: React.Dispatch<React.SetStateAction<Note>>;
     arrOfChanges: string[];
     setArrOfChanges: React.Dispatch<React.SetStateAction<string[]>>;
+    otherWebId: string | null;
+    setOtherWebId: React.Dispatch<React.SetStateAction<string | null>>;
 }
 //component of creation and saving a note the user's pod
 const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
     setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit,
     setCreatorStatus, creatorStatus, categoryArray, setCategoryArray, doNoteSave, setDoNoteSave, NoteInp,
-    setNoteInp, arrOfChanges, setArrOfChanges }: Props) => {
+    setNoteInp, arrOfChanges, setArrOfChanges, otherWebId, setOtherWebId }: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
     const [categoryModalState, setCategoryModalState] = useState<boolean>(false);
@@ -54,14 +56,12 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
                 setIsEdit(true);
             }
         }
-
     }, [viewerStatus, noteToView]);
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setNoteInp(prevState => ({ ...prevState, [e.target.name]: e.target.value }));
         if (!arrOfChanges.includes(e.target.name)) {
-            console.log("we changed arr!");
             setArrOfChanges((prevState) => ([...prevState, e.target.name]));
         }
 
@@ -95,19 +95,21 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
                     value={NoteInp.title === null ? "" : NoteInp.title}
                     {...(!isEdit && { disabled: true })}
                     onChange={handleChange} />
-                <ButtonGroup>
-                    <Button onClick={handleSave}>save</Button>
-                    <DropdownButton className="dropNoIcon"
-                        variant="outline-secondary"
-                        title={<BsThreeDots />}
-                        id="input-group-dropdown-1"
-                    >
-                        {viewerStatus && <Dropdown.Item onClick={handleEdit}><FiEdit /> edit</Dropdown.Item>}
-                        {viewerStatus && <Dropdown.Item onClick={handleDelete}>delete</Dropdown.Item>}
-                        <Dropdown.Item href="" onClick={() => (setCategoryModalState(true))}>Set Category</Dropdown.Item>
-                        <Dropdown.Item href="" onClick={() => (setAccessModalState(true))}>Set Access type</Dropdown.Item>
-                    </DropdownButton>
-                </ButtonGroup>
+                {
+                    !otherWebId && <ButtonGroup>
+                        <Button onClick={handleSave}>save</Button>
+                        <DropdownButton className="dropNoIcon"
+                            variant="outline-secondary"
+                            title={<BsThreeDots />}
+                            id="input-group-dropdown-1"
+                        >
+                            {viewerStatus && <Dropdown.Item onClick={handleEdit}><FiEdit /> edit</Dropdown.Item>}
+                            {viewerStatus && <Dropdown.Item onClick={handleDelete}>delete</Dropdown.Item>}
+                            <Dropdown.Item href="" onClick={() => (setCategoryModalState(true))}>Set Category</Dropdown.Item>
+                            <Dropdown.Item href="" onClick={() => (setAccessModalState(true))}>Set Access type</Dropdown.Item>
+                        </DropdownButton>
+                    </ButtonGroup>
+                }
             </InputGroup>
             <FormControl {...(!isEdit && { disabled: true })} as="textarea" aria-label="textarea" style={{ 'resize': 'none', 'height': '91%' }}
                 name="content"

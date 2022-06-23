@@ -10,7 +10,7 @@ interface Props {
     writeStatus: boolean;
 
 }
-const AccessElement = ({ title, readOnChange, appendOnChange, writeOnChange, readStatus, appendStatus,
+const AccessElement = ({ title, readOnChange, appendOnChange, writeOnChange, readStatus, appendStatus, accUpdObj, setAccUpdObj,
     writeStatus }: Props) => {
     return (
         <div className="my-2" key={Date.now() + Math.floor(Math.random() * 1000)}>

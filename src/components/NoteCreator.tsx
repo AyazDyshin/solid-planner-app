@@ -54,12 +54,18 @@ interface Props {
     setFullContacts: React.Dispatch<React.SetStateAction<{
         [x: string]: string | null;
     }>>;
+    accUpdObj: {
+        [x: string]: boolean;
+    };
+    setAccUpdObj: React.Dispatch<React.SetStateAction<{
+        [x: string]: boolean;
+    }>>;
 }
 //component of creation and saving a note the user's pod
 const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
     setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit,
     setCreatorStatus, creatorStatus, categoryArray, setCategoryArray, doNoteSave, setDoNoteSave, NoteInp,
-    setNoteInp, arrOfChanges, setArrOfChanges, otherWebId, setOtherWebId,
+    setNoteInp, arrOfChanges, setArrOfChanges, otherWebId, setOtherWebId, accUpdObj, setAccUpdObj,
     publicAccess, setPublicAccess, contactsList, setContactsList, webIdToSave, setWebIdToSave, sharedList, setSharedList,
     fullContacts, setFullContacts
 }: Props) => {
@@ -155,6 +161,8 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
                 setCategoryArray={setCategoryArray}
             />
             <AccessModal
+                accUpdObj={accUpdObj}
+                setAccUpdObj={setAccUpdObj}
                 fullContacts={fullContacts}
                 setFullContacts={setFullContacts}
                 publicAccess={publicAccess}

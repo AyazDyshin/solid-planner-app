@@ -40,9 +40,15 @@ interface Props {
     setFullContacts: React.Dispatch<React.SetStateAction<{
         [x: string]: string | null;
     }>>;
+    accUpdObj: {
+        [x: string]: boolean;
+    };
+    setAccUpdObj: React.Dispatch<React.SetStateAction<{
+        [x: string]: boolean;
+    }>>;
 }
 //a popup window to prompt user to set access type
-const AccessModal = ({ accessModalState, setAccessModalState, setNoteInp, contactsList, setContactsList,
+const AccessModal = ({ accessModalState, setAccessModalState, setNoteInp, contactsList, setContactsList, accUpdObj, setAccUpdObj,
     noteInp, viewerStatus, setArrOfChanges, noteToView, setNoteToView, publicAccess, setPublicAccess,
     sharedList, setSharedList, webIdToSave, setWebIdToSave, fullContacts, setFullContacts }: Props) => {
     const { session, fetch } = useSession();
@@ -60,7 +66,6 @@ const AccessModal = ({ accessModalState, setAccessModalState, setNoteInp, contac
     const [webIdReady, setWebIdReady] = useState<boolean>(false);
     const [workingWebId, setWorkingWebId] = useState<string>("");
     const [reload, setReload] = useState<boolean>(false);
-    const [accUpdObj, setAccUpdObj] = useState<{ [x: string]: boolean; }>({});
     useEffect(() => {
         const fetchAccess = async () => {
 
@@ -108,26 +113,7 @@ const AccessModal = ({ accessModalState, setAccessModalState, setNoteInp, contac
 
     }, [accessModalState, reload]);
 
-    const handleSave = async () => {
-        //handle
-        // await setPubAccess(webId, publicAccess, noteToView!.url, fetch);
-        // for (let item in contactsList) {
-        //     if (fullContacts[item]) {
-        //         await shareWith(webId, noteToView!.url, fetch, contactsList[item], fullContacts[item]!);
-        //     }
-        //     else {
-        //         await shareWith(webId, noteToView!.url, fetch, contactsList[item], item);
-        //     }
-        // }
-        // for (let item in sharedList) {
-        //     await shareWith(webId, noteToView!.url, fetch, sharedList[item], item);
 
-        // }
-        // for (let item in webIdToSave) {
-        //     await shareWith(webId, noteToView!.url, fetch, webIdToSave[item], item);
-
-        // }
-    }
 
 
     return (
@@ -142,7 +128,10 @@ const AccessModal = ({ accessModalState, setAccessModalState, setNoteInp, contac
             </div>}
             {
                 !isLoading && <div>
-                    <Modal.Header closeButton onClick={() => { setAccessModalState(false) }}>
+                    <Modal.Header closeButton onClick={() => {
+                        setAccUpdObj({});
+                        setAccessModalState(false);
+                    }}>
                         <Modal.Title>Set Access:</Modal.Title>
                     </Modal.Header>
                     <Modal.Body >
@@ -152,8 +141,14 @@ const AccessModal = ({ accessModalState, setAccessModalState, setNoteInp, contac
                                 setPublicAccess(prevState => ({ ...prevState, read: !publicAccess.read }));
                                 setAccUpdObj(prevState => ({ ...prevState, "public": true }));
                             }}
-                            appendOnChange={() => setPublicAccess(prevState => ({ ...prevState, append: !publicAccess.append }))}
-                            writeOnChange={() => setPublicAccess(prevState => ({ ...prevState, write: !publicAccess.write }))}
+                            appendOnChange={() => {
+                                setPublicAccess(prevState => ({ ...prevState, append: !publicAccess.append }));
+                                setAccUpdObj(prevState => ({ ...prevState, "public": true }));
+                            }}
+                            writeOnChange={() => {
+                                setPublicAccess(prevState => ({ ...prevState, write: !publicAccess.write }));
+                                setAccUpdObj(prevState => ({ ...prevState, "public": true }));
+                            }}
                             readStatus={publicAccess.read}
                             appendStatus={publicAccess.append}
                             writeStatus={publicAccess.write}
@@ -188,9 +183,18 @@ const AccessModal = ({ accessModalState, setAccessModalState, setNoteInp, contac
                                                 <AccessElement
                                                     key={Date.now() + Math.floor(Math.random() * 1000)}
                                                     title={key}
-                                                    readOnChange={() => setSharedList(prevState => ({ ...prevState, [key]: { read: !value.read, append: value.append, write: value.write } }))}
-                                                    appendOnChange={() => setSharedList(prevState => ({ ...prevState, [key]: { read: value.read, append: !value.append, write: value.write } }))}
-                                                    writeOnChange={() => setSharedList(prevState => ({ ...prevState, [key]: { read: value.read, append: value.append, write: !value.write } }))}
+                                                    readOnChange={() => {
+                                                        setSharedList(prevState => ({ ...prevState, [key]: { read: !value.read, append: value.append, write: value.write } }));
+                                                        setAccUpdObj(prevState => ({ ...prevState, "shared": true }));
+                                                    }}
+                                                    appendOnChange={() => {
+                                                        setSharedList(prevState => ({ ...prevState, [key]: { read: value.read, append: !value.append, write: value.write } }));
+                                                        setAccUpdObj(prevState => ({ ...prevState, "shared": true }));
+                                                    }}
+                                                    writeOnChange={() => {
+                                                        setSharedList(prevState => ({ ...prevState, [key]: { read: value.read, append: value.append, write: !value.write } }));
+                                                        setAccUpdObj(prevState => ({ ...prevState, "shared": true }));
+                                                    }}
                                                     readStatus={sharedList[key].read}
                                                     appendStatus={sharedList[key].append}
                                                     writeStatus={sharedList[key].write}
@@ -231,9 +235,18 @@ const AccessModal = ({ accessModalState, setAccessModalState, setNoteInp, contac
                                                         <AccessElement
                                                             key={Date.now() + Math.floor(Math.random() * 1000)}
                                                             title={key}
-                                                            readOnChange={() => setContactsList(prevState => ({ ...prevState, [key]: { read: !value.read, append: value.append, write: value.write } }))}
-                                                            appendOnChange={() => setContactsList(prevState => ({ ...prevState, [key]: { read: value.read, append: !value.append, write: value.write } }))}
-                                                            writeOnChange={() => setContactsList(prevState => ({ ...prevState, [key]: { read: value.read, append: value.append, write: !value.write } }))}
+                                                            readOnChange={() => {
+                                                                setContactsList(prevState => ({ ...prevState, [key]: { read: !value.read, append: value.append, write: value.write } }));
+                                                                setAccUpdObj(prevState => ({ ...prevState, "contact": true }));
+                                                            }}
+                                                            appendOnChange={() => {
+                                                                setContactsList(prevState => ({ ...prevState, [key]: { read: value.read, append: !value.append, write: value.write } }));
+                                                                setAccUpdObj(prevState => ({ ...prevState, "contact": true }));
+                                                            }}
+                                                            writeOnChange={() => {
+                                                                setContactsList(prevState => ({ ...prevState, [key]: { read: value.read, append: value.append, write: !value.write } }));
+                                                                setAccUpdObj(prevState => ({ ...prevState, "contact": true }));
+                                                            }}
                                                             readStatus={contactsList[key].read}
                                                             appendStatus={contactsList[key].append}
                                                             writeStatus={contactsList[key].write}
@@ -274,7 +287,6 @@ const AccessModal = ({ accessModalState, setAccessModalState, setNoteInp, contac
                                                         writeStatus={webIdToSave[workingWebId].write}
                                                     />
                                                     <Button onClick={() => {
-                                                        handleSave();
                                                         setReload(!reload);
                                                     }}>Save</Button>
                                                 </div>
@@ -286,11 +298,14 @@ const AccessModal = ({ accessModalState, setAccessModalState, setNoteInp, contac
                         </div>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button variant="secondary" onClick={() => setAccessModalState(false)}>Go Back</Button>
+                        <Button variant="secondary"
+                            onClick={() => {
+                                setAccUpdObj({});
+                                setAccessModalState(false);
+                            }}>Go Back</Button>
                         <Button variant="primary" onClick={() => {
-                            handleSave();
                             setAccessModalState(false);
-                        }}>save</Button>
+                        }}>set</Button>
                     </Modal.Footer>
                 </div>
             }

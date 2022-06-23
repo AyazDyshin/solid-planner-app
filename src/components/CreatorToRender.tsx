@@ -48,13 +48,19 @@ interface Props {
     setFullContacts: React.Dispatch<React.SetStateAction<{
         [x: string]: string | null;
     }>>;
+    accUpdObj: {
+        [x: string]: boolean;
+    };
+    setAccUpdObj: React.Dispatch<React.SetStateAction<{
+        [x: string]: boolean;
+    }>>;
 }
 // component that renders entry creator, based on the "active" value
 const CreatorToRender = ({ active, creatorStatus, newEntryCr, setNewEntryCr,
     noteToView, setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, setCreatorStatus, categoryArray,
     setCategoryArray, doNoteSave, setDoNoteSave, NoteInp, setNoteInp, arrOfChanges, setArrOfChanges, otherWebId, setOtherWebId,
     publicAccess, setPublicAccess, contactsList, setContactsList, webIdToSave, setWebIdToSave, sharedList, setSharedList,
-    fullContacts, setFullContacts
+    fullContacts, setFullContacts, accUpdObj, setAccUpdObj
 }: Props) => {
 
     useEffect(() => {
@@ -66,6 +72,8 @@ const CreatorToRender = ({ active, creatorStatus, newEntryCr, setNewEntryCr,
             case "contacts":
                 return (
                     <NoteCreator
+                        accUpdObj={accUpdObj}
+                        setAccUpdObj={setAccUpdObj}
                         fullContacts={fullContacts}
                         setFullContacts={setFullContacts}
                         publicAccess={publicAccess}

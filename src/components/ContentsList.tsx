@@ -64,6 +64,12 @@ interface Props {
     setFullContacts: React.Dispatch<React.SetStateAction<{
         [x: string]: string | null;
     }>>;
+    accUpdObj: {
+        [x: string]: boolean;
+    };
+    setAccUpdObj: React.Dispatch<React.SetStateAction<{
+        [x: string]: boolean;
+    }>>;
 }
 
 const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, setNewEntryCr,
@@ -71,7 +77,7 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
     setDoNoteSave, NoteInp, setNoteInp, arrOfChanges, setArrOfChanges,
     otherWebId, setOtherWebId, notesArray, setNotesArray, contactsArr, setContactsArr, isLoadingContents, setIsLoadingContents,
     publicAccess, setPublicAccess, contactsList, setContactsList, webIdToSave, setWebIdToSave, sharedList, setSharedList,
-    fullContacts, setFullContacts
+    fullContacts, setFullContacts, accUpdObj, setAccUpdObj
 }: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
@@ -94,23 +100,36 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
                 else if (arrOfChanges.length !== 0) {
                     await editNote(webId, fetch, NoteInp, arrOfChanges);
                 }
-
-                await setPubAccess(webId, publicAccess, noteToView!.url, fetch);
-                for (let item in contactsList) {
-                    if (fullContacts[item]) {
-                        await shareWith(webId, noteToView!.url, fetch, contactsList[item], fullContacts[item]!);
+                else if (Object.keys(accUpdObj).length !== 0) {
+                    if (accUpdObj["public"]) {
+                        await setPubAccess(webId, publicAccess, noteToView!.url, fetch);
                     }
-                    else {
-                        await shareWith(webId, noteToView!.url, fetch, contactsList[item], item);
+                    else if (accUpdObj["contact"]) {
+                        for (let item in contactsList) {
+
+                            if (fullContacts[item]) {
+                                console.log(contactsList[item]);
+                                console.log(fullContacts[item]);
+                                await shareWith(webId, noteToView!.url, fetch, contactsList[item], fullContacts[item]!);
+                            }
+                            else {
+                                console.log(contactsList[item]);
+                                console.log(item);
+                                await shareWith(webId, noteToView!.url, fetch, contactsList[item], item);
+                            }
+                        }
                     }
-                }
-                for (let item in sharedList) {
-                    await shareWith(webId, noteToView!.url, fetch, sharedList[item], item);
+                    else if (accUpdObj["shared"]) {
+                        for (let item in sharedList) {
+                            await shareWith(webId, noteToView!.url, fetch, sharedList[item], item);
 
-                }
-                for (let item in webIdToSave) {
-                    await shareWith(webId, noteToView!.url, fetch, webIdToSave[item], item);
+                        }
+                    }
 
+                    // for (let item in webIdToSave) {
+                    //     await shareWith(webId, noteToView!.url, fetch, webIdToSave[item], item);
+
+                    // }
                 }
 
                 setCreatorStatus(false);

@@ -1,8 +1,10 @@
 import { Thing } from "@inrupt/solid-client";
+import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import { useSession } from "@inrupt/solid-ui-react";
 //import { Note } from "rdf-namespaces/dist/as";
 import { useEffect, useState } from "react";
 import { Button, Spinner } from "react-bootstrap";
+import { setPubAccess, shareWith } from "../services/access";
 import {
     fetchAllNotes, getDefaultFolder, recordDefaultFolder, thingToNote, saveNote,
     editNote, fetchContacts, checkContacts
@@ -10,7 +12,7 @@ import {
 import ContactsList from "./ContactsList";
 import NoContacts from "./NoContacts";
 import NotesList from "./NotesList";
-import { Note } from "./types";
+import { accessObject, Note } from "./types";
 // need to upgrade for habits case
 interface Props {
     creatorStatus: boolean;
@@ -40,12 +42,37 @@ interface Props {
     setContactsArr: React.Dispatch<React.SetStateAction<(string | null)[][]>>;
     isLoadingContents: boolean;
     setIsLoadingContents: React.Dispatch<React.SetStateAction<boolean>>;
+    publicAccess: accessObject;
+    setPublicAccess: React.Dispatch<React.SetStateAction<accessObject>>;
+    contactsList: {
+        [x: string]: AccessModes;
+    };
+    setContactsList: React.Dispatch<React.SetStateAction<{
+        [x: string]: AccessModes;
+    }>>;
+    webIdToSave: {
+        [x: string]: AccessModes;
+    };
+    setWebIdToSave: React.Dispatch<React.SetStateAction<{
+        [x: string]: AccessModes;
+    }>>;
+    sharedList: Record<string, AccessModes>;
+    setSharedList: React.Dispatch<React.SetStateAction<Record<string, AccessModes>>>;
+    fullContacts: {
+        [x: string]: string | null;
+    };
+    setFullContacts: React.Dispatch<React.SetStateAction<{
+        [x: string]: string | null;
+    }>>;
 }
 
 const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, setNewEntryCr,
     noteToView, setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, categoryArray, setCategoryArray, doNoteSave,
     setDoNoteSave, NoteInp, setNoteInp, arrOfChanges, setArrOfChanges,
-    otherWebId, setOtherWebId, notesArray, setNotesArray, contactsArr, setContactsArr, isLoadingContents, setIsLoadingContents }: Props) => {
+    otherWebId, setOtherWebId, notesArray, setNotesArray, contactsArr, setContactsArr, isLoadingContents, setIsLoadingContents,
+    publicAccess, setPublicAccess, contactsList, setContactsList, webIdToSave, setWebIdToSave, sharedList, setSharedList,
+    fullContacts, setFullContacts
+}: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
     if (webId === undefined) {
@@ -58,13 +85,7 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
     const [otherStatus, setOtherStatus] = useState<boolean>(false);
 
     useEffect(() => {
-        console.log("we are in use effect");
-        console.log("active:");
-        console.log(active);
-        console.log("otherWebId:");
-        console.log(otherWebId);
-        console.log("notesArray");
-        console.log(notesArray);
+
         const perfSave = async () => {
             if (doNoteSave || arrOfChanges.length !== 0) {
                 if (creatorStatus) {
@@ -73,6 +94,25 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
                 else if (arrOfChanges.length !== 0) {
                     await editNote(webId, fetch, NoteInp, arrOfChanges);
                 }
+
+                await setPubAccess(webId, publicAccess, noteToView!.url, fetch);
+                for (let item in contactsList) {
+                    if (fullContacts[item]) {
+                        await shareWith(webId, noteToView!.url, fetch, contactsList[item], fullContacts[item]!);
+                    }
+                    else {
+                        await shareWith(webId, noteToView!.url, fetch, contactsList[item], item);
+                    }
+                }
+                for (let item in sharedList) {
+                    await shareWith(webId, noteToView!.url, fetch, sharedList[item], item);
+
+                }
+                for (let item in webIdToSave) {
+                    await shareWith(webId, noteToView!.url, fetch, webIdToSave[item], item);
+
+                }
+
                 setCreatorStatus(false);
                 setNoteInp({ id: null, title: "", content: "", category: "", url: "", access: null });
                 setIsEdit(false);
@@ -120,7 +160,7 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
         }
         else if (active === "contacts") {
             setIsLoadingContents(true);
-           // setNotesArray([]);
+            // setNotesArray([]);
             if (!otherWebId) {
                 getContacts();
             }
@@ -128,10 +168,10 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
                 fetchNotes(otherWebId);
             }
         }
-        
+
     }, [newEntryCr, currentCategory, currentAccess, active, otherWebId]);
 
-    if (isLoadingContents) {    
+    if (isLoadingContents) {
         return (
             <Spinner animation="border" role="status">
                 <span className="visually-hidden">Loading...</span>

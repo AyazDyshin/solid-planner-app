@@ -4,11 +4,12 @@ import { useEffect, useState } from "react";
 import { InputGroup, FormControl, Button, ButtonGroup, DropdownButton, Dropdown } from "react-bootstrap";
 import CategoryModal from "../modals/CategoryModal";
 import { deleteNote, editNote, saveNote, thingToNote } from "../services/SolidPod";
-import { Note } from "./types";
+import { accessObject, Note } from "./types";
 import { BsThreeDots } from "react-icons/bs";
 import { FiEdit } from "react-icons/fi";
 import "../styles.css";
 import AccessModal from "../modals/AccessModal";
+import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 
 interface Props {
     newEntryCr: boolean;
@@ -31,16 +32,43 @@ interface Props {
     setArrOfChanges: React.Dispatch<React.SetStateAction<string[]>>;
     otherWebId: string | null;
     setOtherWebId: React.Dispatch<React.SetStateAction<string | null>>;
+    publicAccess: accessObject;
+    setPublicAccess: React.Dispatch<React.SetStateAction<accessObject>>;
+    contactsList: {
+        [x: string]: AccessModes;
+    };
+    setContactsList: React.Dispatch<React.SetStateAction<{
+        [x: string]: AccessModes;
+    }>>;
+    webIdToSave: {
+        [x: string]: AccessModes;
+    };
+    setWebIdToSave: React.Dispatch<React.SetStateAction<{
+        [x: string]: AccessModes;
+    }>>;
+    sharedList: Record<string, AccessModes>;
+    setSharedList: React.Dispatch<React.SetStateAction<Record<string, AccessModes>>>;
+    fullContacts: {
+        [x: string]: string | null;
+    };
+    setFullContacts: React.Dispatch<React.SetStateAction<{
+        [x: string]: string | null;
+    }>>;
 }
 //component of creation and saving a note the user's pod
 const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
     setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit,
     setCreatorStatus, creatorStatus, categoryArray, setCategoryArray, doNoteSave, setDoNoteSave, NoteInp,
-    setNoteInp, arrOfChanges, setArrOfChanges, otherWebId, setOtherWebId }: Props) => {
+    setNoteInp, arrOfChanges, setArrOfChanges, otherWebId, setOtherWebId,
+    publicAccess, setPublicAccess, contactsList, setContactsList, webIdToSave, setWebIdToSave, sharedList, setSharedList,
+    fullContacts, setFullContacts
+}: Props) => {
+
     const { session, fetch } = useSession();
     const { webId } = session.info;
     const [categoryModalState, setCategoryModalState] = useState<boolean>(false);
     const [accessModalState, setAccessModalState] = useState<boolean>(false);
+
 
     useEffect(() => {
         if (arrOfChanges.length !== 0) {
@@ -116,7 +144,8 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
                 value={NoteInp.content === null ? "" : NoteInp.content}
                 onChange={handleChange}
             />
-            <CategoryModal categoryModalState={categoryModalState}
+            <CategoryModal
+                categoryModalState={categoryModalState}
                 setCategoryModalState={setCategoryModalState}
                 setNoteInp={setNoteInp}
                 noteInp={NoteInp}
@@ -126,6 +155,16 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
                 setCategoryArray={setCategoryArray}
             />
             <AccessModal
+                fullContacts={fullContacts}
+                setFullContacts={setFullContacts}
+                publicAccess={publicAccess}
+                setPublicAccess={setPublicAccess}
+                contactsList={contactsList}
+                setContactsList={setContactsList}
+                webIdToSave={webIdToSave}
+                setWebIdToSave={setWebIdToSave}
+                sharedList={sharedList}
+                setSharedList={setSharedList}
                 accessModalState={accessModalState}
                 setAccessModalState={setAccessModalState}
                 setNoteInp={setNoteInp}

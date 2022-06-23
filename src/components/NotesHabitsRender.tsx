@@ -3,8 +3,9 @@ import { useState } from "react";
 import CreatorToRender from "./CreatorToRender";
 import FolderPickerOrContent from "./FolderPickerOrContent";
 import "../styles.css";
-import { Note } from "./types";
+import { accessObject, Note } from "./types";
 import ContentsList from "./ContentsList";
+import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 interface Props {
     active: string;
     otherWebId: string | null;
@@ -40,11 +41,27 @@ const NotesHabitsRender = ({ active, otherWebId, setOtherWebId,
     const [NoteInp, setNoteInp] = useState<Note>({ id: null, title: "", content: "", category: "", url: "", access: null });
     const [arrOfChanges, setArrOfChanges] = useState<string[]>([]);
 
+    const [publicAccess, setPublicAccess] = useState<accessObject>({ read: false, append: false, write: false });
+    const [contactsList, setContactsList] = useState<{ [x: string]: AccessModes; }>({});
+    const [webIdToSave, setWebIdToSave] = useState<{ [x: string]: AccessModes; }>({});
+    const [sharedList, setSharedList] = useState<Record<string, AccessModes>>({});
+    const [fullContacts, setFullContacts] = useState<{ [x: string]: string | null; }>({});
+
     return (
         <div className="container-fluid pad">
             <div className="row h-100">
                 <div className="col h-100 border border-5 border-end-0 d-flex justify-content-center align-items-center p-0">
                     <ContentsList
+                        fullContacts={fullContacts}
+                        setFullContacts={setFullContacts}
+                        publicAccess={publicAccess}
+                        setPublicAccess={setPublicAccess}
+                        contactsList={contactsList}
+                        setContactsList={setContactsList}
+                        webIdToSave={webIdToSave}
+                        setWebIdToSave={setWebIdToSave}
+                        sharedList={sharedList}
+                        setSharedList={setSharedList}
                         isLoadingContents={isLoadingContents}
                         setIsLoadingContents={setIsLoadingContents}
                         contactsArr={contactsArr}
@@ -76,6 +93,16 @@ const NotesHabitsRender = ({ active, otherWebId, setOtherWebId,
                 </div>
                 <div className="col h-100 border border-5">
                     <CreatorToRender
+                        fullContacts={fullContacts}
+                        setFullContacts={setFullContacts}
+                        publicAccess={publicAccess}
+                        setPublicAccess={setPublicAccess}
+                        contactsList={contactsList}
+                        setContactsList={setContactsList}
+                        webIdToSave={webIdToSave}
+                        setWebIdToSave={setWebIdToSave}
+                        sharedList={sharedList}
+                        setSharedList={setSharedList}
                         otherWebId={otherWebId}
                         setOtherWebId={setOtherWebId}
                         active={active}

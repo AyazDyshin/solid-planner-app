@@ -18,33 +18,52 @@ interface Props {
     setArrOfChanges: React.Dispatch<React.SetStateAction<string[]>>;
     noteToView: Note | null;
     setNoteToView: React.Dispatch<React.SetStateAction<Note | null>>;
+    publicAccess: accessObject;
+    setPublicAccess: React.Dispatch<React.SetStateAction<accessObject>>;
+    contactsList: {
+        [x: string]: AccessModes;
+    };
+    setContactsList: React.Dispatch<React.SetStateAction<{
+        [x: string]: AccessModes;
+    }>>;
+    webIdToSave: {
+        [x: string]: AccessModes;
+    };
+    setWebIdToSave: React.Dispatch<React.SetStateAction<{
+        [x: string]: AccessModes;
+    }>>;
+    sharedList: Record<string, AccessModes>;
+    setSharedList: React.Dispatch<React.SetStateAction<Record<string, AccessModes>>>;
+    fullContacts: {
+        [x: string]: string | null;
+    };
+    setFullContacts: React.Dispatch<React.SetStateAction<{
+        [x: string]: string | null;
+    }>>;
 }
 //a popup window to prompt user to set access type
-const AccessModal = ({ accessModalState, setAccessModalState, setNoteInp,
-    noteInp, viewerStatus, setArrOfChanges, noteToView, setNoteToView }: Props) => {
+const AccessModal = ({ accessModalState, setAccessModalState, setNoteInp, contactsList, setContactsList,
+    noteInp, viewerStatus, setArrOfChanges, noteToView, setNoteToView, publicAccess, setPublicAccess,
+    sharedList, setSharedList, webIdToSave, setWebIdToSave, fullContacts, setFullContacts }: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
     if (!webId) {
         throw new Error("couldn't get your webId");
     }
-    const [publicAccess, setPublicAccess] = useState<accessObject>({ read: false, append: false, write: false });
     const [sharedOpen, setSharedOpen] = useState<boolean>(false);
     const [sharingOpen, setSharingOpen] = useState<boolean>(false);
     const [contactsOpen, setContactsOpen] = useState<boolean>(false);
     const [webIdOpen, setWebIdOpen] = useState<boolean>(false);
-    const [contactsList, setContactsList] = useState<{ [x: string]: AccessModes; }>({});
     const [contactsStat, setContactsStat] = useState<boolean>(false);
-    const [sharedList, setSharedList] = useState<Record<string, AccessModes>>({});
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [fullContacts, setFullContacts] = useState<{ [x: string]: string | null; }>({});
     const [currentWebId, setCurrentWebId] = useState<string>("");
-    const [webIdToSave, setWebIdToSave] = useState<{ [x: string]: AccessModes; }>({});
     const [webIdReady, setWebIdReady] = useState<boolean>(false);
     const [workingWebId, setWorkingWebId] = useState<string>("");
     const [reload, setReload] = useState<boolean>(false);
-
+    const [accUpdObj, setAccUpdObj] = useState<{ [x: string]: boolean; }>({});
     useEffect(() => {
         const fetchAccess = async () => {
+
             setIsLoading(true);
             setSharedOpen(false);
             setSharingOpen(false);
@@ -91,23 +110,23 @@ const AccessModal = ({ accessModalState, setAccessModalState, setNoteInp,
 
     const handleSave = async () => {
         //handle
-        await setPubAccess(webId, publicAccess, noteToView!.url, fetch);
-        for (let item in contactsList) {
-            if (fullContacts[item]) {
-                await shareWith(webId, noteToView!.url, fetch, contactsList[item], fullContacts[item]!);
-            }
-            else {
-                await shareWith(webId, noteToView!.url, fetch, contactsList[item], item);
-            }
-        }
-        for (let item in sharedList) {
-            await shareWith(webId, noteToView!.url, fetch, sharedList[item], item);
+        // await setPubAccess(webId, publicAccess, noteToView!.url, fetch);
+        // for (let item in contactsList) {
+        //     if (fullContacts[item]) {
+        //         await shareWith(webId, noteToView!.url, fetch, contactsList[item], fullContacts[item]!);
+        //     }
+        //     else {
+        //         await shareWith(webId, noteToView!.url, fetch, contactsList[item], item);
+        //     }
+        // }
+        // for (let item in sharedList) {
+        //     await shareWith(webId, noteToView!.url, fetch, sharedList[item], item);
 
-        }
-        for (let item in webIdToSave) {
-            await shareWith(webId, noteToView!.url, fetch, webIdToSave[item], item);
+        // }
+        // for (let item in webIdToSave) {
+        //     await shareWith(webId, noteToView!.url, fetch, webIdToSave[item], item);
 
-        }
+        // }
     }
 
 
@@ -129,7 +148,10 @@ const AccessModal = ({ accessModalState, setAccessModalState, setNoteInp,
                     <Modal.Body >
                         <AccessElement
                             title={"Public access"}
-                            readOnChange={() => setPublicAccess(prevState => ({ ...prevState, read: !publicAccess.read }))}
+                            readOnChange={() => {
+                                setPublicAccess(prevState => ({ ...prevState, read: !publicAccess.read }));
+                                setAccUpdObj(prevState => ({ ...prevState, "public": true }));
+                            }}
                             appendOnChange={() => setPublicAccess(prevState => ({ ...prevState, append: !publicAccess.append }))}
                             writeOnChange={() => setPublicAccess(prevState => ({ ...prevState, write: !publicAccess.write }))}
                             readStatus={publicAccess.read}

@@ -1,7 +1,8 @@
 import { Thing } from "@inrupt/solid-client";
+import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import { useEffect } from "react";
 import NoteCreator from "./NoteCreator";
-import { Note } from "./types";
+import { accessObject, Note } from "./types";
 
 interface Props {
     active: string;
@@ -25,11 +26,36 @@ interface Props {
     setArrOfChanges: React.Dispatch<React.SetStateAction<string[]>>;
     otherWebId: string | null;
     setOtherWebId: React.Dispatch<React.SetStateAction<string | null>>;
+    publicAccess: accessObject;
+    setPublicAccess: React.Dispatch<React.SetStateAction<accessObject>>;
+    contactsList: {
+        [x: string]: AccessModes;
+    };
+    setContactsList: React.Dispatch<React.SetStateAction<{
+        [x: string]: AccessModes;
+    }>>;
+    webIdToSave: {
+        [x: string]: AccessModes;
+    };
+    setWebIdToSave: React.Dispatch<React.SetStateAction<{
+        [x: string]: AccessModes;
+    }>>;
+    sharedList: Record<string, AccessModes>;
+    setSharedList: React.Dispatch<React.SetStateAction<Record<string, AccessModes>>>;
+    fullContacts: {
+        [x: string]: string | null;
+    };
+    setFullContacts: React.Dispatch<React.SetStateAction<{
+        [x: string]: string | null;
+    }>>;
 }
 // component that renders entry creator, based on the "active" value
 const CreatorToRender = ({ active, creatorStatus, newEntryCr, setNewEntryCr,
     noteToView, setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, setCreatorStatus, categoryArray,
-    setCategoryArray, doNoteSave, setDoNoteSave, NoteInp, setNoteInp, arrOfChanges, setArrOfChanges, otherWebId, setOtherWebId }: Props) => {
+    setCategoryArray, doNoteSave, setDoNoteSave, NoteInp, setNoteInp, arrOfChanges, setArrOfChanges, otherWebId, setOtherWebId,
+    publicAccess, setPublicAccess, contactsList, setContactsList, webIdToSave, setWebIdToSave, sharedList, setSharedList,
+    fullContacts, setFullContacts
+}: Props) => {
 
     useEffect(() => {
     }, [creatorStatus, viewerStatus]);
@@ -40,6 +66,16 @@ const CreatorToRender = ({ active, creatorStatus, newEntryCr, setNewEntryCr,
             case "contacts":
                 return (
                     <NoteCreator
+                        fullContacts={fullContacts}
+                        setFullContacts={setFullContacts}
+                        publicAccess={publicAccess}
+                        setPublicAccess={setPublicAccess}
+                        contactsList={contactsList}
+                        setContactsList={setContactsList}
+                        webIdToSave={webIdToSave}
+                        setWebIdToSave={setWebIdToSave}
+                        sharedList={sharedList}
+                        setSharedList={setSharedList}
                         otherWebId={otherWebId}
                         setOtherWebId={setOtherWebId}
                         newEntryCr={newEntryCr}

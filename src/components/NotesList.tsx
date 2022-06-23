@@ -35,6 +35,7 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView,
   viewerStatus, setViewerStatus, setCreatorStatus, isEdit, setIsEdit, categoryArray, setCategoryArray,
   setCurrentCategory, currentCategory, setCurrentAccess, currentAccess, otherWebId,
   setOtherWebId, isLoadingContents, setIsLoadingContents }: Props) => {
+    
   const { session, fetch } = useSession();
   const { webId } = session.info;
   const [activeNote, setActiveNote] = useState<number | null>(null);

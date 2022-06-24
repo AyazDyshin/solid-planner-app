@@ -59,7 +59,8 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView,
     <div className="w-100 h-100">
       <div className="d-flex">
         <DropdownButton
-          variant="outline-secondary"
+        className="mx-1 my-1"
+          variant="secondary"
           title={<div><VscTypeHierarchySuper /> {currentAccess ? currentAccess : "access type"} <RiArrowDropDownLine /></div>}
         >
           {
@@ -77,7 +78,8 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView,
         </DropdownButton>
         {
           categoryArray.length !== 0 && <DropdownButton
-            variant="outline-secondary"
+          className="mx-1 my-1"
+            variant="secondary"
             title={<div><BiFolder /> {currentCategory ? currentCategory : "Category"} <RiArrowDropDownLine /></div>}
           >
             {
@@ -102,7 +104,7 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView,
               Create a new note
             </Popover.Body>
           </Popover>}>
-          <a className="btn btn-primary ms-auto d-flex align-items-center justify-content-center" onClick={handleCreate}><BsPlusLg /></a>
+          <a className="btn btn-secondary ms-auto my-1 d-flex align-items-center justify-content-center" onClick={handleCreate}><BsPlusLg /></a>
         </OverlayTrigger>
       </div>
       <div className="list-group w-100 h-100">
@@ -123,10 +125,10 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView,
                 }}
               >
                 <div style={{ display: "inline-block" }}>
-                  {note.category && <Badge pill bg="primary" className="me-1">{note.category}</Badge>}
+                  {note.category && <Badge pill bg="info" className="me-1">{note.category}</Badge>}
                 </div>
                 <div style={{ display: "inline-block" }}>
-                  {!note.category && <Badge pill bg="secondary" className="me-1">no category</Badge>}
+                  {!note.category && <Badge pill bg="info" className="me-1">no category</Badge>}
                 </div>
                 {note.access && <OverlayTrigger placement="right" overlay={
                   <Popover>

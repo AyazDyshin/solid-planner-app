@@ -14,7 +14,7 @@ const LogInPage = () => {
         <h3 className="display-3 text-center mb-5">Solid Planner App</h3>
         <InputGroup>
           <DropdownButton
-            variant="outline-secondary"
+            variant="secondary"
             title="Choose a provider"
             id="input-group-dropdown-1">
             <Dropdown.Item href="#" onClick={() => {

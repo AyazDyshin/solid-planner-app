@@ -136,7 +136,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
                     onChange={handleChange} />
 
                 <ButtonGroup>
-                    <Button onClick={handleSave}><MdSaveAlt /> save</Button>
+                    <Button variant="secondary" onClick={handleSave}><MdSaveAlt /> save</Button>
                     <DropdownButton className="dropNoIcon"
                         variant="outline-secondary"
                         title={<BsThreeDots />}

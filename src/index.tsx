@@ -1,6 +1,7 @@
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import { SessionProvider } from "@inrupt/solid-ui-react";
+import './custom.scss';
 
 const container = document.getElementById('root');
 const root = createRoot(container!);

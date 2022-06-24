@@ -44,7 +44,7 @@ const Navbar = ({ links, active, setActive, viewerStatus, setViewerStatus,
 
     }
     return (
-        <nav className="navbar fixed-top navbar-expand-lg navbar-light bg-light">
+        <nav className="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
             <div className="container-fluid">
                 <div className="navbar-nav d-flex justify-content-around w-100">
                     {links.map((link) => (

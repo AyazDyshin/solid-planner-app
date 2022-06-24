@@ -7,8 +7,12 @@ import { RefAttributes, useState } from "react";
 import { Dropdown, DropdownButton, Badge, Overlay, Tooltip, OverlayTrigger, TooltipProps, Popover, PopoverProps, Button } from "react-bootstrap";
 import SaveModal from "./SaveModal";
 import { Note } from "./types";
-import { RiArrowDropDownLine } from "react-icons/ri";
-
+import { RiArrowDropDownLine, RiArrowGoBackFill } from "react-icons/ri";
+import { AiOutlinePlus } from "react-icons/ai";
+import { BsPlusLg } from "react-icons/bs";
+import { BiFolder } from "react-icons/bi";
+import { VscTypeHierarchySuper } from "react-icons/vsc";
+import { GoPrimitiveDot } from "react-icons/go";
 interface Props {
   notesArray: (Note | null)[];
   setNotesArray: React.Dispatch<React.SetStateAction<(Note | null)[]>>;
@@ -25,17 +29,14 @@ interface Props {
   currentCategory: string | null;
   setCurrentAccess: React.Dispatch<React.SetStateAction<string | null>>;
   currentAccess: string | null;
-  otherWebId: string | null;
-  setOtherWebId: React.Dispatch<React.SetStateAction<string | null>>;
   isLoadingContents: boolean;
   setIsLoadingContents: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView,
   viewerStatus, setViewerStatus, setCreatorStatus, isEdit, setIsEdit, categoryArray, setCategoryArray,
-  setCurrentCategory, currentCategory, setCurrentAccess, currentAccess, otherWebId,
-  setOtherWebId, isLoadingContents, setIsLoadingContents }: Props) => {
-    
+  setCurrentCategory, currentCategory, setCurrentAccess, currentAccess, isLoadingContents, setIsLoadingContents }: Props) => {
+
   const { session, fetch } = useSession();
   const { webId } = session.info;
   const [activeNote, setActiveNote] = useState<number | null>(null);
@@ -66,48 +67,48 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView,
   return (
     <div className="w-100 h-100">
       <div className="d-flex">
-        {otherWebId && <Button onClick={() => {
-           setOtherWebId(null);
-           setIsLoadingContents(true);
-            }}>Go Back</Button>}
-        {!otherWebId && <OverlayTrigger placement="right" overlay={renderTooltip}>
+        <OverlayTrigger placement="right" overlay={renderTooltip}>
           <DropdownButton
             variant="outline-secondary"
-            title={<div>{currentAccess ? currentAccess : "access type"} <RiArrowDropDownLine /></div>}
+            title={<div><VscTypeHierarchySuper /> {currentAccess ? currentAccess : "access type"} <RiArrowDropDownLine /></div>}
           >
             {
-
-
-              !otherWebId && accessArray.map((access) => {
+              accessArray.map((access) => {
                 return <Dropdown.Item href="" key={Date.now() + Math.floor(Math.random() * 1000)}
-                  onClick={() => setCurrentAccess(access)}>{access}</Dropdown.Item>
+                  onClick={() => {
+                    setViewerStatus(false);
+                    setCreatorStatus(false);
+                    setCurrentAccess(access);
+                  }}><GoPrimitiveDot /> {access}</Dropdown.Item>
               })
-
             }
             {currentAccess && (
-              <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentAccess(null)}>Reset</Dropdown.Item></>)}
+              <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentAccess(null)}><RiArrowGoBackFill /> reset</Dropdown.Item></>)}
           </DropdownButton>
         </OverlayTrigger>
-        }
-
         {
-          categoryArray.length !== 0 && !otherWebId && <DropdownButton
+          categoryArray.length !== 0 && <DropdownButton
             variant="outline-secondary"
-            title={<div>{currentCategory ? currentCategory : "All notes"} <RiArrowDropDownLine /></div>}
+            title={<div><BiFolder /> {currentCategory ? currentCategory : "Category"} <RiArrowDropDownLine /></div>}
           >
             {
               categoryArray.map((category) => {
                 return <Dropdown.Item href="" key={Date.now() + Math.floor(Math.random() * 1000)}
-                  onClick={() => setCurrentCategory(category)}>{category}</Dropdown.Item>
+                  onClick={() => {
+                    setViewerStatus(false);
+                    setCreatorStatus(false);
+                    setCurrentCategory(category);
+
+                  }}><GoPrimitiveDot /> {category}</Dropdown.Item>
               })
             }
 
             {currentCategory && (
-              <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentCategory(null)}>Reset</Dropdown.Item></>)}
+              <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentCategory(null)}><RiArrowGoBackFill /> reset</Dropdown.Item></>)}
           </DropdownButton>
         }
 
-        {!otherWebId && <a className="btn btn-primary ms-auto" onClick={handleCreate}>create</a>}
+        <a className="btn btn-primary ms-auto d-flex align-items-center justify-content-center" onClick={handleCreate}><BsPlusLg /></a>
 
       </div>
       <div className="list-group w-100 h-100">
@@ -129,8 +130,8 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView,
               >
                 {note.category && <Badge pill bg="primary" className="me-1">{note.category}</Badge>}
                 {!note.category && <Badge pill bg="secondary" className="me-1">no category</Badge>}
-                {note.access && !otherWebId && <Badge pill bg="secondary" className="me-1">{Object.keys(note.access)[0]}</Badge>}
-                {note.shareList && !otherWebId && <Badge pill bg="secondary" className="me-1">shared</Badge>}
+                {note.access && <Badge pill bg="secondary" className="me-1">{Object.keys(note.access)[0]}</Badge>}
+                {note.shareList && <Badge pill bg="secondary" className="me-1">shared</Badge>}
                 {note.title}
               </a>
             }
@@ -142,6 +143,6 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView,
       </div>
     </div>
   )
-}
+};
 
 export default NotesList;

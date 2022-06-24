@@ -5,12 +5,15 @@ import { InputGroup, FormControl, Button, ButtonGroup, DropdownButton, Dropdown 
 import CategoryModal from "../modals/CategoryModal";
 import { deleteNote, editNote, saveNote, thingToNote } from "../services/SolidPod";
 import { accessObject, Note } from "./types";
-import { BsThreeDots } from "react-icons/bs";
+import { BsThreeDots, BsShare } from "react-icons/bs";
 import { FiEdit } from "react-icons/fi";
 import "../styles.css";
 import AccessModal from "../modals/AccessModal";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import SharedModal from "../modals/SharedModal";
+import { RiDeleteBin6Line, RiUserSharedLine } from "react-icons/ri";
+import { BiFolderPlus } from "react-icons/bi";
+import { MdSaveAlt } from "react-icons/md";
 interface Props {
     newEntryCr: boolean;
     setNewEntryCr: React.Dispatch<React.SetStateAction<boolean>>;
@@ -30,20 +33,12 @@ interface Props {
     setNoteInp: React.Dispatch<React.SetStateAction<Note>>;
     arrOfChanges: string[];
     setArrOfChanges: React.Dispatch<React.SetStateAction<string[]>>;
-    otherWebId: string | null;
-    setOtherWebId: React.Dispatch<React.SetStateAction<string | null>>;
     publicAccess: accessObject;
     setPublicAccess: React.Dispatch<React.SetStateAction<accessObject>>;
     contactsList: {
         [x: string]: AccessModes;
     };
     setContactsList: React.Dispatch<React.SetStateAction<{
-        [x: string]: AccessModes;
-    }>>;
-    webIdToSave: {
-        [x: string]: AccessModes;
-    };
-    setWebIdToSave: React.Dispatch<React.SetStateAction<{
         [x: string]: AccessModes;
     }>>;
     sharedList: Record<string, AccessModes>;
@@ -71,8 +66,8 @@ interface Props {
 const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
     setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit,
     setCreatorStatus, creatorStatus, categoryArray, setCategoryArray, doNoteSave, setDoNoteSave, NoteInp,
-    setNoteInp, arrOfChanges, setArrOfChanges, otherWebId, setOtherWebId, accUpdObj, setAccUpdObj, agentsToUpd, setAgentsToUpd,
-    publicAccess, setPublicAccess, contactsList, setContactsList, webIdToSave, setWebIdToSave, sharedList, setSharedList,
+    setNoteInp, arrOfChanges, setArrOfChanges, accUpdObj, setAccUpdObj, agentsToUpd, setAgentsToUpd,
+    publicAccess, setPublicAccess, contactsList, setContactsList, sharedList, setSharedList,
     fullContacts, setFullContacts
 }: Props) => {
 
@@ -83,7 +78,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
     const [sharedModalState, setSharedModalState] = useState<boolean>(false);
 
     useEffect(() => {
-        
+
         if (arrOfChanges.length !== 0) {
             handleSave();
         }
@@ -110,6 +105,8 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
     };
 
     const handleSave = () => {
+        setIsEdit(false);
+        setCreatorStatus(false);
         setViewerStatus(false);
         setDoNoteSave(true);
         newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
@@ -137,23 +134,29 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
                     value={NoteInp.title === null ? "" : NoteInp.title}
                     {...(!isEdit && { disabled: true })}
                     onChange={handleChange} />
-                {
-                    !otherWebId && <ButtonGroup>
-                        <Button onClick={handleSave}>save</Button>
-                        <DropdownButton className="dropNoIcon"
-                            variant="outline-secondary"
-                            title={<BsThreeDots />}
-                            id="input-group-dropdown-1"
-                        >
-                            {viewerStatus && <Dropdown.Item onClick={handleEdit}><FiEdit /> edit</Dropdown.Item>}
-                            {viewerStatus && <Dropdown.Item onClick={handleDelete}>delete</Dropdown.Item>}
-                            <Dropdown.Item href="" onClick={() => (setCategoryModalState(true))}>Set Category</Dropdown.Item>
-                            <Dropdown.Item href="" onClick={() => (setAccessModalState(true))}>Set Access Type</Dropdown.Item>
-                            {viewerStatus && noteToView?.shareList &&
-                                <Dropdown.Item href="" onClick={() => (setSharedModalState(true))}>Shared List</Dropdown.Item>}
-                        </DropdownButton>
-                    </ButtonGroup>
-                }
+
+                <ButtonGroup>
+                    <Button onClick={handleSave}><MdSaveAlt /> save</Button>
+                    <DropdownButton className="dropNoIcon"
+                        variant="outline-secondary"
+                        title={<BsThreeDots />}
+                        id="input-group-dropdown-1"
+                    >
+                        {viewerStatus && <Dropdown.Item onClick={handleEdit}><FiEdit /> edit</Dropdown.Item>}
+                        <Dropdown.Item href="" onClick={() => (setCategoryModalState(true))}>
+                            <BiFolderPlus /> set category
+                        </Dropdown.Item>
+                        <Dropdown.Item href="" onClick={() => (setAccessModalState(true))}><BsShare /> share</Dropdown.Item>
+                        {viewerStatus && noteToView?.shareList &&
+                            <Dropdown.Item href="" onClick={() => (setSharedModalState(true))}>
+                                <RiUserSharedLine /> shared list
+                            </Dropdown.Item>}
+                        {viewerStatus && <Dropdown.Item onClick={handleDelete}
+                            style={{ color: "red" }}
+                        ><RiDeleteBin6Line /> delete</Dropdown.Item>}
+                    </DropdownButton>
+                </ButtonGroup>
+
             </InputGroup>
             <FormControl {...(!isEdit && { disabled: true })} as="textarea" aria-label="textarea" style={{ 'resize': 'none', 'height': '91%' }}
                 name="content"
@@ -181,8 +184,6 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
                 setPublicAccess={setPublicAccess}
                 contactsList={contactsList}
                 setContactsList={setContactsList}
-                webIdToSave={webIdToSave}
-                setWebIdToSave={setWebIdToSave}
                 sharedList={sharedList}
                 setSharedList={setSharedList}
                 accessModalState={accessModalState}

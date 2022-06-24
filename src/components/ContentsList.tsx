@@ -1,7 +1,6 @@
 import { Thing } from "@inrupt/solid-client";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import { useSession } from "@inrupt/solid-ui-react";
-//import { Note } from "rdf-namespaces/dist/as";
 import { useEffect, useState } from "react";
 import { Button, Spinner } from "react-bootstrap";
 import { setPubAccess, shareWith } from "../services/access";
@@ -34,12 +33,8 @@ interface Props {
     setNoteInp: React.Dispatch<React.SetStateAction<Note>>;
     arrOfChanges: string[];
     setArrOfChanges: React.Dispatch<React.SetStateAction<string[]>>;
-    otherWebId: string | null;
-    setOtherWebId: React.Dispatch<React.SetStateAction<string | null>>;
     notesArray: (Note | null)[];
     setNotesArray: React.Dispatch<React.SetStateAction<(Note | null)[]>>;
-    contactsArr: (string | null)[][];
-    setContactsArr: React.Dispatch<React.SetStateAction<(string | null)[][]>>;
     isLoadingContents: boolean;
     setIsLoadingContents: React.Dispatch<React.SetStateAction<boolean>>;
     publicAccess: accessObject;
@@ -48,12 +43,6 @@ interface Props {
         [x: string]: AccessModes;
     };
     setContactsList: React.Dispatch<React.SetStateAction<{
-        [x: string]: AccessModes;
-    }>>;
-    webIdToSave: {
-        [x: string]: AccessModes;
-    };
-    setWebIdToSave: React.Dispatch<React.SetStateAction<{
         [x: string]: AccessModes;
     }>>;
     sharedList: Record<string, AccessModes>;
@@ -80,9 +69,8 @@ interface Props {
 
 const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, setNewEntryCr,
     noteToView, setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, categoryArray, setCategoryArray, doNoteSave,
-    setDoNoteSave, NoteInp, setNoteInp, arrOfChanges, setArrOfChanges, agentsToUpd, setAgentsToUpd,
-    otherWebId, setOtherWebId, notesArray, setNotesArray, contactsArr, setContactsArr, isLoadingContents, setIsLoadingContents,
-    publicAccess, setPublicAccess, contactsList, setContactsList, webIdToSave, setWebIdToSave, sharedList, setSharedList,
+    setDoNoteSave, NoteInp, setNoteInp, arrOfChanges, setArrOfChanges, agentsToUpd, setAgentsToUpd, notesArray, setNotesArray, isLoadingContents, setIsLoadingContents,
+    publicAccess, setPublicAccess, contactsList, setContactsList, sharedList, setSharedList,
     fullContacts, setFullContacts, accUpdObj, setAccUpdObj
 }: Props) => {
     const { session, fetch } = useSession();
@@ -93,8 +81,7 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
     const [habitsArray, setHabitsArray] = useState<Thing[]>([]);
     const [currentCategory, setCurrentCategory] = useState<string | null>(null);
     const [currentAccess, setCurrentAccess] = useState<string | null>(null);
-    const [contactsFdrStatus, setContactsFdrStatus] = useState<boolean>(false);
-    const [otherStatus, setOtherStatus] = useState<boolean>(false);
+
     useEffect(() => {
 
         const perfSave = async () => {
@@ -106,8 +93,6 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
                     await editNote(webId, fetch, NoteInp, arrOfChanges);
                 }
                 else if (Object.keys(accUpdObj).length !== 0) {
-                    console.log(accUpdObj);
-                    console.log(agentsToUpd);
                     if (accUpdObj["public"]) {
                         await setPubAccess(webId, publicAccess, noteToView!.url, fetch);
                     }
@@ -117,10 +102,7 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
 
                         }
                     }
-                    // for (let item in webIdToSave) {
-                    //     await shareWith(webId, noteToView!.url, fetch, webIdToSave[item], item);
 
-                    // }
                 }
 
                 setCreatorStatus(false);
@@ -131,18 +113,13 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
             }
         }
         const fetchNotes = async (otherId?: string) => {
-
-            let currentWebId = otherId ? otherId : webId;
-            // const defFolderUpd = await getDefaultFolder(currentWebId, fetch);
-            // if (!defFolderUpd) {
-            //     let heh = await recordDefaultFolder(currentWebId, fetch);
-            // }
             await perfSave();
-            let ret = await fetchAllNotes(currentWebId, fetch,
-                ((currentCategory) ? currentCategory : undefined), ((currentAccess) ? currentAccess : undefined), ((otherId) ? true : undefined));
+            let ret = await fetchAllNotes(webId, fetch,
+                ((currentCategory) ? currentCategory : undefined), ((currentAccess) ? currentAccess : undefined));
+            //handle
             const [updNotesArray, updCategoriesArray] = ret!;
             let transformedArr = await Promise.all(updNotesArray.map(async (thing) => {
-                return await thingToNote(thing, currentWebId, fetch);
+                return await thingToNote(thing, webId, fetch);
             }));
             // add fetch all habits here
             setNotesArray(transformedArr.filter((item) => item !== null));
@@ -152,34 +129,11 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
 
         }
 
-        const getContacts = async () => {
-            setIsLoadingContents(true);
-            let contactsStatus = await checkContacts(webId, fetch);
-            setContactsFdrStatus(contactsStatus);
-            if (contactsStatus) {
-                const namesAndIds = await fetchContacts(webId, fetch);
-                setContactsArr(namesAndIds);
-                const namesArr = namesAndIds.map((pair) => pair[0] ? pair[0] : pair[1]);
-
-            }
-            setIsLoadingContents(false);
-        }
         if (active === "notes") {
             setIsLoadingContents(true);
             fetchNotes();
         }
-        else if (active === "contacts") {
-            setIsLoadingContents(true);
-            // setNotesArray([]);
-            if (!otherWebId) {
-                getContacts();
-            }
-            else {
-                fetchNotes(otherWebId);
-            }
-        }
-
-    }, [newEntryCr, currentCategory, currentAccess, active, otherWebId]);
+    }, [newEntryCr, currentCategory, currentAccess, active]);
 
     if (isLoadingContents) {
         return (
@@ -189,47 +143,27 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
         )
     }
     else {
-        if (active === "notes" || (active === "contacts" && otherWebId)) {
+        if (active === "notes") {
             if (notesArray.length === 0) {
-                if (active === "contacts") {
-                    return (
-                        <div>
+                return (
+                    <div className="card text-center">
+                        <div className="card-body">
+                            <h5 className="card-title">You don't have any {active} yet!</h5>
+                            <p className="card-text">Let's fix this</p>
+                            <a className="btn btn-primary" onClick={() => {
+                                setCreatorStatus(true);
+                                setViewerStatus(false);
+                            }}>create</a>
+                        </div>
+                    </div>
+                );
 
-                            <div className="card text-center">
-                                <div className="card-body">
-                                    <h5 className="card-title">Oooops...</h5>
-                                    <p className="card-text">Seems like there is no content that you can view</p>
-                                    <Button onClick={() => {
-                                        setOtherWebId(null);
-                                        setIsLoadingContents(true);
-                                    }}>Go Back</Button>
-                                </div>
-                            </div>
-                        </div>
-                    );
-                }
-                else {
-                    return (
-                        <div className="card text-center">
-                            <div className="card-body">
-                                <h5 className="card-title">You don't have any {active} yet!</h5>
-                                <p className="card-text">Let's fix this</p>
-                                <a className="btn btn-primary" onClick={() => {
-                                    setCreatorStatus(true);
-                                    setViewerStatus(false);
-                                }}>create</a>
-                            </div>
-                        </div>
-                    );
-                }
             }
             else {
                 return (
                     <NotesList
                         isLoadingContents={isLoadingContents}
                         setIsLoadingContents={setIsLoadingContents}
-                        otherWebId={otherWebId}
-                        setOtherWebId={setOtherWebId}
                         notesArray={notesArray}
                         setNotesArray={setNotesArray}
                         noteToView={noteToView}
@@ -268,25 +202,6 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
                 return (
                     <div>Not implemented yet (case for when habits exist)</div>
                 )
-            }
-        }
-
-        else if (active === "contacts") {
-            if (contactsFdrStatus) {
-                return (
-                    <ContactsList
-                        notesArray={notesArray}
-                        setNotesArray={setNotesArray}
-                        isLoadingContents={isLoadingContents}
-                        setIsLoadingContents={setIsLoadingContents}
-                        contactsArr={contactsArr}
-                        setContactsArr={setContactsArr}
-                        otherWebId={otherWebId}
-                        setOtherWebId={setOtherWebId}
-                    />);
-            }
-            else {
-                return (<NoContacts />);
             }
         }
         else {

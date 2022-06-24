@@ -31,26 +31,31 @@ const CategoryModal = ({ categoryModalState, setCategoryModalState, setNoteInp,
     return (
         <Modal show={categoryModalState}>
             <Modal.Header closeButton onClick={() => { setCategoryModalState(false) }}>
-                <Modal.Title>Enter Category Name:</Modal.Title>
+                <Modal.Title>Set Category:</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <div className="d-flex justify-content-center mb-3">
-                {
-                    categoryArray.length !== 0 && <DropdownButton
-                        variant="outline-secondary"
-                        title="choose category"
-                    >
-                        {
-                            categoryArray.map((category) => {
-                                return <Dropdown.Item href="" key={Date.now() + Math.floor(Math.random() * 1000)}
-                                    onClick={() => setInput(category)}>{category}</Dropdown.Item>
-                            })
-                        }
+                    {
+                        categoryArray.length !== 0 && <DropdownButton
+                            variant="outline-secondary"
+                            title="choose existing category"
+                        >
+                            {
+                                categoryArray.map((category) => {
+                                    return <Dropdown.Item href="" key={Date.now() + Math.floor(Math.random() * 1000)}
+                                        onClick={() => setInput(category)}>{category}</Dropdown.Item>
+                                })
+                            }
 
-                    </DropdownButton>
-                }
+                        </DropdownButton>
+                    }
                 </div>
-                <FormControl className="mt-1" aria-describedby="basic-addon3" value={input} onChange={e => setInput(e.target.value)} />
+                <InputGroup>
+                    <InputGroup.Text>
+                        Or enter new:
+                    </InputGroup.Text>
+                    <FormControl  aria-describedby="basic-addon3" value={input} onChange={e => setInput(e.target.value)} />
+                </InputGroup>
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" value={input} onClick={() => setCategoryModalState(false)}>Go Back</Button>

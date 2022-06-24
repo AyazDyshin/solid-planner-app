@@ -24,20 +24,12 @@ interface Props {
     setNoteInp: React.Dispatch<React.SetStateAction<Note>>;
     arrOfChanges: string[];
     setArrOfChanges: React.Dispatch<React.SetStateAction<string[]>>;
-    otherWebId: string | null;
-    setOtherWebId: React.Dispatch<React.SetStateAction<string | null>>;
     publicAccess: accessObject;
     setPublicAccess: React.Dispatch<React.SetStateAction<accessObject>>;
     contactsList: {
         [x: string]: AccessModes;
     };
     setContactsList: React.Dispatch<React.SetStateAction<{
-        [x: string]: AccessModes;
-    }>>;
-    webIdToSave: {
-        [x: string]: AccessModes;
-    };
-    setWebIdToSave: React.Dispatch<React.SetStateAction<{
         [x: string]: AccessModes;
     }>>;
     sharedList: Record<string, AccessModes>;
@@ -64,8 +56,8 @@ interface Props {
 // component that renders entry creator, based on the "active" value
 const CreatorToRender = ({ active, creatorStatus, newEntryCr, setNewEntryCr, agentsToUpd, setAgentsToUpd,
     noteToView, setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, setCreatorStatus, categoryArray,
-    setCategoryArray, doNoteSave, setDoNoteSave, NoteInp, setNoteInp, arrOfChanges, setArrOfChanges, otherWebId, setOtherWebId,
-    publicAccess, setPublicAccess, contactsList, setContactsList, webIdToSave, setWebIdToSave, sharedList, setSharedList,
+    setCategoryArray, doNoteSave, setDoNoteSave, NoteInp, setNoteInp, arrOfChanges, setArrOfChanges,
+    publicAccess, setPublicAccess, contactsList, setContactsList, sharedList, setSharedList,
     fullContacts, setFullContacts, accUpdObj, setAccUpdObj
 }: Props) => {
 
@@ -88,12 +80,8 @@ const CreatorToRender = ({ active, creatorStatus, newEntryCr, setNewEntryCr, age
                         setPublicAccess={setPublicAccess}
                         contactsList={contactsList}
                         setContactsList={setContactsList}
-                        webIdToSave={webIdToSave}
-                        setWebIdToSave={setWebIdToSave}
                         sharedList={sharedList}
                         setSharedList={setSharedList}
-                        otherWebId={otherWebId}
-                        setOtherWebId={setOtherWebId}
                         newEntryCr={newEntryCr}
                         setNewEntryCr={setNewEntryCr}
                         noteToView={noteToView}

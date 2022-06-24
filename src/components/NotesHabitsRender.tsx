@@ -8,8 +8,6 @@ import ContentsList from "./ContentsList";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 interface Props {
     active: string;
-    otherWebId: string | null;
-    setOtherWebId: React.Dispatch<React.SetStateAction<string | null>>;
     viewerStatus: boolean;
     setViewerStatus: React.Dispatch<React.SetStateAction<boolean>>;
     creatorStatus: boolean;
@@ -18,8 +16,6 @@ interface Props {
     setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
     notesArray: (Note | null)[];
     setNotesArray: React.Dispatch<React.SetStateAction<(Note | null)[]>>;
-    contactsArr: (string | null)[][];
-    setContactsArr: React.Dispatch<React.SetStateAction<(string | null)[][]>>;
     isLoadingContents: boolean;
     setIsLoadingContents: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -30,9 +26,8 @@ interface Props {
 // this is needed to update the left side view, ie list of entries existing in the user's pod
 // "creatorStatus" and "setCreatorStatus" are hooks to monitor if create button was pressed,
 // this is needed to render the respective creator component
-const NotesHabitsRender = ({ active, otherWebId, setOtherWebId,
-    viewerStatus, setViewerStatus, creatorStatus, setCreatorStatus, isEdit,
-    setIsEdit, notesArray, setNotesArray, contactsArr, setContactsArr, isLoadingContents, setIsLoadingContents }: Props) => {
+const NotesHabitsRender = ({ active, viewerStatus, setViewerStatus, creatorStatus, setCreatorStatus, isEdit,
+    setIsEdit, notesArray, setNotesArray, isLoadingContents, setIsLoadingContents }: Props) => {
 
     const [newEntryCr, setNewEntryCr] = useState<boolean>(false);
     const [noteToView, setNoteToView] = useState<Note | null>(null);
@@ -40,10 +35,8 @@ const NotesHabitsRender = ({ active, otherWebId, setOtherWebId,
     const [doNoteSave, setDoNoteSave] = useState<boolean>(false);
     const [NoteInp, setNoteInp] = useState<Note>({ id: null, title: "", content: "", category: "", url: "", access: null });
     const [arrOfChanges, setArrOfChanges] = useState<string[]>([]);
-
     const [publicAccess, setPublicAccess] = useState<accessObject>({ read: false, append: false, write: false });
     const [contactsList, setContactsList] = useState<{ [x: string]: AccessModes; }>({});
-    const [webIdToSave, setWebIdToSave] = useState<{ [x: string]: AccessModes; }>({});
     const [sharedList, setSharedList] = useState<Record<string, AccessModes>>({});
     const [fullContacts, setFullContacts] = useState<{ [x: string]: string | null; }>({});
     const [accUpdObj, setAccUpdObj] = useState<{ [x: string]: boolean; }>({});
@@ -65,18 +58,12 @@ const NotesHabitsRender = ({ active, otherWebId, setOtherWebId,
                         setPublicAccess={setPublicAccess}
                         contactsList={contactsList}
                         setContactsList={setContactsList}
-                        webIdToSave={webIdToSave}
-                        setWebIdToSave={setWebIdToSave}
                         sharedList={sharedList}
                         setSharedList={setSharedList}
                         isLoadingContents={isLoadingContents}
                         setIsLoadingContents={setIsLoadingContents}
-                        contactsArr={contactsArr}
-                        setContactsArr={setContactsArr}
                         notesArray={notesArray}
                         setNotesArray={setNotesArray}
-                        otherWebId={otherWebId}
-                        setOtherWebId={setOtherWebId}
                         active={active}
                         creatorStatus={creatorStatus}
                         setCreatorStatus={setCreatorStatus}
@@ -100,8 +87,8 @@ const NotesHabitsRender = ({ active, otherWebId, setOtherWebId,
                 </div>
                 <div className="col h-100 border border-5">
                     <CreatorToRender
-                    agentsToUpd={agentsToUpd}
-                    setAgentsToUpd={setAgentsToUpd}
+                        agentsToUpd={agentsToUpd}
+                        setAgentsToUpd={setAgentsToUpd}
                         accUpdObj={accUpdObj}
                         setAccUpdObj={setAccUpdObj}
                         fullContacts={fullContacts}
@@ -110,12 +97,8 @@ const NotesHabitsRender = ({ active, otherWebId, setOtherWebId,
                         setPublicAccess={setPublicAccess}
                         contactsList={contactsList}
                         setContactsList={setContactsList}
-                        webIdToSave={webIdToSave}
-                        setWebIdToSave={setWebIdToSave}
                         sharedList={sharedList}
                         setSharedList={setSharedList}
-                        otherWebId={otherWebId}
-                        setOtherWebId={setOtherWebId}
                         active={active}
                         creatorStatus={creatorStatus}
                         newEntryCr={newEntryCr}

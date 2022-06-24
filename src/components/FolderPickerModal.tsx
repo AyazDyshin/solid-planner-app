@@ -17,7 +17,7 @@ const FolderPickerModal = ({ modalState, setModalState, defFolderUrlToUp, setDef
     const { webId } = session.info;
     const [input, setInput] = useState<string>("");
     const urlToShow = modifyWebId(webId ?? "Error, no webId");
-
+    
     return (
         <Modal show={modalState}>
             <Modal.Header closeButton onClick={() => { setModalState(false) }}>

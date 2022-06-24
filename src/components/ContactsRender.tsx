@@ -1,7 +1,7 @@
 import { ThingPersisted } from "@inrupt/solid-client";
 import { useSession } from "@inrupt/solid-ui-react";
 import { useEffect, useState } from "react";
-import { Spinner } from "react-bootstrap";
+import { Button, Spinner } from "react-bootstrap";
 import { checkContacts, fetchAllNotes, fetchContacts, thingToNote } from "../services/SolidPod";
 import ContactsList from "./ContactsList";
 import NoContacts from "./NoContacts";
@@ -70,7 +70,7 @@ const ContactsRender = () => {
                         />
                     }
                     {
-                        !isLoading && contactsFdrStatus && otherWebId &&
+                        notesArray.length !== 0 && !isLoading && contactsFdrStatus && otherWebId &&
                         <ViewNotes
                             isLoading={isLoading}
                             setIsLoading={setIsLoading}
@@ -83,6 +83,22 @@ const ContactsRender = () => {
                             otherWebId={otherWebId}
                             setOtherWebId={setOtherWebId}
                         />
+                    }
+                    {
+                        notesArray.length === 0 && !isLoading && otherWebId && contactsFdrStatus &&
+                        <div>
+                            <div className="card text-center">
+                                <div className="card-body">
+                                    <h5 className="card-title">Oooops...</h5>
+                                    <p className="card-text">Seems like there is no content that you can view</p>
+                                    <Button onClick={() => {
+                                        setIsLoading(true);
+                                        setOtherWebId(null);
+                                    }}>Go Back</Button>
+                                </div>
+                            </div>
+                        </div>
+
                     }
                     {
                         !isLoading && !contactsFdrStatus && <NoContacts />

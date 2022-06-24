@@ -1,9 +1,8 @@
 import 'bootstrap/dist/css/bootstrap.css';
 import { getInteger, getStringNoLocale, Thing } from "@inrupt/solid-client";
 import { useSession } from "@inrupt/solid-ui-react";
-import { DCTERMS } from "@inrupt/vocab-common-rdf";
-import { schema } from "rdf-namespaces";
 import { RefAttributes, useState } from "react";
+import "../styles.css";
 import { Dropdown, DropdownButton, Badge, Overlay, Tooltip, OverlayTrigger, TooltipProps, Popover, PopoverProps, Button } from "react-bootstrap";
 import SaveModal from "./SaveModal";
 import { Note } from "./types";
@@ -12,7 +11,7 @@ import { AiOutlinePlus } from "react-icons/ai";
 import { BsPlusLg } from "react-icons/bs";
 import { BiFolder } from "react-icons/bi";
 import { VscTypeHierarchySuper } from "react-icons/vsc";
-import { GoPrimitiveDot } from "react-icons/go";
+import { GoPrimitiveDot, GoCheck, GoX } from "react-icons/go";
 interface Props {
   notesArray: (Note | null)[];
   setNotesArray: React.Dispatch<React.SetStateAction<(Note | null)[]>>;
@@ -43,15 +42,7 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView,
   const [saveModalState, setSaveModalState] = useState<boolean>(false);
 
   let accessArray = ["public", "private", "shared"];
-  const renderTooltip = (props: JSX.IntrinsicAttributes & PopoverProps & RefAttributes<HTMLDivElement>) => (
-    <Popover id="popover-basic" {...props}>
-      <Popover.Header as="h3">Popover right</Popover.Header>
-      <Popover.Body>
-        And here's some <strong>amazing</strong> content. It's very engaging.
-        right?
-      </Popover.Body>
-    </Popover>
-  );
+
 
 
   const handleCreate = () => {
@@ -67,25 +58,23 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView,
   return (
     <div className="w-100 h-100">
       <div className="d-flex">
-        <OverlayTrigger placement="right" overlay={renderTooltip}>
-          <DropdownButton
-            variant="outline-secondary"
-            title={<div><VscTypeHierarchySuper /> {currentAccess ? currentAccess : "access type"} <RiArrowDropDownLine /></div>}
-          >
-            {
-              accessArray.map((access) => {
-                return <Dropdown.Item href="" key={Date.now() + Math.floor(Math.random() * 1000)}
-                  onClick={() => {
-                    setViewerStatus(false);
-                    setCreatorStatus(false);
-                    setCurrentAccess(access);
-                  }}><GoPrimitiveDot /> {access}</Dropdown.Item>
-              })
-            }
-            {currentAccess && (
-              <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentAccess(null)}><RiArrowGoBackFill /> reset</Dropdown.Item></>)}
-          </DropdownButton>
-        </OverlayTrigger>
+        <DropdownButton
+          variant="outline-secondary"
+          title={<div><VscTypeHierarchySuper /> {currentAccess ? currentAccess : "access type"} <RiArrowDropDownLine /></div>}
+        >
+          {
+            accessArray.map((access) => {
+              return <Dropdown.Item href="" key={Date.now() + Math.floor(Math.random() * 1000)}
+                onClick={() => {
+                  setViewerStatus(false);
+                  setCreatorStatus(false);
+                  setCurrentAccess(access);
+                }}><GoPrimitiveDot /> {access}</Dropdown.Item>
+            })
+          }
+          {currentAccess && (
+            <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentAccess(null)}><RiArrowGoBackFill /> reset</Dropdown.Item></>)}
+        </DropdownButton>
         {
           categoryArray.length !== 0 && <DropdownButton
             variant="outline-secondary"
@@ -107,9 +96,14 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView,
               <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentCategory(null)}><RiArrowGoBackFill /> reset</Dropdown.Item></>)}
           </DropdownButton>
         }
-
-        <a className="btn btn-primary ms-auto d-flex align-items-center justify-content-center" onClick={handleCreate}><BsPlusLg /></a>
-
+        <OverlayTrigger placement="left" overlay={
+          <Popover>
+            <Popover.Body className="py-1 px-1">
+              Create a new note
+            </Popover.Body>
+          </Popover>}>
+          <a className="btn btn-primary ms-auto d-flex align-items-center justify-content-center" onClick={handleCreate}><BsPlusLg /></a>
+        </OverlayTrigger>
       </div>
       <div className="list-group w-100 h-100">
         {
@@ -128,10 +122,56 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView,
                   setCreatorStatus(false);
                 }}
               >
-                {note.category && <Badge pill bg="primary" className="me-1">{note.category}</Badge>}
-                {!note.category && <Badge pill bg="secondary" className="me-1">no category</Badge>}
-                {note.access && <Badge pill bg="secondary" className="me-1">{Object.keys(note.access)[0]}</Badge>}
-                {note.shareList && <Badge pill bg="secondary" className="me-1">shared</Badge>}
+                <div style={{ display: "inline-block" }}>
+                  {note.category && <Badge pill bg="primary" className="me-1">{note.category}</Badge>}
+                </div>
+                <div style={{ display: "inline-block" }}>
+                  {!note.category && <Badge pill bg="secondary" className="me-1">no category</Badge>}
+                </div>
+                {note.access && <OverlayTrigger placement="right" overlay={
+                  <Popover>
+                    <Popover.Body className="py-1 px-1">
+                      {(note!.access![Object.keys(note!.access!)[0]].read) ?
+                        (<div>read: <GoCheck /></div>) : (<div>read: <GoX /></div>)}
+                      {(note!.access![Object.keys(note!.access!)[0]].append) ?
+                        (<div>append: <GoCheck /></div>) : (<div>append: <GoX /></div>)}
+                      {(note!.access![Object.keys(note!.access!)[0]].write) ?
+                        (<div>write: <GoCheck /></div>) : (<div>write: <GoX /></div>)}
+                    </Popover.Body>
+                  </Popover>
+                }>
+                  <div style={{ display: "inline-block" }}>
+                    <Badge pill bg="secondary" className="me-1 cursor">{Object.keys(note.access)[0]}</Badge>
+                  </div>
+                </OverlayTrigger>}
+
+                {note.shareList && <OverlayTrigger placement="right" overlay={
+                  <Popover style={{ maxWidth: "400px" }}>
+                    <Popover.Body className="py-1 px-1">
+                      <div >
+                        {
+                          Object.keys(note!.shareList!).map((key, index) => {
+                            return <div key={Date.now() + Math.floor(Math.random() * 1000)}>
+                              <div> {key} :</div>
+                              <div className="d-flex justify-content-between">
+                                {(note!.shareList![key].read) ?
+                                  (<div style={{ display: "inline" }}>read: <GoCheck /></div>) : (<div style={{ display: "inline" }}>read: <GoX /></div>)}
+                                {(note!.shareList![key].append) ?
+                                  (<div style={{ display: "inline" }}>append: <GoCheck /></div>) : (<div style={{ display: "inline" }}>append: <GoX /></div>)}
+                                {(note!.shareList![key].write) ?
+                                  (<div style={{ display: "inline" }}>write: <GoCheck /></div>) : (<div style={{ display: "inline" }}>write: <GoX /></div>)}
+                              </div>
+                            </div>
+                          })
+                        }
+                      </div>
+                    </Popover.Body>
+                  </Popover>
+                }>
+                  <div style={{ display: "inline-block" }}>
+                    <Badge pill bg="secondary" className="me-1 cursor">shared</Badge>
+                  </div>
+                </OverlayTrigger>}
                 {note.title}
               </a>
             }

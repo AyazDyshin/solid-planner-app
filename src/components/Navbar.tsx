@@ -49,8 +49,8 @@ const Navbar = ({ links, active, setActive, viewerStatus, setViewerStatus,
                 <div className="navbar-nav d-flex justify-content-around w-100">
                     {links.map((link) => (
                         <a
-                            key={`${link}${Date.now()}`}
-                            className={`nav-link ${active === link ? 'active' : ''} nav`}
+                            key={Date.now() + Math.floor(Math.random() * 1000)}
+                            className={`nav-link ${active === link ? 'active' : ''} cursor`}
                             onClick={(e) => {
                                 e.preventDefault();
                                 // setNotesArray([]);

@@ -3,10 +3,10 @@ import {
     hasResourceAcl, universalAccess, getResourceAcl, saveAclFor, acp_ess_2, createContainerAt, deleteContainer
 } from "@inrupt/solid-client";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
-import { getAccessType, getPrefLink, getStoragePref } from "./SolidPod";
 import { ACP } from "@inrupt/vocab-solid";
 import { accessObject, fetcher } from "../components/types";
 import { changeAccessAcp, getAcpAccess } from "./helperAccess";
+import { getAccessType, getStoragePref } from "./podGetters";
 
 
 // export function getAcrPolicyUrlAll<ResourceExt extends WithAccessibleAcr>(
@@ -28,11 +28,7 @@ import { changeAccessAcp, getAcpAccess } from "./helperAccess";
 //     resourceWithAcr: { internal_acp: { acr: AccessControlResource; }; }
 // ): ResourcePolicy[] {
 //     const acr = getAcr(resourceWithAcr);
-//     console.log("here1");
-//     console.log(acr);
 //     const foundThings = getThingAll(acr);
-//     console.log("here2");
-//     console.log(foundThings);
 //     const foundPolicies = foundThings.filter(
 //         (thing) => thing !== null && isPolicy(thing)
 //     ) as ResourcePolicy[];
@@ -75,7 +71,6 @@ export const initializeAcl = async (url: string, fetch: fetcher) => {
 }
 
 export const determineAccess = async (webId: string, url: string, fetch: fetcher) => {
-    console.log("this5?");
 
     let accType;
     const pubAcc = await getPubAccess(webId, url, fetch);
@@ -88,7 +83,6 @@ export const determineAccess = async (webId: string, url: string, fetch: fetcher
 // This function is used to set public Access type for both WAC and ACP PODs, sets access type to either public or private
 // ie give read permission to general public or not.
 export const setPubAccess = async (webId: string, accessObj: accessObject, url: string, fetch: fetcher) => {
-    console.log("this1?");
     let type = await getAccessType(webId, fetch);
     if (type === "wac") {
         try {
@@ -125,7 +119,6 @@ export const setPubAccess = async (webId: string, accessObj: accessObject, url: 
 
 // this function is used to give read permission to specific Agents. Used for both WAC and ACP PODs
 export const shareWith = async (webId: string, url: string, fetch: fetcher, accessObj: accessObject, shareWith: string) => {
-    console.log("this2?");
 
     let type = await getAccessType(webId, fetch);
 
@@ -178,7 +171,6 @@ export const shareWith = async (webId: string, url: string, fetch: fetcher, acce
 
 
 export const getSharedList = async (webId: string, url: string, fetch: fetcher) => {
-    console.log("this3?");
 
     let type = await getAccessType(webId, fetch);
 
@@ -225,7 +217,6 @@ export const getSharedList = async (webId: string, url: string, fetch: fetcher) 
 
 
 export const getPubAccess = async (webId: string, url: string, fetch: fetcher) => {
-    console.log("this4?");
 
     let type = await getAccessType(webId, fetch);
     if (type === "wac") {
@@ -287,7 +278,6 @@ export const checkPermissions = async (webId: string, fetch: fetcher) => {
         else {
             let b = await createContainerAt(`${storage}planerAppTester1/`, { fetch: fetch });
             await initializeAcl(`${storage}planerAppTester1/`, fetch);
-            // await setAccess("public",`${storage}planerAppTester1/`,fetch);
             let upd = await universalAccess.setPublicAccess(`${storage}planerAppTester1/`, {
                 read: true,
                 append: true,

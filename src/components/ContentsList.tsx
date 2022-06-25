@@ -6,8 +6,8 @@ import { useEffect, useState } from "react";
 import { Button, Spinner } from "react-bootstrap";
 import { setPubAccess, shareWith } from "../services/access";
 import {
-    fetchAllNotes, getDefaultFolder, recordDefaultFolder, thingToNote, saveNote,
-    editNote, fetchContacts, checkContacts, getPublicTypeIndexUrl
+    fetchAllEntries, recordDefaultFolder, thingToNote, saveNote,
+    editNote, fetchContacts, checkContacts
 } from "../services/SolidPod";
 import ContactsList from "./ContactsList";
 import NoContacts from "./NoContacts";
@@ -79,30 +79,19 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
     if (webId === undefined) {
         throw new Error("error when trying to get webId");
     }
-    const [habitsArray, setHabitsArray] = useState<Thing[]>([]);
     const [currentCategory, setCurrentCategory] = useState<string | null>(null);
     const [currentAccess, setCurrentAccess] = useState<string | null>(null);
 
     useEffect(() => {
-        const subscribe = async () => {
-            let pubTypeUrl = await getPublicTypeIndexUrl(webId, fetch);
-            const websocket = new WebsocketNotification(
-                pubTypeUrl,
-                { fetch: fetch }
-            );
-            websocket.on("message", console.log);
-            websocket.connect();
-        }
-
         const perfSave = async () => {
             if (doNoteSave || arrOfChanges.length !== 0) {
-                if (creatorStatus) {
+                if (doNoteSave) {
                     await saveNote(webId, fetch, NoteInp);
                 }
                 else if (arrOfChanges.length !== 0) {
                     await editNote(webId, fetch, NoteInp, arrOfChanges);
                 }
-                else if (Object.keys(accUpdObj).length !== 0) {
+                if (Object.keys(accUpdObj).length !== 0) {
                     if (accUpdObj["public"]) {
                         await setPubAccess(webId, publicAccess, noteToView!.url, fetch);
                     }
@@ -112,9 +101,7 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
 
                         }
                     }
-
                 }
-
                 setCreatorStatus(false);
                 setNoteInp({ id: null, title: "", content: "", category: "", url: "", access: null });
                 setIsEdit(false);
@@ -124,7 +111,7 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
         }
         const fetchNotes = async (otherId?: string) => {
             await perfSave();
-            let ret = await fetchAllNotes(webId, fetch,
+            let ret = await fetchAllEntries(webId, fetch, "note",
                 ((currentCategory) ? currentCategory : undefined), ((currentAccess) ? currentAccess : undefined));
             //handle
             const [updNotesArray, updCategoriesArray] = ret!;
@@ -133,12 +120,12 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
             }));
             // add fetch all habits here
             setNotesArray(transformedArr.filter((item) => item !== null));
+
             setCategoryArray(updCategoriesArray);
             setDoNoteSave(false);
             setIsLoadingContents(false);
 
         }
-        subscribe();
         if (active === "notes") {
             setIsLoadingContents(true);
             fetchNotes();
@@ -190,27 +177,6 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
                         currentAccess={currentAccess}
                         setCurrentAccess={setCurrentAccess}
                     />
-                )
-            }
-        }
-        // might need to make it else if(active==="habits")
-        // fetch of habitsArray is not implemented yet, so it will always fall in the 
-        // habitsArray.length === 0 case
-        else if (active === "habits") {
-            if (habitsArray.length === 0) {
-                return (
-                    <div className="card text-center">
-                        <div className="card-body">
-                            <h5 className="card-title">You don't have any {active} yet!</h5>
-                            <p className="card-text">Let's fix this</p>
-                            <a className="btn btn-primary" onClick={() => { setCreatorStatus(true) }}>create</a>
-                        </div>
-                    </div>
-                )
-            }
-            else {
-                return (
-                    <div>Not implemented yet (case for when habits exist)</div>
                 )
             }
         }

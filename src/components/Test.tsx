@@ -43,8 +43,6 @@ const Test = () => {
   const gets = async () => {
     // await createContainerAt("https://inrtester2.inrupt.net/bob/", {fetch: fetch});
     let b =await getPubAccess(webId ?? "", "https://inrtester2.inrupt.net/SolidPlannerApp/notes/1655570018660.ttl", fetch);
-    console.log("this is b");
-    console.log(b);
   }
 
  // gets();

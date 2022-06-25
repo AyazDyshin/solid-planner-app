@@ -115,7 +115,6 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView,
                 key={`${note.id}${Date.now() + Math.floor(Math.random() * 1000)}`}
                 className={`list-group-item px-1 list-group-item-action ${activeNote === note.id ? 'active' : ''}`}
                 onClick={(e) => {
-                  console.log(viewerStatus);
                   e.preventDefault();
                   setIsEdit(false);
                   setActiveNote(note.id);

@@ -1,4 +1,4 @@
-import { Thing } from "@inrupt/solid-client";
+import "../styles.css";
 import { useSession } from "@inrupt/solid-ui-react";
 import { useEffect, useState } from "react";
 import { InputGroup, FormControl, Button, ButtonGroup, DropdownButton, Dropdown } from "react-bootstrap";
@@ -7,13 +7,13 @@ import { deleteNote, editNote, saveNote, thingToNote } from "../services/SolidPo
 import { accessObject, Note } from "./types";
 import { BsThreeDots, BsShare } from "react-icons/bs";
 import { FiEdit } from "react-icons/fi";
-import "../styles.css";
-import AccessModal from "../modals/AccessModal";
-import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
-import SharedModal from "../modals/SharedModal";
 import { RiDeleteBin6Line, RiUserSharedLine } from "react-icons/ri";
 import { BiFolderPlus } from "react-icons/bi";
 import { MdSaveAlt } from "react-icons/md";
+import AccessModal from "../modals/AccessModal";
+import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
+import SharedModal from "../modals/SharedModal";
+
 interface Props {
     newEntryCr: boolean;
     setNewEntryCr: React.Dispatch<React.SetStateAction<boolean>>;
@@ -85,7 +85,6 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
         if (arrOfChanges.length === 0) {
             if (viewerStatus) {
                 // handle 
-                console.log(noteToView);
                 setNoteInp(noteToView!);
             }
             else {

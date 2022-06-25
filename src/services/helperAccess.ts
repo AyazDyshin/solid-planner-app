@@ -5,7 +5,7 @@ import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import { RDF } from "@inrupt/vocab-common-rdf";
 import { ACL, ACP } from "@inrupt/vocab-solid";
 import { accessObject, fetcher } from "../components/types";
-import { getStoragePref } from "./SolidPod";
+import { getStoragePref } from "./podGetters";
 
 export const initializePolicies = async (webId: string, fetch: fetcher, url: string, access: accessObject, agent: string) => {
     let storagePref = await getStoragePref(webId, fetch);
@@ -17,7 +17,6 @@ export const initializePolicies = async (webId: string, fetch: fetcher, url: str
     let readRule = acp_ess_1.getRule(myRulesAndPoliciesSolidDataset, `${policiesUrl}#defaultAccessControlAgentReadPolicyRule${url}`);
     if (!readRule) {
         readRule = acp_ess_1.createRule(`${policiesUrl}#defaultAccessControlAgentReadPolicyRule${url}`);
-
     }
     let appendRule = acp_ess_1.getRule(myRulesAndPoliciesSolidDataset, `${policiesUrl}#defaultAccessControlAgentAppendPolicyRule${url}`);
     if (!appendRule) {
@@ -119,19 +118,13 @@ export const setAccessForResource = async (webId: string, fetch: fetcher, url: s
         updResource,
         `${policiesUrl}#defaultAccessControlWriteReadPolicy${url}`
     );
-    console.log("this is changed resource");
-    console.log(changedResourceWithAcr);
 
 
     // const updatedResourceWithAcr = await acp_ess_1.saveAcrFor(
     //     changedResourceWithAcr, 
     //     { fetch: fetch }           
     //   );
-//     const updatedResourceWithAcr = await saveSolidDatasetAt(url, updatedResourceWithAcr, {fetch: fetch});
-//   console.log("this is upd");
-//   console.log(updatedResourceWithAcr);
-//   console.log("this is ll")
-//   console.log(ll);
+    //     const updatedResourceWithAcr = await saveSolidDatasetAt(url, updatedResourceWithAcr, {fetch: fetch});
 }
 
 // export const getAllRules = async (webId: string, fetch: fetcher) => {
@@ -309,8 +302,6 @@ export const updateMainAcr = async (resource: WithAccessibleAcr, allPolicies: an
     let mainAcr = allThings.find((thing) => getUrl(thing, RDF.type) === ACP.AccessControl);
 
     let allPoliciesUpd = allPolicies.filter((policy) => policy !== null);
-    console.log("these are allPoliciesUpd");
-    console.log(allPoliciesUpd);
     let changedResourceWithAcr = resource;
     allPoliciesUpd.map((policy) => {
         //handle
@@ -320,25 +311,13 @@ export const updateMainAcr = async (resource: WithAccessibleAcr, allPolicies: an
         );
         // mainAcr = addUrl(mainAcr!, ACP.apply, policy.url);
     });
-    console.log("this is changed:");
-    console.log(changedResourceWithAcr);
-    // console.log("resource before");
-    // console.log(resource);
     // resource = acp_ess_2.setResourcePolicy(resource, mainAcr!);
-    // console.log("resource after");
-    // console.log(resource);
     //  acr = setThing(acr, mainAcr!);
     // // resource.internal_acp = { acr };
-    // // console.log("heheh");
-    // // console.log(resource);
     // resource = acp_ess_2.setResourceMatcher(resource, mainAcr!);
 
     // // const savedAcr = await saveSolidDatasetAt(getSourceUrl(acr), acr, {fetch : fetch});
-    // // console.log("this is saved");
-    // // console.log(savedAcr);
     // let updResource = await acp_ess_2.saveAcrFor(resource, { fetch: fetch });
-    // console.log("after save");
-    // console.log(updResource);
 
 }
 export const getAcpMatchersAndPolices = async (url: string, fetch: fetcher) => {

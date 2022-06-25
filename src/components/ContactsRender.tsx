@@ -2,7 +2,7 @@ import { ThingPersisted } from "@inrupt/solid-client";
 import { useSession } from "@inrupt/solid-ui-react";
 import { useEffect, useState } from "react";
 import { Button, Spinner } from "react-bootstrap";
-import { checkContacts, fetchAllNotes, fetchContacts, thingToNote } from "../services/SolidPod";
+import { checkContacts, fetchAllEntries, fetchContacts, thingToNote } from "../services/SolidPod";
 import ContactsList from "./ContactsList";
 import NoContacts from "./NoContacts";
 import NotesList from "./NotesList";
@@ -36,7 +36,7 @@ const ContactsRender = () => {
 
             }
             if (otherWebId) {
-                let ret = await fetchAllNotes(otherWebId, fetch, undefined, undefined, true);
+                let ret = await fetchAllEntries(otherWebId, fetch, "note", undefined, undefined, true);
                 let [notesArrUpd, rest] = ret;
                 let transformedArr = await Promise.all(notesArrUpd.map(async (thing) => {
                     return await thingToNote(thing, otherWebId, fetch);

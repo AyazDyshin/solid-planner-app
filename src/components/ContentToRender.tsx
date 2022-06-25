@@ -1,5 +1,6 @@
 import { Contact } from "rdf-namespaces/dist/vcard";
 import ContactsRender from "./ContactsRender";
+import HabitsRender from "./HabitsRender";
 import NotesHabitsRender from "./NotesHabitsRender";
 import SettingsPage from "./SettingsPage";
 import { Note } from "./types";
@@ -25,7 +26,6 @@ const ContentToRender = ({ active, viewerStatus, setViewerStatus,
 
     switch (active) {
         case "notes":
-        case "habits":
             return (
                 <NotesHabitsRender
                     isLoadingContents={isLoadingContents}
@@ -40,7 +40,10 @@ const ContentToRender = ({ active, viewerStatus, setViewerStatus,
                     isEdit={isEdit}
                     setIsEdit={setIsEdit}
                 />);
-
+        case "habits":
+            return (
+                <HabitsRender />
+            )
         case "contacts":
             return (
                 <ContactsRender />

@@ -154,6 +154,7 @@ export const recordDefaultFolder = async (webId: string, fetch: fetcher) => {
   const storagePref = await getStoragePref(webId, fetch);
   let defaultFolderPath = `${storagePref}SolidPlannerApp`;
   let notesPath = `${defaultFolderPath}/notes/`;
+  let habitsPath = `${defaultFolderPath}/habits/`;
   const prefFileLocation = await getPrefLink(webId, fetch);
   //handle
   let dataSet;
@@ -175,10 +176,11 @@ export const recordDefaultFolder = async (webId: string, fetch: fetcher) => {
   dataSet = setThing(dataSet, aThing);
   await createDefFolder(webId, defaultFolderPath, fetch);
   const updDataSet = await saveSolidDatasetAt(prefFileLocation!, dataSet, { fetch: fetch });
-  await createEntriesInTypeIndex(webId, fetch, notesPath);
+  await createEntriesInTypeIndex(webId, fetch, notesPath, "note");
+  await createEntriesInTypeIndex(webId, fetch, habitsPath, "habit");
 }
 
-export const createEntriesInTypeIndex = async (webId: string, fetch: fetcher, url: string) => {
+export const createEntriesInTypeIndex = async (webId: string, fetch: fetcher, url: string, entryType: string) => {
   const pubicTypeIndexUrl = await getPublicTypeIndexUrl(webId, fetch);
   let dataSet;
   try {
@@ -190,7 +192,7 @@ export const createEntriesInTypeIndex = async (webId: string, fetch: fetcher, ur
     throw new Error("error when fetching public type index file, it either doesn't exist, or has different location from the one specified in the webId");
   }
   let aThing = buildThing(createThing())
-    .addIri(solid.forClass, schema.TextDigitalDocument)
+    .addIri(solid.forClass, entryType === "note" ? schema.TextDigitalDocument : "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#Habit")
     .addIri(solid.instance, url)
     .build();
   dataSet = setThing(dataSet, aThing);
@@ -274,7 +276,7 @@ export const createDefFolder = async (webId: string, defFolderUrl: string, fetch
   await recordAccessType(webId, fetch, type);
 
 
-  await setPubAccess(webId, { read: true, append: true, write: true }, `${updUrlForFolder(defFolderUrl)}`, fetch);
+  await setPubAccess(webId, { read: true, append: false, write: false }, `${updUrlForFolder(defFolderUrl)}`, fetch);
 
   try {
     await createContainerAt(`${updUrlForFolder(defFolderUrl)}notes/`, {
@@ -288,7 +290,21 @@ export const createDefFolder = async (webId: string, defFolderUrl: string, fetch
   if (type === "wac") {
     await initializeAcl(`${updUrlForFolder(defFolderUrl)}notes/`, fetch);
   }
-  await setPubAccess(webId, { read: true, append: true, write: true }, `${updUrlForFolder(defFolderUrl)}notes/`, fetch);
+  await setPubAccess(webId, { read: true, append: false, write: false }, `${updUrlForFolder(defFolderUrl)}notes/`, fetch);
+
+  try {
+    await createContainerAt(`${updUrlForFolder(defFolderUrl)}habits/`, {
+      fetch: fetch
+    });
+  }
+  catch (error) {
+    throw new Error("error when trying to create a folder for habits in specified folder");
+  }
+
+  if (type === "wac") {
+    await initializeAcl(`${updUrlForFolder(defFolderUrl)}habits/`, fetch);
+  }
+  await setPubAccess(webId, { read: true, append: false, write: false }, `${updUrlForFolder(defFolderUrl)}habits/`, fetch);
 
 }
 
@@ -305,7 +321,6 @@ export const getAllNotesUrlFromPublicIndex = async (webId: string, fetch: fetche
 }
 
 export const fetchAllNotes = async (webId: string, fetch: fetcher, categoryFilter?: string, accessFilter?: string, other?: boolean) => {
-  console.log("we are lul");
   let arrayOfCategories: string[] = [];
   let urlsArr
   try {
@@ -447,7 +462,6 @@ export const saveNote = async (webId: string, fetch: fetcher, note: Note) => {
     await initializeAcl(noteUrl, fetch);
   }
   await setPubAccess(webId, { read: true, append: true, write: true }, noteUrl, fetch);
-  console.log("this6?");
 
   let p = await getPubAccess(webId, noteUrl, fetch);
 }

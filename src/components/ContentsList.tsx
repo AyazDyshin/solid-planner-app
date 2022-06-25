@@ -1,4 +1,5 @@
 import { Thing } from "@inrupt/solid-client";
+import { WebsocketNotification } from "@inrupt/solid-client-notifications";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import { useSession } from "@inrupt/solid-ui-react";
 import { useEffect, useState } from "react";
@@ -6,7 +7,7 @@ import { Button, Spinner } from "react-bootstrap";
 import { setPubAccess, shareWith } from "../services/access";
 import {
     fetchAllNotes, getDefaultFolder, recordDefaultFolder, thingToNote, saveNote,
-    editNote, fetchContacts, checkContacts
+    editNote, fetchContacts, checkContacts, getPublicTypeIndexUrl
 } from "../services/SolidPod";
 import ContactsList from "./ContactsList";
 import NoContacts from "./NoContacts";
@@ -83,6 +84,15 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
     const [currentAccess, setCurrentAccess] = useState<string | null>(null);
 
     useEffect(() => {
+        const subscribe = async () => {
+            let pubTypeUrl = await getPublicTypeIndexUrl(webId, fetch);
+            const websocket = new WebsocketNotification(
+                pubTypeUrl,
+                { fetch: fetch }
+            );
+            websocket.on("message", console.log);
+            websocket.connect();
+        }
 
         const perfSave = async () => {
             if (doNoteSave || arrOfChanges.length !== 0) {
@@ -128,7 +138,7 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
             setIsLoadingContents(false);
 
         }
-
+        subscribe();
         if (active === "notes") {
             setIsLoadingContents(true);
             fetchNotes();

@@ -41,6 +41,7 @@
   },
   "dependencies": {
     "@inrupt/solid-client": "^1.23.1",
+    "@inrupt/solid-client-notifications": "^1.0.0",
     "@inrupt/solid-ui-react": "^2.8.0",
     "@inrupt/vocab-common-rdf": "^1.0.3",
     "@inrupt/vocab-solid": "^1.0.4",

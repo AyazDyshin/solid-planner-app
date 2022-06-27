@@ -17,7 +17,7 @@ const MainContent = () => {
   if (!webId) {
     throw new Error("Error, couldn't get your webId");
   }
-  const links = ['notes', 'habits', 'contacts', 'settings'];
+  const links = ['notes', 'habits', 'contacts'];
   const [active, setActive] = useState("notes");
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [permissionStatus, setPermissionStatus] = useState<boolean>(false);

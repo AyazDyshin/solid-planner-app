@@ -10,7 +10,7 @@ export interface Note {
   shareList?: Record<string, AccessModes>;
   //  [key: string]: string | number;
 }
-type weekDays = string[];
+//type weekDays = string[];
 
 export interface Habit {
   id: number | null;
@@ -18,7 +18,7 @@ export interface Habit {
   content: string | null;
   startDate: Date | null;
   lastCheckInDate: Date | null;
-  recurrence: "daily" | "weekly" | "custom" | null;
+  recurrence: string | null;
   bestStreak: number | null;
   currentStreak: number | null;
   url: string | null;
@@ -26,7 +26,7 @@ export interface Habit {
   category: string | null;
   access: Record<string, AccessModes> | null;
   shareList?: Record<string, AccessModes>;
-  custom?: weekDays | null;
+  custom?: string[] | number | null;
 }
 export type withCategory = object & { category: string | null; };
 
@@ -38,4 +38,9 @@ export enum voc {
   Habit = "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#Habit",
   accessType = "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#accessType",
   defaultFolder = "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#defaultFolder"
+}
+
+export enum otherV {
+  category = "http://dbpedia.org/ontology/category",
+
 }

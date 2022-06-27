@@ -3,7 +3,7 @@ import ContactsRender from "./ContactsRender";
 import HabitsRender from "./HabitsRender";
 import NotesHabitsRender from "./NotesHabitsRender";
 import SettingsPage from "./SettingsPage";
-import { Note } from "./types";
+import { Habit, Note } from "./types";
 
 interface Props {
     active: string;
@@ -19,10 +19,14 @@ interface Props {
     setIsLoadingContents: React.Dispatch<React.SetStateAction<boolean>>;
     notesFetched: boolean;
     setNotesFetched: React.Dispatch<React.SetStateAction<boolean>>;
+    habitsFetched: boolean;
+    setHabitsFetched: React.Dispatch<React.SetStateAction<boolean>>;
+    habitsArray: Habit[];
+    setHabitsArray: React.Dispatch<React.SetStateAction<Habit[]>>;
 }
 // this component decides what to render based on "active" property ie clicked tab
 // while seems redundant at the moment will be useful once other tabs will be implemented
-const ContentToRender = ({ active, viewerStatus, setViewerStatus,
+const ContentToRender = ({ active, viewerStatus, setViewerStatus, habitsFetched, setHabitsFetched, habitsArray, setHabitsArray,
     creatorStatus, setCreatorStatus, isEdit, setIsEdit, notesArray,
     setNotesArray, isLoadingContents, setIsLoadingContents, notesFetched, setNotesFetched }: Props) => {
 
@@ -46,7 +50,12 @@ const ContentToRender = ({ active, viewerStatus, setViewerStatus,
                 />);
         case "habits":
             return (
-                <HabitsRender />
+                <HabitsRender
+                    habitsFetched={habitsFetched}
+                    setHabitsFetched={setHabitsFetched}
+                    habitsArray={habitsArray}
+                    setHabitsArray={setHabitsArray}
+                />
             )
         case "contacts":
             return (

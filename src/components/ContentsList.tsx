@@ -67,7 +67,6 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
     const [currentCategory, setCurrentCategory] = useState<string | null>(null);
     const [currentAccess, setCurrentAccess] = useState<string | null>(null);
     const [notesToShow, setNotesToShow] = useState<Note[]>([]);
-    const [refetch, setRefetch] = useState<boolean>(true);
     const [isLoading,setIsLoading] = useState<boolean>(true);
     useEffect(() => {
         setIsLoading(true);

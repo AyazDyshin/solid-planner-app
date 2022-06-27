@@ -3,11 +3,13 @@ import {
   addUrl, setThing, saveSolidDatasetAt, createContainerAt, Thing, getInteger,
   getStringNoLocale, removeThing, getContainedResourceUrlAll, deleteSolidDataset,
   setStringNoLocale, addStringNoLocale, isContainer, addInteger,
-  buildThing
+  buildThing,
+  getDate,
+  getBoolean
 } from '@inrupt/solid-client';
 import { DCTERMS, RDF } from '@inrupt/vocab-common-rdf';
 import { solid, schema, foaf, vcard } from 'rdf-namespaces';
-import { Note, fetcher, Habit, voc } from '../components/types';
+import { Note, fetcher, Habit, voc, otherV } from '../components/types';
 import { determineAccess, getPubAccess, getSharedList, initializeAcl, isWacOrAcp, setPubAccess } from './access';
 import { updUrlForFolder } from './helpers';
 import { getStoragePref, getPrefLink, getPublicTypeIndexUrl, getAllUrlFromPublicIndex, getDefaultFolder, getAccessType } from './podGetters';
@@ -21,7 +23,7 @@ export const thingToNote = async (toChange: Thing | null, webId: string, fetch: 
   let updContent = getStringNoLocale(toChange, schema.text) ? getStringNoLocale(toChange, schema.text) : "";
   let updId = getInteger(toChange, schema.identifier) ? getInteger(toChange, schema.identifier) :
     Date.now() + Math.floor(Math.random() * 1000);
-  let updCategory = getStringNoLocale(toChange, "http://dbpedia.org/ontology/category");
+  let updCategory = getStringNoLocale(toChange, otherV.category);
   let getAcc;
   try {
     getAcc = await determineAccess(webId, toChange.url, fetch);
@@ -41,6 +43,60 @@ export const thingToNote = async (toChange: Thing | null, webId: string, fetch: 
   return note;
 }
 
+export const thingToHabit = async (toChange: Thing | null, webId: string, fetch: fetcher) => {
+  if (!toChange) {
+    return null;
+  }
+  let updTitle = getStringNoLocale(toChange, DCTERMS.title) ? getStringNoLocale(toChange, DCTERMS.title) : "";
+  let updContent = getStringNoLocale(toChange, schema.text) ? getStringNoLocale(toChange, schema.text) : "";
+  let updId = getInteger(toChange, schema.identifier) ? getInteger(toChange, schema.identifier) :
+    Date.now() + Math.floor(Math.random() * 1000);
+  let updCategory = getStringNoLocale(toChange, otherV.category);
+  let updStartDate = getDate(toChange, "http://example.org/startDate");
+  let updLastCheckInDate = getDate(toChange, "http://example.org/lastCheckInDate");
+  let updBestStreak = getInteger(toChange, "http://example.org/bestStreak");
+  let updCurrentStreak = getInteger(toChange, "http://example.org/currentStreak");
+  let updStatus = getBoolean(toChange, "http://example.org/status");
+  let updRecurrence = getStringNoLocale(toChange, "http://example.org/recurrence");
+  let updCustom = getStringNoLocale(toChange, "http://example.org/custom");
+
+  let newCustomValue: string[] | number | null = null;
+  if (updCustom) {
+    let customArr = updCustom.split(" ");
+    if (customArr.length === 1 && parseInt(customArr[0])) {
+      newCustomValue = parseInt(customArr[0]);
+    }
+    else {
+      newCustomValue = customArr;
+    }
+  }
+
+  let getAcc;
+  try {
+    getAcc = await determineAccess(webId, toChange.url, fetch);
+  }
+  catch {
+    getAcc = [null];
+  }
+  const habit: Habit = {
+    id: updId,
+    title: updTitle,
+    content: updContent,
+    category: updCategory,
+    lastCheckInDate: updLastCheckInDate,
+    bestStreak: updBestStreak,
+    currentStreak: updCurrentStreak,
+    status: updStatus,
+    recurrence: updRecurrence,
+    url: toChange.url,
+    startDate: updStartDate,
+    custom: newCustomValue,
+    access: getAcc[0] ? getAcc[0] : null,
+    ...(getAcc[1] && { shareList: getAcc[1] })
+  };
+  return habit;
+  //   status
+}
 // creates a link to preference file in user's webId card #here
 // export const createPrefLink = async (webId: string, fetch: fetcher) => {
 //   let dataSet;
@@ -259,7 +315,7 @@ export const fetchAllEntries = async (webId: string, fetch: fetcher, entry: stri
     else {
       let arrOf = getThingAll(data);
       arrOf.forEach((thing) => {
-        let categoryOfCurrNote = getStringNoLocale(thing, "http://dbpedia.org/ontology/category");
+        let categoryOfCurrNote = getStringNoLocale(thing, otherV.category);
         if (categoryOfCurrNote && !arrayOfCategories.includes(categoryOfCurrNote)) arrayOfCategories.push(categoryOfCurrNote);
         if (!getInteger(thing, schema.identifier)) {
           let newThing = addInteger(thing, schema.identifier, Date.now() + Math.floor(Math.random() * 1000));
@@ -301,13 +357,22 @@ export const saveHabit = async (webId: string, fetch: fetcher, habit: Habit) => 
     .addInteger(schema.identifier, id)
     .addStringNoLocale(DCTERMS.title, titleUpd)
     .addStringNoLocale(schema.text, contentUpd)
-    .addDate("http://example.org/date", startDate)
+    .addDate("http://example.org/startDate", startDate)
     .addStringNoLocale("http://example.org/recurrence", habit.recurrence!)
     .build();
 
-  if (habit.category) newHabit = addStringNoLocale(newHabit, "http://dbpedia.org/ontology/category", habit.category);
+  if (habit.category) newHabit = addStringNoLocale(newHabit, otherV.category, habit.category);
 
-  if (habit.custom) newHabit = addStringNoLocale(newHabit, "http://example.org/custom", habit.custom.join(" "));
+  if (habit.custom) {
+    let customToUpload;
+    if (typeof habit.custom === 'number') {
+      customToUpload = habit.custom.toString();
+    }
+    else {
+      customToUpload = habit.custom.join(" ");
+    }
+    newHabit = addStringNoLocale(newHabit, "http://example.org/custom", customToUpload)
+  };
 
   dataSet = setThing(dataSet, newHabit);
   await saveSolidDatasetAt(habitUrl, dataSet, { fetch: fetch });
@@ -335,7 +400,7 @@ export const saveNote = async (webId: string, fetch: fetcher, note: Note) => {
     .addStringNoLocale(schema.text, contentUpd)
     .addInteger(schema.identifier, id)
     .build();
-  if (note.category) newNote = addStringNoLocale(newNote, "http://dbpedia.org/ontology/category", note.category);
+  if (note.category) newNote = addStringNoLocale(newNote, otherV.category, note.category);
 
   dataSet = setThing(dataSet, newNote);
   await saveSolidDatasetAt(noteUrl, dataSet, { fetch: fetch });
@@ -369,7 +434,7 @@ export const editNote = async (webId: string, fetch: fetcher, note: Note, change
                   newThing = setStringNoLocale(newThing!, schema.text, note.content!);
                   break;
                 case "category":
-                  newThing = setStringNoLocale(newThing!, "http://dbpedia.org/ontology/category", note.category!);
+                  newThing = setStringNoLocale(newThing!, otherV.category, note.category!);
               }
             });
             //handle?

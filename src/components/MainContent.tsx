@@ -7,7 +7,7 @@ import { useSession } from "@inrupt/solid-ui-react";
 import { Spinner } from "react-bootstrap";
 import { ControlledStorage } from "rdf-namespaces/dist/space";
 import { recordDefaultFolder } from "../services/SolidPod";
-import { Note } from "./types";
+import { Habit, Note } from "./types";
 import { getDefaultFolder } from "../services/podGetters";
 // This is the root component that first renders NavBar and then other content
 // Passes active and setActive hooks, which represent the currently clicked tab
@@ -27,6 +27,8 @@ const MainContent = () => {
   const [notesArray, setNotesArray] = useState<Note[]>([]);
   const [isLoadingContents, setIsLoadingContents] = useState<boolean>(true);
   const [notesFetched, setNotesFetched] = useState<boolean>(false);
+  const [habitsFetched, setHabitsFetched] = useState<boolean>(false);
+  const [habitsArray, setHabitsArray] = useState<Habit[]>([]);
 
   useEffect(() => {
     let check = async () => {
@@ -74,6 +76,10 @@ const MainContent = () => {
             setIsEdit={setIsEdit}
           />
           <ContentToRender
+            habitsFetched={habitsFetched}
+            setHabitsFetched={setHabitsFetched}
+            habitsArray={habitsArray}
+            setHabitsArray={setHabitsArray}
             notesFetched={notesFetched}
             setNotesFetched={setNotesFetched}
             isLoadingContents={isLoadingContents}

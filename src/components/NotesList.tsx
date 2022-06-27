@@ -41,7 +41,7 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, notes
   const [activeNote, setActiveNote] = useState<number | null>(null);
   const [saveModalState, setSaveModalState] = useState<boolean>(false);
 
-  let accessArray = ["public", "private", "shared"];
+  const accessArray = ["public", "private", "shared"];
 
 
 
@@ -193,9 +193,6 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, notes
             </div>
           </div>
         }
-        <SaveModal saveModalState={saveModalState} setSaveModalState={setSaveModalState}
-          setCreatorStatus={setCreatorStatus}
-          setViewerStatus={setViewerStatus} />
       </div>
     </div>
   )

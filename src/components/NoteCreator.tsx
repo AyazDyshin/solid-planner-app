@@ -88,7 +88,6 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
         if (arrOfChanges.length !== 0) {
             handleSave();
         }
-        // if (arrOfChanges.length === 0) {
         if (viewerStatus) {
             // handle 
             setNoteInp(noteToView!);
@@ -97,7 +96,6 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
             setNoteInp({ id: null, title: "", content: "", category: "", url: "", access: null });
             setIsEdit(true);
         }
-        //  }
     }, [viewerStatus, noteToView, creatorStatus]);
 
 
@@ -181,12 +179,6 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
                 }
             }
         }
-        //setCreatorStatus(false);
-
-        // setIsEdit(false);
-
-        // setDoNoteSave(false);
-
     };
 
     const handleEdit = () => {

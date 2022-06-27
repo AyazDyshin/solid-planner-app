@@ -1,7 +1,8 @@
+import { AccessModes } from '@inrupt/solid-client/dist/acp/policy';
 import React, { useState } from 'react'
 import HabitsCreator from './HabitsCreator'
 import HabitsList from './HabitsList'
-import { Habit } from './types';
+import { accessObject, Habit } from './types';
 interface Props {
     habitsFetched: boolean;
     setHabitsFetched: React.Dispatch<React.SetStateAction<boolean>>;
@@ -12,17 +13,25 @@ const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsA
     const [viewerStatus, setViewerStatus] = useState<boolean>(false);
     const [creatorStatus, setCreatorStatus] = useState<boolean>(false);
     const [arrOfChanges, setArrOfChanges] = useState<string[]>([]);
-    const [habitInp, setHabitInp] = useState<Habit>({
-        id: null, title: null, content: null, startDate: null, lastCheckInDate: null, recurrence: null, bestStreak: null,
-        currentStreak: null, status: null, category: null, url: null, access: null
-    });
+    const [newEntryCr, setNewEntryCr] = useState<boolean>(false);
     const [isEdit, setIsEdit] = useState<boolean>(false);
     const [habitToView, setHabitToView] = useState<Habit | null>(null);
+    const [accUpdObj, setAccUpdObj] = useState<{ [x: string]: boolean; }>({});
+    const [publicAccess, setPublicAccess] = useState<accessObject>({ read: false, append: false, write: false });
+    const [agentsToUpd, setAgentsToUpd] = useState<{ [x: string]: AccessModes; }>({});
+    const [habitInp, setHabitInp] = useState<Habit>({
+        id: null, title: "", content: "", startDate: null, lastCheckInDate: null, recurrence: "daily", bestStreak: null,
+        currentStreak: null, status: false, category: "", url: "", access: null
+    });
+
+
     return (
         <div className="container-fluid pad">
             <div className="row h-100">
                 <div className="col h-100 border border-5 border-end-0 d-flex justify-content-center align-items-center p-0">
                     <HabitsList
+                        newEntryCr={newEntryCr}
+                        setNewEntryCr={setNewEntryCr}
                         habitToView={habitToView}
                         setHabitToView={setHabitToView}
                         habitsFetched={habitsFetched}
@@ -38,7 +47,21 @@ const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsA
                     />
                 </div>
                 <div className="col h-100 border border-5">
-                    <HabitsCreator
+                    {(viewerStatus || creatorStatus) && <HabitsCreator
+                        agentsToUpd={agentsToUpd}
+                        setAgentsToUpd={setAgentsToUpd}
+                        publicAccess={publicAccess}
+                        setPublicAccess={setPublicAccess}
+                        accUpdObj={accUpdObj}
+                        setAccUpdObj={setAccUpdObj}
+                        newEntryCr={newEntryCr}
+                        setNewEntryCr={setNewEntryCr}
+                        habitsArray={habitsArray}
+                        setHabitsArray={setHabitsArray}
+                        habitToView={habitToView}
+                        setHabitToView={setHabitToView}
+                        creatorStatus={creatorStatus}
+                        setCreatorStatus={setCreatorStatus}
                         habitInp={habitInp}
                         setHabitInp={setHabitInp}
                         arrOfChanges={arrOfChanges}
@@ -48,6 +71,7 @@ const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsA
                         isEdit={isEdit}
                         setIsEdit={setIsEdit}
                     />
+                    }
                 </div>
             </div>
         </div>

@@ -11,7 +11,13 @@ export const modifyWebId = (webId: string): string => {
     return `${updArr.join("/")}/`;
 }
 
-
+export const constructDate = (date: Date|null) => {
+    if (!date) return "no date"
+    let day = date.getDate();
+    let month = date.getMonth() + 1;
+    let year = date.getFullYear();
+    return (`${day}.${month}.${year}`);
+}
 //  adds '/' to Url's end if it is missing
 export const updUrlForFolder = (url: string) => {
     if (url.charAt(url.length - 1) !== '/') return url += '/'

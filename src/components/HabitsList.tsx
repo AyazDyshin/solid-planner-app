@@ -23,9 +23,11 @@ interface Props {
   setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
   habitToView: Habit | null;
   setHabitToView: React.Dispatch<React.SetStateAction<Habit | null>>;
+  newEntryCr: boolean;
+  setNewEntryCr: React.Dispatch<React.SetStateAction<boolean>>;
 }
 const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorStatus, habitsFetched, setHabitsFetched,
-  habitsArray, setHabitsArray, isEdit, setIsEdit, habitToView, setHabitToView }: Props) => {
+  habitsArray, setHabitsArray, isEdit, setIsEdit, habitToView, setHabitToView, newEntryCr, setNewEntryCr }: Props) => {
   const { session, fetch } = useSession();
   const { webId } = session.info;
   if (webId === undefined) {
@@ -34,7 +36,6 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
   const [currentCategory, setCurrentCategory] = useState<string | null>(null);
   const [currentAccess, setCurrentAccess] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [newEntryCr, setNewEntryCr] = useState<boolean>(false);
   const [habitsToShow, setHabitsToShow] = useState<Habit[]>([]);
   const [categoryArray, setCategoryArray] = useState<string[]>([]);
   const [activeHabit, setActiveHabit] = useState<number | null>(null);
@@ -119,7 +120,7 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
       return (
         <div className="card text-center">
           <div className="card-body">
-            <h5 className="card-title">You don't have any notes yet!</h5>
+            <h5 className="card-title">You don't have any habits yet!</h5>
             <p className="card-text">Let's fix this</p>
             <a className="btn btn-primary" onClick={() => {
               setCreatorStatus(true);
@@ -260,7 +261,7 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
               habitsToShow.length === 0 && <div className="card text-center">
                 <div className="card-body">
                   <h5 className="card-title">Oooops!</h5>
-                  <p className="card-text">Seems like there are no notes satisfying your filters</p>
+                  <p className="card-text">Seems like there are no habits satisfying your filters</p>
                 </div>
               </div>
             }

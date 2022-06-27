@@ -36,8 +36,7 @@ const ContactsRender = () => {
 
             }
             if (otherWebId) {
-                let ret = await fetchAllEntries(otherWebId, fetch, "note", undefined, undefined, true);
-                let [notesArrUpd, rest] = ret;
+                let notesArrUpd = await fetchAllEntries(otherWebId, fetch, "note", true);
                 let transformedArr = await Promise.all(notesArrUpd.map(async (thing) => {
                     return await thingToNote(thing, otherWebId, fetch);
                 }));

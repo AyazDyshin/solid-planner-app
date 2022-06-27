@@ -101,22 +101,19 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
         const fetchNotes = async () => {
             let filteredNotes: Note[]
             if (!notesFetched) {
-                let [noteArr, rest] = await fetchAllEntries(webId, fetch, "note");
+                let noteArr = await fetchAllEntries(webId, fetch, "note");
                 let transformedArr = await Promise.all(noteArr.map(async (thing) => {
                     return await thingToNote(thing, webId, fetch);
                 }));
                 transformedArr = transformedArr.filter((item) => item !== null) as Note[];
                 let updType = transformedArr as Note[];
-               // console.log(updType);
                 setNotesArray(updType);
-                //console.log("fetched");
                 setNotesFetched(true);
                 filteredNotes = updType;
             }
             else {
                 filteredNotes = notesArray;
             }
-            //console.log(filteredNotes);
             let extr = extractCategories(filteredNotes);
             setCategoryArray(extr);
             if (currentCategory || currentAccess) {

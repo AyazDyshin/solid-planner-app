@@ -53,10 +53,9 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
     const fetchNotes = async (otherId?: string) => {
       // await perfSave();
       setIsLoading(true);
-      let ret = await fetchAllEntries(webId, fetch, "habit",
-        ((currentCategory) ? currentCategory : undefined), ((currentAccess) ? currentAccess : undefined));
+      let ret = await fetchAllEntries(webId, fetch, "habit");
       //handle
-      const [updNotesArray, updCategoriesArray] = ret!;
+      //const [updNotesArray, updCategoriesArray] = ret!;
       // let transformedArr = await Promise.all(updNotesArray.map(async (thing) => {
       //   return await thingToHabit();
       // }));

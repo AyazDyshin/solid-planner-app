@@ -55,6 +55,7 @@ const MainContent = () => {
     if (permissionStatus) {
       return (
         <div>
+          <Test />
           <Navbar
             notesFetched={notesFetched}
             setNotesFetched={setNotesFetched}

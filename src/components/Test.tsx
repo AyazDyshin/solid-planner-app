@@ -14,8 +14,7 @@ import { first } from 'lodash';
 import { schema, space, vcard } from 'rdf-namespaces';
 import { pim } from '@inrupt/solid-client/dist/constants';
 import {
-  getPrefLink, recordDefaultFolder, fetchAllNotes, saveNote, createDefFolder,
-  createEntriesInTypeIndex, getAllNotesUrlFromPublicIndex, getDefaultFolder, getStoragePref, fetchContacts
+  fetchContacts
 } from '../services/SolidPod';
 import { access } from "@inrupt/solid-client";
 import { object, updated } from 'rdf-namespaces/dist/as';
@@ -41,11 +40,11 @@ const Test = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const gets = async () => {
-    // await createContainerAt("https://inrtester2.inrupt.net/bob/", {fetch: fetch});
-    let b =await getPubAccess(webId ?? "", "https://inrtester2.inrupt.net/SolidPlannerApp/notes/1655570018660.ttl", fetch);
+    //const socket = new WebSocket("wss://inrtester2.inrupt.net/SolidPlannerApp/");
+    //console.log(socket);
   }
 
- // gets();
+  //gets();
 
 
   return (

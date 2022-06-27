@@ -175,8 +175,7 @@ export const createDefFolder = async (webId: string, defFolderUrl: string, fetch
 }
 
 
-export const fetchAllEntries = async (webId: string, fetch: fetcher, entry: string, categoryFilter?: string, accessFilter?: string,
-  other?: boolean) => {
+export const fetchAllEntries = async (webId: string, fetch: fetcher, entry: string, other?: boolean) => {
   let arrayOfCategories: string[] = [];
   let urlsArr
   try {
@@ -216,43 +215,43 @@ export const fetchAllEntries = async (webId: string, fetch: fetcher, entry: stri
           }
         }
         let newThing = getThing(newDs, noteUrl);
-        if (newThing) {
-          let categoryOfCurrNote = getStringNoLocale(newThing, "http://dbpedia.org/ontology/category");
-          if (categoryOfCurrNote && !arrayOfCategories.includes(categoryOfCurrNote)) arrayOfCategories.push(categoryOfCurrNote);
-          if (categoryFilter || accessFilter) {
-            let toReturn: ThingPersisted | null;
-            toReturn = newThing;
-            if (categoryFilter) {
-              toReturn = (categoryOfCurrNote === categoryFilter ? newThing : null);
-            }
-            if (accessFilter) {
-              switch (accessFilter) {
-                case "public": {
-                  const acc = await getPubAccess(webId, noteUrl, fetch);
-                  if (!toReturn) {
-                    break;
-                  }
-                  else {
-                    toReturn = (acc!.read ? newThing : null);
-                    break;
-                  }
-                }
-                case "private": {
-                  const acc = await getPubAccess(webId, noteUrl, fetch);
-                  if (!toReturn) {
-                    break;
-                  }
-                  else {
-                    toReturn = (acc!.read ? null : newThing);
-                    break;
-                  }
-                }
-              }
-            }
-            return toReturn;
-          }
+        // if (newThing) {
+        //   let categoryOfCurrNote = getStringNoLocale(newThing, "http://dbpedia.org/ontology/category");
+        //   if (categoryOfCurrNote && !arrayOfCategories.includes(categoryOfCurrNote)) arrayOfCategories.push(categoryOfCurrNote);
+        //   if (categoryFilter || accessFilter) {
+        //     let toReturn: ThingPersisted | null;
+        //     toReturn = newThing;
+        //     if (categoryFilter) {
+        //       toReturn = (categoryOfCurrNote === categoryFilter ? newThing : null);
+        //     }
+        //     if (accessFilter) {
+        //       switch (accessFilter) {
+        //         case "public": {
+        //           const acc = await getPubAccess(webId, noteUrl, fetch);
+        //           if (!toReturn) {
+        //             break;
+        //           }
+        //           else {
+        //             toReturn = (acc!.read ? newThing : null);
+        //             break;
+        //           }
+        //         }
+        //         case "private": {
+        //           const acc = await getPubAccess(webId, noteUrl, fetch);
+        //           if (!toReturn) {
+        //             break;
+        //           }
+        //           else {
+        //             toReturn = (acc!.read ? null : newThing);
+        //             break;
+        //           }
+        //         }
+        //       }
+        //     }
+        //     return toReturn;
+        //   }
 
-        }
+        // }
         return newThing;
       }));
       return updArr;
@@ -268,18 +267,20 @@ export const fetchAllEntries = async (webId: string, fetch: fetcher, entry: stri
           const updDataSet = saveSolidDatasetAt(url, newData, { fetch: fetch });
         }
       });
-      if (categoryFilter) {
-        let newArr = arrOf.map((thing) => {
-          let categoryOfCurrNote = getStringNoLocale(thing, "http://dbpedia.org/ontology/category");
-          if (categoryFilter) {
-            return categoryOfCurrNote === categoryFilter ? thing : null;
-          }
-        });
-      }
+      // if (categoryFilter) {
+      //   let newArr = arrOf.map((thing) => {
+      //     let categoryOfCurrNote = getStringNoLocale(thing, "http://dbpedia.org/ontology/category");
+      //     if (categoryFilter) {
+      //       return categoryOfCurrNote === categoryFilter ? thing : null;
+      //     }
+      //   });
+      // }
       return arrOf;
     }
   }));
-  let retValue: [(ThingPersisted | null)[], string[]] = [updUrlsArr.flat(), arrayOfCategories]
+  //let retValue: [(ThingPersisted | null)[], string[]] = [updUrlsArr.flat(), arrayOfCategories]
+  let retValue = updUrlsArr.flat();
+  if (!retValue) return [];
   return retValue;
 }
 

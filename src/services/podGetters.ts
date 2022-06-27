@@ -1,6 +1,6 @@
 import { getSolidDataset, getThing, getUrl, getStringNoLocale, getThingAll } from "@inrupt/solid-client";
 import { space, solid, schema } from "rdf-namespaces";
-import { fetcher } from "../components/types";
+import { fetcher, voc } from "../components/types";
 
 export const getPrefLink = async (webId: string, fetch: fetcher) => {
     let dataSet;
@@ -84,7 +84,7 @@ export const getDefaultFolder = async (webId: string, fetch: fetcher): Promise<s
     //handle
     let aThing = await getThing(dataSet, prefFileLocation!);
     //handle
-    let defFolderUrl = await getUrl(aThing!, "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#defaultFolder");
+    let defFolderUrl = await getUrl(aThing!, voc.defaultFolder);
     return defFolderUrl;
 }
 
@@ -106,7 +106,7 @@ export const getAccessType = async (webId: string, fetch: fetcher) => {
         throw new Error("preference file is empty");
     }
     //handle
-    let type = await getStringNoLocale(aThing, "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#accessType");
+    let type = await getStringNoLocale(aThing, voc.accessType);
     if (type === null) {
         // add try repair here
         throw new Error("access type is not recorded in pref file");
@@ -116,7 +116,7 @@ export const getAccessType = async (webId: string, fetch: fetcher) => {
 
 
 export const getAllUrlFromPublicIndex = async (webId: string, fetch: fetcher, type: string) => {
-    let typeToGet = (type === "note" ? schema.TextDigitalDocument : "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#Habit");
+    let typeToGet = (type === "note" ? schema.TextDigitalDocument : voc.Habit);
     const publicTypeIndexUrl = await getPublicTypeIndexUrl(webId, fetch);
     const dataSet = await getSolidDataset(publicTypeIndexUrl, { fetch: fetch });
     let allThing = getThingAll(dataSet);

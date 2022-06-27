@@ -6,12 +6,17 @@ import { checkPermissions } from "../services/access";
 import { useSession } from "@inrupt/solid-ui-react";
 import { Spinner } from "react-bootstrap";
 import { ControlledStorage } from "rdf-namespaces/dist/space";
-import { getDefaultFolder, recordDefaultFolder } from "../services/SolidPod";
+import { recordDefaultFolder } from "../services/SolidPod";
 import { Note } from "./types";
+import { getDefaultFolder } from "../services/podGetters";
 // This is the root component that first renders NavBar and then other content
 // Passes active and setActive hooks, which represent the currently clicked tab
 const MainContent = () => {
   const { session, fetch } = useSession();
+  const { webId } = session.info;
+  if (!webId) {
+    throw new Error("Error, couldn't get your webId");
+  }
   const links = ['notes', 'habits', 'contacts', 'settings'];
   const [active, setActive] = useState("notes");
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -19,13 +24,10 @@ const MainContent = () => {
   const [viewerStatus, setViewerStatus] = useState<boolean>(false);
   const [creatorStatus, setCreatorStatus] = useState<boolean>(false);
   const [isEdit, setIsEdit] = useState(false);
-  const [notesArray, setNotesArray] = useState<(Note | null)[]>([]);
+  const [notesArray, setNotesArray] = useState<Note[]>([]);
   const [isLoadingContents, setIsLoadingContents] = useState<boolean>(true);
-  const { webId } = session.info;
+  const [notesFetched, setNotesFetched] = useState<boolean>(false);
 
-  if (!webId) {
-    throw new Error("Error, couldn't get your webId");
-  }
   useEffect(() => {
     let check = async () => {
       setIsLoading(true);
@@ -53,8 +55,9 @@ const MainContent = () => {
     if (permissionStatus) {
       return (
         <div>
-          <Test />
           <Navbar
+            notesFetched={notesFetched}
+            setNotesFetched={setNotesFetched}
             isLoadingContents={isLoadingContents}
             setIsLoadingContents={setIsLoadingContents}
             notesArray={notesArray}
@@ -70,6 +73,8 @@ const MainContent = () => {
             setIsEdit={setIsEdit}
           />
           <ContentToRender
+            notesFetched={notesFetched}
+            setNotesFetched={setNotesFetched}
             isLoadingContents={isLoadingContents}
             setIsLoadingContents={setIsLoadingContents}
             notesArray={notesArray}

@@ -1,7 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.css';
 import { getInteger, getStringNoLocale, Thing } from "@inrupt/solid-client";
 import { useSession } from "@inrupt/solid-ui-react";
-import { RefAttributes, useState } from "react";
+import { RefAttributes, useEffect, useState } from "react";
 import "../styles.css";
 import { Dropdown, DropdownButton, Badge, Overlay, Tooltip, OverlayTrigger, TooltipProps, Popover, PopoverProps, Button } from "react-bootstrap";
 import SaveModal from "./SaveModal";
@@ -13,8 +13,10 @@ import { BiFolder } from "react-icons/bi";
 import { VscTypeHierarchySuper } from "react-icons/vsc";
 import { GoPrimitiveDot, GoCheck, GoX } from "react-icons/go";
 interface Props {
-  notesArray: (Note | null)[];
-  setNotesArray: React.Dispatch<React.SetStateAction<(Note | null)[]>>;
+  notesToShow: Note[];
+  setNotesToShow: React.Dispatch<React.SetStateAction<Note[]>>;
+  notesArray: Note[];
+  setNotesArray: React.Dispatch<React.SetStateAction<Note[]>>;
   noteToView: Note | null;
   setNoteToView: React.Dispatch<React.SetStateAction<Note | null>>;
   viewerStatus: boolean;
@@ -28,13 +30,11 @@ interface Props {
   currentCategory: string | null;
   setCurrentAccess: React.Dispatch<React.SetStateAction<string | null>>;
   currentAccess: string | null;
-  isLoadingContents: boolean;
-  setIsLoadingContents: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView,
+const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, notesToShow, setNotesToShow,
   viewerStatus, setViewerStatus, setCreatorStatus, isEdit, setIsEdit, categoryArray, setCategoryArray,
-  setCurrentCategory, currentCategory, setCurrentAccess, currentAccess, isLoadingContents, setIsLoadingContents }: Props) => {
+  setCurrentCategory, currentCategory, setCurrentAccess, currentAccess }: Props) => {
 
   const { session, fetch } = useSession();
   const { webId } = session.info;
@@ -55,11 +55,12 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView,
     }
   }
 
+
   return (
     <div className="w-100 h-100">
       <div className="d-flex">
         <DropdownButton
-        className="mx-1 my-1"
+          className="mx-1 my-1"
           variant="secondary"
           title={<div><VscTypeHierarchySuper /> {currentAccess ? currentAccess : "access type"} <RiArrowDropDownLine /></div>}
         >
@@ -78,7 +79,7 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView,
         </DropdownButton>
         {
           categoryArray.length !== 0 && <DropdownButton
-          className="mx-1 my-1"
+            className="mx-1 my-1"
             variant="secondary"
             title={<div><BiFolder /> {currentCategory ? currentCategory : "Category"} <RiArrowDropDownLine /></div>}
           >
@@ -107,76 +108,90 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView,
           <a className="btn btn-secondary ms-auto my-1 d-flex align-items-center justify-content-center" onClick={handleCreate}><BsPlusLg /></a>
         </OverlayTrigger>
       </div>
-      <div className="list-group w-100 h-100">
+      <div className="list-group w-100 h-80">
         {
-          notesArray.map((note) => {
-            if (note) {
-              return <a
-                key={`${note.id}${Date.now() + Math.floor(Math.random() * 1000)}`}
-                className={`list-group-item px-1 list-group-item-action ${activeNote === note.id ? 'active' : ''}`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setIsEdit(false);
-                  setActiveNote(note.id);
-                  setNoteToView(note);
-                  setViewerStatus(true);
-                  setCreatorStatus(false);
-                }}
-              >
-                <div style={{ display: "inline-block" }}>
-                  {note.category && <Badge pill bg="info" className="me-1">{note.category}</Badge>}
-                </div>
-                <div style={{ display: "inline-block" }}>
-                  {!note.category && <Badge pill bg="info" className="me-1">no category</Badge>}
-                </div>
-                {note.access && <OverlayTrigger placement="right" overlay={
-                  <Popover>
-                    <Popover.Body className="py-1 px-1">
-                      {(note!.access![Object.keys(note!.access!)[0]].read) ?
-                        (<div>read: <GoCheck /></div>) : (<div>read: <GoX /></div>)}
-                      {(note!.access![Object.keys(note!.access!)[0]].append) ?
-                        (<div>append: <GoCheck /></div>) : (<div>append: <GoX /></div>)}
-                      {(note!.access![Object.keys(note!.access!)[0]].write) ?
-                        (<div>write: <GoCheck /></div>) : (<div>write: <GoX /></div>)}
-                    </Popover.Body>
-                  </Popover>
-                }>
+          notesToShow.length !== 0 && <div className="list-group" style={{ maxHeight: '80%', overflow: 'auto' }}>
+            {
+              notesToShow.map((note) => {
+                return <a
+                  key={`${note.id}${Date.now() + Math.floor(Math.random() * 1000)}`}
+                  className={`list-group-item px-1 list-group-item-action ${activeNote === note.id ? 'active' : ''}`}
+                  onClick={(e) => {
+                    console.log(viewerStatus);
+                    //console.log(note);
+                    e.preventDefault();
+                    setIsEdit(false);
+                    setActiveNote(note.id);
+                    setNoteToView(note);
+                    setViewerStatus(true);
+                    setCreatorStatus(false);
+                    console.log(viewerStatus);
+                  }}
+                >
                   <div style={{ display: "inline-block" }}>
-                    <Badge pill bg="secondary" className="me-1 cursor">{Object.keys(note.access)[0]}</Badge>
+                    {note.category && <Badge pill bg="info" className="me-1">{note.category}</Badge>}
                   </div>
-                </OverlayTrigger>}
+                  <div style={{ display: "inline-block" }}>
+                    {!note.category && <Badge pill bg="info" className="me-1">no category</Badge>}
+                  </div>
+                  {note.access && <OverlayTrigger placement="right" overlay={
+                    <Popover>
+                      <Popover.Body className="py-1 px-1">
+                        {(note!.access![Object.keys(note!.access!)[0]].read) ?
+                          (<div>read: <GoCheck /></div>) : (<div>read: <GoX /></div>)}
+                        {(note!.access![Object.keys(note!.access!)[0]].append) ?
+                          (<div>append: <GoCheck /></div>) : (<div>append: <GoX /></div>)}
+                        {(note!.access![Object.keys(note!.access!)[0]].write) ?
+                          (<div>write: <GoCheck /></div>) : (<div>write: <GoX /></div>)}
+                      </Popover.Body>
+                    </Popover>
+                  }>
+                    <div style={{ display: "inline-block" }}>
+                      <Badge pill bg="secondary" className="me-1 cursor">{Object.keys(note.access)[0]}</Badge>
+                    </div>
+                  </OverlayTrigger>}
 
-                {note.shareList && <OverlayTrigger placement="right" overlay={
-                  <Popover style={{ maxWidth: "400px" }}>
-                    <Popover.Body className="py-1 px-1">
-                      <div >
-                        {
-                          Object.keys(note!.shareList!).map((key, index) => {
-                            return <div key={Date.now() + Math.floor(Math.random() * 1000)}>
-                              <div> {key} :</div>
-                              <div className="d-flex justify-content-between">
-                                {(note!.shareList![key].read) ?
-                                  (<div style={{ display: "inline" }}>read: <GoCheck /></div>) : (<div style={{ display: "inline" }}>read: <GoX /></div>)}
-                                {(note!.shareList![key].append) ?
-                                  (<div style={{ display: "inline" }}>append: <GoCheck /></div>) : (<div style={{ display: "inline" }}>append: <GoX /></div>)}
-                                {(note!.shareList![key].write) ?
-                                  (<div style={{ display: "inline" }}>write: <GoCheck /></div>) : (<div style={{ display: "inline" }}>write: <GoX /></div>)}
+                  {note.shareList && <OverlayTrigger placement="right" overlay={
+                    <Popover style={{ maxWidth: "400px" }}>
+                      <Popover.Body className="py-1 px-1">
+                        <div >
+                          {
+                            Object.keys(note!.shareList!).map((key, index) => {
+                              return <div key={Date.now() + Math.floor(Math.random() * 1000)}>
+                                <div> {key} :</div>
+                                <div className="d-flex justify-content-between">
+                                  {(note!.shareList![key].read) ?
+                                    (<div style={{ display: "inline" }}>read: <GoCheck /></div>) : (<div style={{ display: "inline" }}>read: <GoX /></div>)}
+                                  {(note!.shareList![key].append) ?
+                                    (<div style={{ display: "inline" }}>append: <GoCheck /></div>) : (<div style={{ display: "inline" }}>append: <GoX /></div>)}
+                                  {(note!.shareList![key].write) ?
+                                    (<div style={{ display: "inline" }}>write: <GoCheck /></div>) : (<div style={{ display: "inline" }}>write: <GoX /></div>)}
+                                </div>
                               </div>
-                            </div>
-                          })
-                        }
-                      </div>
-                    </Popover.Body>
-                  </Popover>
-                }>
-                  <div style={{ display: "inline-block" }}>
-                    <Badge pill bg="secondary" className="me-1 cursor">shared</Badge>
-                  </div>
-                </OverlayTrigger>}
-                {note.title}
-              </a>
+                            })
+                          }
+                        </div>
+                      </Popover.Body>
+                    </Popover>
+                  }>
+                    <div style={{ display: "inline-block" }}>
+                      <Badge pill bg="secondary" className="me-1 cursor">shared</Badge>
+                    </div>
+                  </OverlayTrigger>}
+                  {note.title}
+                </a>
+
+              })
             }
-          })
+          </div>
+        }
+        {
+          notesToShow.length === 0 && <div className="card text-center">
+            <div className="card-body">
+              <h5 className="card-title">Oooops!</h5>
+              <p className="card-text">Seems like there are no notes satisfying your filters</p>
+            </div>
+          </div>
         }
         <SaveModal saveModalState={saveModalState} setSaveModalState={setSaveModalState}
           setCreatorStatus={setCreatorStatus}

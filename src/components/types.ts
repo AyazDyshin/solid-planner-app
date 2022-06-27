@@ -10,6 +10,7 @@ export interface Note {
   shareList?: Record<string, AccessModes>;
   //  [key: string]: string | number;
 }
+type weekDays = string[];
 
 export interface Habit {
   id: number | null;
@@ -17,7 +18,7 @@ export interface Habit {
   content: string | null;
   startDate: Date | null;
   lastCheckInDate: Date | null;
-  recurrence: number | null;
+  recurrence: "daily" | "weekly" | "custom" | null;
   bestStreak: number | null;
   currentStreak: number | null;
   url: string | null;
@@ -25,8 +26,16 @@ export interface Habit {
   category: string | null;
   access: Record<string, AccessModes> | null;
   shareList?: Record<string, AccessModes>;
+  custom?: weekDays | null;
 }
+export type withCategory = object & { category: string | null; };
 
 export type fetcher = (((input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>) & ((input: RequestInfo | URL, init?: RequestInit | undefined) => Promise<Response>)) | undefined;
 
 export type accessObject = { read: boolean, append: boolean, write: boolean };
+
+export enum voc {
+  Habit = "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#Habit",
+  accessType = "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#accessType",
+  defaultFolder = "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#defaultFolder"
+}

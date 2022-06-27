@@ -7,7 +7,7 @@ import {
 } from '@inrupt/solid-client';
 import { DCTERMS, RDF } from '@inrupt/vocab-common-rdf';
 import { solid, schema, foaf, vcard } from 'rdf-namespaces';
-import { Note, fetcher } from '../components/types';
+import { Note, fetcher, Habit, voc } from '../components/types';
 import { determineAccess, getPubAccess, getSharedList, initializeAcl, isWacOrAcp, setPubAccess } from './access';
 import { updUrlForFolder } from './helpers';
 import { getStoragePref, getPrefLink, getPublicTypeIndexUrl, getAllUrlFromPublicIndex, getDefaultFolder, getAccessType } from './podGetters';
@@ -82,7 +82,7 @@ export const recordDefaultFolder = async (webId: string, fetch: fetcher) => {
     throw new Error("preference file does not exist");
   }
   //handle
-  aThing = addUrl(aThing, "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#defaultFolder", updUrlForFolder(defaultFolderPath));
+  aThing = addUrl(aThing, voc.defaultFolder, updUrlForFolder(defaultFolderPath));
   dataSet = setThing(dataSet, aThing);
   await createDefFolder(webId, defaultFolderPath, fetch);
   const updDataSet = await saveSolidDatasetAt(prefFileLocation!, dataSet, { fetch: fetch });
@@ -103,7 +103,7 @@ export const createEntriesInTypeIndex = async (webId: string, fetch: fetcher, ur
     throw new Error("error when fetching public type index file, it either doesn't exist, or has different location from the one specified in the webId");
   }
   let aThing = buildThing(createThing())
-    .addIri(solid.forClass, entryType === "note" ? schema.TextDigitalDocument : "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#Habit")
+    .addIri(solid.forClass, entryType === "note" ? schema.TextDigitalDocument : voc.Habit)
     .addIri(solid.instance, url)
     .build();
   dataSet = setThing(dataSet, aThing);
@@ -130,7 +130,7 @@ export const recordAccessType = async (webId: string, fetch: fetcher, type: stri
   }
 
   //handle
-  aThing = addStringNoLocale(aThing, "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#accessType", type);
+  aThing = addStringNoLocale(aThing, voc.accessType, type);
   dataSet = setThing(dataSet, aThing);
   const updDataSet = await saveSolidDatasetAt(prefFileLocation!, dataSet, { fetch: fetch });
 }
@@ -236,7 +236,6 @@ export const fetchAllEntries = async (webId: string, fetch: fetcher, entry: stri
                     toReturn = (acc!.read ? newThing : null);
                     break;
                   }
-
                 }
                 case "private": {
                   const acc = await getPubAccess(webId, noteUrl, fetch);
@@ -284,6 +283,40 @@ export const fetchAllEntries = async (webId: string, fetch: fetcher, entry: stri
   return retValue;
 }
 
+export const saveHabit = async (webId: string, fetch: fetcher, habit: Habit) => {
+  const defFolder = await getDefaultFolder(webId, fetch);
+  const habitsFolder = `${defFolder}habits/`;
+  let dataSet = await getSolidDataset(habitsFolder, {
+    fetch: fetch
+  });
+  const id = habit.id === null ? Date.now() + Math.floor(Math.random() * 1000) : habit.id;
+  const habitUrl = `${habitsFolder}${id}.ttl`;
+  const titleUpd = habit.title === null ? "" : habit.title;
+  const contentUpd = habit.content === null ? "" : habit.content;
+  const startDate = new Date();
+
+  let newHabit = buildThing(createThing({ url: habitUrl }))
+    .addUrl(RDF.type, voc.Habit)
+    .addInteger(schema.identifier, id)
+    .addStringNoLocale(DCTERMS.title, titleUpd)
+    .addStringNoLocale(schema.text, contentUpd)
+    .addDate("http://example.org/date", startDate)
+    .addStringNoLocale("http://example.org/recurrence", habit.recurrence!)
+    .build();
+
+  if (habit.category) newHabit = addStringNoLocale(newHabit, "http://dbpedia.org/ontology/category", habit.category);
+
+  if (habit.custom) newHabit = addStringNoLocale(newHabit, "http://example.org/custom", habit.custom.join(" "));
+
+  dataSet = setThing(dataSet, newHabit);
+  await saveSolidDatasetAt(habitUrl, dataSet, { fetch: fetch });
+  let type = await getAccessType(webId, fetch);
+  if (type === "wac") {
+    await initializeAcl(habitUrl, fetch);
+  };
+  await setPubAccess(webId, { read: false, append: false, write: false }, habitUrl, fetch);
+  //lastCheckInDate, bestStreak, currentStreak, status
+}
 
 export const saveNote = async (webId: string, fetch: fetcher, note: Note) => {
   const defFolder = await getDefaultFolder(webId, fetch);
@@ -295,22 +328,22 @@ export const saveNote = async (webId: string, fetch: fetcher, note: Note) => {
   const noteUrl = `${notesFolder}${id}.ttl`;
   const titleUpd = note.title === null ? "" : note.title;
   const contentUpd = note.content === null ? "" : note.content;
-  let newNote = buildThing(createThing({ url: noteUrl })).addUrl(RDF.type, schema.TextDigitalDocument)
+  let newNote = buildThing(createThing({ url: noteUrl }))
+    .addUrl(RDF.type, schema.TextDigitalDocument)
     .addStringNoLocale(DCTERMS.title, titleUpd)
     .addStringNoLocale(schema.text, contentUpd)
     .addInteger(schema.identifier, id)
     .build();
-  if (note.category) {
-    newNote = addStringNoLocale(newNote, "http://dbpedia.org/ontology/category", note.category);
-  }
+  if (note.category) newNote = addStringNoLocale(newNote, "http://dbpedia.org/ontology/category", note.category);
+
   dataSet = setThing(dataSet, newNote);
-  const updDataSet = await saveSolidDatasetAt(noteUrl, dataSet, { fetch: fetch });
+  await saveSolidDatasetAt(noteUrl, dataSet, { fetch: fetch });
   let type = await getAccessType(webId, fetch);
   if (type === "wac") {
     await initializeAcl(noteUrl, fetch);
-  }
-  await setPubAccess(webId, { read: true, append: true, write: true }, noteUrl, fetch);
-  let p = await getPubAccess(webId, noteUrl, fetch);
+  };
+  await setPubAccess(webId, { read: false, append: false, write: false }, noteUrl, fetch);
+  //let p = await getPubAccess(webId, noteUrl, fetch);
 }
 
 

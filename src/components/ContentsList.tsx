@@ -1,16 +1,15 @@
-import { Thing } from "@inrupt/solid-client";
+import { Thing, ThingPersisted } from "@inrupt/solid-client";
 import { WebsocketNotification } from "@inrupt/solid-client-notifications";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import { useSession } from "@inrupt/solid-ui-react";
 import { useEffect, useState } from "react";
 import { Button, Spinner } from "react-bootstrap";
 import { setPubAccess, shareWith } from "../services/access";
+import { extractCategories, filterByAccess, filterByCategory } from "../services/helpers";
 import {
     fetchAllEntries, recordDefaultFolder, thingToNote, saveNote,
     editNote, fetchContacts, checkContacts
 } from "../services/SolidPod";
-import ContactsList from "./ContactsList";
-import NoContacts from "./NoContacts";
 import NotesList from "./NotesList";
 import { accessObject, Note } from "./types";
 // need to upgrade for habits case
@@ -34,26 +33,11 @@ interface Props {
     setNoteInp: React.Dispatch<React.SetStateAction<Note>>;
     arrOfChanges: string[];
     setArrOfChanges: React.Dispatch<React.SetStateAction<string[]>>;
-    notesArray: (Note | null)[];
-    setNotesArray: React.Dispatch<React.SetStateAction<(Note | null)[]>>;
+    notesArray: Note[];
+    setNotesArray: React.Dispatch<React.SetStateAction<Note[]>>;
     isLoadingContents: boolean;
     setIsLoadingContents: React.Dispatch<React.SetStateAction<boolean>>;
     publicAccess: accessObject;
-    setPublicAccess: React.Dispatch<React.SetStateAction<accessObject>>;
-    contactsList: {
-        [x: string]: AccessModes;
-    };
-    setContactsList: React.Dispatch<React.SetStateAction<{
-        [x: string]: AccessModes;
-    }>>;
-    sharedList: Record<string, AccessModes>;
-    setSharedList: React.Dispatch<React.SetStateAction<Record<string, AccessModes>>>;
-    fullContacts: {
-        [x: string]: string | null;
-    };
-    setFullContacts: React.Dispatch<React.SetStateAction<{
-        [x: string]: string | null;
-    }>>;
     accUpdObj: {
         [x: string]: boolean;
     };
@@ -66,13 +50,14 @@ interface Props {
     setAgentsToUpd: React.Dispatch<React.SetStateAction<{
         [x: string]: AccessModes;
     }>>;
+    notesFetched: boolean;
+    setNotesFetched: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, setNewEntryCr,
     noteToView, setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, categoryArray, setCategoryArray, doNoteSave,
-    setDoNoteSave, NoteInp, setNoteInp, arrOfChanges, setArrOfChanges, agentsToUpd, setAgentsToUpd, notesArray, setNotesArray, isLoadingContents, setIsLoadingContents,
-    publicAccess, setPublicAccess, contactsList, setContactsList, sharedList, setSharedList,
-    fullContacts, setFullContacts, accUpdObj, setAccUpdObj
+    setDoNoteSave, NoteInp, setNoteInp, arrOfChanges, setArrOfChanges, agentsToUpd, setAgentsToUpd, notesArray, setNotesArray,
+    isLoadingContents, setIsLoadingContents, publicAccess, accUpdObj, setAccUpdObj, notesFetched, setNotesFetched
 }: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
@@ -81,8 +66,11 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
     }
     const [currentCategory, setCurrentCategory] = useState<string | null>(null);
     const [currentAccess, setCurrentAccess] = useState<string | null>(null);
-
+    const [notesToShow, setNotesToShow] = useState<Note[]>([]);
+    const [refetch, setRefetch] = useState<boolean>(true);
+    const [isLoading,setIsLoading] = useState<boolean>(true);
     useEffect(() => {
+        setIsLoading(true);
         const perfSave = async () => {
             if (doNoteSave || arrOfChanges.length !== 0) {
                 if (doNoteSave) {
@@ -96,6 +84,7 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
                         await setPubAccess(webId, publicAccess, noteToView!.url, fetch);
                     }
                     else if (accUpdObj["agent"]) {
+
                         for (let item in agentsToUpd) {
                             await shareWith(webId, noteToView!.url, fetch, agentsToUpd[item], item);
 
@@ -109,30 +98,76 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
                 setDoNoteSave(false);
             }
         }
-        const fetchNotes = async (otherId?: string) => {
-            await perfSave();
-            let ret = await fetchAllEntries(webId, fetch, "note",
-                ((currentCategory) ? currentCategory : undefined), ((currentAccess) ? currentAccess : undefined));
-            //handle
-            const [updNotesArray, updCategoriesArray] = ret!;
-            let transformedArr = await Promise.all(updNotesArray.map(async (thing) => {
-                return await thingToNote(thing, webId, fetch);
-            }));
-            // add fetch all habits here
-            setNotesArray(transformedArr.filter((item) => item !== null));
-
-            setCategoryArray(updCategoriesArray);
-            setDoNoteSave(false);
-            setIsLoadingContents(false);
-
+        const fetchNotes = async () => {
+            let filteredNotes: Note[]
+            if (!notesFetched) {
+                let [noteArr, rest] = await fetchAllEntries(webId, fetch, "note");
+                let transformedArr = await Promise.all(noteArr.map(async (thing) => {
+                    return await thingToNote(thing, webId, fetch);
+                }));
+                transformedArr = transformedArr.filter((item) => item !== null) as Note[];
+                let updType = transformedArr as Note[];
+               // console.log(updType);
+                setNotesArray(updType);
+                //console.log("fetched");
+                setNotesFetched(true);
+                filteredNotes = updType;
+            }
+            else {
+                filteredNotes = notesArray;
+            }
+            //console.log(filteredNotes);
+            let extr = extractCategories(filteredNotes);
+            setCategoryArray(extr);
+            if (currentCategory || currentAccess) {
+                if (currentCategory) filteredNotes = filterByCategory(filteredNotes, currentCategory);
+                if (currentAccess) filteredNotes = filterByAccess(filteredNotes, currentAccess);
+            }
+            setNotesToShow(filteredNotes);
+            setIsLoading(false);
         }
-        if (active === "notes") {
-            setIsLoadingContents(true);
-            fetchNotes();
-        }
-    }, [newEntryCr, currentCategory, currentAccess, active]);
+        // const fetchNotes = async (otherId?: string) => {
+        //     await perfSave();
+        //     let ret: never[] | [(ThingPersisted | null)[], string[]] = [];
+        //     let transformedArr = [];
+        //     if (refetch) {
+        //         ret = await fetchAllEntries(webId, fetch, "note",
+        //             ((currentCategory) ? currentCategory : undefined), ((currentAccess) ? currentAccess : undefined));
+        //         setRefetch(false);
+        //         const [updNotesArray, updCategoriesArray] = ret!;
+        //         transformedArr = await Promise.all(updNotesArray.map(async (thing) => {
+        //             return await thingToNote(thing, webId, fetch);
+        //         }));
+        //         transformedArr = transformedArr.filter((item) => item !== null);
+        //         setAllNotes(transformedArr as Note[]);
+        //     }
+        //     else {
+        //         transformedArr = allNotes;
+        //     }
+        //     //handle
 
-    if (isLoadingContents) {
+        //     if (currentAccess || currentCategory) {
+        //         if (currentCategory) {
+        //             transformedArr
+        //         }
+        //     }
+
+        //     // add fetch all habits here
+        //     setNotesArray(transformedArr);
+
+        //     setCategoryArray(updCategoriesArray);
+        //     setDoNoteSave(false);
+        //     setIsLoadingContents(false);
+
+        // }
+        // if (active === "notes") {
+        //     setIsLoadingContents(true);
+        //     fetchNotes();
+        // }
+        fetchNotes();
+    }, [newEntryCr, currentCategory, currentAccess]);
+
+    if (!notesFetched || isLoading) {
         return (
             <Spinner animation="border" role="status">
                 <span className="visually-hidden">Loading...</span>
@@ -140,12 +175,12 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
         )
     }
     else {
-        if (active === "notes") {
-            if (notesArray.length === 0) {
+        if ((notesToShow.length === 0) &&!(currentAccess || currentCategory)){
+
                 return (
                     <div className="card text-center">
                         <div className="card-body">
-                            <h5 className="card-title">You don't have any {active} yet!</h5>
+                            <h5 className="card-title">You don't have any notes yet!</h5>
                             <p className="card-text">Let's fix this</p>
                             <a className="btn btn-primary" onClick={() => {
                                 setCreatorStatus(true);
@@ -154,35 +189,31 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
                         </div>
                     </div>
                 );
-
-            }
-            else {
-                return (
-                    <NotesList
-                        isLoadingContents={isLoadingContents}
-                        setIsLoadingContents={setIsLoadingContents}
-                        notesArray={notesArray}
-                        setNotesArray={setNotesArray}
-                        noteToView={noteToView}
-                        setNoteToView={setNoteToView}
-                        viewerStatus={viewerStatus}
-                        setViewerStatus={setViewerStatus}
-                        setCreatorStatus={setCreatorStatus}
-                        isEdit={isEdit}
-                        setIsEdit={setIsEdit}
-                        categoryArray={categoryArray}
-                        setCategoryArray={setCategoryArray}
-                        setCurrentCategory={setCurrentCategory}
-                        currentCategory={currentCategory}
-                        currentAccess={currentAccess}
-                        setCurrentAccess={setCurrentAccess}
-                    />
-                )
-            }
         }
         else {
-            return (<div>Error</div>);
+            return (
+                <NotesList
+                    notesToShow={notesToShow}
+                    setNotesToShow={setNotesToShow}
+                    notesArray={notesArray}
+                    setNotesArray={setNotesArray}
+                    noteToView={noteToView}
+                    setNoteToView={setNoteToView}
+                    viewerStatus={viewerStatus}
+                    setViewerStatus={setViewerStatus}
+                    setCreatorStatus={setCreatorStatus}
+                    isEdit={isEdit}
+                    setIsEdit={setIsEdit}
+                    categoryArray={categoryArray}
+                    setCategoryArray={setCategoryArray}
+                    setCurrentCategory={setCurrentCategory}
+                    currentCategory={currentCategory}
+                    currentAccess={currentAccess}
+                    setCurrentAccess={setCurrentAccess}
+                />
+            )
         }
+
     }
 }
 

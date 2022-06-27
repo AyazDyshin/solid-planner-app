@@ -4,7 +4,7 @@ import { useState, useEffect, SetStateAction } from "react";
 import { Modal, Button, Form, FormControl, InputGroup, DropdownButton, Dropdown, Collapse, Spinner } from "react-bootstrap";
 import { Note } from "../components/types";
 import { getPubAccess, getSharedList, setPubAccess, shareWith } from "../services/access";
-import { checkContacts, fetchContacts, modifyWebId } from "../services/SolidPod";
+import { checkContacts, fetchContacts } from "../services/SolidPod";
 import "../styles.css";
 import AccessElement from "./AccessElement";
 import { accessObject } from "../components/types";
@@ -14,7 +14,7 @@ interface Props {
     accessModalState: boolean;
     setAccessModalState: React.Dispatch<React.SetStateAction<boolean>>;
     setNoteInp: React.Dispatch<React.SetStateAction<Note>>;
-    noteInp: Note;
+    NoteInp: Note;
     viewerStatus: boolean;
     setArrOfChanges: React.Dispatch<React.SetStateAction<string[]>>;
     noteToView: Note | null;
@@ -50,7 +50,7 @@ interface Props {
 }
 //a popup window to prompt user to set access type
 const AccessModal = ({ accessModalState, setAccessModalState, setNoteInp, contactsList, setContactsList, accUpdObj, setAccUpdObj,
-    noteInp, viewerStatus, setArrOfChanges, noteToView, setNoteToView, publicAccess, setPublicAccess,
+    NoteInp, viewerStatus, setArrOfChanges, noteToView, setNoteToView, publicAccess, setPublicAccess,
     sharedList, setSharedList, fullContacts, setFullContacts, agentsToUpd, setAgentsToUpd }: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
@@ -77,12 +77,12 @@ const AccessModal = ({ accessModalState, setAccessModalState, setNoteInp, contac
             setContactsOpen(false);
             setWebIdOpen(false);
             //handle
-            let key = Object.keys(noteToView!.access!)[0];
-            let pubAccess = noteToView!.access![key];
+            let key = Object.keys(NoteInp!.access!)[0];
+            let pubAccess = NoteInp!.access![key];
             setPublicAccess({ read: pubAccess.read, append: pubAccess.append, write: pubAccess.write });
             //let shList = await getSharedList(webId, noteToView!.url, fetch);
             let shList: Record<string, AccessModes>;
-            if (noteToView!.shareList) shList = noteToView!.shareList;
+            if (NoteInp!.shareList) shList = NoteInp!.shareList;
             else shList = {};
             setSharedList(shList);
             let contactsStatus = await checkContacts(webId, fetch);
@@ -184,7 +184,7 @@ const AccessModal = ({ accessModalState, setAccessModalState, setNoteInp, contac
                             </div>
                             <Collapse in={contactsOpen}>
                                 <div>
-                                    {!contactsStat && <div>
+                                    {contactsStat && <div>
                                         {
                                             Object.entries(contactsList).map(([key, value]) => {
                                                 return (
@@ -218,7 +218,7 @@ const AccessModal = ({ accessModalState, setAccessModalState, setNoteInp, contac
                                         }
                                     </div>}
                                     {
-                                        contactsStat && <NoContacts />
+                                        !contactsStat && <NoContacts />
                                     }
                                 </div>
                             </Collapse>

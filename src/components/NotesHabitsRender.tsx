@@ -6,6 +6,7 @@ import "../styles.css";
 import { accessObject, Note } from "./types";
 import ContentsList from "./ContentsList";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
+import NoteCreator from "./NoteCreator";
 interface Props {
     active: string;
     viewerStatus: boolean;
@@ -14,10 +15,12 @@ interface Props {
     setCreatorStatus: React.Dispatch<React.SetStateAction<boolean>>;
     isEdit: boolean;
     setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
-    notesArray: (Note | null)[];
-    setNotesArray: React.Dispatch<React.SetStateAction<(Note | null)[]>>;
+    notesArray: Note[];
+    setNotesArray: React.Dispatch<React.SetStateAction<Note[]>>;
     isLoadingContents: boolean;
     setIsLoadingContents: React.Dispatch<React.SetStateAction<boolean>>;
+    notesFetched: boolean;
+    setNotesFetched: React.Dispatch<React.SetStateAction<boolean>>;
 }
 // Component that is responsible for rendering content of notes and habits tab
 // splits the content in two halves, left half: "FolderPickerOrContent"
@@ -27,7 +30,7 @@ interface Props {
 // "creatorStatus" and "setCreatorStatus" are hooks to monitor if create button was pressed,
 // this is needed to render the respective creator component
 const NotesHabitsRender = ({ active, viewerStatus, setViewerStatus, creatorStatus, setCreatorStatus, isEdit,
-    setIsEdit, notesArray, setNotesArray, isLoadingContents, setIsLoadingContents }: Props) => {
+    setIsEdit, notesArray, setNotesArray, isLoadingContents, setIsLoadingContents, notesFetched, setNotesFetched }: Props) => {
 
     const [newEntryCr, setNewEntryCr] = useState<boolean>(false);
     const [noteToView, setNoteToView] = useState<Note | null>(null);
@@ -48,18 +51,13 @@ const NotesHabitsRender = ({ active, viewerStatus, setViewerStatus, creatorStatu
             <div className="row h-100">
                 <div className="col h-100 border border-5 border-end-0 d-flex justify-content-center align-items-center p-0">
                     <ContentsList
+                        notesFetched={notesFetched}
+                        setNotesFetched={setNotesFetched}
                         agentsToUpd={agentsToUpd}
                         setAgentsToUpd={setAgentsToUpd}
                         accUpdObj={accUpdObj}
                         setAccUpdObj={setAccUpdObj}
-                        fullContacts={fullContacts}
-                        setFullContacts={setFullContacts}
                         publicAccess={publicAccess}
-                        setPublicAccess={setPublicAccess}
-                        contactsList={contactsList}
-                        setContactsList={setContactsList}
-                        sharedList={sharedList}
-                        setSharedList={setSharedList}
                         isLoadingContents={isLoadingContents}
                         setIsLoadingContents={setIsLoadingContents}
                         notesArray={notesArray}
@@ -86,7 +84,9 @@ const NotesHabitsRender = ({ active, viewerStatus, setViewerStatus, creatorStatu
                     />
                 </div>
                 <div className="col h-100 border border-5">
-                    <CreatorToRender
+                    {(viewerStatus || creatorStatus) && <NoteCreator
+                        notesArray={notesArray}
+                        setNotesArray={setNotesArray}
                         agentsToUpd={agentsToUpd}
                         setAgentsToUpd={setAgentsToUpd}
                         accUpdObj={accUpdObj}
@@ -99,8 +99,6 @@ const NotesHabitsRender = ({ active, viewerStatus, setViewerStatus, creatorStatu
                         setContactsList={setContactsList}
                         sharedList={sharedList}
                         setSharedList={setSharedList}
-                        active={active}
-                        creatorStatus={creatorStatus}
                         newEntryCr={newEntryCr}
                         setNewEntryCr={setNewEntryCr}
                         noteToView={noteToView}
@@ -109,6 +107,7 @@ const NotesHabitsRender = ({ active, viewerStatus, setViewerStatus, creatorStatu
                         setViewerStatus={setViewerStatus}
                         isEdit={isEdit}
                         setIsEdit={setIsEdit}
+                        creatorStatus={creatorStatus}
                         setCreatorStatus={setCreatorStatus}
                         categoryArray={categoryArray}
                         setCategoryArray={setCategoryArray}
@@ -117,8 +116,9 @@ const NotesHabitsRender = ({ active, viewerStatus, setViewerStatus, creatorStatu
                         NoteInp={NoteInp}
                         setNoteInp={setNoteInp}
                         arrOfChanges={arrOfChanges}
-                        setArrOfChanges={setArrOfChanges} />
-
+                        setArrOfChanges={setArrOfChanges}
+                    />
+                    }
                 </div>
             </div>
         </div>

@@ -21,7 +21,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
   viewerStatus, setViewerStatus }: Props) => {
   useEffect(() => {
     setHabitInp({
-      id: null, title: null, content: null, startDate: null, lastCheckInDate: null, recurrence: null, bestStreak: null,
+      id: null, title: null, content: null, startDate: null, lastCheckInDate: null, recurrence: "daily", bestStreak: null,
       currentStreak: null, status: null, category: null, url: null, access: null
     });
     setIsEdit(true);
@@ -35,7 +35,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
   };
 
   const handleSave = () => {
-
+    
   };
 
   const handleDelete = () => {
@@ -47,7 +47,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
   };
 
   return (
-    <div>
+    <div className="h-100">
       <InputGroup className="mb-2 mt-2">
         <InputGroup.Text id="basic-addon1">Title:</InputGroup.Text>
         <FormControl
@@ -81,8 +81,8 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
 
       </InputGroup>
       <InputGroup>
-      <InputGroup.Text id="basic-addon1">Repeat:</InputGroup.Text>
-      <DropdownButton
+        <InputGroup.Text id="basic-addon1">{habitInp.recurrence}</InputGroup.Text>
+        <DropdownButton
           variant="outline-secondary"
           title="Dropdown"
           id="input-group-dropdown-1"
@@ -90,12 +90,10 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
           <Dropdown.Item href="#">Daily</Dropdown.Item>
           <Dropdown.Item href="#">Weekly</Dropdown.Item>
           <Dropdown.Item href="#">Custom</Dropdown.Item>
-          <Dropdown.Divider />
-          <Dropdown.Item href="#">Separated link</Dropdown.Item>
         </DropdownButton>
       </InputGroup>
       <FormControl {...(!isEdit && { disabled: true })} as="textarea" aria-label="textarea"
-        style={{ 'resize': 'none', 'height': '91%' }}
+        style={{ 'resize': 'none', 'height': '80%', 'boxSizing': 'border-box' }}
         name="content"
         value={habitInp.content === null ? "" : habitInp.content}
         onChange={handleChange}

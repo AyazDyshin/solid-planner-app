@@ -13,6 +13,7 @@ import { MdSaveAlt } from "react-icons/md";
 import AccessModal from "../modals/AccessModal";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import SharedModal from "../modals/SharedModal";
+import { setPubAccess, shareWith } from "../services/access";
 
 interface Props {
     newEntryCr: boolean;
@@ -61,6 +62,8 @@ interface Props {
     setAgentsToUpd: React.Dispatch<React.SetStateAction<{
         [x: string]: AccessModes;
     }>>;
+    notesArray: Note[];
+    setNotesArray: React.Dispatch<React.SetStateAction<Note[]>>;
 }
 //component of creation and saving a note the user's pod
 const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
@@ -68,11 +71,14 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
     setCreatorStatus, creatorStatus, categoryArray, setCategoryArray, doNoteSave, setDoNoteSave, NoteInp,
     setNoteInp, arrOfChanges, setArrOfChanges, accUpdObj, setAccUpdObj, agentsToUpd, setAgentsToUpd,
     publicAccess, setPublicAccess, contactsList, setContactsList, sharedList, setSharedList,
-    fullContacts, setFullContacts
+    fullContacts, setFullContacts, notesArray, setNotesArray
 }: Props) => {
 
     const { session, fetch } = useSession();
     const { webId } = session.info;
+    if (!webId) {
+        throw new Error("Error, couldn't get your webId");
+    }
     const [categoryModalState, setCategoryModalState] = useState<boolean>(false);
     const [accessModalState, setAccessModalState] = useState<boolean>(false);
     const [sharedModalState, setSharedModalState] = useState<boolean>(false);
@@ -82,17 +88,17 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
         if (arrOfChanges.length !== 0) {
             handleSave();
         }
-        if (arrOfChanges.length === 0) {
-            if (viewerStatus) {
-                // handle 
-                setNoteInp(noteToView!);
-            }
-            else {
-                setNoteInp({ id: null, title: "", content: "", category: "", url: "", access: null });
-                setIsEdit(true);
-            }
+        // if (arrOfChanges.length === 0) {
+        if (viewerStatus) {
+            // handle 
+            setNoteInp(noteToView!);
         }
-    }, [viewerStatus, noteToView]);
+        else {
+            setNoteInp({ id: null, title: "", content: "", category: "", url: "", access: null });
+            setIsEdit(true);
+        }
+        //  }
+    }, [viewerStatus, noteToView, creatorStatus]);
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -103,12 +109,84 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
 
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         setIsEdit(false);
-        setCreatorStatus(false);
         setViewerStatus(false);
-        setDoNoteSave(true);
-        newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
+        //setDoNoteSave(true);
+        if (creatorStatus) {
+            setCreatorStatus(false);
+            let newNote = { ...NoteInp, id: Date.now() + Math.floor(Math.random() * 1000), access: { "private": { read: false, append: false, write: false } } }
+            setNoteInp(newNote);
+            setNotesArray((prevState) => ([...prevState, newNote]));
+            setNewEntryCr(!newEntryCr);
+            setNoteInp({ id: null, title: "", content: "", category: "", url: "", access: null });
+            setArrOfChanges([]);
+            await saveNote(webId, fetch, NoteInp);
+        }
+        else if (arrOfChanges.length !== 0 || Object.keys(accUpdObj).length !== 0) {
+            let noteToUpd = NoteInp;
+            if (Object.keys(accUpdObj).length !== 0) {
+                if (accUpdObj["public"]) {
+                    let newAccess: Record<string, AccessModes>;
+                    if (!publicAccess.read && !publicAccess.append && !publicAccess.write) {
+                        newAccess = { "private": publicAccess };
+
+                    }
+                    else {
+                        newAccess = { "public": publicAccess };
+                    }
+                    noteToUpd = { ...noteToUpd, access: newAccess };
+                }
+                if (accUpdObj["agent"]) {
+                    let updShareList: Record<string, AccessModes> | undefined;
+                    if (noteToUpd.shareList) {
+                        updShareList = { ...noteToUpd.shareList, ...agentsToUpd };
+                    }
+                    else {
+                        updShareList = agentsToUpd;
+                    }
+                    let b = Object.keys(updShareList);
+                    Object.keys(updShareList).map((key) => {
+                        if (!updShareList![key].read && !updShareList![key].append && !updShareList![key].write) {
+                            delete updShareList![key];
+                        }
+                    });
+                    if (Object.keys(updShareList).length === 0) updShareList = undefined;
+
+                    noteToUpd = { ...noteToUpd, shareList: updShareList }
+                }
+                setAccUpdObj({});
+            }
+            let index = notesArray.findIndex(item => item.id === noteToUpd.id);
+            let updArr = notesArray;
+            updArr[index] = noteToUpd;
+            setNotesArray(updArr);
+            setNewEntryCr(!newEntryCr);
+            setNoteInp({ id: null, title: "", content: "", category: "", url: "", access: null });
+            setArrOfChanges([]);
+            if (arrOfChanges.length !== 0) {
+                await editNote(webId, fetch, NoteInp, arrOfChanges);
+            }
+        }
+
+        if (Object.keys(accUpdObj).length !== 0) {
+            if (accUpdObj["public"]) {
+                await setPubAccess(webId, publicAccess, NoteInp!.url, fetch);
+            }
+            else if (accUpdObj["agent"]) {
+
+                for (let item in agentsToUpd) {
+                    await shareWith(webId, NoteInp!.url, fetch, agentsToUpd[item], item);
+
+                }
+            }
+        }
+        //setCreatorStatus(false);
+
+        // setIsEdit(false);
+
+        // setDoNoteSave(false);
+
     };
 
     const handleEdit = () => {
@@ -116,11 +194,15 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
     }
 
     const handleDelete = async () => {
-        await deleteNote(webId ?? "", fetch, NoteInp.id!);
-        newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
         setIsEdit(false);
         setViewerStatus(false);
         setCreatorStatus(false);
+        let updArr = notesArray.filter((note) => note.id !== NoteInp.id);
+        setNotesArray(updArr);
+        newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
+        await deleteNote(webId ?? "", fetch, NoteInp.id!);
+
+
     }
 
     return (
@@ -157,7 +239,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
                 </ButtonGroup>
 
             </InputGroup>
-            <FormControl {...(!isEdit && { disabled: true })} as="textarea" aria-label="textarea" style={{ 'resize': 'none', 'height': '91%' }}
+            <FormControl {...(!isEdit && { disabled: true })} as="textarea" aria-label="textarea" style={{ 'resize': 'none', 'height': '80%' }}
                 name="content"
                 value={NoteInp.content === null ? "" : NoteInp.content}
                 onChange={handleChange}
@@ -188,7 +270,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
                 accessModalState={accessModalState}
                 setAccessModalState={setAccessModalState}
                 setNoteInp={setNoteInp}
-                noteInp={NoteInp}
+                NoteInp={NoteInp}
                 setArrOfChanges={setArrOfChanges}
                 viewerStatus={viewerStatus}
                 noteToView={noteToView}
@@ -208,7 +290,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
                 sharedModalState={sharedModalState}
                 setSharedModalState={setSharedModalState}
                 setNoteInp={setNoteInp}
-                noteInp={NoteInp}
+                NoteInp={NoteInp}
                 setArrOfChanges={setArrOfChanges}
                 viewerStatus={viewerStatus}
                 categoryArray={categoryArray}

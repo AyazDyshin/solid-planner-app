@@ -4,14 +4,13 @@ import { useEffect, useState } from "react";
 import { Modal, Button, Form, FormControl, InputGroup, DropdownButton, Dropdown, Spinner } from "react-bootstrap";
 import { accessObject, Note } from "../components/types";
 import { getPubAccess, getSharedList } from "../services/access";
-import { modifyWebId } from "../services/SolidPod";
 import AccessElement from "./AccessElement";
 
 interface Props {
     sharedModalState: boolean;
     setSharedModalState: React.Dispatch<React.SetStateAction<boolean>>;
     setNoteInp: React.Dispatch<React.SetStateAction<Note>>;
-    noteInp: Note;
+    NoteInp: Note;
     viewerStatus: boolean;
     setArrOfChanges: React.Dispatch<React.SetStateAction<string[]>>;
     categoryArray: string[];
@@ -37,7 +36,7 @@ interface Props {
 }
 //a popup window to prompt user to pick a folder
 const SharedModal = ({ sharedModalState, setSharedModalState, setNoteInp,
-    noteInp, viewerStatus, setArrOfChanges, categoryArray, setCategoryArray, noteToView, setNoteToView, publicAccess,
+    NoteInp, viewerStatus, setArrOfChanges, categoryArray, setCategoryArray, noteToView, setNoteToView, publicAccess,
     accUpdObj, setAccUpdObj, agentsToUpd, setAgentsToUpd,
     setPublicAccess, sharedList, setSharedList }: Props) => {
     const { session, fetch } = useSession();
@@ -52,10 +51,10 @@ const SharedModal = ({ sharedModalState, setSharedModalState, setNoteInp,
 
             setIsLoading(true);
             //handle
-            let key = Object.keys(noteToView!.access!)[0];
-            let pubAccess = noteToView!.access![key];
+            let key = Object.keys(NoteInp!.access!)[0];
+            let pubAccess = NoteInp!.access![key];
             setPublicAccess({ read: pubAccess.read, append: pubAccess.append, write: pubAccess.write });
-            if (noteToView!.shareList) setSharedList(noteToView!.shareList);
+            if (NoteInp!.shareList) setSharedList(NoteInp!.shareList);
             else setSharedList({});
 
             setIsLoading(false);
@@ -111,12 +110,12 @@ const SharedModal = ({ sharedModalState, setSharedModalState, setNoteInp,
                                             setAccUpdObj(prevState => ({ ...prevState, "agent": true }));
                                         }}
                                         appendOnChange={() => {
-                                            setAgentsToUpd(prevState => ({ ...prevState, [key]: { read: !value.read, append: value.append, write: value.write } }));
+                                            setAgentsToUpd(prevState => ({ ...prevState, [key]: { read: value.read, append: !value.append, write: value.write } }));
                                             setSharedList(prevState => ({ ...prevState, [key]: { read: value.read, append: !value.append, write: value.write } }));
                                             setAccUpdObj(prevState => ({ ...prevState, "agent": true }));
                                         }}
                                         writeOnChange={() => {
-                                            setAgentsToUpd(prevState => ({ ...prevState, [key]: { read: !value.read, append: value.append, write: value.write } }));
+                                            setAgentsToUpd(prevState => ({ ...prevState, [key]: { read: value.read, append: value.append, write: !value.write } }));
                                             setSharedList(prevState => ({ ...prevState, [key]: { read: value.read, append: value.append, write: !value.write } }));
                                             setAccUpdObj(prevState => ({ ...prevState, "agent": true }));
                                         }}

@@ -13,21 +13,25 @@ interface Props {
     setCreatorStatus: React.Dispatch<React.SetStateAction<boolean>>;
     isEdit: boolean;
     setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
-    notesArray: (Note | null)[];
-    setNotesArray: React.Dispatch<React.SetStateAction<(Note | null)[]>>;
+    notesArray: Note[];
+    setNotesArray: React.Dispatch<React.SetStateAction<Note[]>>;
     isLoadingContents: boolean;
     setIsLoadingContents: React.Dispatch<React.SetStateAction<boolean>>;
+    notesFetched: boolean;
+    setNotesFetched: React.Dispatch<React.SetStateAction<boolean>>;
 }
 // this component decides what to render based on "active" property ie clicked tab
 // while seems redundant at the moment will be useful once other tabs will be implemented
 const ContentToRender = ({ active, viewerStatus, setViewerStatus,
     creatorStatus, setCreatorStatus, isEdit, setIsEdit, notesArray,
-    setNotesArray, isLoadingContents, setIsLoadingContents }: Props) => {
+    setNotesArray, isLoadingContents, setIsLoadingContents, notesFetched, setNotesFetched }: Props) => {
 
     switch (active) {
         case "notes":
             return (
                 <NotesHabitsRender
+                    notesFetched={notesFetched}
+                    setNotesFetched={setNotesFetched}
                     isLoadingContents={isLoadingContents}
                     setIsLoadingContents={setIsLoadingContents}
                     notesArray={notesArray}

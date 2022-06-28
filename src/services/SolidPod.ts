@@ -60,14 +60,14 @@ export const thingToHabit = async (toChange: Thing | null, webId: string, fetch:
   let updRecurrence = getStringNoLocale(toChange, "http://example.org/recurrence");
   let updCustom = getStringNoLocale(toChange, "http://example.org/custom");
 
-  let newCustomValue: string[] | number | null = null;
+  let newCustomValue: number[] | number | null = null;
   if (updCustom) {
     let customArr = updCustom.split(" ");
     if (customArr.length === 1 && parseInt(customArr[0])) {
       newCustomValue = parseInt(customArr[0]);
     }
     else {
-      newCustomValue = customArr;
+      newCustomValue = customArr.map((value) => parseInt(value));
     }
   }
 

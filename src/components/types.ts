@@ -26,7 +26,7 @@ export interface Habit {
   category: string | null;
   access: Record<string, AccessModes> | null;
   shareList?: Record<string, AccessModes>;
-  custom?: string[] | number | null;
+  custom?: number[] | number | null;
 }
 export type withCategory = object & { category: string | null; };
 

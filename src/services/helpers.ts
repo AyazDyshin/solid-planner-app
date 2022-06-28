@@ -15,7 +15,28 @@ export const modifyWebId = (webId: string): string => {
 export const getHabitsToday = (allHabits: Habit[]) => {
     let today = new Date();
     let habitsToday = allHabits.filter((habit) => {
-        if (!habit.status) return true;
+        if (!habit.status) {
+            if (habit.recurrence === "custom") {
+                if (typeof habit.custom === 'number') {
+                    let dateToCheck = habit.lastCheckInDate ? habit.lastCheckInDate : habit.startDate;
+                    //handle?
+                    if (isSameDay(dateToCheck!, today) || differenceInDays(today, habit.lastCheckInDate!) === habit.custom) {
+                        return true;
+                    }
+                }
+                else {
+                    let todayWeek = getDay(today);
+                    let updArr = habit.custom?.filter((weekDay) => {
+                        if (weekDay === todayWeek) return true;
+                    });
+                    if (updArr) {
+                        if (updArr.length !== 0) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
         else {
             switch (habit.recurrence) {
                 case "daily": {
@@ -39,8 +60,7 @@ export const getHabitsToday = (allHabits: Habit[]) => {
                         if (!isSameDay(habit.lastCheckInDate!, today)) {
                             let todayWeek = getDay(today);
                             let updArr = habit.custom?.filter((weekDay) => {
-                                let numVersion = parseInt(weekDay);
-                                if (numVersion === todayWeek) return true;
+                                if (weekDay === todayWeek) return true;
                             });
                             if (updArr) {
                                 if (updArr.length !== 0) {
@@ -55,6 +75,7 @@ export const getHabitsToday = (allHabits: Habit[]) => {
     });
     return habitsToday;
 }
+
 export const constructDate = (date: Date | null) => {
     if (!date) return "no date"
     let day = date.getDate();

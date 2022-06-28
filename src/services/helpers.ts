@@ -2,7 +2,8 @@ import { getStringNoLocale, ThingPersisted } from "@inrupt/solid-client";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import { entrypoint } from "rdf-namespaces/dist/hydra";
 import { category } from "rdf-namespaces/dist/qu";
-import { withCategory } from "../components/types";
+import { Habit, withCategory } from "../components/types";
+import { isSameDay, isSameWeek, isSameMonth, isSameYear, differenceInDays, getDay } from 'date-fns';
 
 //function that extracts main part from the user's webId
 export const modifyWebId = (webId: string): string => {
@@ -11,7 +12,50 @@ export const modifyWebId = (webId: string): string => {
     return `${updArr.join("/")}/`;
 }
 
-export const constructDate = (date: Date|null) => {
+export const getHabitsToday = (allHabits: Habit[]) => {
+    let today = new Date();
+    let habitsToday = allHabits.filter((habit) => {
+        if (!habit.status) return true;
+        else {
+            switch (habit.recurrence) {
+                case "daily": {
+                    //handle
+                    if (!isSameDay(habit.lastCheckInDate!, today)) return true;
+                }
+                case "weekly": {
+                    if (!isSameWeek(habit.lastCheckInDate!, today)) return true;
+                }
+                case "monthly": {
+                    if (!isSameMonth(habit.lastCheckInDate!, today)) return true;
+                }
+                case "yearly": {
+                    if (!isSameYear(habit.lastCheckInDate!, today)) return true;
+                }
+                case "custom": {
+                    if (typeof habit.custom === 'number') {
+                        if (differenceInDays(today, habit.lastCheckInDate!) >= habit.custom) return true;
+                    }
+                    else {
+                        if (!isSameDay(habit.lastCheckInDate!, today)) {
+                            let todayWeek = getDay(today);
+                            let updArr = habit.custom?.filter((weekDay) => {
+                                let numVersion = parseInt(weekDay);
+                                if (numVersion === todayWeek) return true;
+                            });
+                            if (updArr) {
+                                if (updArr.length !== 0) {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    });
+    return habitsToday;
+}
+export const constructDate = (date: Date | null) => {
     if (!date) return "no date"
     let day = date.getDate();
     let month = date.getMonth() + 1;

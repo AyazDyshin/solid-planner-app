@@ -228,7 +228,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
           {viewerStatus && <InputGroup className="w-100">
             <InputGroup.Text className="text-center" id="basic-addon1" style={{ 'width': '50%' }}>Status:</InputGroup.Text>
             <div className="form-check form-switch d-flex justify-content-center align-items-center">
-              <input className="form-check-input" type="checkbox" style={{ "transform": "scale(1.8)", "marginLeft": "0em" }}
+              <input className="form-check-input" type="checkbox" style={{ "transform": "scale(1.6)", "marginLeft": "-0.5em" }}
                 onChange={() => {
                   setHabitInp((prevState) => ({ ...prevState, status: !habitInp.status }));
                 }}

@@ -86,7 +86,7 @@ export const thingToHabit = async (toChange: Thing | null, webId: string, fetch:
     lastCheckInDate: updLastCheckInDate,
     bestStreak: updBestStreak,
     currentStreak: updCurrentStreak,
-    status: updStatus,
+    status: updStatus ? updStatus : false,
     recurrence: updRecurrence,
     url: toChange.url,
     startDate: updStartDate,

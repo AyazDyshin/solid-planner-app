@@ -27,10 +27,12 @@ interface Props {
   setNewEntryCr: React.Dispatch<React.SetStateAction<boolean>>;
   habitsToday: Habit[];
   setHabitsToday: React.Dispatch<React.SetStateAction<Habit[]>>;
+  categoryArray: string[];
+  setCategoryArray: React.Dispatch<React.SetStateAction<string[]>>;
 }
 const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorStatus, habitsFetched, setHabitsFetched,
   habitsArray, setHabitsArray, isEdit, setIsEdit, habitToView, setHabitToView, newEntryCr, setNewEntryCr,
-  habitsToday, setHabitsToday
+  habitsToday, setHabitsToday, categoryArray, setCategoryArray
 }: Props) => {
   const { session, fetch } = useSession();
   const { webId } = session.info;
@@ -41,7 +43,6 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
   const [currentAccess, setCurrentAccess] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [habitsToShow, setHabitsToShow] = useState<Habit[]>([]);
-  const [categoryArray, setCategoryArray] = useState<string[]>([]);
   const [activeHabit, setActiveHabit] = useState<number | null>(null);
   const [currentView, setCurrentView] = useState<string>("today");
   const accessArray = ["public", "private", "shared"];

@@ -1,13 +1,15 @@
 import { useSession } from "@inrupt/solid-ui-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Modal, Button, Form, FormControl, InputGroup, DropdownButton, Dropdown } from "react-bootstrap";
-import { Note } from "../components/types";
+import { Note, Habit } from "../components/types";
 
 interface Props {
     categoryModalState: boolean;
     setCategoryModalState: React.Dispatch<React.SetStateAction<boolean>>;
-    setNoteInp: React.Dispatch<React.SetStateAction<Note>>;
-    noteInp: Note;
+    setNoteInp?: React.Dispatch<React.SetStateAction<Note>>;
+    noteInp?: Note;
+    habitInp?: Habit;
+    setHabitInp?: React.Dispatch<React.SetStateAction<Habit>>;
     viewerStatus: boolean;
     setArrOfChanges: React.Dispatch<React.SetStateAction<string[]>>;
     categoryArray: string[];
@@ -15,15 +17,26 @@ interface Props {
 }
 //a popup window to prompt user to pick a folder
 const CategoryModal = ({ categoryModalState, setCategoryModalState, setNoteInp,
-    noteInp, viewerStatus, setArrOfChanges, categoryArray, setCategoryArray }: Props) => {
+    noteInp, viewerStatus, setArrOfChanges, categoryArray, setCategoryArray, habitInp, setHabitInp }: Props) => {
     const { session } = useSession();
     const { webId } = session.info;
     const [input, setInput] = useState<string>("");
+
     const handleSave = () => {
-        if (noteInp.category !== input.trim()) {
-            if (viewerStatus) setArrOfChanges((prevState) => ([...prevState, "category"]));
-            setNoteInp({ ...noteInp, category: input.trim() });
-            setInput("");
+        console.log(habitInp);
+        if (noteInp && setNoteInp) {
+            if (noteInp.category !== input.trim()) {
+                if (viewerStatus) setArrOfChanges((prevState) => ([...prevState, "category"]));
+                setNoteInp({ ...noteInp, category: input.trim() });
+                setInput("");
+            }
+        }
+        else if (habitInp && setHabitInp) {
+            if (habitInp.category !== input.trim()) {
+                if (viewerStatus) setArrOfChanges((prevState) => ([...prevState, "category"]));
+                setHabitInp({ ...habitInp, category: input.trim() });
+                setInput("");
+            }
         }
         setCategoryModalState(false);
     }
@@ -54,7 +67,7 @@ const CategoryModal = ({ categoryModalState, setCategoryModalState, setNoteInp,
                     <InputGroup.Text>
                         Or enter new:
                     </InputGroup.Text>
-                    <FormControl  aria-describedby="basic-addon3" value={input} onChange={e => setInput(e.target.value)} />
+                    <FormControl aria-describedby="basic-addon3" value={input} onChange={e => setInput(e.target.value)} />
                 </InputGroup>
             </Modal.Body>
             <Modal.Footer>

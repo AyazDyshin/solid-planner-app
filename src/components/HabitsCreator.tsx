@@ -15,6 +15,7 @@ import { useSession } from "@inrupt/solid-ui-react";
 import { constructDate } from "../services/helpers";
 import AccessModal from "../modals/AccessModal";
 import CustomHabitModal from "../modals/CustomHabitModal";
+import CategoryModal from "../modals/CategoryModal";
 
 interface Props {
   habitInp: Habit;
@@ -47,10 +48,12 @@ interface Props {
   setAgentsToUpd: React.Dispatch<React.SetStateAction<{
     [x: string]: AccessModes;
   }>>;
+  categoryArray: string[];
+  setCategoryArray: React.Dispatch<React.SetStateAction<string[]>>;
 }
 const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, isEdit, setIsEdit, creatorStatus, setCreatorStatus,
   viewerStatus, setViewerStatus, habitToView, setHabitToView, habitsArray, setHabitsArray, newEntryCr, setNewEntryCr,
-  accUpdObj, setAccUpdObj, publicAccess, setPublicAccess, agentsToUpd, setAgentsToUpd
+  accUpdObj, setAccUpdObj, publicAccess, setPublicAccess, agentsToUpd, setAgentsToUpd, categoryArray, setCategoryArray
 }: Props) => {
   const { session, fetch } = useSession();
   const { webId } = session.info;
@@ -58,7 +61,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
     throw new Error("error when trying to get webId");
   }
   const [customHabitModalState, setCustomHabitModalState] = useState<boolean>(false);
-
+  const [categoryModalState, setCategoryModalState] = useState<boolean>(false);
   useEffect(() => {
     if (arrOfChanges.length !== 0) {
       handleSave();
@@ -194,7 +197,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
             id="input-group-dropdown-1"
           >
             {viewerStatus && <Dropdown.Item onClick={handleEdit}><FiEdit /> edit</Dropdown.Item>}
-            <Dropdown.Item href="" >
+            <Dropdown.Item onClick={() => (setCategoryModalState(true))}>
               <BiFolderPlus /> set category
             </Dropdown.Item>
             {viewerStatus && <Dropdown.Item href="" ><BsShare /> share</Dropdown.Item>}
@@ -280,6 +283,16 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
         setCustomHabitModalState={setCustomHabitModalState}
         habitInp={habitInp}
         setHabitInp={setHabitInp}
+      />
+      <CategoryModal
+        setArrOfChanges={setArrOfChanges}
+        categoryArray={categoryArray}
+        setCategoryArray={setCategoryArray}
+        habitInp={habitInp}
+        setHabitInp={setHabitInp}
+        viewerStatus={viewerStatus}
+        categoryModalState={categoryModalState}
+        setCategoryModalState={setCategoryModalState}
       />
       {/* <AccessModal
         agentsToUpd={agentsToUpd}

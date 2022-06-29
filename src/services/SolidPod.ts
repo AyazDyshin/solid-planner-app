@@ -470,9 +470,8 @@ export const editNote = async (webId: string, fetch: fetcher, note: Note, change
   }));
 }
 
-
-export const deleteNote = async (webId: string, fetch: fetcher, id: number) => {
-  let urlsArr = await getAllUrlFromPublicIndex(webId, fetch, "note");
+export const deleteEntry = async (webId: string, fetch: fetcher, id: number, type: string) => {
+  let urlsArr = await getAllUrlFromPublicIndex(webId, fetch, type);
   let updUrlsArr = await Promise.all(urlsArr.map(async (url) => {
     const data = await getSolidDataset(url, { fetch: fetch });
     if (isContainer(data)) {

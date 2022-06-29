@@ -168,9 +168,16 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
     }
   };
 
-  const handleDelete = () => {
-
+  const handleDelete = async () => {
+    setIsEdit(false);
+    setViewerStatus(false);
+    setCreatorStatus(false);
+    let updArr = habitsArray.filter((habit) => habit.id !== habitInp.id);
+    setHabitsArray(updArr);
+    newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
+    await deleteNote(webId ?? "", fetch, habitInp.id!, "habit");
   };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setHabitInp(prevState => ({ ...prevState, [e.target.name]: e.target.value }));
     if (!arrOfChanges.includes(e.target.name)) {

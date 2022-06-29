@@ -176,9 +176,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
         let updArr = notesArray.filter((note) => note.id !== NoteInp.id);
         setNotesArray(updArr);
         newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
-        await deleteNote(webId ?? "", fetch, NoteInp.id!);
-
-
+        await deleteNote(webId ?? "", fetch, NoteInp.id!, "note");
     }
 
     return (

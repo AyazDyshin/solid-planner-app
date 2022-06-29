@@ -70,33 +70,33 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
     const [isLoading,setIsLoading] = useState<boolean>(true);
     useEffect(() => {
         setIsLoading(true);
-        const perfSave = async () => {
-            if (doNoteSave || arrOfChanges.length !== 0) {
-                if (doNoteSave) {
-                    await saveNote(webId, fetch, NoteInp);
-                }
-                else if (arrOfChanges.length !== 0) {
-                    await editNote(webId, fetch, NoteInp, arrOfChanges);
-                }
-                if (Object.keys(accUpdObj).length !== 0) {
-                    if (accUpdObj["public"]) {
-                        await setPubAccess(webId, publicAccess, noteToView!.url, fetch);
-                    }
-                    else if (accUpdObj["agent"]) {
+        // const perfSave = async () => {
+        //     if (doNoteSave || arrOfChanges.length !== 0) {
+        //         if (doNoteSave) {
+        //             await saveNote(webId, fetch, NoteInp);
+        //         }
+        //         else if (arrOfChanges.length !== 0) {
+        //             await editNote(webId, fetch, NoteInp, arrOfChanges);
+        //         }
+        //         if (Object.keys(accUpdObj).length !== 0) {
+        //             if (accUpdObj["public"]) {
+        //                 await setPubAccess(webId, publicAccess, noteToView!.url, fetch);
+        //             }
+        //             else if (accUpdObj["agent"]) {
 
-                        for (let item in agentsToUpd) {
-                            await shareWith(webId, noteToView!.url, fetch, agentsToUpd[item], item);
+        //                 for (let item in agentsToUpd) {
+        //                     await shareWith(webId, noteToView!.url, fetch, agentsToUpd[item], item);
 
-                        }
-                    }
-                }
-                setCreatorStatus(false);
-                setNoteInp({ id: null, title: "", content: "", category: "", url: "", access: null });
-                setIsEdit(false);
-                setArrOfChanges([]);
-                setDoNoteSave(false);
-            }
-        }
+        //                 }
+        //             }
+        //         }
+        //         setCreatorStatus(false);
+        //         setNoteInp({ id: null, title: "", content: "", category: "", url: "", access: null });
+        //         setIsEdit(false);
+        //         setArrOfChanges([]);
+        //         setDoNoteSave(false);
+        //     }
+        // }
         const fetchNotes = async () => {
             let filteredNotes: Note[]
             if (!notesFetched) {

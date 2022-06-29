@@ -154,6 +154,14 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
             <DropdownButton
               className="mx-1 my-1"
               variant="secondary"
+              title={currentView}
+            >
+              <Dropdown.Item onClick={() => { setCurrentView('today') }}>today</Dropdown.Item>
+              <Dropdown.Item onClick={() => { setCurrentView('all habits') }}>all habits</Dropdown.Item>
+            </DropdownButton>
+            <DropdownButton
+              className="mx-1 my-1"
+              variant="secondary"
               title={<div><VscTypeHierarchySuper /> {currentAccess ? currentAccess : "access type"} <RiArrowDropDownLine /></div>}
             >
               {

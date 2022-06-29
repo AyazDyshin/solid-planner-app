@@ -62,6 +62,10 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
   }
   const [customHabitModalState, setCustomHabitModalState] = useState<boolean>(false);
   const [categoryModalState, setCategoryModalState] = useState<boolean>(false);
+  const [habitChanged, setHabitChanged] = useState<boolean>(false);
+  const [accessModalState, setAccessModalState] = useState<boolean>(false);
+  const [contactsList, setContactsList] = useState<{ [x: string]: AccessModes; }>({});
+
   useEffect(() => {
     if (arrOfChanges.length !== 0) {
       handleSave();
@@ -79,13 +83,6 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
     }
   }, [viewerStatus, habitToView, creatorStatus]);
 
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setHabitInp(prevState => ({ ...prevState, [e.target.name]: e.target.value }));
-    if (!arrOfChanges.includes(e.target.name)) {
-      setArrOfChanges((prevState) => ([...prevState, e.target.name]));
-    }
-  };
 
   const handleSave = async () => {
     setIsEdit(false);
@@ -107,7 +104,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
       setArrOfChanges([]);
       await saveHabit(webId, fetch, habitInp);
     }
-    else if (arrOfChanges.length !== 0 || Object.keys(accUpdObj).length !== 0) {
+    else if (arrOfChanges.length !== 0 || Object.keys(accUpdObj).length !== 0 || habitChanged) {
       let habitToUpd = habitInp;
       if (Object.keys(accUpdObj).length !== 0) {
         if (accUpdObj["public"]) {
@@ -173,8 +170,15 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
   const handleDelete = () => {
 
   };
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setHabitInp(prevState => ({ ...prevState, [e.target.name]: e.target.value }));
+    if (!arrOfChanges.includes(e.target.name)) {
+      setArrOfChanges((prevState) => ([...prevState, e.target.name]));
+    }
+  };
 
   const handleEdit = () => {
+    isEdit ? setIsEdit(false) : setIsEdit(true);
 
   };
 
@@ -200,7 +204,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
             <Dropdown.Item onClick={() => (setCategoryModalState(true))}>
               <BiFolderPlus /> set category
             </Dropdown.Item>
-            {viewerStatus && <Dropdown.Item href="" ><BsShare /> share</Dropdown.Item>}
+            {viewerStatus && <Dropdown.Item onClick={() => { setAccessModalState(true) }} ><BsShare /> share</Dropdown.Item>}
             {viewerStatus && habitInp.shareList &&
               <Dropdown.Item href="" >
                 <RiUserSharedLine /> shared list
@@ -226,22 +230,27 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
                 <Dropdown.Item onClick={() => {
                   setHabitInp(prevState => ({ ...prevState, recurrence: 'daily' }));
                   setHabitInp(prevState => ({ ...prevState, custom: null }));
+                  setHabitChanged(true);
                 }}>daily</Dropdown.Item>
                 <Dropdown.Item onClick={() => {
                   setHabitInp(prevState => ({ ...prevState, recurrence: 'weekly' }));
                   setHabitInp(prevState => ({ ...prevState, custom: null }));
+                  setHabitChanged(true);
                 }}>weekly</Dropdown.Item>
                 <Dropdown.Item onClick={() => {
                   setHabitInp(prevState => ({ ...prevState, recurrence: 'monthly' }));
                   setHabitInp(prevState => ({ ...prevState, custom: null }));
+                  setHabitChanged(true);
                 }}>monthly</Dropdown.Item>
                 <Dropdown.Item onClick={() => {
                   setHabitInp(prevState => ({ ...prevState, recurrence: 'yearly' }));
                   setHabitInp(prevState => ({ ...prevState, custom: null }));
+                  setHabitChanged(true);
                 }}>yearly</Dropdown.Item>
                 <Dropdown.Item onClick={() => {
                   setHabitInp(prevState => ({ ...prevState, recurrence: 'custom' }))
                   setCustomHabitModalState(true);
+                  setHabitChanged(true);
                 }}>custom</Dropdown.Item>
               </DropdownButton>
             </div>
@@ -256,6 +265,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
               <input className="form-check-input" type="checkbox" style={{ "transform": "scale(1.6)", "marginLeft": "-0.5em" }}
                 onChange={() => {
                   setHabitInp((prevState) => ({ ...prevState, status: !habitInp.status }));
+                  setHabitChanged(true);
                 }}
                 checked={habitInp.status}
                 role="switch" id="flexSwitchCheckDefault" />
@@ -263,11 +273,15 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
           </InputGroup>}
           {viewerStatus && <InputGroup className="w-100">
             <InputGroup.Text className="text-center" id="basic-addon1" style={{ 'width': '50%' }}>Current streak:</InputGroup.Text>
-            <InputGroup.Text className="text-center" id="basic-addon1" style={{ 'width': '50%' }}>{constructDate(habitInp.startDate)}</InputGroup.Text>
+            <InputGroup.Text className="text-center" id="basic-addon1" style={{ 'width': '50%' }}>
+              {habitInp.currentStreak ? habitInp.currentStreak : "0"}
+            </InputGroup.Text>
           </InputGroup>}
           {viewerStatus && <InputGroup className="w-100">
             <InputGroup.Text className="text-center" id="basic-addon1" style={{ 'width': '50%' }}>Best streak:</InputGroup.Text>
-            <InputGroup.Text className="text-center" id="basic-addon1" style={{ 'width': '50%' }}>{constructDate(habitInp.startDate)}</InputGroup.Text>
+            <InputGroup.Text className="text-center" id="basic-addon1" style={{ 'width': '50%' }}>
+              {habitInp.bestStreak ? habitInp.bestStreak : "0"}
+            </InputGroup.Text>
           </InputGroup>}
         </div>
         <FormControl {...(!isEdit && { disabled: true })} as="textarea" aria-label="textarea"
@@ -294,25 +308,21 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
         categoryModalState={categoryModalState}
         setCategoryModalState={setCategoryModalState}
       />
-      {/* <AccessModal
+      <AccessModal
         agentsToUpd={agentsToUpd}
         setAgentsToUpd={setAgentsToUpd}
         accUpdObj={accUpdObj}
-        setAccUpdObj={setAccUpdObj}
-        fullContacts={fullContacts}
-        setFullContacts={setFullContacts}
-        publicAccess={publicAccess}
-        setPublicAccess={setPublicAccess}
         contactsList={contactsList}
         setContactsList={setContactsList}
-        sharedList={sharedList}
-        setSharedList={setSharedList}
+        setAccUpdObj={setAccUpdObj}
+        publicAccess={publicAccess}
+        setPublicAccess={setPublicAccess}
         accessModalState={accessModalState}
         setAccessModalState={setAccessModalState}
         setHabitInp={setHabitInp}
         habitInp={habitInp}
         setArrOfChanges={setArrOfChanges}
-      /> */}
+      />
     </div>
   );
 }

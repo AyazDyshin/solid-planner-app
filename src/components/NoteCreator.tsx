@@ -36,20 +36,6 @@ interface Props {
     setArrOfChanges: React.Dispatch<React.SetStateAction<string[]>>;
     publicAccess: accessObject;
     setPublicAccess: React.Dispatch<React.SetStateAction<accessObject>>;
-    contactsList: {
-        [x: string]: AccessModes;
-    };
-    setContactsList: React.Dispatch<React.SetStateAction<{
-        [x: string]: AccessModes;
-    }>>;
-    sharedList: Record<string, AccessModes>;
-    setSharedList: React.Dispatch<React.SetStateAction<Record<string, AccessModes>>>;
-    fullContacts: {
-        [x: string]: string | null;
-    };
-    setFullContacts: React.Dispatch<React.SetStateAction<{
-        [x: string]: string | null;
-    }>>;
     accUpdObj: {
         [x: string]: boolean;
     };
@@ -70,8 +56,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
     setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit,
     setCreatorStatus, creatorStatus, categoryArray, setCategoryArray, doNoteSave, setDoNoteSave, NoteInp,
     setNoteInp, arrOfChanges, setArrOfChanges, accUpdObj, setAccUpdObj, agentsToUpd, setAgentsToUpd,
-    publicAccess, setPublicAccess, contactsList, setContactsList, sharedList, setSharedList,
-    fullContacts, setFullContacts, notesArray, setNotesArray
+    publicAccess, setPublicAccess, notesArray, setNotesArray
 }: Props) => {
 
     const { session, fetch } = useSession();
@@ -82,6 +67,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
     const [categoryModalState, setCategoryModalState] = useState<boolean>(false);
     const [accessModalState, setAccessModalState] = useState<boolean>(false);
     const [sharedModalState, setSharedModalState] = useState<boolean>(false);
+    const [contactsList, setContactsList] = useState<{ [x: string]: AccessModes; }>({});
 
     useEffect(() => {
 
@@ -104,11 +90,11 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
         if (!arrOfChanges.includes(e.target.name)) {
             setArrOfChanges((prevState) => ([...prevState, e.target.name]));
         }
-
     };
 
     const handleSave = async () => {
         setIsEdit(false);
+        setViewerStatus(false);
         if (creatorStatus) {
             setCreatorStatus(false);
             let newNote = { ...NoteInp, id: Date.now() + Math.floor(Math.random() * 1000), access: { "private": { read: false, append: false, write: false } } }
@@ -214,12 +200,12 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
                         id="input-group-dropdown-1"
                     >
                         {viewerStatus && <Dropdown.Item onClick={handleEdit}><FiEdit /> edit</Dropdown.Item>}
-                        <Dropdown.Item href="" onClick={() => (setCategoryModalState(true))}>
+                        <Dropdown.Item onClick={() => (setCategoryModalState(true))}>
                             <BiFolderPlus /> set category
                         </Dropdown.Item>
-                        {viewerStatus && <Dropdown.Item href="" onClick={() => (setAccessModalState(true))}><BsShare /> share</Dropdown.Item>}
+                        {viewerStatus && <Dropdown.Item onClick={() => (setAccessModalState(true))}><BsShare /> share</Dropdown.Item>}
                         {viewerStatus && noteToView?.shareList &&
-                            <Dropdown.Item href="" onClick={() => (setSharedModalState(true))}>
+                            <Dropdown.Item onClick={() => (setSharedModalState(true))}>
                                 <RiUserSharedLine /> shared list
                             </Dropdown.Item>}
                         {viewerStatus && <Dropdown.Item onClick={handleDelete}
@@ -249,14 +235,10 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
                 setAgentsToUpd={setAgentsToUpd}
                 accUpdObj={accUpdObj}
                 setAccUpdObj={setAccUpdObj}
-                fullContacts={fullContacts}
-                setFullContacts={setFullContacts}
                 publicAccess={publicAccess}
                 setPublicAccess={setPublicAccess}
                 contactsList={contactsList}
                 setContactsList={setContactsList}
-                sharedList={sharedList}
-                setSharedList={setSharedList}
                 accessModalState={accessModalState}
                 setAccessModalState={setAccessModalState}
                 setNoteInp={setNoteInp}
@@ -268,8 +250,6 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
                 setAgentsToUpd={setAgentsToUpd}
                 accUpdObj={accUpdObj}
                 setAccUpdObj={setAccUpdObj}
-                sharedList={sharedList}
-                setSharedList={setSharedList}
                 publicAccess={publicAccess}
                 setPublicAccess={setPublicAccess}
                 noteToView={noteToView}

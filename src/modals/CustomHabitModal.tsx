@@ -126,8 +126,9 @@ const CustomHabitModal = ({ customHabitModalState, setCustomHabitModalState, hab
 
                 <Collapse in={dayOpen}>
                     <InputGroup>
-                        <InputGroup.Text>First and last name</InputGroup.Text>
+                        <InputGroup.Text>every</InputGroup.Text>
                         <Form.Control type="number" min="1" value={numberOfDays} onChange={e => setNumberOfDays(e.target.value)} />
+                        <InputGroup.Text>days</InputGroup.Text>
                     </InputGroup>
                 </Collapse>
 

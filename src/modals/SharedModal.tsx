@@ -19,8 +19,6 @@ interface Props {
     setNoteToView: React.Dispatch<React.SetStateAction<Note | null>>;
     publicAccess: accessObject;
     setPublicAccess: React.Dispatch<React.SetStateAction<accessObject>>;
-    sharedList: Record<string, AccessModes>;
-    setSharedList: React.Dispatch<React.SetStateAction<Record<string, AccessModes>>>;
     accUpdObj: {
         [x: string]: boolean;
     };
@@ -37,14 +35,14 @@ interface Props {
 //a popup window to prompt user to pick a folder
 const SharedModal = ({ sharedModalState, setSharedModalState, setNoteInp,
     NoteInp, viewerStatus, setArrOfChanges, categoryArray, setCategoryArray, noteToView, setNoteToView, publicAccess,
-    accUpdObj, setAccUpdObj, agentsToUpd, setAgentsToUpd,
-    setPublicAccess, sharedList, setSharedList }: Props) => {
+    accUpdObj, setAccUpdObj, agentsToUpd, setAgentsToUpd, setPublicAccess }: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
     if (!webId) {
         throw new Error("couldn't get your webId");
     }
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [sharedList, setSharedList] = useState<Record<string, AccessModes>>({});
 
     useEffect(() => {
         const fetchAccess = async () => {

@@ -24,14 +24,6 @@ interface Props {
     setContactsList: React.Dispatch<React.SetStateAction<{
         [x: string]: AccessModes;
     }>>;
-    sharedList: Record<string, AccessModes>;
-    setSharedList: React.Dispatch<React.SetStateAction<Record<string, AccessModes>>>;
-    fullContacts: {
-        [x: string]: string | null;
-    };
-    setFullContacts: React.Dispatch<React.SetStateAction<{
-        [x: string]: string | null;
-    }>>;
     accUpdObj: {
         [x: string]: boolean;
     };
@@ -49,7 +41,7 @@ interface Props {
 }
 //a popup window to prompt user to set access type
 const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, setNoteInp, contactsList, setContactsList, accUpdObj, setAccUpdObj,
-    setArrOfChanges, publicAccess, setPublicAccess, sharedList, setSharedList, fullContacts, setFullContacts, habitInp, setHabitInp,
+    setArrOfChanges, publicAccess, setPublicAccess, habitInp, setHabitInp,
     agentsToUpd, setAgentsToUpd }: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
@@ -66,6 +58,8 @@ const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, setNoteIn
     const [webIdReady, setWebIdReady] = useState<boolean>(false);
     const [workingWebId, setWorkingWebId] = useState<string>("");
     const [webIdToSave, setWebIdToSave] = useState<{ [x: string]: AccessModes; }>({});
+    const [fullContacts, setFullContacts] = useState<{ [x: string]: string | null; }>({});
+    const [sharedList, setSharedList] = useState<Record<string, AccessModes>>({});
 
     useEffect(() => {
         const fetchAccess = async () => {

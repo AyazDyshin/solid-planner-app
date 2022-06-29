@@ -2,7 +2,6 @@ import { useSession } from "@inrupt/solid-ui-react";
 import { useState } from "react";
 import { Modal, Button, Form, FormControl, InputGroup, DropdownButton, Dropdown } from "react-bootstrap";
 import { Note } from "../components/types";
-import { modifyWebId } from "../services/SolidPod";
 
 interface Props {
     categoryModalState: boolean;
@@ -24,6 +23,7 @@ const CategoryModal = ({ categoryModalState, setCategoryModalState, setNoteInp,
         if (noteInp.category !== input.trim()) {
             if (viewerStatus) setArrOfChanges((prevState) => ([...prevState, "category"]));
             setNoteInp({ ...noteInp, category: input.trim() });
+            setInput("");
         }
         setCategoryModalState(false);
     }

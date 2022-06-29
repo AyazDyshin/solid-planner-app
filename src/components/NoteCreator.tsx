@@ -109,8 +109,6 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
 
     const handleSave = async () => {
         setIsEdit(false);
-        setViewerStatus(false);
-        //setDoNoteSave(true);
         if (creatorStatus) {
             setCreatorStatus(false);
             let newNote = { ...NoteInp, id: Date.now() + Math.floor(Math.random() * 1000), access: { "private": { read: false, append: false, write: false } } }
@@ -219,7 +217,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
                         <Dropdown.Item href="" onClick={() => (setCategoryModalState(true))}>
                             <BiFolderPlus /> set category
                         </Dropdown.Item>
-                        <Dropdown.Item href="" onClick={() => (setAccessModalState(true))}><BsShare /> share</Dropdown.Item>
+                        {viewerStatus && <Dropdown.Item href="" onClick={() => (setAccessModalState(true))}><BsShare /> share</Dropdown.Item>}
                         {viewerStatus && noteToView?.shareList &&
                             <Dropdown.Item href="" onClick={() => (setSharedModalState(true))}>
                                 <RiUserSharedLine /> shared list
@@ -264,9 +262,6 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
                 setNoteInp={setNoteInp}
                 NoteInp={NoteInp}
                 setArrOfChanges={setArrOfChanges}
-                viewerStatus={viewerStatus}
-                noteToView={noteToView}
-                setNoteToView={setNoteToView}
             />
             <SharedModal
                 agentsToUpd={agentsToUpd}

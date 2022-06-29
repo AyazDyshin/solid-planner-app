@@ -19,6 +19,7 @@ const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsA
     const [accUpdObj, setAccUpdObj] = useState<{ [x: string]: boolean; }>({});
     const [publicAccess, setPublicAccess] = useState<accessObject>({ read: false, append: false, write: false });
     const [agentsToUpd, setAgentsToUpd] = useState<{ [x: string]: AccessModes; }>({});
+    const [habitsToday, setHabitsToday] = useState<Habit[]>([]);
     const [habitInp, setHabitInp] = useState<Habit>({
         id: null, title: "", content: "", startDate: null, lastCheckInDate: null, recurrence: "daily", bestStreak: null,
         currentStreak: null, status: false, category: "", url: "", access: null
@@ -30,6 +31,8 @@ const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsA
             <div className="row h-100">
                 <div className="col h-100 border border-5 border-end-0 d-flex justify-content-center align-items-center p-0">
                     <HabitsList
+                        habitsToday={habitsToday}
+                        setHabitsToday={setHabitsToday}
                         newEntryCr={newEntryCr}
                         setNewEntryCr={setNewEntryCr}
                         habitToView={habitToView}

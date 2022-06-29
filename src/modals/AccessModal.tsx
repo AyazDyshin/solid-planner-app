@@ -2,7 +2,7 @@ import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import { useSession } from "@inrupt/solid-ui-react";
 import { useState, useEffect, SetStateAction } from "react";
 import { Modal, Button, Form, FormControl, InputGroup, DropdownButton, Dropdown, Collapse, Spinner } from "react-bootstrap";
-import { Note } from "../components/types";
+import { Habit, Note } from "../components/types";
 import { getPubAccess, getSharedList, setPubAccess, shareWith } from "../services/access";
 import { checkContacts, fetchContacts } from "../services/SolidPod";
 import "../styles.css";
@@ -13,12 +13,9 @@ import NoContacts from "../components/NoContacts";
 interface Props {
     accessModalState: boolean;
     setAccessModalState: React.Dispatch<React.SetStateAction<boolean>>;
-    setNoteInp: React.Dispatch<React.SetStateAction<Note>>;
-    NoteInp: Note;
-    viewerStatus: boolean;
+    setNoteInp?: React.Dispatch<React.SetStateAction<Note>>;
+    NoteInp?: Note;
     setArrOfChanges: React.Dispatch<React.SetStateAction<string[]>>;
-    noteToView: Note | null;
-    setNoteToView: React.Dispatch<React.SetStateAction<Note | null>>;
     publicAccess: accessObject;
     setPublicAccess: React.Dispatch<React.SetStateAction<accessObject>>;
     contactsList: {
@@ -47,11 +44,13 @@ interface Props {
     setAgentsToUpd: React.Dispatch<React.SetStateAction<{
         [x: string]: AccessModes;
     }>>;
+    habitInp?: Habit;
+    setHabitInp?: React.Dispatch<React.SetStateAction<Habit>>;
 }
 //a popup window to prompt user to set access type
-const AccessModal = ({ accessModalState, setAccessModalState, setNoteInp, contactsList, setContactsList, accUpdObj, setAccUpdObj,
-    NoteInp, viewerStatus, setArrOfChanges, noteToView, setNoteToView, publicAccess, setPublicAccess,
-    sharedList, setSharedList, fullContacts, setFullContacts, agentsToUpd, setAgentsToUpd }: Props) => {
+const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, setNoteInp, contactsList, setContactsList, accUpdObj, setAccUpdObj,
+    setArrOfChanges, publicAccess, setPublicAccess, sharedList, setSharedList, fullContacts, setFullContacts, habitInp, setHabitInp,
+    agentsToUpd, setAgentsToUpd }: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
     if (!webId) {
@@ -77,12 +76,13 @@ const AccessModal = ({ accessModalState, setAccessModalState, setNoteInp, contac
             setContactsOpen(false);
             setWebIdOpen(false);
             //handle
-            let key = Object.keys(NoteInp!.access!)[0];
-            let pubAccess = NoteInp!.access![key];
+            let inputToUse = NoteInp ? NoteInp : habitInp;
+            let key = Object.keys(inputToUse!.access!)[0];
+            let pubAccess = inputToUse!.access![key];
             setPublicAccess({ read: pubAccess.read, append: pubAccess.append, write: pubAccess.write });
             //let shList = await getSharedList(webId, noteToView!.url, fetch);
             let shList: Record<string, AccessModes>;
-            if (NoteInp!.shareList) shList = NoteInp!.shareList;
+            if (inputToUse!.shareList) shList = inputToUse!.shareList;
             else shList = {};
             setSharedList(shList);
             let contactsStatus = await checkContacts(webId, fetch);

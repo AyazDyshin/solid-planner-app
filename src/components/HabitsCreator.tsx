@@ -6,13 +6,16 @@ import { FiEdit } from "react-icons/fi";
 import { RiDeleteBin6Line, RiUserSharedLine } from "react-icons/ri";
 import { BiFolderPlus } from "react-icons/bi";
 import { MdSaveAlt } from "react-icons/md";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import { publicAccess } from "rdf-namespaces/dist/schema";
 import { setPubAccess, shareWith } from "../services/access";
 import { saveHabit, editNote } from "../services/SolidPod";
 import { useSession } from "@inrupt/solid-ui-react";
 import { constructDate } from "../services/helpers";
+import AccessModal from "../modals/AccessModal";
+import CustomHabitModal from "../modals/CustomHabitModal";
+
 interface Props {
   habitInp: Habit;
   setHabitInp: React.Dispatch<React.SetStateAction<Habit>>;
@@ -54,6 +57,8 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
   if (webId === undefined) {
     throw new Error("error when trying to get webId");
   }
+  const [customHabitModalState, setCustomHabitModalState] = useState<boolean>(false);
+
   useEffect(() => {
     if (arrOfChanges.length !== 0) {
       handleSave();
@@ -192,7 +197,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
             <Dropdown.Item href="" >
               <BiFolderPlus /> set category
             </Dropdown.Item>
-            <Dropdown.Item href="" ><BsShare /> share</Dropdown.Item>
+            {viewerStatus && <Dropdown.Item href="" ><BsShare /> share</Dropdown.Item>}
             {viewerStatus && habitInp.shareList &&
               <Dropdown.Item href="" >
                 <RiUserSharedLine /> shared list
@@ -207,17 +212,34 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
       <div className="d-flex">
         <div className="d-flex-column w-50">
           <InputGroup className="w-100">
-            <InputGroup.Text id="basic-addon1" style={{ 'width': '50%' }}>{habitInp.recurrence}</InputGroup.Text>
+            <InputGroup.Text id="basic-addon1" style={{ 'width': '50%' }}>repeat</InputGroup.Text>
             <div className="d-grid">
               <DropdownButton
                 variant="outline-secondary"
-                title="repeat"
+                title={habitInp.recurrence}
                 id="input-group-dropdown-1"
                 className="w-100"
               >
-                <Dropdown.Item href="#">Daily</Dropdown.Item>
-                <Dropdown.Item href="#">Weekly</Dropdown.Item>
-                <Dropdown.Item href="#">Custom</Dropdown.Item>
+                <Dropdown.Item onClick={() => {
+                  setHabitInp(prevState => ({ ...prevState, recurrence: 'daily' }));
+                  setHabitInp(prevState => ({ ...prevState, custom: null }));
+                }}>daily</Dropdown.Item>
+                <Dropdown.Item onClick={() => {
+                  setHabitInp(prevState => ({ ...prevState, recurrence: 'weekly' }));
+                  setHabitInp(prevState => ({ ...prevState, custom: null }));
+                }}>weekly</Dropdown.Item>
+                <Dropdown.Item onClick={() => {
+                  setHabitInp(prevState => ({ ...prevState, recurrence: 'monthly' }));
+                  setHabitInp(prevState => ({ ...prevState, custom: null }));
+                }}>monthly</Dropdown.Item>
+                <Dropdown.Item onClick={() => {
+                  setHabitInp(prevState => ({ ...prevState, recurrence: 'yearly' }));
+                  setHabitInp(prevState => ({ ...prevState, custom: null }));
+                }}>yearly</Dropdown.Item>
+                <Dropdown.Item onClick={() => {
+                  setHabitInp(prevState => ({ ...prevState, recurrence: 'custom' }))
+                  setCustomHabitModalState(true);
+                }}>custom</Dropdown.Item>
               </DropdownButton>
             </div>
           </InputGroup>
@@ -253,6 +275,31 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
           onChange={handleChange}
         />
       </div>
+      <CustomHabitModal
+        customHabitModalState={customHabitModalState}
+        setCustomHabitModalState={setCustomHabitModalState}
+        habitInp={habitInp}
+        setHabitInp={setHabitInp}
+      />
+      {/* <AccessModal
+        agentsToUpd={agentsToUpd}
+        setAgentsToUpd={setAgentsToUpd}
+        accUpdObj={accUpdObj}
+        setAccUpdObj={setAccUpdObj}
+        fullContacts={fullContacts}
+        setFullContacts={setFullContacts}
+        publicAccess={publicAccess}
+        setPublicAccess={setPublicAccess}
+        contactsList={contactsList}
+        setContactsList={setContactsList}
+        sharedList={sharedList}
+        setSharedList={setSharedList}
+        accessModalState={accessModalState}
+        setAccessModalState={setAccessModalState}
+        setHabitInp={setHabitInp}
+        habitInp={habitInp}
+        setArrOfChanges={setArrOfChanges}
+      /> */}
     </div>
   );
 }

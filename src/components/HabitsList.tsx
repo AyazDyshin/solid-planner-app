@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { fetchAllEntries, thingToHabit } from '../services/SolidPod';
 import { BsPlusLg } from "react-icons/bs";
 import { Habit } from './types';
-import { extractCategories, filterByAccess, filterByCategory } from '../services/helpers';
+import { extractCategories, filterByAccess, filterByCategory, getHabitsToday } from '../services/helpers';
 import { DropdownButton, Dropdown, OverlayTrigger, Popover, Badge, Spinner } from 'react-bootstrap';
 import { BiFolder } from 'react-icons/bi';
 import { GoPrimitiveDot, GoCheck, GoX } from 'react-icons/go';
@@ -25,9 +25,13 @@ interface Props {
   setHabitToView: React.Dispatch<React.SetStateAction<Habit | null>>;
   newEntryCr: boolean;
   setNewEntryCr: React.Dispatch<React.SetStateAction<boolean>>;
+  habitsToday: Habit[];
+  setHabitsToday: React.Dispatch<React.SetStateAction<Habit[]>>;
 }
 const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorStatus, habitsFetched, setHabitsFetched,
-  habitsArray, setHabitsArray, isEdit, setIsEdit, habitToView, setHabitToView, newEntryCr, setNewEntryCr }: Props) => {
+  habitsArray, setHabitsArray, isEdit, setIsEdit, habitToView, setHabitToView, newEntryCr, setNewEntryCr,
+  habitsToday, setHabitsToday
+}: Props) => {
   const { session, fetch } = useSession();
   const { webId } = session.info;
   if (webId === undefined) {
@@ -39,7 +43,7 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
   const [habitsToShow, setHabitsToShow] = useState<Habit[]>([]);
   const [categoryArray, setCategoryArray] = useState<string[]>([]);
   const [activeHabit, setActiveHabit] = useState<number | null>(null);
-
+  const [currentView, setCurrentView] = useState<string>("today");
   const accessArray = ["public", "private", "shared"];
   useEffect(() => {
 
@@ -93,6 +97,18 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
       if (currentCategory || currentAccess) {
         if (currentCategory) filteredHabits = filterByCategory(filteredHabits, currentCategory);
         if (currentAccess) filteredHabits = filterByAccess(filteredHabits, currentAccess);
+
+        if (currentView === 'today') {
+          filteredHabits = getHabitsToday(filteredHabits);
+          let temp = habitsArray;
+          filteredHabits.forEach((habit) => {
+            temp.map((habit2) => {
+              if (habit.id === habit2.id) habit2.status = habit.status;
+              return habit2;
+            });
+          });
+          setHabitsArray(temp);
+        }
       }
       setHabitsToShow(filteredHabits);
       setIsLoading(false);
@@ -101,7 +117,7 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
 
     fetchNotes();
 
-  }, [newEntryCr, currentCategory, currentAccess]);
+  }, [newEntryCr, currentCategory, currentAccess, currentView]);
   const handleCreate = () => {
     setViewerStatus(false);
     setCreatorStatus(true);

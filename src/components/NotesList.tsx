@@ -46,13 +46,10 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, notes
 
 
   const handleCreate = () => {
-    if (isEdit) {
-      setSaveModalState(true);
-    }
-    else {
-      setViewerStatus(false);
-      setCreatorStatus(true);
-    }
+
+    setViewerStatus(false);
+    setCreatorStatus(true);
+
   }
 
 
@@ -117,15 +114,12 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, notes
                   key={`${note.id}${Date.now() + Math.floor(Math.random() * 1000)}`}
                   className={`list-group-item px-1 list-group-item-action ${activeNote === note.id ? 'active' : ''}`}
                   onClick={(e) => {
-                    console.log(viewerStatus);
-                    //console.log(note);
                     e.preventDefault();
                     setIsEdit(false);
                     setActiveNote(note.id);
                     setNoteToView(note);
                     setViewerStatus(true);
                     setCreatorStatus(false);
-                    console.log(viewerStatus);
                   }}
                 >
                   <div style={{ display: "inline-block" }}>

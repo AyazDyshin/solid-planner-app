@@ -11,6 +11,24 @@ export const modifyWebId = (webId: string): string => {
     const updArr = [...arr.slice(0, 3)];
     return `${updArr.join("/")}/`;
 }
+export const getNumberFromDay = (day: string) => {
+    switch (day) {
+        case "monday":
+            return 0;
+        case "tuesday":
+            return 1;
+        case "wednesday":
+            return 2;
+        case "thursday":
+            return 3;
+        case "friday":
+            return 4;
+        case "saturday":
+            return 5;
+        case "sunday":
+            return 6;
+    }
+}
 
 export const getHabitsToday = (allHabits: Habit[]) => {
     let today = new Date();
@@ -72,6 +90,9 @@ export const getHabitsToday = (allHabits: Habit[]) => {
                 }
             }
         }
+    }).map((habit) => {
+        habit.status = false;
+        return habit;
     });
     return habitsToday;
 }

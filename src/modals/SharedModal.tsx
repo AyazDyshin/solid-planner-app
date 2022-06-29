@@ -2,21 +2,21 @@ import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import { useSession } from "@inrupt/solid-ui-react";
 import { useEffect, useState } from "react";
 import { Modal, Button, Form, FormControl, InputGroup, DropdownButton, Dropdown, Spinner } from "react-bootstrap";
-import { accessObject, Note } from "../components/types";
+import { accessObject, Note, Habit } from "../components/types";
 import { getPubAccess, getSharedList } from "../services/access";
 import AccessElement from "./AccessElement";
 
 interface Props {
     sharedModalState: boolean;
     setSharedModalState: React.Dispatch<React.SetStateAction<boolean>>;
-    setNoteInp: React.Dispatch<React.SetStateAction<Note>>;
-    NoteInp: Note;
+    setNoteInp?: React.Dispatch<React.SetStateAction<Note>>;
+    NoteInp?: Note;
+    setHabitInp?: React.Dispatch<React.SetStateAction<Habit>>;
+    habitInp?: Habit;
     viewerStatus: boolean;
     setArrOfChanges: React.Dispatch<React.SetStateAction<string[]>>;
     categoryArray: string[];
     setCategoryArray: React.Dispatch<React.SetStateAction<string[]>>;
-    noteToView: Note | null;
-    setNoteToView: React.Dispatch<React.SetStateAction<Note | null>>;
     publicAccess: accessObject;
     setPublicAccess: React.Dispatch<React.SetStateAction<accessObject>>;
     accUpdObj: {
@@ -34,8 +34,8 @@ interface Props {
 }
 //a popup window to prompt user to pick a folder
 const SharedModal = ({ sharedModalState, setSharedModalState, setNoteInp,
-    NoteInp, viewerStatus, setArrOfChanges, categoryArray, setCategoryArray, noteToView, setNoteToView, publicAccess,
-    accUpdObj, setAccUpdObj, agentsToUpd, setAgentsToUpd, setPublicAccess }: Props) => {
+    NoteInp, viewerStatus, setArrOfChanges, categoryArray, setCategoryArray, publicAccess,
+    accUpdObj, setAccUpdObj, agentsToUpd, setAgentsToUpd, setPublicAccess, habitInp, setHabitInp }: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
     if (!webId) {
@@ -46,13 +46,14 @@ const SharedModal = ({ sharedModalState, setSharedModalState, setNoteInp,
 
     useEffect(() => {
         const fetchAccess = async () => {
-
             setIsLoading(true);
+            let inputToUse = NoteInp ? NoteInp : habitInp;
+
             //handle
-            let key = Object.keys(NoteInp!.access!)[0];
-            let pubAccess = NoteInp!.access![key];
+            let key = Object.keys(inputToUse!.access!)[0];
+            let pubAccess = inputToUse!.access![key];
             setPublicAccess({ read: pubAccess.read, append: pubAccess.append, write: pubAccess.write });
-            if (NoteInp!.shareList) setSharedList(NoteInp!.shareList);
+            if (inputToUse!.shareList) setSharedList(inputToUse!.shareList);
             else setSharedList({});
 
             setIsLoading(false);

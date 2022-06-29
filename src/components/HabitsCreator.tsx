@@ -16,6 +16,7 @@ import { constructDate } from "../services/helpers";
 import AccessModal from "../modals/AccessModal";
 import CustomHabitModal from "../modals/CustomHabitModal";
 import CategoryModal from "../modals/CategoryModal";
+import SharedModal from "../modals/SharedModal";
 
 interface Props {
   habitInp: Habit;
@@ -65,7 +66,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
   const [habitChanged, setHabitChanged] = useState<boolean>(false);
   const [accessModalState, setAccessModalState] = useState<boolean>(false);
   const [contactsList, setContactsList] = useState<{ [x: string]: AccessModes; }>({});
-
+  const [sharedModalState, setSharedModalState] = useState<boolean>(false);
   useEffect(() => {
     if (arrOfChanges.length !== 0) {
       handleSave();
@@ -206,7 +207,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
             </Dropdown.Item>
             {viewerStatus && <Dropdown.Item onClick={() => { setAccessModalState(true) }} ><BsShare /> share</Dropdown.Item>}
             {viewerStatus && habitInp.shareList &&
-              <Dropdown.Item href="" >
+              <Dropdown.Item onClick={() => (setSharedModalState(true))} >
                 <RiUserSharedLine /> shared list
               </Dropdown.Item>}
             {viewerStatus && <Dropdown.Item onClick={handleDelete}
@@ -226,6 +227,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
                 title={habitInp.recurrence}
                 id="input-group-dropdown-1"
                 className="w-100"
+                {...(!isEdit && { disabled: true })}
               >
                 <Dropdown.Item onClick={() => {
                   setHabitInp(prevState => ({ ...prevState, recurrence: 'daily' }));
@@ -256,13 +258,15 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
             </div>
           </InputGroup>
           {viewerStatus && <InputGroup className="w-100">
-            <InputGroup.Text className="text-center" id="basic-addon1" style={{ 'width': '50%' }}>Date Created:</InputGroup.Text>
-            <InputGroup.Text className="text-center" id="basic-addon1" style={{ 'width': '50%' }}>{constructDate(habitInp.startDate)}</InputGroup.Text>
+            <InputGroup.Text  {...(!isEdit && { disabled: true })}
+              className="text-center" id="basic-addon1" style={{ 'width': '50%' }}>Date Created:</InputGroup.Text>
+            <InputGroup.Text style={{ 'width': '50%' }}>
+              {habitInp.startDate ? constructDate(habitInp.startDate) : constructDate(new Date())}</InputGroup.Text>
           </InputGroup>}
           {viewerStatus && <InputGroup className="w-100">
             <InputGroup.Text className="text-center" id="basic-addon1" style={{ 'width': '50%' }}>Status:</InputGroup.Text>
-            <div className="form-check form-switch d-flex justify-content-center align-items-center">
-              <input className="form-check-input" type="checkbox" style={{ "transform": "scale(1.6)", "marginLeft": "-0.5em" }}
+            <div className="form-check form-switch d-flex justify-content-center align-items-center disabled">
+              <input className="form-check-input" {...(!isEdit && { disabled: true })} type="checkbox" style={{ "transform": "scale(1.6)", "marginLeft": "-0.5em" }}
                 onChange={() => {
                   setHabitInp((prevState) => ({ ...prevState, status: !habitInp.status }));
                   setHabitChanged(true);
@@ -322,6 +326,23 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
         setHabitInp={setHabitInp}
         habitInp={habitInp}
         setArrOfChanges={setArrOfChanges}
+      />
+
+      <SharedModal
+        agentsToUpd={agentsToUpd}
+        setAgentsToUpd={setAgentsToUpd}
+        accUpdObj={accUpdObj}
+        setAccUpdObj={setAccUpdObj}
+        publicAccess={publicAccess}
+        setPublicAccess={setPublicAccess}
+        sharedModalState={sharedModalState}
+        setSharedModalState={setSharedModalState}
+        setHabitInp={setHabitInp}
+        habitInp={habitInp}
+        setArrOfChanges={setArrOfChanges}
+        viewerStatus={viewerStatus}
+        categoryArray={categoryArray}
+        setCategoryArray={setCategoryArray}
       />
     </div>
   );

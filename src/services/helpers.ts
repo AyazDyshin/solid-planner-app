@@ -37,8 +37,9 @@ export const getHabitsToday = (allHabits: Habit[]) => {
             if (habit.recurrence === "custom") {
                 if (typeof habit.custom === 'number') {
                     let dateToCheck = habit.lastCheckInDate ? habit.lastCheckInDate : habit.startDate;
+                    let updDate =  dateToCheck ? dateToCheck : new Date();
                     //handle?
-                    if (isSameDay(dateToCheck!, today) || differenceInDays(today, habit.lastCheckInDate!) === habit.custom) {
+                    if (isSameDay(updDate, today) || differenceInDays(today, habit.lastCheckInDate!) === habit.custom) {
                         return true;
                     }
                 }
@@ -56,26 +57,29 @@ export const getHabitsToday = (allHabits: Habit[]) => {
             }
         }
         else {
+            let toCheckDate = habit.lastCheckInDate ? habit.lastCheckInDate : habit.startDate;
+            let updDate = toCheckDate ? toCheckDate : new Date();
             switch (habit.recurrence) {
                 case "daily": {
                     //handle
-                    if (!isSameDay(habit.lastCheckInDate!, today)) return true;
+                    console.log("in daily");
+                    if (!isSameDay(updDate, today)) return true;
                 }
                 case "weekly": {
-                    if (!isSameWeek(habit.lastCheckInDate!, today)) return true;
+                    if (!isSameWeek(updDate, today)) return true;
                 }
                 case "monthly": {
-                    if (!isSameMonth(habit.lastCheckInDate!, today)) return true;
+                    if (!isSameMonth(updDate, today)) return true;
                 }
                 case "yearly": {
-                    if (!isSameYear(habit.lastCheckInDate!, today)) return true;
+                    if (!isSameYear(updDate, today)) return true;
                 }
                 case "custom": {
                     if (typeof habit.custom === 'number') {
-                        if (differenceInDays(today, habit.lastCheckInDate!) >= habit.custom) return true;
+                        if (differenceInDays(today, updDate) >= habit.custom) return true;
                     }
                     else {
-                        if (!isSameDay(habit.lastCheckInDate!, today)) {
+                        if (!isSameDay(updDate, today)) {
                             let todayWeek = getDay(today);
                             let updArr = habit.custom?.filter((weekDay) => {
                                 if (weekDay === todayWeek) return true;

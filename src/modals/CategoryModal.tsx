@@ -23,7 +23,6 @@ const CategoryModal = ({ categoryModalState, setCategoryModalState, setNoteInp,
     const [input, setInput] = useState<string>("");
 
     const handleSave = () => {
-        console.log(habitInp);
         if (noteInp && setNoteInp) {
             if (noteInp.category !== input.trim()) {
                 if (viewerStatus) setArrOfChanges((prevState) => ([...prevState, "category"]));

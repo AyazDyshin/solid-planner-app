@@ -3,9 +3,7 @@ import {
   addUrl, setThing, saveSolidDatasetAt, createContainerAt, Thing, getInteger,
   getStringNoLocale, removeThing, getContainedResourceUrlAll, deleteSolidDataset,
   setStringNoLocale, addStringNoLocale, isContainer, addInteger,
-  buildThing,
-  getDate,
-  getBoolean
+  buildThing, setDate, getDate, getBoolean, addBoolean
 } from '@inrupt/solid-client';
 import { DCTERMS, RDF } from '@inrupt/vocab-common-rdf';
 import { solid, schema, foaf, vcard } from 'rdf-namespaces';
@@ -340,49 +338,6 @@ export const fetchAllEntries = async (webId: string, fetch: fetcher, entry: stri
   return retValue;
 }
 
-export const saveHabit = async (webId: string, fetch: fetcher, habit: Habit) => {
-  const defFolder = await getDefaultFolder(webId, fetch);
-  const habitsFolder = `${defFolder}habits/`;
-  let dataSet = await getSolidDataset(habitsFolder, {
-    fetch: fetch
-  });
-  const id = habit.id === null ? Date.now() + Math.floor(Math.random() * 1000) : habit.id;
-  const habitUrl = `${habitsFolder}${id}.ttl`;
-  const titleUpd = habit.title === null ? "" : habit.title;
-  const contentUpd = habit.content === null ? "" : habit.content;
-  const startDate = new Date();
-
-  let newHabit = buildThing(createThing({ url: habitUrl }))
-    .addUrl(RDF.type, voc.Habit)
-    .addInteger(schema.identifier, id)
-    .addStringNoLocale(DCTERMS.title, titleUpd)
-    .addStringNoLocale(schema.text, contentUpd)
-    .addDate("http://example.org/startDate", startDate)
-    .addStringNoLocale("http://example.org/recurrence", habit.recurrence!)
-    .build();
-
-  if (habit.category) newHabit = addStringNoLocale(newHabit, otherV.category, habit.category);
-
-  if (habit.custom) {
-    let customToUpload;
-    if (typeof habit.custom === 'number') {
-      customToUpload = habit.custom.toString();
-    }
-    else {
-      customToUpload = habit.custom.join(" ");
-    }
-    newHabit = addStringNoLocale(newHabit, "http://example.org/custom", customToUpload)
-  };
-
-  dataSet = setThing(dataSet, newHabit);
-  await saveSolidDatasetAt(habitUrl, dataSet, { fetch: fetch });
-  let type = await getAccessType(webId, fetch);
-  if (type === "wac") {
-    await initializeAcl(habitUrl, fetch);
-  };
-  await setPubAccess(webId, { read: false, append: false, write: false }, habitUrl, fetch);
-  //lastCheckInDate, bestStreak, currentStreak, status
-}
 
 export const saveNote = async (webId: string, fetch: fetcher, note: Note) => {
   const defFolder = await getDefaultFolder(webId, fetch);
@@ -412,6 +367,86 @@ export const saveNote = async (webId: string, fetch: fetcher, note: Note) => {
   //let p = await getPubAccess(webId, noteUrl, fetch);
 }
 
+export const saveHabit = async (webId: string, fetch: fetcher, habit: Habit) => {
+  const defFolder = await getDefaultFolder(webId, fetch);
+  const habitsFolder = `${defFolder}habits/`;
+  let dataSet = await getSolidDataset(habitsFolder, {
+    fetch: fetch
+  });
+  const id = habit.id === null ? Date.now() + Math.floor(Math.random() * 1000) : habit.id;
+  const habitUrl = `${habitsFolder}${id}.ttl`;
+  const titleUpd = habit.title === null ? "" : habit.title;
+  const contentUpd = habit.content === null ? "" : habit.content;
+  const startDate = new Date();
+
+  let newHabit = buildThing(createThing({ url: habitUrl }))
+    .addUrl(RDF.type, voc.Habit)
+    .addInteger(schema.identifier, id)
+    .addStringNoLocale(DCTERMS.title, titleUpd)
+    .addStringNoLocale(schema.text, contentUpd)
+    .addDate("http://example.org/startDate", startDate)
+    .addStringNoLocale("http://example.org/recurrence", habit.recurrence ? habit.recurrence : "daily")
+    .build();
+
+  if (habit.category) newHabit = addStringNoLocale(newHabit, otherV.category, habit.category);
+
+  if (habit.custom) {
+    let customToUpload;
+    if (typeof habit.custom === 'number') {
+      customToUpload = habit.custom.toString();
+    }
+    else {
+      customToUpload = habit.custom.join(" ");
+    }
+    newHabit = addStringNoLocale(newHabit, "http://example.org/custom", customToUpload);
+  };
+  if (habit.status) {
+    newHabit = addBoolean(newHabit, "http://example.org/status", habit.status)
+  }
+  dataSet = setThing(dataSet, newHabit);
+  await saveSolidDatasetAt(habitUrl, dataSet, { fetch: fetch });
+  let type = await getAccessType(webId, fetch);
+  if (type === "wac") {
+    await initializeAcl(habitUrl, fetch);
+  };
+  await setPubAccess(webId, { read: false, append: false, write: false }, habitUrl, fetch);
+  //lastCheckInDate, bestStreak, currentStreak, status
+}
+
+export const editHabit = async (webId: string, fetch: fetcher, habitToSave: Habit) => {
+  if (!habitToSave.url || !habitToSave.id) {
+    await saveHabit(webId, fetch, habitToSave);
+    return;
+  }
+
+  let newHabit = buildThing(createThing({ url: habitToSave.url }))
+    .addUrl(RDF.type, voc.Habit)
+    .addInteger(schema.identifier, habitToSave.id)
+    .addStringNoLocale(DCTERMS.title, habitToSave.title ? habitToSave.title : "")
+    .addStringNoLocale(schema.text, habitToSave.content ? habitToSave.content : "")
+    .addDate("http://example.org/startDate", habitToSave.startDate ? habitToSave.startDate : new Date())
+    .addStringNoLocale("http://example.org/recurrence", habitToSave.recurrence ? habitToSave.recurrence : "daily")
+    .build();
+  if (habitToSave.lastCheckInDate && !habitToSave.status) {
+    newHabit = setDate(newHabit, "http://example.org/lastCheckIn", habitToSave.lastCheckInDate);
+  }
+  if (habitToSave.status) {
+    //if lastcheck in then save
+    newHabit = addBoolean(newHabit, "http://example.org/status", habitToSave.status)
+    let newLast = new Date();
+    newHabit = setDate(newHabit, "http://example.org/lastCheckIn", newLast);
+  }
+  if (habitToSave.custom) {
+    let customToUpload;
+    if (typeof habitToSave.custom === 'number') {
+      customToUpload = habitToSave.custom.toString();
+    }
+    else {
+      customToUpload = habitToSave.custom.join(" ");
+    }
+    newHabit = addStringNoLocale(newHabit, "http://example.org/custom", customToUpload)
+  };
+};
 
 export const editNote = async (webId: string, fetch: fetcher, note: Note, changes: string[]) => {
   let urlsArr = await getAllUrlFromPublicIndex(webId, fetch, "note");

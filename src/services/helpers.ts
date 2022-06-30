@@ -3,7 +3,10 @@ import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import { entrypoint } from "rdf-namespaces/dist/hydra";
 import { category } from "rdf-namespaces/dist/qu";
 import { Habit, withCategory } from "../components/types";
-import { isSameDay, isSameWeek, isSameMonth, isSameYear, differenceInDays, getDay } from 'date-fns';
+import {
+    isSameDay, isSameWeek, isSameMonth, isSameYear, differenceInCalendarDays, getDay,
+    differenceInCalendarWeeks, differenceInCalendarMonths, differenceInCalendarYears
+} from 'date-fns';
 
 //function that extracts main part from the user's webId
 export const modifyWebId = (webId: string): string => {
@@ -11,6 +14,8 @@ export const modifyWebId = (webId: string): string => {
     const updArr = [...arr.slice(0, 3)];
     return `${updArr.join("/")}/`;
 }
+
+
 export const getNumberFromDay = (day: string) => {
     switch (day) {
         case "monday":
@@ -30,6 +35,222 @@ export const getNumberFromDay = (day: string) => {
     }
 }
 
+export const setStreaks = (habit: Habit) => {
+    let today = new Date();
+    if (habit.status) {
+        if (!habit.currentStreak || habit.currentStreak === 0) { // case for when habit is checked, but doesn't have current streak
+            habit.currentStreak = 1;
+            if (!habit.bestStreak || habit.bestStreak === 0) {
+                habit.bestStreak = 1;
+            }
+            habit.lastCheckInDate = today;
+            return habit;
+        }
+        else { //case for when habit is checked but has current streak >0 
+            switch (habit.recurrence) {
+                case "daily": {
+                    if (!habit.lastCheckInDate) { // habit has current streak>0 but doesn't have last check in 
+                        habit.lastCheckInDate = today; // means wrong data recording, repair it
+                        habit.currentStreak = 1;
+                        habit = habitUpdBest(habit);
+                        return habit;
+                    }
+                    else {
+                        if (differenceInCalendarDays(today, habit.lastCheckInDate) > 0) {
+                            habit.lastCheckInDate = today;
+                            habit = habitUpdBest(habit);
+                            habit.currentStreak = 0;
+                            return habit;
+                        }
+                        else { //if (differenceInCalendarDays(today, habit.lastCheckInDate) <= 0)
+                            if (!isSameDay(today, habit.lastCheckInDate)) {
+                                habit.lastCheckInDate = today;
+                                habit.currentStreak = habit.currentStreak + 1;
+                                habit = habitUpdBest(habit);
+                                return habit;
+                            }
+                            else {
+                                return habit;
+                            }
+                        }
+                    }
+                }
+                case "weekly": {
+                    if (!habit.lastCheckInDate) { // habit has current streak>0 but doesn't have last check in 
+                        habit.lastCheckInDate = today; // means wrong data recording, repair it
+                        habit.currentStreak = 1;
+                        habit = habitUpdBest(habit);
+                        return habit;
+                    }
+                    else {
+                        if (differenceInCalendarWeeks(today, habit.lastCheckInDate) > 0) {
+                            habit.lastCheckInDate = today;
+                            habit = habitUpdBest(habit);
+                            habit.currentStreak = 0;
+                            return habit;
+                        }
+                        else { //if (differenceInCalendarWeeks(today, habit.lastCheckInDate) <= 0)
+                            if (!isSameDay(today, habit.lastCheckInDate)) {
+                                habit.lastCheckInDate = today;
+                                habit.currentStreak = habit.currentStreak + 1;
+                                habit = habitUpdBest(habit);
+                                return habit;
+                            }
+                            else {
+                                return habit;
+                            }
+                        }
+                    }
+                }
+                case "monthly": {
+                    if (!habit.lastCheckInDate) { // habit has current streak>0 but doesn't have last check in 
+                        habit.lastCheckInDate = today; // means wrong data recording, repair it
+                        habit.currentStreak = 1;
+                        habit = habitUpdBest(habit);
+                        return habit;
+                    }
+                    else {
+                        if (differenceInCalendarMonths(today, habit.lastCheckInDate) > 0) {
+                            habit.lastCheckInDate = today;
+                            habit = habitUpdBest(habit);
+                            habit.currentStreak = 0;
+                            return habit;
+                        }
+                        else { //if (differenceInCalendarMonths(today, habit.lastCheckInDate) <= 0)
+                            if (!isSameDay(today, habit.lastCheckInDate)) {
+                                habit.lastCheckInDate = today;
+                                habit.currentStreak = habit.currentStreak + 1;
+                                habit = habitUpdBest(habit);
+                                return habit;
+                            }
+                            else {
+                                return habit;
+                            }
+                        }
+                    }
+                }
+                case "yearly": {
+                    if (!habit.lastCheckInDate) { // habit has current streak>0 but doesn't have last check in 
+                        habit.lastCheckInDate = today; // means wrong data recording, repair it
+                        habit.currentStreak = 1;
+                        habit = habitUpdBest(habit);
+                        return habit;
+                    }
+                    else {
+                        if (differenceInCalendarYears(today, habit.lastCheckInDate) > 0) {
+                            habit.lastCheckInDate = today;
+                            habit = habitUpdBest(habit);
+                            habit.currentStreak = 0;
+                            return habit;
+                        }
+                        else { //if (differenceInCalendarYears(today, habit.lastCheckInDate) <= 0)
+                            if (!isSameDay(today, habit.lastCheckInDate)) {
+                                habit.lastCheckInDate = today;
+                                habit.currentStreak = habit.currentStreak + 1;
+                                habit = habitUpdBest(habit);
+                                return habit;
+                            }
+                            else {
+                                return habit;
+                            }
+                        }
+                    }
+                }
+                case "custom": {
+                    if (!habit.lastCheckInDate) { // habit has current streak>0 but doesn't have last check in 
+                        habit.lastCheckInDate = today; // means wrong data recording, repair it
+                        habit.currentStreak = 1;
+                        habit = habitUpdBest(habit);
+                        return habit;
+                    }
+                    else {
+                        if (typeof habit.custom === 'number') {
+                            if (differenceInCalendarDays(today, habit.lastCheckInDate) === habit.custom - 1) {
+                                habit.lastCheckInDate = today;
+                                habit.currentStreak = habit.currentStreak + 1;
+                                habit = habitUpdBest(habit);
+                                return habit;
+                            }
+                            else if (isSameDay(today, habit.lastCheckInDate)) {
+                                return habit;
+                            }
+                            else { //wrong data recorded shouldn't be set to true
+                                habit.status = false;
+                                return habit;
+                            }
+                        }
+                        else if (!habit.custom) {
+                            habit.custom = null;
+                            habit.recurrence = "daily";
+                        }
+                        else {
+                            if (checkWeekDay(habit)) {
+                                if (isSameDay(today, habit.lastCheckInDate)) {
+                                    return habit;
+                                }
+                                else {
+                                    habit.lastCheckInDate = today;
+                                    habit.currentStreak = habit.currentStreak + 1;
+                                    habit = habitUpdBest(habit);
+                                    return habit;
+                                }
+                            }
+                            else { //wrong data recorded shouldn't be set to true
+                                habit.status = false;
+                                return habit;
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+    else {
+        let checkHabit = getHabitsToday([habit]);
+        if (checkHabit.length !== 0) {
+            habit = habitUpdBest(habit);
+            habit.currentStreak = 0;
+            return habit;
+        }
+        else {
+            return habit;
+        }
+    }
+}
+
+const checkWeekDay = (habit: Habit) => {
+    let today = new Date();
+    if (habit.custom && !(typeof habit.custom === 'number')) {
+        let todayWeek = getDay(today);
+        let updArr = habit.custom.map((weekDay) => {
+            if (weekDay === todayWeek) return true;
+        });
+        if (updArr) {
+            if (updArr.length !== 0) {
+                return true;
+            }
+        }
+        else {
+            return false;
+        }
+    }
+    else {
+        return false;
+    }
+
+}
+const habitUpdBest = (habit: Habit) => {
+    if (habit.bestStreak) {
+        if (habit.currentStreak! > habit.bestStreak) {
+            habit.bestStreak = habit.currentStreak;
+        }
+    }
+    else {
+        habit.bestStreak = habit.currentStreak;
+    }
+    return habit;
+}
 export const getHabitsToday = (allHabits: Habit[]) => {
     let today = new Date();
     let habitsToday = allHabits.filter((habit) => {
@@ -37,9 +258,9 @@ export const getHabitsToday = (allHabits: Habit[]) => {
             if (habit.recurrence === "custom") {
                 if (typeof habit.custom === 'number') {
                     let dateToCheck = habit.lastCheckInDate ? habit.lastCheckInDate : habit.startDate;
-                    let updDate =  dateToCheck ? dateToCheck : new Date();
+                    let updDate = dateToCheck ? dateToCheck : new Date();
                     //handle?
-                    if (isSameDay(updDate, today) || differenceInDays(today, habit.lastCheckInDate!) === habit.custom) {
+                    if (isSameDay(updDate, today) || differenceInCalendarDays(today, habit.lastCheckInDate!) === habit.custom) {
                         return true;
                     }
                 }
@@ -62,27 +283,64 @@ export const getHabitsToday = (allHabits: Habit[]) => {
             switch (habit.recurrence) {
                 case "daily": {
                     //handle
-                    console.log("in daily");
-                    if (!isSameDay(updDate, today)) return true;
+                    if (isSameDay(updDate, today)) return true;
+                    else {
+                        habit.status = false;
+                        return true;
+                    }
                 }
                 case "weekly": {
-                    if (!isSameWeek(updDate, today)) return true;
+                    if (isSameWeek(updDate, today)) return true;
+                    else {
+                        habit.status = false;
+                        return true;
+                    }
                 }
                 case "monthly": {
-                    if (!isSameMonth(updDate, today)) return true;
+                    if (isSameMonth(updDate, today)) return true;
+                    else {
+                        habit.status = false;
+                        return true;
+                    }
                 }
                 case "yearly": {
-                    if (!isSameYear(updDate, today)) return true;
+                    if (isSameYear(updDate, today)) return true;
+                    else {
+                        habit.status = false;
+                        return true;
+                    }
                 }
                 case "custom": {
                     if (typeof habit.custom === 'number') {
-                        if (differenceInDays(today, updDate) >= habit.custom) return true;
+                        if (differenceInCalendarDays(today, updDate) >= habit.custom) {
+                            habit.status = false;
+                            return true;
+                        }
+                        else {
+                            return true;
+                        }
                     }
                     else {
                         if (!isSameDay(updDate, today)) {
                             let todayWeek = getDay(today);
                             let updArr = habit.custom?.filter((weekDay) => {
-                                if (weekDay === todayWeek) return true;
+                                if (weekDay === todayWeek) {
+                                    return true;
+                                }
+                            });
+                            if (updArr) {
+                                if (updArr.length !== 0) {
+                                    habit.status = false;
+                                    return true;
+                                }
+                            }
+                        }
+                        else {
+                            let todayWeek = getDay(today);
+                            let updArr = habit.custom?.filter((weekDay) => {
+                                if (weekDay === todayWeek) {
+                                    return true;
+                                }
                             });
                             if (updArr) {
                                 if (updArr.length !== 0) {
@@ -94,9 +352,6 @@ export const getHabitsToday = (allHabits: Habit[]) => {
                 }
             }
         }
-    }).map((habit) => {
-        habit.status = false;
-        return habit;
     });
     return habitsToday;
 }

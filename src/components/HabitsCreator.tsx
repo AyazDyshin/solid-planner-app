@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import { publicAccess } from "rdf-namespaces/dist/schema";
 import { setPubAccess, shareWith } from "../services/access";
-import { saveHabit, editNote } from "../services/SolidPod";
+import { saveHabit, editNote, deleteEntry } from "../services/SolidPod";
 import { useSession } from "@inrupt/solid-ui-react";
 import { constructDate } from "../services/helpers";
 import AccessModal from "../modals/AccessModal";
@@ -175,7 +175,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
     let updArr = habitsArray.filter((habit) => habit.id !== habitInp.id);
     setHabitsArray(updArr);
     newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
-    await deleteNote(webId ?? "", fetch, habitInp.id!, "habit");
+    await deleteEntry(webId ?? "", fetch, habitInp.id!, "habit");
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

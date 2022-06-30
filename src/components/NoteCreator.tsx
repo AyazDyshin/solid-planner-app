@@ -3,7 +3,7 @@ import { useSession } from "@inrupt/solid-ui-react";
 import { useEffect, useState } from "react";
 import { InputGroup, FormControl, Button, ButtonGroup, DropdownButton, Dropdown } from "react-bootstrap";
 import CategoryModal from "../modals/CategoryModal";
-import { deleteNote, editNote, saveNote, thingToNote } from "../services/SolidPod";
+import { deleteEntry, editNote, saveNote } from "../services/SolidPod";
 import { accessObject, Note } from "./types";
 import { BsThreeDots, BsShare } from "react-icons/bs";
 import { FiEdit } from "react-icons/fi";
@@ -176,7 +176,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
         let updArr = notesArray.filter((note) => note.id !== NoteInp.id);
         setNotesArray(updArr);
         newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
-        await deleteNote(webId ?? "", fetch, NoteInp.id!, "note");
+        await deleteEntry(webId ?? "", fetch, NoteInp.id!, "note");
     }
 
     return (

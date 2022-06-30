@@ -86,6 +86,8 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
         }));
         transformedArr = transformedArr.filter((item) => item !== null) as Habit[];
         let updType = transformedArr as Habit[];
+        console.log("this is updType");
+        console.log(updType);
         setHabitsArray(updType);
         setHabitsFetched(true);
         filteredHabits = updType;
@@ -95,19 +97,25 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
       }
       let extr = extractCategories(filteredHabits);
       setCategoryArray(extr);
-      if (currentCategory || currentAccess) {
+      if (currentCategory || currentAccess || currentView) {
+        let temp = filteredHabits;
         if (currentCategory) filteredHabits = filterByCategory(filteredHabits, currentCategory);
         if (currentAccess) filteredHabits = filterByAccess(filteredHabits, currentAccess);
 
         if (currentView === 'today') {
           filteredHabits = getHabitsToday(filteredHabits);
-          let temp = habitsArray;
+          console.log("this is first temp");
+          console.log(temp);
           filteredHabits.forEach((habit) => {
             temp.map((habit2) => {
-              if (habit.id === habit2.id) habit2.status = habit.status;
+              if (habit.id === habit2.id) {
+                habit2.status = habit.status
+              }
               return habit2;
             });
           });
+          console.log("this is temp");
+          console.log(temp);
           setHabitsArray(temp);
         }
       }
@@ -132,7 +140,7 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
     )
   }
   else {
-    if ((habitsToShow.length === 0) && !(currentAccess || currentCategory)) {
+    if ((habitsToShow.length === 0) && !(currentAccess || currentCategory || currentView)) {
 
       return (
         <div className="card text-center">

@@ -19,16 +19,16 @@ import {
 import { access } from "@inrupt/solid-client";
 import { object, updated } from 'rdf-namespaces/dist/as';
 import { universalAccess } from "@inrupt/solid-client";
-import { AccessControlResource } from '@inrupt/solid-client/dist/acp/control';
+//import { AccessControlResource } from '@inrupt/solid-client/dist/acp/control';
 import {
   checkPermissions, getPubAccess, getSharedList, initializeAcl,
   isWacOrAcp, setPubAccess, shareWith
 } from '../services/access';
-import { getPolicyAll } from '@inrupt/solid-client/dist/acp/policy';
+//import { getPolicyAll } from '@inrupt/solid-client/dist/acp/policy';
 import { ACP } from '@inrupt/vocab-solid';
 import { changeAccessAcp, initializePolicies, setAccessForResource } from '../services/helperAccess';
 import { fdatasync } from 'fs';
-import { WithAccessibleAcr } from '@inrupt/solid-client/dist/acp/acp';
+import { getResourceInfoWithAcr, getSolidDatasetWithAcr, WithAccessibleAcr } from '@inrupt/solid-client/dist/acp/acp';
 
 
 const Test = () => {
@@ -42,7 +42,17 @@ const Test = () => {
   const gets = async () => {
     //const socket = new WebSocket("wss://inrtester2.inrupt.net/SolidPlannerApp/");
     //console.log(socket);
+    await createContainerAt("https://pod.inrupt.com/podsptester/toTest/", { fetch: fetch });
+    let firstPubAccess = await universalAccess.getPublicAccess("https://pod.inrupt.com/podsptester/toTest/", { fetch: fetch });
+    await universalAccess.setPublicAccess("https://pod.inrupt.com/podsptester/toTest/",
+      { read: true, append: true, write: true }, { fetch: fetch });
+    let secondPubAccess = await universalAccess.getPublicAccess("https://pod.inrupt.com/podsptester/toTest/", { fetch: fetch });
+    let checkResourceACR = await acp_ess_2.getSolidDatasetWithAcr("https://pod.inrupt.com/podsptester/toTest/", { fetch: fetch });
+    console.log(firstPubAccess);
+    console.log(secondPubAccess);
+    console.log(checkResourceACR);
   }
+
 
   //gets();
 

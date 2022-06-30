@@ -12,7 +12,7 @@ import { publicAccess } from "rdf-namespaces/dist/schema";
 import { setPubAccess, shareWith } from "../services/access";
 import { saveHabit, editNote, deleteEntry } from "../services/SolidPod";
 import { useSession } from "@inrupt/solid-ui-react";
-import { constructDate } from "../services/helpers";
+import { constructDate, setStreaks } from "../services/helpers";
 import AccessModal from "../modals/AccessModal";
 import CustomHabitModal from "../modals/CustomHabitModal";
 import CategoryModal from "../modals/CategoryModal";
@@ -141,6 +141,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
       }
       let index = habitsArray.findIndex(item => item.id === habitToUpd.id);
       let updArr = habitsArray;
+      habitToUpd = setStreaks(habitToUpd);
       updArr[index] = habitToUpd;
       setHabitsArray(updArr);
       setNewEntryCr(!newEntryCr);
@@ -148,10 +149,10 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
         id: null, title: null, content: null, startDate: null, lastCheckInDate: null, recurrence: "daily", bestStreak: null,
         currentStreak: null, status: false, category: null, url: null, access: null
       });
-      setArrOfChanges([]);
       if (arrOfChanges.length !== 0) {
         //  await editHabit(webId, fetch, habitInp, arrOfChanges);
       }
+      setArrOfChanges([]);
     }
 
     if (Object.keys(accUpdObj).length !== 0) {

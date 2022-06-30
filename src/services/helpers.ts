@@ -34,7 +34,56 @@ export const getNumberFromDay = (day: string) => {
             return 6;
     }
 }
-
+const setStreaksDefaultCases = (habit: Habit) => {
+    let functionToUse;
+    let today = new Date();
+    switch (habit.recurrence) {
+        case "daily": {
+            functionToUse = differenceInCalendarDays;
+        }
+            break;
+        case "weekly": {
+            functionToUse = differenceInCalendarWeeks;
+        }
+            break;
+        case "monthly": {
+            functionToUse = differenceInCalendarMonths;
+        }
+            break;
+        case "yearly": {
+            functionToUse = differenceInCalendarYears;
+        }
+            break;
+        default: {
+            functionToUse = differenceInCalendarDays;
+        }
+    }
+    if (!habit.lastCheckInDate) { // habit has current streak>0 but doesn't have last check in 
+        habit.lastCheckInDate = today; // means wrong data recording, repair it
+        habit.currentStreak = 1;
+        habit = habitUpdBest(habit);
+        return habit;
+    }
+    else {
+        if (functionToUse(today, habit.lastCheckInDate) > 0) {
+            habit.lastCheckInDate = today;
+            habit = habitUpdBest(habit);
+            habit.currentStreak = 0;
+            return habit;
+        }
+        else { //if (differenceInCalendarDays(today, habit.lastCheckInDate) <= 0)
+            if (!isSameDay(today, habit.lastCheckInDate)) {
+                habit.lastCheckInDate = today;
+                habit.currentStreak = habit.currentStreak! + 1;
+                habit = habitUpdBest(habit);
+                return habit;
+            }
+            else {
+                return habit;
+            }
+        }
+    }
+}
 export const setStreaks = (habit: Habit) => {
     let today = new Date();
     if (habit.status) {
@@ -48,114 +97,13 @@ export const setStreaks = (habit: Habit) => {
         }
         else { //case for when habit is checked but has current streak >0 
             switch (habit.recurrence) {
-                case "daily": {
-                    if (!habit.lastCheckInDate) { // habit has current streak>0 but doesn't have last check in 
-                        habit.lastCheckInDate = today; // means wrong data recording, repair it
-                        habit.currentStreak = 1;
-                        habit = habitUpdBest(habit);
-                        return habit;
+                case "daily":
+                case "weekly":
+                case "monthly":
+                case "yearly":
+                    {
+                        return setStreaksDefaultCases(habit);
                     }
-                    else {
-                        if (differenceInCalendarDays(today, habit.lastCheckInDate) > 0) {
-                            habit.lastCheckInDate = today;
-                            habit = habitUpdBest(habit);
-                            habit.currentStreak = 0;
-                            return habit;
-                        }
-                        else { //if (differenceInCalendarDays(today, habit.lastCheckInDate) <= 0)
-                            if (!isSameDay(today, habit.lastCheckInDate)) {
-                                habit.lastCheckInDate = today;
-                                habit.currentStreak = habit.currentStreak + 1;
-                                habit = habitUpdBest(habit);
-                                return habit;
-                            }
-                            else {
-                                return habit;
-                            }
-                        }
-                    }
-                }
-                case "weekly": {
-                    if (!habit.lastCheckInDate) { // habit has current streak>0 but doesn't have last check in 
-                        habit.lastCheckInDate = today; // means wrong data recording, repair it
-                        habit.currentStreak = 1;
-                        habit = habitUpdBest(habit);
-                        return habit;
-                    }
-                    else {
-                        if (differenceInCalendarWeeks(today, habit.lastCheckInDate) > 0) {
-                            habit.lastCheckInDate = today;
-                            habit = habitUpdBest(habit);
-                            habit.currentStreak = 0;
-                            return habit;
-                        }
-                        else { //if (differenceInCalendarWeeks(today, habit.lastCheckInDate) <= 0)
-                            if (!isSameDay(today, habit.lastCheckInDate)) {
-                                habit.lastCheckInDate = today;
-                                habit.currentStreak = habit.currentStreak + 1;
-                                habit = habitUpdBest(habit);
-                                return habit;
-                            }
-                            else {
-                                return habit;
-                            }
-                        }
-                    }
-                }
-                case "monthly": {
-                    if (!habit.lastCheckInDate) { // habit has current streak>0 but doesn't have last check in 
-                        habit.lastCheckInDate = today; // means wrong data recording, repair it
-                        habit.currentStreak = 1;
-                        habit = habitUpdBest(habit);
-                        return habit;
-                    }
-                    else {
-                        if (differenceInCalendarMonths(today, habit.lastCheckInDate) > 0) {
-                            habit.lastCheckInDate = today;
-                            habit = habitUpdBest(habit);
-                            habit.currentStreak = 0;
-                            return habit;
-                        }
-                        else { //if (differenceInCalendarMonths(today, habit.lastCheckInDate) <= 0)
-                            if (!isSameDay(today, habit.lastCheckInDate)) {
-                                habit.lastCheckInDate = today;
-                                habit.currentStreak = habit.currentStreak + 1;
-                                habit = habitUpdBest(habit);
-                                return habit;
-                            }
-                            else {
-                                return habit;
-                            }
-                        }
-                    }
-                }
-                case "yearly": {
-                    if (!habit.lastCheckInDate) { // habit has current streak>0 but doesn't have last check in 
-                        habit.lastCheckInDate = today; // means wrong data recording, repair it
-                        habit.currentStreak = 1;
-                        habit = habitUpdBest(habit);
-                        return habit;
-                    }
-                    else {
-                        if (differenceInCalendarYears(today, habit.lastCheckInDate) > 0) {
-                            habit.lastCheckInDate = today;
-                            habit = habitUpdBest(habit);
-                            habit.currentStreak = 0;
-                            return habit;
-                        }
-                        else { //if (differenceInCalendarYears(today, habit.lastCheckInDate) <= 0)
-                            if (!isSameDay(today, habit.lastCheckInDate)) {
-                                habit.lastCheckInDate = today;
-                                habit.currentStreak = habit.currentStreak + 1;
-                                habit = habitUpdBest(habit);
-                                return habit;
-                            }
-                            else {
-                                return habit;
-                            }
-                        }
-                    }
-                }
                 case "custom": {
                     if (!habit.lastCheckInDate) { // habit has current streak>0 but doesn't have last check in 
                         habit.lastCheckInDate = today; // means wrong data recording, repair it
@@ -203,6 +151,9 @@ export const setStreaks = (habit: Habit) => {
                         }
                     }
                 }
+                default: {
+                    return habit;
+                }
             }
         }
     }
@@ -218,6 +169,7 @@ export const setStreaks = (habit: Habit) => {
         }
     }
 }
+
 
 const checkWeekDay = (habit: Habit) => {
     let today = new Date();
@@ -252,6 +204,7 @@ const habitUpdBest = (habit: Habit) => {
     return habit;
 }
 export const getHabitsToday = (allHabits: Habit[]) => {
+
     let today = new Date();
     let habitsToday = allHabits.filter((habit) => {
         if (!habit.status) {
@@ -275,6 +228,9 @@ export const getHabitsToday = (allHabits: Habit[]) => {
                         }
                     }
                 }
+            }
+            else {
+                return true;
             }
         }
         else {
@@ -353,6 +309,7 @@ export const getHabitsToday = (allHabits: Habit[]) => {
             }
         }
     });
+    console.log(habitsToday);
     return habitsToday;
 }
 

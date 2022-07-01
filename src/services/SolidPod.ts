@@ -89,11 +89,11 @@ export const thingToHabit = async (toChange: Thing | null, webId: string, fetch:
     url: toChange.url,
     startDate: updStartDate,
     custom: newCustomValue,
+    prevBestStreak: null,
+    prevLastCheckIn: null,
     access: getAcc[0] ? getAcc[0] : null,
     ...(getAcc[1] && { shareList: getAcc[1] })
   };
-  console.log("thsi is what we ret");
-  console.log(habit);
   return habit;
   //   status
 }
@@ -277,11 +277,11 @@ export const fetchAllEntries = async (webId: string, fetch: fetcher, entry: stri
     }
     else {
       let arrOf = getThingAll(data);
-      arrOf.forEach((thing) => {
+      arrOf.forEach((thing, index) => {
         let categoryOfCurrNote = getStringNoLocale(thing, otherV.category);
         if (categoryOfCurrNote && !arrayOfCategories.includes(categoryOfCurrNote)) arrayOfCategories.push(categoryOfCurrNote);
         if (!getInteger(thing, schema.identifier)) {
-          let newThing = addInteger(thing, schema.identifier, Date.now() + Math.floor(Math.random() * 1000));
+          let newThing = addInteger(thing, schema.identifier, Date.now() + index + Math.floor(Math.random() * 1000));
           let newData = setThing(data, newThing);
           const updDataSet = saveSolidDatasetAt(url, newData, { fetch: fetch });
         }

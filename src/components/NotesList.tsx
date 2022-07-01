@@ -62,8 +62,8 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, notes
           title={<div><VscTypeHierarchySuper /> {currentAccess ? currentAccess : "access type"} <RiArrowDropDownLine /></div>}
         >
           {
-            accessArray.map((access) => {
-              return <Dropdown.Item href="" key={Date.now() + Math.floor(Math.random() * 1000)}
+            accessArray.map((access, index) => {
+              return <Dropdown.Item href="" key={Date.now() + index + Math.floor(Math.random() * 1000)}
                 onClick={() => {
                   setViewerStatus(false);
                   setCreatorStatus(false);
@@ -81,8 +81,8 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, notes
             title={<div><BiFolder /> {currentCategory ? currentCategory : "Category"} <RiArrowDropDownLine /></div>}
           >
             {
-              categoryArray.map((category) => {
-                return <Dropdown.Item href="" key={Date.now() + Math.floor(Math.random() * 1000)}
+              categoryArray.map((category, index) => {
+                return <Dropdown.Item href="" key={Date.now() + index + Math.floor(Math.random() * 1000)}
                   onClick={() => {
                     setViewerStatus(false);
                     setCreatorStatus(false);
@@ -109,9 +109,9 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, notes
         {
           notesToShow.length !== 0 && <div className="list-group" style={{ maxHeight: '80%', overflow: 'auto' }}>
             {
-              notesToShow.map((note) => {
+              notesToShow.map((note, index) => {
                 return <a
-                  key={`${note.id}${Date.now() + Math.floor(Math.random() * 1000)}`}
+                  key={`${note.id}${Date.now() + index + Math.floor(Math.random() * 1000)}`}
                   className={`list-group-item px-1 list-group-item-action ${activeNote === note.id ? 'active' : ''}`}
                   onClick={(e) => {
                     e.preventDefault();
@@ -151,7 +151,7 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, notes
                         <div >
                           {
                             Object.keys(note!.shareList!).map((key, index) => {
-                              return <div key={Date.now() + Math.floor(Math.random() * 1000)}>
+                              return <div key={Date.now() + index + Math.floor(Math.random() * 1000)}>
                                 <div> {key} :</div>
                                 <div className="d-flex justify-content-between">
                                   {(note!.shareList![key].read) ?

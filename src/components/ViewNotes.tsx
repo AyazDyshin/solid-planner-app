@@ -29,10 +29,10 @@ const ViewNotes = ({ otherWebId, setOtherWebId, notesArray, setNotesArray, noteT
             </div>
             <div className="list-group w-100 h-100">
                 {
-                    notesArray.map((note) => {
+                    notesArray.map((note, index) => {
                         if (note) {
                             return <a
-                                key={`${note.id}${Date.now() + Math.floor(Math.random() * 1000)}`}
+                                key={`${note.id}${Date.now() + index + Math.floor(Math.random() * 1000)}`}
                                 className={`list-group-item px-1 list-group-item-action ${activeNote === note.id ? 'active' : ''}`}
                                 onClick={(e) => {
                                     e.preventDefault();

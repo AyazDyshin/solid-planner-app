@@ -1,7 +1,7 @@
 import { useSession } from "@inrupt/solid-ui-react";
 import { useState } from "react";
 import { Modal, Button, Form, FormControl, InputGroup } from "react-bootstrap";
-import { modifyWebId } from "../services/SolidPod";
+import { modifyWebId } from "../services/helpers";
 
 interface Props {
     modalState: boolean;

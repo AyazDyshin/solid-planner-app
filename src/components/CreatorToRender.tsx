@@ -69,38 +69,34 @@ const CreatorToRender = ({ active, creatorStatus, newEntryCr, setNewEntryCr, age
             case "notes":
             case "contacts":
                 return (
-                    <NoteCreator
-                        agentsToUpd={agentsToUpd}
-                        setAgentsToUpd={setAgentsToUpd}
-                        accUpdObj={accUpdObj}
-                        setAccUpdObj={setAccUpdObj}
-                        fullContacts={fullContacts}
-                        setFullContacts={setFullContacts}
-                        publicAccess={publicAccess}
-                        setPublicAccess={setPublicAccess}
-                        contactsList={contactsList}
-                        setContactsList={setContactsList}
-                        sharedList={sharedList}
-                        setSharedList={setSharedList}
-                        newEntryCr={newEntryCr}
-                        setNewEntryCr={setNewEntryCr}
-                        noteToView={noteToView}
-                        setNoteToView={setNoteToView}
-                        viewerStatus={viewerStatus}
-                        setViewerStatus={setViewerStatus}
-                        isEdit={isEdit}
-                        setIsEdit={setIsEdit}
-                        creatorStatus={creatorStatus}
-                        setCreatorStatus={setCreatorStatus}
-                        categoryArray={categoryArray}
-                        setCategoryArray={setCategoryArray}
-                        doNoteSave={doNoteSave}
-                        setDoNoteSave={setDoNoteSave}
-                        NoteInp={NoteInp}
-                        setNoteInp={setNoteInp}
-                        arrOfChanges={arrOfChanges}
-                        setArrOfChanges={setArrOfChanges}
-                    />);
+                    <div></div>
+                    // <NoteCreator
+                    //     agentsToUpd={agentsToUpd}
+                    //     setAgentsToUpd={setAgentsToUpd}
+                    //     accUpdObj={accUpdObj}
+                    //     setAccUpdObj={setAccUpdObj}
+                    //     publicAccess={publicAccess}
+                    //     setPublicAccess={setPublicAccess}
+                    //     newEntryCr={newEntryCr}
+                    //     setNewEntryCr={setNewEntryCr}
+                    //     noteToView={noteToView}
+                    //     setNoteToView={setNoteToView}
+                    //     viewerStatus={viewerStatus}
+                    //     setViewerStatus={setViewerStatus}
+                    //     isEdit={isEdit}
+                    //     setIsEdit={setIsEdit}
+                    //     creatorStatus={creatorStatus}
+                    //     setCreatorStatus={setCreatorStatus}
+                    //     categoryArray={categoryArray}
+                    //     setCategoryArray={setCategoryArray}
+                    //     doNoteSave={doNoteSave}
+                    //     setDoNoteSave={setDoNoteSave}
+                    //     NoteInp={NoteInp}
+                    //     setNoteInp={setNoteInp}
+                    //     arrOfChanges={arrOfChanges}
+                    //     setArrOfChanges={setArrOfChanges}
+                    // />
+                );
                 break;
             case "habits":
                 return (<div>Ooopps, not here yet</div>);

@@ -98,10 +98,10 @@ const SharedModal = ({ sharedModalState, setSharedModalState, setNoteInp,
                             writeStatus={publicAccess.write}
                         />
                         {
-                            Object.entries(sharedList).map(([key, value]) => {
+                            Object.entries(sharedList).map(([key, value], index) => {
                                 return (
                                     <AccessElement
-                                        key={Date.now() + Math.floor(Math.random() * 1000)}
+                                        key={Date.now() + index + Math.floor(Math.random() * 1000)}
                                         title={key}
                                         readOnChange={() => {
                                             setAgentsToUpd(prevState => ({ ...prevState, [key]: { read: !value.read, append: value.append, write: value.write } }));

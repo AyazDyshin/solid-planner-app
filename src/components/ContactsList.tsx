@@ -17,9 +17,9 @@ const ContactsList = ({ contactsArr, setContactsArr, otherWebId, setOtherWebId, 
         <div className="w-100 h-100">
             <div className="list-group w-100 h-100">
                 {
-                    contactsArr.map((contact) => {
+                    contactsArr.map((contact, index) => {
                         return <a
-                            key={Date.now() + Math.floor(Math.random() * 1000)}
+                            key={Date.now() + index + Math.floor(Math.random() * 1000)}
                             className={`list-group-item px-1 text-center list-group-item-action ${activeContact === contact[1] ? 'active' : ''}`}
                             onClick={(e) => {
                                 e.preventDefault();

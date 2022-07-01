@@ -23,7 +23,7 @@ const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsA
     const [categoryArray, setCategoryArray] = useState<string[]>([]);
     const [habitInp, setHabitInp] = useState<Habit>({
         id: null, title: "", content: "", startDate: null, lastCheckInDate: null, recurrence: "daily", bestStreak: null,
-        currentStreak: null, stat: null, category: "", url: "", access: null
+        currentStreak: null, stat: null, category: "", url: "", access: null, prevBestStreak: null, prevLastCheckIn: null
     });
 
 

@@ -156,8 +156,8 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
               title={<div><VscTypeHierarchySuper /> {currentAccess ? currentAccess : "access type"} <RiArrowDropDownLine /></div>}
             >
               {
-                accessArray.map((access) => {
-                  return <Dropdown.Item href="" key={Date.now() + Math.floor(Math.random() * 1000)}
+                accessArray.map((access, key) => {
+                  return <Dropdown.Item href="" key={Date.now() + key + Math.floor(Math.random() * 1000)}
                     onClick={() => {
                       setViewerStatus(false);
                       setCreatorStatus(false);
@@ -175,8 +175,8 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                 title={<div><BiFolder /> {currentCategory ? currentCategory : "Category"} <RiArrowDropDownLine /></div>}
               >
                 {
-                  categoryArray.map((category) => {
-                    return <Dropdown.Item href="" key={Date.now() + Math.floor(Math.random() * 1000)}
+                  categoryArray.map((category, key) => {
+                    return <Dropdown.Item href="" key={Date.now() + key + Math.floor(Math.random() * 1000)}
                       onClick={() => {
                         setViewerStatus(false);
                         setCreatorStatus(false);
@@ -203,9 +203,9 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
             {
               habitsToShow.length !== 0 && <div className="list-group" style={{ maxHeight: '80%', overflow: 'auto' }}>
                 {
-                  habitsToShow.map((habit) => {
+                  habitsToShow.map((habit, key) => {
                     return <a
-                      key={`${habit.id}${Date.now() + Math.floor(Math.random() * 1000)}`}
+                      key={`${habit.id}${Date.now() + key + Math.floor(Math.random() * 1000)}`}
                       className={`list-group-item px-1 list-group-item-action ${activeHabit === habit.id ? 'active' : ''}`}
                       onClick={(e) => {
                         e.preventDefault();
@@ -246,7 +246,7 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                             <div >
                               {
                                 Object.keys(habit!.shareList!).map((key, index) => {
-                                  return <div key={Date.now() + Math.floor(Math.random() * 1000)}>
+                                  return <div key={Date.now() + index + Math.floor(Math.random() * 1000)}>
                                     <div> {key} :</div>
                                     <div className="d-flex justify-content-between">
                                       {(habit!.shareList![key].read) ?

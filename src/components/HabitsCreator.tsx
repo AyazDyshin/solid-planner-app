@@ -78,7 +78,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
     else {
       setHabitInp({
         id: null, title: null, content: null, startDate: null, lastCheckInDate: null, recurrence: "daily", bestStreak: null,
-        currentStreak: null, stat: false, category: null, url: null, access: null
+        currentStreak: null, stat: false, category: null, url: null, access: null, prevBestStreak: null, prevLastCheckIn: null
       });
       setIsEdit(true);
     }
@@ -100,7 +100,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
       setNewEntryCr(!newEntryCr);
       setHabitInp({
         id: null, title: null, content: null, startDate: null, lastCheckInDate: null, recurrence: "daily", bestStreak: null,
-        currentStreak: null, stat: false, category: null, url: null, access: null
+        currentStreak: null, stat: false, category: null, url: null, access: null, prevBestStreak: null, prevLastCheckIn: null
       });
       setArrOfChanges([]);
       await saveHabit(webId, fetch, habitInp);
@@ -151,7 +151,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
       }
       setHabitInp({
         id: null, title: null, content: null, startDate: null, lastCheckInDate: null, recurrence: "daily", bestStreak: null,
-        currentStreak: null, stat: null, category: null, url: null, access: null
+        currentStreak: null, stat: null, category: null, url: null, access: null, prevBestStreak: null, prevLastCheckIn: null
       });
       setArrOfChanges([]);
     }
@@ -279,8 +279,6 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
               <input className="form-check-input" {...(!isEdit && { disabled: true })} type="checkbox" style={{ "transform": "scale(1.6)", "marginLeft": "-0.5em" }}
                 onChange={() => {
                   setHabitInp((prevState) => ({ ...prevState, stat: !habitInp.stat }));
-                  console.log("hereeee");
-                  console.log(habitInp.stat);
                   setHabitChanged(true);
                 }}
                 checked={habitInp.stat!}

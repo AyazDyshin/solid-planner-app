@@ -20,6 +20,8 @@ export interface Habit {
   lastCheckInDate: Date | null;
   recurrence: string | null;
   bestStreak: number | null;
+  prevBestStreak: number | null;
+  prevLastCheckIn: Date | null;
   currentStreak: number | null;
   url: string | null;
   stat: boolean | null;

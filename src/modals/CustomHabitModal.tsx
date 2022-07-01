@@ -137,9 +137,10 @@ const CustomHabitModal = ({ customHabitModalState, setCustomHabitModalState, hab
 
                     <div>
                         {
-                            daysArr.map((key) => {
+                            daysArr.map((key, index) => {
                                 return (
-                                    <div key={Date.now() + Math.floor(Math.random() * 10000)} className="form-check form-switch">
+                                    <div key={Date.now() + index + Math.floor(Math.random() * 10000)}
+                                        className="form-check form-switch">
                                         <label className="form-check-label"
                                             htmlFor="flexSwitchCheckDefault1">{key}</label>
                                         <input className="form-check-input" type="checkbox"

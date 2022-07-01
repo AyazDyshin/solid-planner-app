@@ -180,10 +180,10 @@ const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, setNoteIn
                                 <div>
                                     {contactsStat && <div>
                                         {
-                                            Object.entries(contactsList).map(([key, value]) => {
+                                            Object.entries(contactsList).map(([key, value], index) => {
                                                 return (
                                                     <AccessElement
-                                                        key={Date.now() + Math.floor(Math.random() * 1000)}
+                                                        key={Date.now() + index + Math.floor(Math.random() * 1000)}
                                                         title={key}
                                                         readOnChange={() => {
                                                             let wId = (fullContacts[key]) ? fullContacts[key] : key;

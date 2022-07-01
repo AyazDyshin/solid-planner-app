@@ -53,8 +53,8 @@ const CategoryModal = ({ categoryModalState, setCategoryModalState, setNoteInp,
                             title="choose existing category"
                         >
                             {
-                                categoryArray.map((category) => {
-                                    return <Dropdown.Item href="" key={Date.now() + Math.floor(Math.random() * 1000)}
+                                categoryArray.map((category, index) => {
+                                    return <Dropdown.Item href="" key={Date.now() + index + Math.floor(Math.random() * 1000)}
                                         onClick={() => setInput(category)}>{category}</Dropdown.Item>
                                 })
                             }

@@ -51,31 +51,29 @@ const Navbar = ({ links, active, setActive, viewerStatus, setViewerStatus,
                 return <div></div>;
         }
     }
-    const perfFetch = async (active: string) => {
-        switch (active) {
-            case "notes": {
-                // if (!notesFetched) {
-                //     let [noteArr, rest] = await fetchAllEntries(webId, fetch, "note");
-                //     let transformedArr = await Promise.all(noteArr.map(async (thing) => {
-                //         return await thingToNote(thing, webId, fetch);
-                //     }));
-                //     transformedArr = transformedArr.filter((item) => item !== null) as Note[];
-                //     let updType = transformedArr as Note[];
-                //     console.log(updType);
-                //     setNotesArray(updType);
-                //     console.log("fetched");
-                //     setNotesFetched(true);
-                // }
-            }
-        }
-    }
+    // const perfFetch = async (active: string) => {
+    //     switch (active) {
+    //         case "notes": {
+    //             // if (!notesFetched) {
+    //             //     let [noteArr, rest] = await fetchAllEntries(webId, fetch, "note");
+    //             //     let transformedArr = await Promise.all(noteArr.map(async (thing) => {
+    //             //         return await thingToNote(thing, webId, fetch);
+    //             //     }));
+    //             //     transformedArr = transformedArr.filter((item) => item !== null) as Note[];
+    //             //     let updType = transformedArr as Note[];
+    //             //     setNotesArray(updType);
+    //             //     setNotesFetched(true);
+    //             // }
+    //         }
+    //     }
+    // }
     return (
         <nav className="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
             <div className="container-fluid">
                 <div className="navbar-nav d-flex justify-content-around w-100">
-                    {links.map((link) => (
+                    {links.map((link, index) => (
                         <a
-                            key={Date.now() + Math.floor(Math.random() * 1000)}
+                            key={Date.now() + index + Math.floor(Math.random() * 1000)}
                             className={`nav-link ${active === link ? 'active' : ''} cursor`}
                             onClick={(e) => {
                                 e.preventDefault();

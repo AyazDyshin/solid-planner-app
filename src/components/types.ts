@@ -22,7 +22,7 @@ export interface Habit {
   bestStreak: number | null;
   currentStreak: number | null;
   url: string | null;
-  status: boolean ;
+  stat: boolean | null;
   category: string | null;
   access: Record<string, AccessModes> | null;
   shareList?: Record<string, AccessModes>;

@@ -1,7 +1,5 @@
 import { getStringNoLocale, ThingPersisted } from "@inrupt/solid-client";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
-import { entrypoint } from "rdf-namespaces/dist/hydra";
-import { category } from "rdf-namespaces/dist/qu";
 import { Habit, withCategory } from "../components/types";
 import {
     isSameDay, isSameWeek, isSameMonth, isSameYear, differenceInCalendarDays, getDay,
@@ -86,7 +84,7 @@ const setStreaksDefaultCases = (habit: Habit) => {
 }
 export const setStreaks = (habit: Habit) => {
     let today = new Date();
-    if (habit.status) {
+    if (habit.stat) {
         if (!habit.currentStreak || habit.currentStreak === 0) { // case for when habit is checked, but doesn't have current streak
             habit.currentStreak = 1;
             if (!habit.bestStreak || habit.bestStreak === 0) {
@@ -123,7 +121,7 @@ export const setStreaks = (habit: Habit) => {
                                 return habit;
                             }
                             else { //wrong data recorded shouldn't be set to true
-                                habit.status = false;
+                                habit.stat = false;
                                 return habit;
                             }
                         }
@@ -144,10 +142,9 @@ export const setStreaks = (habit: Habit) => {
                                 }
                             }
                             else { //wrong data recorded shouldn't be set to true
-                                habit.status = false;
+                                habit.stat = false;
                                 return habit;
                             }
-
                         }
                     }
                 }
@@ -207,7 +204,7 @@ export const getHabitsToday = (allHabits: Habit[]) => {
 
     let today = new Date();
     let habitsToday = allHabits.filter((habit) => {
-        if (!habit.status) {
+        if (!habit.stat) {
             if (habit.recurrence === "custom") {
                 if (typeof habit.custom === 'number') {
                     let dateToCheck = habit.lastCheckInDate ? habit.lastCheckInDate : habit.startDate;
@@ -241,35 +238,35 @@ export const getHabitsToday = (allHabits: Habit[]) => {
                     //handle
                     if (isSameDay(updDate, today)) return true;
                     else {
-                        habit.status = false;
+                        habit.stat = false;
                         return true;
                     }
                 }
                 case "weekly": {
                     if (isSameWeek(updDate, today)) return true;
                     else {
-                        habit.status = false;
+                        habit.stat = false;
                         return true;
                     }
                 }
                 case "monthly": {
                     if (isSameMonth(updDate, today)) return true;
                     else {
-                        habit.status = false;
+                        habit.stat = false;
                         return true;
                     }
                 }
                 case "yearly": {
                     if (isSameYear(updDate, today)) return true;
                     else {
-                        habit.status = false;
+                        habit.stat = false;
                         return true;
                     }
                 }
                 case "custom": {
                     if (typeof habit.custom === 'number') {
                         if (differenceInCalendarDays(today, updDate) >= habit.custom) {
-                            habit.status = false;
+                            habit.stat = false;
                             return true;
                         }
                         else {
@@ -286,7 +283,7 @@ export const getHabitsToday = (allHabits: Habit[]) => {
                             });
                             if (updArr) {
                                 if (updArr.length !== 0) {
-                                    habit.status = false;
+                                    habit.stat = false;
                                     return true;
                                 }
                             }
@@ -309,7 +306,6 @@ export const getHabitsToday = (allHabits: Habit[]) => {
             }
         }
     });
-    console.log(habitsToday);
     return habitsToday;
 }
 
@@ -344,8 +340,6 @@ export const filterByCategory = <T extends { category: string | null; }>(arrOfEn
 export const filterByAccess = <T extends { category: string | null; access: Record<string, AccessModes> | null; shareList?: Record<string, AccessModes>; }>
     (arrOfEntries: T[],
         accessFilter: string) => {
-    console.log("heree");
-    console.log(arrOfEntries);
     switch (accessFilter) {
         case "public":
             return arrOfEntries.filter((entry) => {

@@ -3,7 +3,7 @@ import {
   addUrl, setThing, saveSolidDatasetAt, createContainerAt, Thing, getInteger,
   getStringNoLocale, removeThing, getContainedResourceUrlAll, deleteSolidDataset,
   setStringNoLocale, addStringNoLocale, isContainer, addInteger,
-  buildThing, setDate, getDate, getBoolean, addBoolean
+  buildThing, setDate, getDate, getBoolean, addBoolean, setInteger, addDate, setBoolean
 } from '@inrupt/solid-client';
 import { DCTERMS, RDF } from '@inrupt/vocab-common-rdf';
 import { solid, schema, foaf, vcard } from 'rdf-namespaces';
@@ -77,6 +77,7 @@ export const thingToHabit = async (toChange: Thing | null, webId: string, fetch:
     getAcc = [null];
   }
   const habit: Habit = {
+    stat: updStatus ? true : false,
     id: updId,
     title: updTitle,
     content: updContent,
@@ -84,7 +85,6 @@ export const thingToHabit = async (toChange: Thing | null, webId: string, fetch:
     lastCheckInDate: updLastCheckInDate,
     bestStreak: updBestStreak,
     currentStreak: updCurrentStreak,
-    status: updStatus ? updStatus : false,
     recurrence: updRecurrence,
     url: toChange.url,
     startDate: updStartDate,
@@ -92,6 +92,8 @@ export const thingToHabit = async (toChange: Thing | null, webId: string, fetch:
     access: getAcc[0] ? getAcc[0] : null,
     ...(getAcc[1] && { shareList: getAcc[1] })
   };
+  console.log("thsi is what we ret");
+  console.log(habit);
   return habit;
   //   status
 }
@@ -269,43 +271,6 @@ export const fetchAllEntries = async (webId: string, fetch: fetcher, entry: stri
           }
         }
         let newThing = getThing(newDs, noteUrl);
-        // if (newThing) {
-        //   let categoryOfCurrNote = getStringNoLocale(newThing, "http://dbpedia.org/ontology/category");
-        //   if (categoryOfCurrNote && !arrayOfCategories.includes(categoryOfCurrNote)) arrayOfCategories.push(categoryOfCurrNote);
-        //   if (categoryFilter || accessFilter) {
-        //     let toReturn: ThingPersisted | null;
-        //     toReturn = newThing;
-        //     if (categoryFilter) {
-        //       toReturn = (categoryOfCurrNote === categoryFilter ? newThing : null);
-        //     }
-        //     if (accessFilter) {
-        //       switch (accessFilter) {
-        //         case "public": {
-        //           const acc = await getPubAccess(webId, noteUrl, fetch);
-        //           if (!toReturn) {
-        //             break;
-        //           }
-        //           else {
-        //             toReturn = (acc!.read ? newThing : null);
-        //             break;
-        //           }
-        //         }
-        //         case "private": {
-        //           const acc = await getPubAccess(webId, noteUrl, fetch);
-        //           if (!toReturn) {
-        //             break;
-        //           }
-        //           else {
-        //             toReturn = (acc!.read ? null : newThing);
-        //             break;
-        //           }
-        //         }
-        //       }
-        //     }
-        //     return toReturn;
-        //   }
-
-        // }
         return newThing;
       }));
       return updArr;
@@ -321,18 +286,9 @@ export const fetchAllEntries = async (webId: string, fetch: fetcher, entry: stri
           const updDataSet = saveSolidDatasetAt(url, newData, { fetch: fetch });
         }
       });
-      // if (categoryFilter) {
-      //   let newArr = arrOf.map((thing) => {
-      //     let categoryOfCurrNote = getStringNoLocale(thing, "http://dbpedia.org/ontology/category");
-      //     if (categoryFilter) {
-      //       return categoryOfCurrNote === categoryFilter ? thing : null;
-      //     }
-      //   });
-      // }
       return arrOf;
     }
   }));
-  //let retValue: [(ThingPersisted | null)[], string[]] = [updUrlsArr.flat(), arrayOfCategories]
   let retValue = updUrlsArr.flat();
   if (!retValue) return [];
   return retValue;
@@ -364,7 +320,6 @@ export const saveNote = async (webId: string, fetch: fetcher, note: Note) => {
     await initializeAcl(noteUrl, fetch);
   };
   await setPubAccess(webId, { read: false, append: false, write: false }, noteUrl, fetch);
-  //let p = await getPubAccess(webId, noteUrl, fetch);
 }
 
 export const saveHabit = async (webId: string, fetch: fetcher, habit: Habit) => {
@@ -400,8 +355,8 @@ export const saveHabit = async (webId: string, fetch: fetcher, habit: Habit) => 
     }
     newHabit = addStringNoLocale(newHabit, "http://example.org/custom", customToUpload);
   };
-  if (habit.status) {
-    newHabit = addBoolean(newHabit, "http://example.org/status", habit.status)
+  if (habit.stat) {
+    newHabit = addBoolean(newHabit, "http://example.org/status", habit.stat)
   }
   dataSet = setThing(dataSet, newHabit);
   await saveSolidDatasetAt(habitUrl, dataSet, { fetch: fetch });
@@ -418,7 +373,7 @@ export const editHabit = async (webId: string, fetch: fetcher, habitToSave: Habi
     await saveHabit(webId, fetch, habitToSave);
     return;
   }
-
+  //url, title, content, startDate, lastCheckInDate, recurrence, bestStreak, currentStreak, status, category
   let newHabit = buildThing(createThing({ url: habitToSave.url }))
     .addUrl(RDF.type, voc.Habit)
     .addInteger(schema.identifier, habitToSave.id)
@@ -427,14 +382,20 @@ export const editHabit = async (webId: string, fetch: fetcher, habitToSave: Habi
     .addDate("http://example.org/startDate", habitToSave.startDate ? habitToSave.startDate : new Date())
     .addStringNoLocale("http://example.org/recurrence", habitToSave.recurrence ? habitToSave.recurrence : "daily")
     .build();
-  if (habitToSave.lastCheckInDate && !habitToSave.status) {
+  if (habitToSave.lastCheckInDate) {
     newHabit = setDate(newHabit, "http://example.org/lastCheckIn", habitToSave.lastCheckInDate);
   }
-  if (habitToSave.status) {
-    //if lastcheck in then save
-    newHabit = addBoolean(newHabit, "http://example.org/status", habitToSave.status)
-    let newLast = new Date();
-    newHabit = setDate(newHabit, "http://example.org/lastCheckIn", newLast);
+  if (habitToSave.bestStreak) {
+    newHabit = setInteger(newHabit, "http://example.org/bestStreak", habitToSave.bestStreak);
+  }
+  if (habitToSave.currentStreak) {
+    newHabit = setInteger(newHabit, "http://example.org/currentStreak", habitToSave.currentStreak);
+  }
+  if (habitToSave.stat) {
+    newHabit = setBoolean(newHabit, "http://example.org/status", habitToSave.stat);
+  }
+  if (habitToSave.category) {
+    newHabit = setStringNoLocale(newHabit, otherV.category, habitToSave.category);
   }
   if (habitToSave.custom) {
     let customToUpload;
@@ -446,6 +407,10 @@ export const editHabit = async (webId: string, fetch: fetcher, habitToSave: Habi
     }
     newHabit = addStringNoLocale(newHabit, "http://example.org/custom", customToUpload)
   };
+  let newDs = await getSolidDataset(habitToSave.url, { fetch: fetch });
+  let updDataSet = setThing(newDs, newHabit);
+  const savedDataSet = await saveSolidDatasetAt(habitToSave.url, updDataSet,
+    { fetch: fetch });
 };
 
 export const editNote = async (webId: string, fetch: fetcher, note: Note, changes: string[]) => {

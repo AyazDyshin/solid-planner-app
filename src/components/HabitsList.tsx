@@ -46,77 +46,50 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
   const [activeHabit, setActiveHabit] = useState<number | null>(null);
   const [currentView, setCurrentView] = useState<string>("today");
   const accessArray = ["public", "private", "shared"];
+  const [currentStatus, setCurrentStatus] = useState<string | null>("undone");
   useEffect(() => {
-
-    // const perfSave = async () => {
-    //   if (doNoteSave || arrOfChanges.length !== 0) {
-    //     if (doNoteSave) {
-    //       await saveNote(webId, fetch, NoteInp);
-    //     }
-    //     else if (arrOfChanges.length !== 0) {
-    //       await editNote(webId, fetch, NoteInp, arrOfChanges);
-    //     }
-
-    //     if (Object.keys(accUpdObj).length !== 0) {
-    //       if (accUpdObj["public"]) {
-    //         await setPubAccess(webId, publicAccess, noteToView!.url, fetch);
-    //       }
-    //       else if (accUpdObj["agent"]) {
-    //         for (let item in agentsToUpd) {
-    //           await shareWith(webId, noteToView!.url, fetch, agentsToUpd[item], item);
-
-    //         }
-    //       }
-
-    //     }
-
-    //     setCreatorStatus(false);
-    //     setNoteInp({ id: null, title: "", content: "", category: "", url: "", access: null });
-    //     setIsEdit(false);
-    //     setArrOfChanges([]);
-    //     setDoNoteSave(false);
-    //   }
-    // }
-    const fetchNotes = async (otherId?: string) => {
-      let filteredHabits: Habit[]
+    const fetchHabits = async (otherId?: string) => {
+      let filteredHabits: Habit[] = [];
       if (!habitsFetched) {
         let habitArr = await fetchAllEntries(webId, fetch, "habit");
-        let transformedArr = await Promise.all(habitArr.map(async (thing) => {
-          return await thingToHabit(thing, webId, fetch);
+
+        let tempArr = await Promise.all(habitArr.map(async (thing) => {
+          let toRet = await thingToHabit(thing, webId, fetch);
+          if (toRet) {
+            filteredHabits.push(toRet);
+          }
+          return thing;
         }));
-        transformedArr = transformedArr.filter((item) => item !== null) as Habit[];
-        let updType = transformedArr as Habit[];
-        console.log("this is updType");
-        console.log(updType);
-        setHabitsArray(updType);
+        setHabitsArray(filteredHabits);
         setHabitsFetched(true);
-        filteredHabits = updType;
       }
       else {
         filteredHabits = habitsArray;
       }
       let extr = extractCategories(filteredHabits);
       setCategoryArray(extr);
-      if (currentCategory || currentAccess || currentView) {
+      if (currentCategory || currentAccess || currentView || currentStatus) {
         let temp = filteredHabits;
         if (currentCategory) filteredHabits = filterByCategory(filteredHabits, currentCategory);
         if (currentAccess) filteredHabits = filterByAccess(filteredHabits, currentAccess);
 
         if (currentView === 'today') {
           filteredHabits = getHabitsToday(filteredHabits);
-          console.log("this is first temp");
-          console.log(temp);
           filteredHabits.forEach((habit) => {
             temp.map((habit2) => {
               if (habit.id === habit2.id) {
-                habit2.status = habit.status
+                habit2.stat = habit.stat
               }
               return habit2;
             });
           });
-          console.log("this is temp");
-          console.log(temp);
           setHabitsArray(temp);
+        }
+        if (currentStatus === 'undone') {
+          filteredHabits = filteredHabits.filter((habit) => { if (!habit.stat) return true });
+        }
+        if (currentStatus === 'done') {
+          filteredHabits = filteredHabits.filter((habit) => { if (habit.stat) return true });
         }
       }
       setHabitsToShow(filteredHabits);
@@ -124,9 +97,9 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
 
     }
 
-    fetchNotes();
+    fetchHabits();
 
-  }, [newEntryCr, currentCategory, currentAccess, currentView]);
+  }, [newEntryCr, currentCategory, currentAccess, currentView, currentStatus]);
   const handleCreate = () => {
     setViewerStatus(false);
     setCreatorStatus(true);
@@ -166,6 +139,16 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
             >
               <Dropdown.Item onClick={() => { setCurrentView('today') }}>today</Dropdown.Item>
               <Dropdown.Item onClick={() => { setCurrentView('all habits') }}>all habits</Dropdown.Item>
+            </DropdownButton>
+            <DropdownButton
+              className="mx-1 my-1"
+              variant="secondary"
+              title={currentStatus}
+            >
+              <Dropdown.Item onClick={() => { setCurrentStatus('done') }}>done</Dropdown.Item>
+              <Dropdown.Item onClick={() => { setCurrentStatus('undone') }}>undone</Dropdown.Item>
+              <Dropdown.Item onClick={() => { setCurrentStatus('all') }}>all</Dropdown.Item>
+
             </DropdownButton>
             <DropdownButton
               className="mx-1 my-1"

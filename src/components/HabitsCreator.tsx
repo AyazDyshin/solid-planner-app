@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import { publicAccess } from "rdf-namespaces/dist/schema";
 import { setPubAccess, shareWith } from "../services/access";
-import { saveHabit, editNote, deleteEntry } from "../services/SolidPod";
+import { saveHabit, editNote, deleteEntry, editHabit } from "../services/SolidPod";
 import { useSession } from "@inrupt/solid-ui-react";
 import { constructDate, setStreaks } from "../services/helpers";
 import AccessModal from "../modals/AccessModal";
@@ -78,7 +78,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
     else {
       setHabitInp({
         id: null, title: null, content: null, startDate: null, lastCheckInDate: null, recurrence: "daily", bestStreak: null,
-        currentStreak: null, status: false, category: null, url: null, access: null
+        currentStreak: null, stat: false, category: null, url: null, access: null
       });
       setIsEdit(true);
     }
@@ -100,7 +100,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
       setNewEntryCr(!newEntryCr);
       setHabitInp({
         id: null, title: null, content: null, startDate: null, lastCheckInDate: null, recurrence: "daily", bestStreak: null,
-        currentStreak: null, status: false, category: null, url: null, access: null
+        currentStreak: null, stat: false, category: null, url: null, access: null
       });
       setArrOfChanges([]);
       await saveHabit(webId, fetch, habitInp);
@@ -145,13 +145,14 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
       updArr[index] = habitToUpd;
       setHabitsArray(updArr);
       setNewEntryCr(!newEntryCr);
+
+      if (arrOfChanges.length !== 0 || habitChanged) {
+        await editHabit(webId, fetch, habitInp);
+      }
       setHabitInp({
         id: null, title: null, content: null, startDate: null, lastCheckInDate: null, recurrence: "daily", bestStreak: null,
-        currentStreak: null, status: false, category: null, url: null, access: null
+        currentStreak: null, stat: null, category: null, url: null, access: null
       });
-      if (arrOfChanges.length !== 0) {
-        //  await editHabit(webId, fetch, habitInp, arrOfChanges);
-      }
       setArrOfChanges([]);
     }
 
@@ -240,6 +241,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
                 <Dropdown.Item onClick={() => {
                   setHabitInp(prevState => ({ ...prevState, recurrence: 'daily' }));
                   setHabitInp(prevState => ({ ...prevState, custom: null }));
+
                   setHabitChanged(true);
                 }}>daily</Dropdown.Item>
                 <Dropdown.Item onClick={() => {
@@ -276,10 +278,12 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
             <div className="form-check form-switch d-flex justify-content-center align-items-center disabled">
               <input className="form-check-input" {...(!isEdit && { disabled: true })} type="checkbox" style={{ "transform": "scale(1.6)", "marginLeft": "-0.5em" }}
                 onChange={() => {
-                  setHabitInp((prevState) => ({ ...prevState, status: !habitInp.status }));
+                  setHabitInp((prevState) => ({ ...prevState, stat: !habitInp.stat }));
+                  console.log("hereeee");
+                  console.log(habitInp.stat);
                   setHabitChanged(true);
                 }}
-                checked={habitInp.status}
+                checked={habitInp.stat!}
                 role="switch" id="flexSwitchCheckDefault" />
             </div>
           </InputGroup>}

@@ -26,6 +26,7 @@ const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsA
         id: null, title: "", content: "", startDate: null, lastCheckInDate: null, recurrence: "daily", bestStreak: null,
         currentStreak: null, stat: null, category: "", url: "", access: null, prevBestStreak: null, prevLastCheckIn: null
     });
+    const [currentView, setCurrentView] = useState<string>("today");
 
 
     return (
@@ -33,6 +34,8 @@ const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsA
             <div className="row h-100">
                 <div className="col h-100 border border-5 border-end-0 d-flex justify-content-center align-items-center p-0">
                     <HabitsList
+                        currentView={currentView}
+                        setCurrentView={setCurrentView}
                         habitDoSave={habitDoSave}
                         setHabitDoSave={setHabitDoSave}
                         habitInp={habitInp}
@@ -59,6 +62,8 @@ const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsA
                 </div>
                 <div className="col h-100 border border-5">
                     {(viewerStatus || creatorStatus) && <HabitsCreator
+                        currentView={currentView}
+                        setCurrentView={setCurrentView}
                         habitDoSave={habitDoSave}
                         setHabitDoSave={setHabitDoSave}
                         categoryArray={categoryArray}

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { fetchAllEntries, thingToHabit, editHabit } from '../services/SolidPod';
 import { BsPlusLg } from "react-icons/bs";
 import { Habit } from './types';
-import { extractCategories, filterByAccess, filterByCategory, getHabitsToday } from '../services/helpers';
+import { extractCategories, filterByAccess, filterByCategory, getHabitsToday, setStreaks } from '../services/helpers';
 import { DropdownButton, Dropdown, OverlayTrigger, Popover, Badge, Spinner, Button } from 'react-bootstrap';
 import { BiFolder } from 'react-icons/bi';
 import { GoPrimitiveDot, GoCheck, GoX } from 'react-icons/go';
@@ -34,11 +34,13 @@ interface Props {
   setHabitInp: React.Dispatch<React.SetStateAction<Habit>>;
   habitDoSave: boolean;
   setHabitDoSave: React.Dispatch<React.SetStateAction<boolean>>;
-
+  currentView: string;
+  setCurrentView: React.Dispatch<React.SetStateAction<string>>;
 }
 const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorStatus, habitsFetched, setHabitsFetched,
   habitsArray, setHabitsArray, isEdit, setIsEdit, habitToView, setHabitToView, newEntryCr, setNewEntryCr,
-  habitsToday, setHabitsToday, categoryArray, setCategoryArray, habitInp, setHabitInp, habitDoSave, setHabitDoSave
+  habitsToday, setHabitsToday, categoryArray, setCategoryArray, habitInp, setHabitInp, habitDoSave, setHabitDoSave, currentView,
+  setCurrentView
 }: Props) => {
   const { session, fetch } = useSession();
   const { webId } = session.info;
@@ -50,12 +52,11 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [habitsToShow, setHabitsToShow] = useState<Habit[]>([]);
   const [activeHabit, setActiveHabit] = useState<number | null>(null);
-  const [currentView, setCurrentView] = useState<string>("today");
   const accessArray = ["public", "private", "shared"];
   const [currentStatus, setCurrentStatus] = useState<string | null>("undone");
   const [habitsToSave, setHabitsToSave] = useState<Habit[]>([]);
   const [objOfStates, setObjOfStates] = useState<{ [x: number]: boolean | null; }>({});
-  const [filterTest, setFilterTest] = useState<(Habit | null)[]>([]);
+
   useEffect(() => {
     const fetchHabits = async (otherId?: string) => {
       let filteredHabits: Habit[] = [];
@@ -216,7 +217,10 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                   <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentCategory(null)}><RiArrowGoBackFill /> reset</Dropdown.Item></>)}
               </DropdownButton>
             }
-            <Button variant="secondary" className="ms-auto my-1" onClick={handleSave}><MdSaveAlt /> save</Button>
+            {
+              (currentView === 'today') &&
+              <Button variant="secondary" className="ms-auto my-1" onClick={handleSave}><MdSaveAlt /> save</Button>
+            }
             <OverlayTrigger placement="left" overlay={
               <Popover>
                 <Popover.Body className="py-1 px-1">
@@ -306,6 +310,7 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                             key={Date.now() + key + Math.floor(Math.random() * 1000)}
                             style={{ display: "inline-block", "marginLeft": "auto" }}>
                             <input className="form-check-input"
+                              {...((currentView === 'today') && { disabled: true })}
                               onClick={(e) => {
                                 e.stopPropagation();
                               }}

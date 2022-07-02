@@ -53,11 +53,13 @@ interface Props {
   setCategoryArray: React.Dispatch<React.SetStateAction<string[]>>;
   habitDoSave: boolean;
   setHabitDoSave: React.Dispatch<React.SetStateAction<boolean>>;
+  currentView: string;
+  setCurrentView: React.Dispatch<React.SetStateAction<string>>;
 }
 const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, isEdit, setIsEdit, creatorStatus, setCreatorStatus,
   viewerStatus, setViewerStatus, habitToView, setHabitToView, habitsArray, setHabitsArray, newEntryCr, setNewEntryCr,
   accUpdObj, setAccUpdObj, publicAccess, setPublicAccess, agentsToUpd, setAgentsToUpd, categoryArray, setCategoryArray,
-  habitDoSave, setHabitDoSave
+  habitDoSave, setHabitDoSave, currentView, setCurrentView
 }: Props) => {
   const { session, fetch } = useSession();
   const { webId } = session.info;
@@ -281,7 +283,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
             <InputGroup.Text style={{ 'width': '50%' }}>
               {habitInp.startDate ? constructDate(habitInp.startDate) : constructDate(new Date())}</InputGroup.Text>
           </InputGroup>}
-          {viewerStatus && (habitInp.stat !== null) && <InputGroup className="w-100">
+          {viewerStatus && (currentView === 'today') && (habitInp.stat !== null) && <InputGroup className="w-100">
             <InputGroup.Text className="text-center" id="basic-addon1" style={{ 'width': '50%' }}>Status:</InputGroup.Text>
             <div className="form-check form-switch d-flex justify-content-center align-items-center">
               <input className="form-check-input"  {...(!isEdit && { disabled: true })} type="checkbox" style={{ "transform": "scale(1.6)", "marginLeft": "-0.5em" }}

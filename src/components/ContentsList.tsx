@@ -189,6 +189,8 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
         else {
             return (
                 <NotesList
+                    newEntryCr={newEntryCr}
+                    setNewEntryCr={setNewEntryCr}
                     notesToShow={notesToShow}
                     setNotesToShow={setNotesToShow}
                     notesArray={notesArray}

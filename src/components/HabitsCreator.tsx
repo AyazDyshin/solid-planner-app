@@ -187,7 +187,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
     let updArr = habitsArray.filter((habit) => habit.id !== habitInp.id);
     setHabitsArray(updArr);
     newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
-    await deleteEntry(webId ?? "", fetch, habitInp.id!, "habit");
+    await deleteEntry(webId, fetch, habitInp.id!, "habit");
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

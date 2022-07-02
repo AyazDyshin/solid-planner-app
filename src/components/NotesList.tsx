@@ -12,6 +12,9 @@ import { BsPlusLg } from "react-icons/bs";
 import { BiFolder } from "react-icons/bi";
 import { VscTypeHierarchySuper } from "react-icons/vsc";
 import { GoPrimitiveDot, GoCheck, GoX } from "react-icons/go";
+import { RiDeleteBin6Line } from "react-icons/ri";
+import { deleteEntry } from '../services/SolidPod';
+
 interface Props {
   notesToShow: Note[];
   setNotesToShow: React.Dispatch<React.SetStateAction<Note[]>>;
@@ -30,14 +33,19 @@ interface Props {
   currentCategory: string | null;
   setCurrentAccess: React.Dispatch<React.SetStateAction<string | null>>;
   currentAccess: string | null;
+  newEntryCr: boolean;
+  setNewEntryCr: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, notesToShow, setNotesToShow,
   viewerStatus, setViewerStatus, setCreatorStatus, isEdit, setIsEdit, categoryArray, setCategoryArray,
-  setCurrentCategory, currentCategory, setCurrentAccess, currentAccess }: Props) => {
+  setCurrentCategory, currentCategory, setCurrentAccess, currentAccess, newEntryCr, setNewEntryCr }: Props) => {
 
   const { session, fetch } = useSession();
   const { webId } = session.info;
+  if (webId === undefined) {
+    throw new Error("error when trying to get webId");
+  }
   const [activeNote, setActiveNote] = useState<number | null>(null);
   const [saveModalState, setSaveModalState] = useState<boolean>(false);
 
@@ -52,6 +60,15 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, notes
 
   }
 
+  const handleDelete = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, id: number) => {
+    e.stopPropagation();
+    let updArr = notesArray.filter((note) => note.id !== id);
+    setNotesArray(updArr);
+    newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
+    setViewerStatus(false);
+    setCreatorStatus(false);
+    await deleteEntry(webId, fetch, id, "note");
+  }
 
   return (
     <div className="w-100 h-100">
@@ -112,7 +129,7 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, notes
               notesToShow.map((note, index) => {
                 return <a
                   key={`${note.id}${Date.now() + index + Math.floor(Math.random() * 1000)}`}
-                  className={`list-group-item px-1 list-group-item-action ${activeNote === note.id ? 'active' : ''}`}
+                  className={`list-group-item px-1 d-flex list-group-item-action ${activeNote === note.id ? 'active' : ''}`}
                   onClick={(e) => {
                     e.preventDefault();
                     setIsEdit(false);
@@ -173,6 +190,13 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, notes
                     </div>
                   </OverlayTrigger>}
                   {note.title}
+                  {
+                    <Button variant="outline-danger"
+                      className="ms-auto me-2 px-1 py-1"
+                      style={{ color: "red" }}
+                      onClick={(e) => { handleDelete(e, note.id!) }}
+                    ><RiDeleteBin6Line /></Button>
+                  }
                 </a>
 
               })

@@ -1,6 +1,6 @@
 import { useSession } from '@inrupt/solid-ui-react';
 import { useEffect, useState } from 'react';
-import { fetchAllEntries, thingToHabit, editHabit } from '../services/SolidPod';
+import { fetchAllEntries, thingToHabit, editHabit, deleteEntry } from '../services/SolidPod';
 import { BsPlusLg } from "react-icons/bs";
 import { Habit } from './types';
 import { extractCategories, filterByAccess, filterByCategory, getHabitsToday, setStreaks } from '../services/helpers';
@@ -10,6 +10,7 @@ import { GoPrimitiveDot, GoCheck, GoX } from 'react-icons/go';
 import { RiArrowDropDownLine, RiArrowGoBackFill } from 'react-icons/ri';
 import { VscTypeHierarchySuper } from 'react-icons/vsc';
 import { MdSaveAlt } from "react-icons/md";
+import { RiDeleteBin6Line, RiUserSharedLine } from "react-icons/ri";
 
 interface Props {
   viewerStatus: boolean;
@@ -131,6 +132,16 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
       let updHabit = setStreaks(habit);
       editHabit(webId, fetch, updHabit);
     }))
+  };
+
+  const handleDelete = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, id: number) => {
+    e.stopPropagation();
+    let updArr = habitsArray.filter((habit) => habit.id !== id);
+    setHabitsArray(updArr);
+    newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
+    setViewerStatus(false);
+    setCreatorStatus(false);
+    await deleteEntry(webId, fetch, id, "habit");
   }
   if (!habitsFetched || isLoading) {
     return (
@@ -164,17 +175,37 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
               variant="secondary"
               title={currentView}
             >
-              <Dropdown.Item onClick={() => { setCurrentView('today') }}>today</Dropdown.Item>
-              <Dropdown.Item onClick={() => { setCurrentView('all habits') }}>all habits</Dropdown.Item>
+              <Dropdown.Item onClick={() => {
+                setViewerStatus(false);
+                setCreatorStatus(false);
+                setCurrentView('today');
+              }}>today</Dropdown.Item>
+              <Dropdown.Item onClick={() => {
+                setViewerStatus(false);
+                setCreatorStatus(false);
+                setCurrentView('all habits');
+              }}>all habits</Dropdown.Item>
             </DropdownButton>
             <DropdownButton
               className="mx-1 my-1"
               variant="secondary"
               title={currentStatus}
             >
-              <Dropdown.Item onClick={() => { setCurrentStatus('done') }}>done</Dropdown.Item>
-              <Dropdown.Item onClick={() => { setCurrentStatus('undone') }}>undone</Dropdown.Item>
-              <Dropdown.Item onClick={() => { setCurrentStatus('all') }}>all</Dropdown.Item>
+              <Dropdown.Item onClick={() => {
+                setViewerStatus(false);
+                setCreatorStatus(false);
+                setCurrentStatus('done');
+              }}>done</Dropdown.Item>
+              <Dropdown.Item onClick={() => {
+                setViewerStatus(false);
+                setCreatorStatus(false);
+                setCurrentStatus('undone');
+              }}>undone</Dropdown.Item>
+              <Dropdown.Item onClick={() => {
+                setViewerStatus(false);
+                setCreatorStatus(false);
+                setCurrentStatus('all');
+              }}>all</Dropdown.Item>
 
             </DropdownButton>
             <DropdownButton
@@ -227,7 +258,7 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                   Create a new habit
                 </Popover.Body>
               </Popover>}>
-              <a className="btn btn-secondary ms-auto my-1 d-flex align-items-center justify-content-center" onClick={handleCreate}><BsPlusLg /></a>
+              <a className="btn btn-secondary ms-1 my-1 d-flex align-items-center justify-content-center" onClick={handleCreate}><BsPlusLg /></a>
             </OverlayTrigger>
           </div>
           <div className="list-group w-100 h-80">
@@ -306,11 +337,11 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                         {habit.title}
                         {
                           (habitsToShow[key].stat !== null) &&
-                          <div className="ms-auto me-2"
+                          <div className="ms-auto me-3 mt-0"
                             key={Date.now() + key + Math.floor(Math.random() * 1000)}
                             style={{ display: "inline-block", "marginLeft": "auto" }}>
-                            <input className="form-check-input"
-                              {...((currentView === 'today') && { disabled: true })}
+                            <input className="form-check-input secondary"
+                              {...(!(currentView === 'today') && { disabled: true })}
                               onClick={(e) => {
                                 e.stopPropagation();
                               }}
@@ -321,8 +352,15 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                                 setHabitsToSave((prevState) => ([...prevState, habit]));
                                 setObjOfStates((prevState) => ({ ...prevState, [key]: !objOfStates[key] }));
                               }}
-                              type="checkbox" checked={objOfStates[key]!} style={{ "transform": "scale(1.6)" }} />
+                              type="checkbox" checked={objOfStates[key]!} style={{ "transform": "scale(1.7)" }} />
                           </div>
+                        }
+                        {
+                          <Button variant="outline-danger"
+                            className="px-1 py-1"
+                            style={{ color: "red" }}
+                            onClick={(e) => { handleDelete(e, habit.id!) }}
+                          ><RiDeleteBin6Line /></Button>
                         }
                       </a>
                     )

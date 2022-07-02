@@ -146,7 +146,6 @@ const CustomHabitModal = ({ customHabitModalState, setCustomHabitModalState, hab
                                         <input className="form-check-input" type="checkbox"
                                             onChange={() => {
                                                 setObjOfDays((prevState) => ({ ...prevState, [key]: !objOfDays[key] }));
-                                                //setToApply("week");
                                             }}
                                             checked={objOfDays[key]}
                                             role="switch" id="flexSwitchCheckDefault" />

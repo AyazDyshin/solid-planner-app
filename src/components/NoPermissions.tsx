@@ -12,7 +12,7 @@ const NoPermissions = ({ refresh, setRefresh }: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
     if (webId === undefined) {
-        throw new Error("error when trying to get webId");
+        throw new Error(`Error, couldn't get user's WebId`);
     }
     return (
         <div className="d-flex justify-content-center align-items-center w-100 h-100">

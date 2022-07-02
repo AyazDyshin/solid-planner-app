@@ -10,7 +10,6 @@ export interface Note {
   shareList?: Record<string, AccessModes>;
   //  [key: string]: string | number;
 }
-//type weekDays = string[];
 
 export interface Habit {
   id: number | null;

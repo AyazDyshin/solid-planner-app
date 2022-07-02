@@ -21,7 +21,7 @@ const ContactsRender = () => {
     const [noteToView, setNoteToView] = useState<Note | null>(null);
     const [viewerStatus, setViewerStatus] = useState<boolean>(false);
     if (webId === undefined) {
-        throw new Error("error occurred when fetching webId");
+        throw new Error(`Error, couldn't get user's WebId`);
     }
 
     useEffect(() => {

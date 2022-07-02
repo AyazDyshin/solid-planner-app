@@ -62,7 +62,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
     const { session, fetch } = useSession();
     const { webId } = session.info;
     if (!webId) {
-        throw new Error("Error, couldn't get your webId");
+        throw new Error(`Error, couldn't get user's WebId`);
     }
     const [categoryModalState, setCategoryModalState] = useState<boolean>(false);
     const [accessModalState, setAccessModalState] = useState<boolean>(false);
@@ -75,8 +75,10 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
             handleSave();
         }
         if (viewerStatus) {
-            // handle 
-            setNoteInp(noteToView!);
+            if (!noteToView) {
+                throw new Error("Error, note to view wasn't provided");
+            }
+            setNoteInp(noteToView);
         }
         else {
             setNoteInp({ id: null, title: "", content: "", category: "", url: "", access: null });
@@ -131,6 +133,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
                     }
                     let b = Object.keys(updShareList);
                     Object.keys(updShareList).map((key) => {
+                        //handle
                         if (!updShareList![key].read && !updShareList![key].append && !updShareList![key].write) {
                             delete updShareList![key];
                         }
@@ -155,11 +158,17 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
 
         if (Object.keys(accUpdObj).length !== 0) {
             if (accUpdObj["public"]) {
-                await setPubAccess(webId, publicAccess, NoteInp!.url, fetch);
+                if (!NoteInp) {
+                    throw new Error("Error, note to view wasn't provided");
+                }
+                await setPubAccess(webId, publicAccess, NoteInp.url, fetch);
             }
             else if (accUpdObj["agent"]) {
 
                 for (let item in agentsToUpd) {
+                    if (!NoteInp) {
+                        throw new Error("Error, note to view wasn't provided");
+                    }
                     await shareWith(webId, NoteInp!.url, fetch, agentsToUpd[item], item);
 
                 }
@@ -178,6 +187,9 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
         let updArr = notesArray.filter((note) => note.id !== NoteInp.id);
         setNotesArray(updArr);
         newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
+        if (!NoteInp) {
+            throw new Error("Error, note to view wasn't provided");
+        }
         await deleteEntry(webId ?? "", fetch, NoteInp.id!, "note");
     }
 

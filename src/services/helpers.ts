@@ -213,8 +213,8 @@ const checkWeekDay = (habit: Habit) => {
 
 }
 const habitUpdBest = (habit: Habit) => {
-    if (habit.bestStreak) {
-        if (habit.currentStreak! > habit.bestStreak) {
+    if (habit.bestStreak && habit.currentStreak) {
+        if (habit.currentStreak > habit.bestStreak) {
             habit.bestStreak = habit.currentStreak;
         }
     }
@@ -232,8 +232,7 @@ export const getHabitsToday = (allHab: Habit[]) => {
                 if (typeof habit.custom === 'number') {
                     let dateToCheck = habit.lastCheckInDate ? habit.lastCheckInDate : habit.startDate;
                     let updDate = dateToCheck ? dateToCheck : new Date();
-                    //handle?
-                    if (isSameDay(updDate, today) || differenceInCalendarDays(today, habit.lastCheckInDate!) === habit.custom) {
+                    if (isSameDay(updDate, today) || (habit.lastCheckInDate) && differenceInCalendarDays(today, habit.lastCheckInDate) === habit.custom) {
                         return true;
                     }
                 }
@@ -258,7 +257,6 @@ export const getHabitsToday = (allHab: Habit[]) => {
             let updDate = toCheckDate ? toCheckDate : new Date();
             switch (habit.recurrence) {
                 case "daily": {
-                    //handle
                     if (isSameDay(updDate, today)) return true;
 
                     else {

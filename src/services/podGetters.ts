@@ -18,6 +18,7 @@ export const getPrefLink = async (webId: string, fetch: fetcher) => {
         if (firstData) {
             return firstData;
         }
+        //repair
         throw new Error("a link to preferred storage folder is missing from your profile");
     }
     else {
@@ -77,14 +78,21 @@ export const getPublicTypeIndexUrl = async (webId: string, fetch: fetcher) => {
 
 export const getDefaultFolder = async (webId: string, fetch: fetcher): Promise<string | null> => {
     const prefFileLocation = await getPrefLink(webId, fetch);
-    //handle
-    let dataSet = await getSolidDataset(prefFileLocation!, {
-        fetch: fetch
-    });
-    //handle
-    let aThing = await getThing(dataSet, prefFileLocation!);
-    //handle
-    let defFolderUrl = await getUrl(aThing!, voc.defaultFolder);
+    let dataSet
+    try {
+        dataSet = await getSolidDataset(prefFileLocation, {
+            fetch: fetch
+        });
+    }
+    catch (error) {
+        throw new Error(`couldn't fetch preference file, this might be due to the fact that it doesn't exist, error: ${error}`);
+    }
+    let aThing = await getThing(dataSet, prefFileLocation);
+    //repair?
+    if (!aThing) {
+        throw new Error("preference file is empty");
+    }
+    let defFolderUrl = await getUrl(aThing, voc.defaultFolder);
     return defFolderUrl;
 }
 
@@ -97,18 +105,17 @@ export const getAccessType = async (webId: string, fetch: fetcher) => {
             fetch: fetch
         });
     }
-    catch {
-        throw new Error("couldn't fetch preference file, this might be due to the fact that it doesn't exist");
+    catch (error) {
+        throw new Error(`couldn't fetch preference file, this might be due to the fact that it doesn't exist, error: ${error}`);
     }
-    //handle
+    //repair?
     let aThing = await getThing(dataSet, prefFileLocation);
     if (aThing === null) {
         throw new Error("preference file is empty");
     }
-    //handle
     let type = await getStringNoLocale(aThing, voc.accessType);
     if (type === null) {
-        // add try repair here
+        //repair
         throw new Error("access type is not recorded in pref file");
     }
     return type;
@@ -118,12 +125,19 @@ export const getAccessType = async (webId: string, fetch: fetcher) => {
 export const getAllUrlFromPublicIndex = async (webId: string, fetch: fetcher, type: string) => {
     let typeToGet = (type === "note" ? schema.TextDigitalDocument : voc.Habit);
     const publicTypeIndexUrl = await getPublicTypeIndexUrl(webId, fetch);
-    const dataSet = await getSolidDataset(publicTypeIndexUrl, { fetch: fetch });
+    let dataSet;
+    try {
+        dataSet = await getSolidDataset(publicTypeIndexUrl, { fetch: fetch });
+    }
+    catch (error) {
+        throw new Error(`Error when fetching dataset url: ${publicTypeIndexUrl} error: ${error}`);
+    }
     let allThing = getThingAll(dataSet);
     let updThings = allThing.filter((thing) => getUrl(thing, solid.forClass) === typeToGet)
         .map((thing) => getUrl(thing, solid.instance)).filter((url) => url) as string[];
+    //repair
     if (updThings === []) {
-        throw new Error("error, it seems like something deleted a reference to solid planner app's folder from you public type index files ");
+        throw new Error("error,reference to solid planner app's folder is missing from you public type index files");
     }
     return updThings;
 }

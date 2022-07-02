@@ -46,7 +46,7 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
   const { session, fetch } = useSession();
   const { webId } = session.info;
   if (webId === undefined) {
-    throw new Error("error when trying to get webId");
+    throw new Error(`Error, couldn't get user's WebId`);
   }
   const [currentCategory, setCurrentCategory] = useState<string | null>(null);
   const [currentAccess, setCurrentAccess] = useState<string | null>(null);
@@ -293,11 +293,11 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                         {habit.access && <OverlayTrigger placement="right" overlay={
                           <Popover>
                             <Popover.Body className="py-1 px-1">
-                              {(habit!.access![Object.keys(habit!.access!)[0]].read) ?
+                              {(habit.access[Object.keys(habit.access)[0]].read) ?
                                 (<div>read: <GoCheck /></div>) : (<div>read: <GoX /></div>)}
-                              {(habit!.access![Object.keys(habit!.access!)[0]].append) ?
+                              {(habit.access[Object.keys(habit.access)[0]].append) ?
                                 (<div>append: <GoCheck /></div>) : (<div>append: <GoX /></div>)}
-                              {(habit!.access![Object.keys(habit!.access!)[0]].write) ?
+                              {(habit.access[Object.keys(habit.access)[0]].write) ?
                                 (<div>write: <GoCheck /></div>) : (<div>write: <GoX /></div>)}
                             </Popover.Body>
                           </Popover>
@@ -312,17 +312,20 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                             <Popover.Body className="py-1 px-1">
                               <div >
                                 {
-                                  Object.keys(habit!.shareList!).map((key, index) => {
+                                  Object.keys(habit.shareList).map((key, index) => {
                                     return <div key={Date.now() + index + Math.floor(Math.random() * 1000)}>
                                       <div> {key} :</div>
-                                      <div className="d-flex justify-content-between">
-                                        {(habit!.shareList![key].read) ?
-                                          (<div style={{ display: "inline" }}>read: <GoCheck /></div>) : (<div style={{ display: "inline" }}>read: <GoX /></div>)}
-                                        {(habit!.shareList![key].append) ?
-                                          (<div style={{ display: "inline" }}>append: <GoCheck /></div>) : (<div style={{ display: "inline" }}>append: <GoX /></div>)}
-                                        {(habit!.shareList![key].write) ?
-                                          (<div style={{ display: "inline" }}>write: <GoCheck /></div>) : (<div style={{ display: "inline" }}>write: <GoX /></div>)}
-                                      </div>
+                                      {
+                                        habit.shareList &&
+                                        <div className="d-flex justify-content-between">
+                                          {(habit.shareList[key].read) ?
+                                            (<div style={{ display: "inline" }}>read: <GoCheck /></div>) : (<div style={{ display: "inline" }}>read: <GoX /></div>)}
+                                          {(habit.shareList[key].append) ?
+                                            (<div style={{ display: "inline" }}>append: <GoCheck /></div>) : (<div style={{ display: "inline" }}>append: <GoX /></div>)}
+                                          {(habit.shareList[key].write) ?
+                                            (<div style={{ display: "inline" }}>write: <GoCheck /></div>) : (<div style={{ display: "inline" }}>write: <GoX /></div>)}
+                                        </div>
+                                      }
                                     </div>
                                   })
                                 }
@@ -336,7 +339,7 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                         </OverlayTrigger>}
                         {habit.title}
                         {
-                          (habitsToShow[key].stat !== null) &&
+                          (habitsToShow[key].stat !== null) && (objOfStates[key] !== null) &&
                           <div className="ms-auto me-3 mt-0"
                             key={Date.now() + key + Math.floor(Math.random() * 1000)}
                             style={{ display: "inline-block", "marginLeft": "auto" }}>
@@ -356,6 +359,7 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                           </div>
                         }
                         {
+                          habit.id &&
                           <Button variant="outline-danger"
                             className="px-1 py-1"
                             style={{ color: "red" }}

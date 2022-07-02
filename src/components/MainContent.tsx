@@ -16,7 +16,7 @@ const MainContent = () => {
   const { session, fetch } = useSession();
   const { webId } = session.info;
   if (!webId) {
-    throw new Error("Error, couldn't get your webId");
+    throw new Error(`Error, couldn't get user's WebId`);
   }
   const links = ['notes', 'habits', 'contacts'];
   const [active, setActive] = useState("notes");
@@ -38,7 +38,6 @@ const MainContent = () => {
       if (!defFolderUpd) {
         let heh = await recordDefaultFolder(webId, fetch);
       }
-      //handle
       let result = await checkPermissions(webId, fetch);
       setPermissionStatus(result);
       setIsLoading(false);

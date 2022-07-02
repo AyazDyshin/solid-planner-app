@@ -39,7 +39,7 @@ const SharedModal = ({ sharedModalState, setSharedModalState, setNoteInp,
     const { session, fetch } = useSession();
     const { webId } = session.info;
     if (!webId) {
-        throw new Error("couldn't get your webId");
+        throw new Error(`Error, couldn't get user's WebId`);
     }
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [sharedList, setSharedList] = useState<Record<string, AccessModes>>({});
@@ -49,11 +49,16 @@ const SharedModal = ({ sharedModalState, setSharedModalState, setNoteInp,
             setIsLoading(true);
             let inputToUse = NoteInp ? NoteInp : habitInp;
 
-            //handle
-            let key = Object.keys(inputToUse!.access!)[0];
-            let pubAccess = inputToUse!.access![key];
+            if (!inputToUse){
+                throw new Error("Error, entry to set access for wasn't provided");
+            }
+            if (!inputToUse.access){
+                throw new Error("Error, entry to set access for wasn't provided");
+            }
+            let key = Object.keys(inputToUse.access)[0];
+            let pubAccess = inputToUse.access[key];
             setPublicAccess({ read: pubAccess.read, append: pubAccess.append, write: pubAccess.write });
-            if (inputToUse!.shareList) setSharedList(inputToUse!.shareList);
+            if (inputToUse.shareList) setSharedList(inputToUse.shareList);
             else setSharedList({});
 
             setIsLoading(false);

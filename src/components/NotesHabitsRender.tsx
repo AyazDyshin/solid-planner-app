@@ -1,6 +1,5 @@
 import { Thing } from "@inrupt/solid-client";
 import { useState } from "react";
-import CreatorToRender from "./CreatorToRender";
 import "../styles.css";
 import { accessObject, Note } from "./types";
 import ContentsList from "./ContentsList";

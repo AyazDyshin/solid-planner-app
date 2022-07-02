@@ -1,6 +1,6 @@
 import { useSession } from "@inrupt/solid-ui-react";
-import { useEffect, useState } from "react";
-import { Modal, Button, Form, FormControl, InputGroup, DropdownButton, Dropdown } from "react-bootstrap";
+import { useState } from "react";
+import { Modal, Button, FormControl, InputGroup, DropdownButton, Dropdown } from "react-bootstrap";
 import { Note, Habit } from "../components/types";
 
 interface Props {

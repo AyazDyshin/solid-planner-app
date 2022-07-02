@@ -46,7 +46,7 @@ const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, setNoteIn
     const { session, fetch } = useSession();
     const { webId } = session.info;
     if (!webId) {
-        throw new Error("couldn't get your webId");
+        throw new Error(`Error, couldn't get user's WebId`);
     }
     const [sharedOpen, setSharedOpen] = useState<boolean>(false);
     const [sharingOpen, setSharingOpen] = useState<boolean>(false);
@@ -71,12 +71,17 @@ const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, setNoteIn
             setWebIdOpen(false);
             //handle
             let inputToUse = NoteInp ? NoteInp : habitInp;
-            let key = Object.keys(inputToUse!.access!)[0];
-            let pubAccess = inputToUse!.access![key];
+            if (!inputToUse){
+                throw new Error("Error, entry to set access for wasn't provided");
+            }
+            if (!inputToUse.access){
+                throw new Error("Error, entry to set access for wasn't provided");
+            }
+            let key = Object.keys(inputToUse.access)[0];
+            let pubAccess = inputToUse.access[key];
             setPublicAccess({ read: pubAccess.read, append: pubAccess.append, write: pubAccess.write });
-            //let shList = await getSharedList(webId, noteToView!.url, fetch);
             let shList: Record<string, AccessModes>;
-            if (inputToUse!.shareList) shList = inputToUse!.shareList;
+            if (inputToUse.shareList) shList = inputToUse.shareList;
             else shList = {};
             setSharedList(shList);
             let contactsStatus = await checkContacts(webId, fetch);
@@ -185,6 +190,7 @@ const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, setNoteIn
                                                     <AccessElement
                                                         key={Date.now() + index + Math.floor(Math.random() * 1000)}
                                                         title={key}
+                                                        //handle
                                                         readOnChange={() => {
                                                             let wId = (fullContacts[key]) ? fullContacts[key] : key;
                                                             setAgentsToUpd(prevState => ({ ...prevState, [wId!]: { read: !value.read, append: value.append, write: value.write } }));

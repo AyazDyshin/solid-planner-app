@@ -6,8 +6,6 @@ import { CgNotes } from "react-icons/cg";
 import { FiLogOut } from "react-icons/fi";
 import { RiContactsLine } from "react-icons/ri";
 import { TbListCheck } from "react-icons/tb";
-import { useState } from "react";
-import { fetchAllEntries, thingToNote } from "../services/SolidPod";
 interface Props {
     links: string[];
     active: string;
@@ -34,7 +32,7 @@ const Navbar = ({ links, active, setActive, viewerStatus, setViewerStatus,
     const { session, fetch } = useSession();
     const { webId } = session.info;
     if (webId === undefined) {
-        throw new Error("error when trying to get webId");
+        throw new Error(`Error, couldn't get user's WebId`);
     }
     const onError = (error: Error) => {
         console.log(error);
@@ -51,22 +49,7 @@ const Navbar = ({ links, active, setActive, viewerStatus, setViewerStatus,
                 return <div></div>;
         }
     }
-    // const perfFetch = async (active: string) => {
-    //     switch (active) {
-    //         case "notes": {
-    //             // if (!notesFetched) {
-    //             //     let [noteArr, rest] = await fetchAllEntries(webId, fetch, "note");
-    //             //     let transformedArr = await Promise.all(noteArr.map(async (thing) => {
-    //             //         return await thingToNote(thing, webId, fetch);
-    //             //     }));
-    //             //     transformedArr = transformedArr.filter((item) => item !== null) as Note[];
-    //             //     let updType = transformedArr as Note[];
-    //             //     setNotesArray(updType);
-    //             //     setNotesFetched(true);
-    //             // }
-    //         }
-    //     }
-    // }
+
     return (
         <nav className="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
             <div className="container-fluid">

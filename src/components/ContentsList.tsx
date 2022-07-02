@@ -1,5 +1,3 @@
-import { Thing, ThingPersisted } from "@inrupt/solid-client";
-import { WebsocketNotification } from "@inrupt/solid-client-notifications";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import { useSession } from "@inrupt/solid-ui-react";
 import { useEffect, useState } from "react";
@@ -62,7 +60,7 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
     const { session, fetch } = useSession();
     const { webId } = session.info;
     if (webId === undefined) {
-        throw new Error("error when trying to get webId");
+        throw new Error(`Error, couldn't get user's WebId`);
     }
     const [currentCategory, setCurrentCategory] = useState<string | null>(null);
     const [currentAccess, setCurrentAccess] = useState<string | null>(null);

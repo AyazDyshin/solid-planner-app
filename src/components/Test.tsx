@@ -26,7 +26,7 @@ import {
 } from '../services/access';
 //import { getPolicyAll } from '@inrupt/solid-client/dist/acp/policy';
 import { ACP } from '@inrupt/vocab-solid';
-import { changeAccessAcp, initializePolicies, setAccessForResource } from '../services/helperAccess';
+import { changeAccessAcp } from '../services/helperAccess';
 import { fdatasync } from 'fs';
 import { getResourceInfoWithAcr, getSolidDatasetWithAcr, WithAccessibleAcr } from '@inrupt/solid-client/dist/acp/acp';
 

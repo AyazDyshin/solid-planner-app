@@ -8,7 +8,6 @@ import { BiFolderPlus } from "react-icons/bi";
 import { MdSaveAlt } from "react-icons/md";
 import { useEffect, useState } from "react";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
-import { publicAccess } from "rdf-namespaces/dist/schema";
 import { setPubAccess, shareWith } from "../services/access";
 import { saveHabit, deleteEntry, editHabit } from "../services/SolidPod";
 import { useSession } from "@inrupt/solid-ui-react";
@@ -64,7 +63,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
   const { session, fetch } = useSession();
   const { webId } = session.info;
   if (webId === undefined) {
-    throw new Error("error when trying to get webId");
+    throw new Error(`Error, couldn't get user's WebId`);
   }
   const [customHabitModalState, setCustomHabitModalState] = useState<boolean>(false);
   const [categoryModalState, setCategoryModalState] = useState<boolean>(false);
@@ -77,9 +76,11 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
       handleSave();
     }
     if (viewerStatus) {
-      // handle 
       setCreatorStatus(false);
-      setHabitInp(habitToView!);
+      if (!habitToView) {
+        throw new Error("Error, habit to view wasn't provided");
+      }
+      setHabitInp(habitToView);
     }
     else {
       setHabitInp({
@@ -160,7 +161,6 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
       setHabitChanged(false);
       setArrOfChanges([]);
       if (arrOfChanges.length !== 0 || habitChanged) {
-        console.log("are we here?");
         await editHabit(webId, fetch, habitInp);
       }
 
@@ -168,12 +168,25 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
 
     if (Object.keys(accUpdObj).length !== 0) {
       if (accUpdObj["public"]) {
-        await setPubAccess(webId, publicAccess, habitInp!.url!, fetch);
+        if (!habitInp) {
+          throw new Error("error: habit to set access for, wasn't provided");
+        }
+        if (!habitInp.url) {
+          throw new Error("error: provided habit doesn't have url");
+
+        }
+        await setPubAccess(webId, publicAccess, habitInp.url, fetch);
       }
       else if (accUpdObj["agent"]) {
+        if (!habitInp) {
+          throw new Error("error: habit to set access for, wasn't provided");
+        }
+        if (!habitInp.url) {
+          throw new Error("error: provided habit to set access for, doesn't have url");
 
+        }
         for (let item in agentsToUpd) {
-          await shareWith(webId, habitInp!.url!, fetch, agentsToUpd[item], item);
+          await shareWith(webId, habitInp.url, fetch, agentsToUpd[item], item);
 
         }
       }
@@ -187,7 +200,11 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
     let updArr = habitsArray.filter((habit) => habit.id !== habitInp.id);
     setHabitsArray(updArr);
     newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
-    await deleteEntry(webId, fetch, habitInp.id!, "habit");
+    if (!habitInp.id) {
+      throw new Error("error: provided habit to delete, doesn't have id");
+
+    }
+    await deleteEntry(webId, fetch, habitInp.id, "habit");
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

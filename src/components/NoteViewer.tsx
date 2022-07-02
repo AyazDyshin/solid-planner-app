@@ -7,6 +7,9 @@ interface Props {
 }
 
 const NoteViewer = ({ noteToView, setNoteToView }: Props) => {
+    if (!noteToView) {
+        throw new Error("Error, note to view wasn't provided");
+    }
     return (
         <div>
             <InputGroup className="mb-2 mt-2">
@@ -14,13 +17,13 @@ const NoteViewer = ({ noteToView, setNoteToView }: Props) => {
                 <FormControl
                     name="title"
                     aria-label="title"
-                    value={noteToView!.title === null ? "" : noteToView!.title}
+                    value={noteToView.title === null ? "" : noteToView.title}
                     disabled={true}
                 />
             </InputGroup>
             <FormControl disabled={true} as="textarea" aria-label="textarea" style={{ 'resize': 'none', 'height': '91%' }}
                 name="content"
-                value={noteToView!.content === null ? "" : noteToView!.content}
+                value={noteToView.content === null ? "" : noteToView.content}
 
             />
 

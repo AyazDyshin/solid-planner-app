@@ -44,7 +44,7 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, notes
   const { session, fetch } = useSession();
   const { webId } = session.info;
   if (webId === undefined) {
-    throw new Error("error when trying to get webId");
+    throw new Error(`Error, couldn't get user's WebId`);
   }
   const [activeNote, setActiveNote] = useState<number | null>(null);
   const [saveModalState, setSaveModalState] = useState<boolean>(false);
@@ -148,11 +148,11 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, notes
                   {note.access && <OverlayTrigger placement="right" overlay={
                     <Popover>
                       <Popover.Body className="py-1 px-1">
-                        {(note!.access![Object.keys(note!.access!)[0]].read) ?
+                        {(note.access[Object.keys(note.access)[0]].read) ?
                           (<div>read: <GoCheck /></div>) : (<div>read: <GoX /></div>)}
-                        {(note!.access![Object.keys(note!.access!)[0]].append) ?
+                        {(note.access[Object.keys(note.access)[0]].append) ?
                           (<div>append: <GoCheck /></div>) : (<div>append: <GoX /></div>)}
-                        {(note!.access![Object.keys(note!.access!)[0]].write) ?
+                        {(note.access[Object.keys(note.access)[0]].write) ?
                           (<div>write: <GoCheck /></div>) : (<div>write: <GoX /></div>)}
                       </Popover.Body>
                     </Popover>
@@ -167,6 +167,7 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, notes
                       <Popover.Body className="py-1 px-1">
                         <div >
                           {
+                            //handle
                             Object.keys(note!.shareList!).map((key, index) => {
                               return <div key={Date.now() + index + Math.floor(Math.random() * 1000)}>
                                 <div> {key} :</div>
@@ -191,6 +192,7 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, notes
                   </OverlayTrigger>}
                   {note.title}
                   {
+                    note.id && 
                     <Button variant="outline-danger"
                       className="ms-auto me-2 px-1 py-1"
                       style={{ color: "red" }}

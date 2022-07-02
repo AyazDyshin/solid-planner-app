@@ -94,8 +94,9 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
 
     const handleSave = async () => {
         setIsEdit(false);
-        setViewerStatus(false);
+
         if (creatorStatus) {
+            setViewerStatus(false);
             setCreatorStatus(false);
             let newNote = { ...NoteInp, id: Date.now() + Math.floor(Math.random() * 1000), access: { "private": { read: false, append: false, write: false } } }
             setNoteInp(newNote);
@@ -105,7 +106,8 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
             setArrOfChanges([]);
             await saveNote(webId, fetch, NoteInp);
         }
-        else if (arrOfChanges.length !== 0 || Object.keys(accUpdObj).length !== 0) {
+        else if (viewerStatus && (arrOfChanges.length !== 0 || Object.keys(accUpdObj).length !== 0)) {
+            setViewerStatus(false);
             let noteToUpd = NoteInp;
             if (Object.keys(accUpdObj).length !== 0) {
                 if (accUpdObj["public"]) {

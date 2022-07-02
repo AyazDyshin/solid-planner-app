@@ -1,14 +1,15 @@
 import { useSession } from '@inrupt/solid-ui-react';
 import { useEffect, useState } from 'react';
-import { fetchAllEntries, thingToHabit } from '../services/SolidPod';
+import { fetchAllEntries, thingToHabit, editHabit } from '../services/SolidPod';
 import { BsPlusLg } from "react-icons/bs";
 import { Habit } from './types';
 import { extractCategories, filterByAccess, filterByCategory, getHabitsToday } from '../services/helpers';
-import { DropdownButton, Dropdown, OverlayTrigger, Popover, Badge, Spinner } from 'react-bootstrap';
+import { DropdownButton, Dropdown, OverlayTrigger, Popover, Badge, Spinner, Button } from 'react-bootstrap';
 import { BiFolder } from 'react-icons/bi';
 import { GoPrimitiveDot, GoCheck, GoX } from 'react-icons/go';
 import { RiArrowDropDownLine, RiArrowGoBackFill } from 'react-icons/ri';
 import { VscTypeHierarchySuper } from 'react-icons/vsc';
+import { MdSaveAlt } from "react-icons/md";
 
 interface Props {
   viewerStatus: boolean;
@@ -29,10 +30,15 @@ interface Props {
   setHabitsToday: React.Dispatch<React.SetStateAction<Habit[]>>;
   categoryArray: string[];
   setCategoryArray: React.Dispatch<React.SetStateAction<string[]>>;
+  habitInp: Habit;
+  setHabitInp: React.Dispatch<React.SetStateAction<Habit>>;
+  habitDoSave: boolean;
+  setHabitDoSave: React.Dispatch<React.SetStateAction<boolean>>;
+
 }
 const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorStatus, habitsFetched, setHabitsFetched,
   habitsArray, setHabitsArray, isEdit, setIsEdit, habitToView, setHabitToView, newEntryCr, setNewEntryCr,
-  habitsToday, setHabitsToday, categoryArray, setCategoryArray
+  habitsToday, setHabitsToday, categoryArray, setCategoryArray, habitInp, setHabitInp, habitDoSave, setHabitDoSave
 }: Props) => {
   const { session, fetch } = useSession();
   const { webId } = session.info;
@@ -47,19 +53,27 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
   const [currentView, setCurrentView] = useState<string>("today");
   const accessArray = ["public", "private", "shared"];
   const [currentStatus, setCurrentStatus] = useState<string | null>("undone");
+  const [habitsToSave, setHabitsToSave] = useState<Habit[]>([]);
+  const [objOfStates, setObjOfStates] = useState<{ [x: number]: boolean | null; }>({});
+  const [filterTest, setFilterTest] = useState<(Habit | null)[]>([]);
   useEffect(() => {
     const fetchHabits = async (otherId?: string) => {
       let filteredHabits: Habit[] = [];
       if (!habitsFetched) {
         let habitArr = await fetchAllEntries(webId, fetch, "habit");
-
-        let tempArr = await Promise.all(habitArr.map(async (thing) => {
-          let toRet = await thingToHabit(thing, webId, fetch);
-          if (toRet) {
-            filteredHabits.push(toRet);
+        for (let i = 0; i < habitArr.length; i++) {
+          let item = await thingToHabit(habitArr[i], webId, fetch);
+          if (item) {
+            filteredHabits.push(item);
           }
-          return thing;
-        }));
+        }
+        // let tempArr = await Promise.all(habitArr.map(async (thing) => {
+        //   let toRet = await thingToHabit(thing, webId, fetch);
+        //   if (toRet) {
+        //     filteredHabits.push(toRet);
+        //   }
+        //   return thing;
+        // }));
         setHabitsArray(filteredHabits);
         setHabitsFetched(true);
       }
@@ -68,13 +82,17 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
       }
       let extr = extractCategories(filteredHabits);
       setCategoryArray(extr);
+
+
       if (currentCategory || currentAccess || currentView || currentStatus) {
         let temp = filteredHabits;
         if (currentCategory) filteredHabits = filterByCategory(filteredHabits, currentCategory);
         if (currentAccess) filteredHabits = filterByAccess(filteredHabits, currentAccess);
 
+
         if (currentView === 'today') {
-          filteredHabits = getHabitsToday(filteredHabits);
+
+          let bib = getHabitsToday(filteredHabits);
           filteredHabits.forEach((habit) => {
             temp.map((habit2) => {
               if (habit.id === habit2.id) {
@@ -93,6 +111,9 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
         }
       }
       setHabitsToShow(filteredHabits);
+      filteredHabits.forEach((habit, key) => {
+        setObjOfStates((prevState) => ({ ...prevState, [key]: habit.stat }));
+      });
       setIsLoading(false);
 
     }
@@ -104,7 +125,12 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
     setViewerStatus(false);
     setCreatorStatus(true);
   };
-
+  const handleSave = async () => {
+    await Promise.all(habitsToSave.map(async (habit) => {
+      let updHabit = setStreaks(habit);
+      editHabit(webId, fetch, updHabit);
+    }))
+  }
   if (!habitsFetched || isLoading) {
     return (
       <Spinner animation="border" role="status">
@@ -176,7 +202,7 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
               >
                 {
                   categoryArray.map((category, key) => {
-                    return <Dropdown.Item href="" key={Date.now() + key + Math.floor(Math.random() * 1000)}
+                    return <Dropdown.Item key={Date.now() + key + Math.floor(Math.random() * 1000)}
                       onClick={() => {
                         setViewerStatus(false);
                         setCreatorStatus(false);
@@ -190,86 +216,111 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                   <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentCategory(null)}><RiArrowGoBackFill /> reset</Dropdown.Item></>)}
               </DropdownButton>
             }
+            <Button variant="secondary" className="ms-auto my-1" onClick={handleSave}><MdSaveAlt /> save</Button>
             <OverlayTrigger placement="left" overlay={
               <Popover>
                 <Popover.Body className="py-1 px-1">
-                  Create a new note
+                  Create a new habit
                 </Popover.Body>
               </Popover>}>
               <a className="btn btn-secondary ms-auto my-1 d-flex align-items-center justify-content-center" onClick={handleCreate}><BsPlusLg /></a>
             </OverlayTrigger>
           </div>
           <div className="list-group w-100 h-80">
+
+
+
             {
               habitsToShow.length !== 0 && <div className="list-group" style={{ maxHeight: '80%', overflow: 'auto' }}>
                 {
+
                   habitsToShow.map((habit, key) => {
-                    return <a
-                      key={`${habit.id}${Date.now() + key + Math.floor(Math.random() * 1000)}`}
-                      className={`list-group-item px-1 list-group-item-action ${activeHabit === habit.id ? 'active' : ''}`}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setIsEdit(false);
-                        setActiveHabit(habit.id);
-                        setHabitToView(habit);
-                        setViewerStatus(true);
-                        setCreatorStatus(false);
-                      }}
-                    >
-                      <div style={{ display: "inline-block" }}>
-                        {habit.recurrence && <Badge pill bg="info" className="me-1">{habit.recurrence}</Badge>}
-                        {habit.category && <Badge pill bg="info" className="me-1">{habit.category}</Badge>}
-                      </div>
-                      <div style={{ display: "inline-block" }}>
-                        {!habit.category && <Badge pill bg="info" className="me-1">no category</Badge>}
-                      </div>
-                      {habit.access && <OverlayTrigger placement="right" overlay={
-                        <Popover>
-                          <Popover.Body className="py-1 px-1">
-                            {(habit!.access![Object.keys(habit!.access!)[0]].read) ?
-                              (<div>read: <GoCheck /></div>) : (<div>read: <GoX /></div>)}
-                            {(habit!.access![Object.keys(habit!.access!)[0]].append) ?
-                              (<div>append: <GoCheck /></div>) : (<div>append: <GoX /></div>)}
-                            {(habit!.access![Object.keys(habit!.access!)[0]].write) ?
-                              (<div>write: <GoCheck /></div>) : (<div>write: <GoX /></div>)}
-                          </Popover.Body>
-                        </Popover>
-                      }>
+                    return (
+                      <a
+                        key={`${habit.id}${Date.now() + key + Math.floor(Math.random() * 1000)}`}
+                        className={`list-group-item px-1 d-flex list-group-item-action ${activeHabit === habit.id ? 'active' : ''}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setIsEdit(false);
+                          setActiveHabit(habit.id);
+                          setHabitToView(habit);
+                          setViewerStatus(true);
+                          setCreatorStatus(false);
+                        }}
+                      >
                         <div style={{ display: "inline-block" }}>
-                          <Badge pill bg="secondary" className="me-1 cursor">{Object.keys(habit.access)[0]}</Badge>
+                          {habit.recurrence && <Badge pill bg="info" className="me-1">{habit.recurrence}</Badge>}
+                          {habit.category && <Badge pill bg="info" className="me-1">{habit.category}</Badge>}
                         </div>
-                      </OverlayTrigger>}
+                        <div style={{ display: "inline-block" }}>
+                          {!habit.category && <Badge pill bg="info" className="me-1">no category</Badge>}
+                        </div>
+                        {habit.access && <OverlayTrigger placement="right" overlay={
+                          <Popover>
+                            <Popover.Body className="py-1 px-1">
+                              {(habit!.access![Object.keys(habit!.access!)[0]].read) ?
+                                (<div>read: <GoCheck /></div>) : (<div>read: <GoX /></div>)}
+                              {(habit!.access![Object.keys(habit!.access!)[0]].append) ?
+                                (<div>append: <GoCheck /></div>) : (<div>append: <GoX /></div>)}
+                              {(habit!.access![Object.keys(habit!.access!)[0]].write) ?
+                                (<div>write: <GoCheck /></div>) : (<div>write: <GoX /></div>)}
+                            </Popover.Body>
+                          </Popover>
+                        }>
+                          <div style={{ display: "inline-block" }}>
+                            <Badge pill bg="secondary" className="me-1 cursor">{Object.keys(habit.access)[0]}</Badge>
+                          </div>
+                        </OverlayTrigger>}
 
-                      {habit.shareList && <OverlayTrigger placement="right" overlay={
-                        <Popover style={{ maxWidth: "400px" }}>
-                          <Popover.Body className="py-1 px-1">
-                            <div >
-                              {
-                                Object.keys(habit!.shareList!).map((key, index) => {
-                                  return <div key={Date.now() + index + Math.floor(Math.random() * 1000)}>
-                                    <div> {key} :</div>
-                                    <div className="d-flex justify-content-between">
-                                      {(habit!.shareList![key].read) ?
-                                        (<div style={{ display: "inline" }}>read: <GoCheck /></div>) : (<div style={{ display: "inline" }}>read: <GoX /></div>)}
-                                      {(habit!.shareList![key].append) ?
-                                        (<div style={{ display: "inline" }}>append: <GoCheck /></div>) : (<div style={{ display: "inline" }}>append: <GoX /></div>)}
-                                      {(habit!.shareList![key].write) ?
-                                        (<div style={{ display: "inline" }}>write: <GoCheck /></div>) : (<div style={{ display: "inline" }}>write: <GoX /></div>)}
+                        {habit.shareList && <OverlayTrigger placement="right" overlay={
+                          <Popover style={{ maxWidth: "400px" }}>
+                            <Popover.Body className="py-1 px-1">
+                              <div >
+                                {
+                                  Object.keys(habit!.shareList!).map((key, index) => {
+                                    return <div key={Date.now() + index + Math.floor(Math.random() * 1000)}>
+                                      <div> {key} :</div>
+                                      <div className="d-flex justify-content-between">
+                                        {(habit!.shareList![key].read) ?
+                                          (<div style={{ display: "inline" }}>read: <GoCheck /></div>) : (<div style={{ display: "inline" }}>read: <GoX /></div>)}
+                                        {(habit!.shareList![key].append) ?
+                                          (<div style={{ display: "inline" }}>append: <GoCheck /></div>) : (<div style={{ display: "inline" }}>append: <GoX /></div>)}
+                                        {(habit!.shareList![key].write) ?
+                                          (<div style={{ display: "inline" }}>write: <GoCheck /></div>) : (<div style={{ display: "inline" }}>write: <GoX /></div>)}
+                                      </div>
                                     </div>
-                                  </div>
-                                })
-                              }
-                            </div>
-                          </Popover.Body>
-                        </Popover>
-                      }>
-                        <div style={{ display: "inline-block" }}>
-                          <Badge pill bg="secondary" className="me-1 cursor">shared</Badge>
-                        </div>
-                      </OverlayTrigger>}
-                      {habit.title}
-                    </a>
-
+                                  })
+                                }
+                              </div>
+                            </Popover.Body>
+                          </Popover>
+                        }>
+                          <div style={{ display: "inline-block" }}>
+                            <Badge pill bg="secondary" className="me-1 cursor">shared</Badge>
+                          </div>
+                        </OverlayTrigger>}
+                        {habit.title}
+                        {
+                          (habitsToShow[key].stat !== null) &&
+                          <div className="ms-auto me-2"
+                            key={Date.now() + key + Math.floor(Math.random() * 1000)}
+                            style={{ display: "inline-block", "marginLeft": "auto" }}>
+                            <input className="form-check-input"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                              }}
+                              onChange={() => {
+                                let tempArr = habitsToShow;
+                                tempArr[key].stat = !habit.stat;
+                                setHabitsToShow(tempArr);
+                                setHabitsToSave((prevState) => ([...prevState, habit]));
+                                setObjOfStates((prevState) => ({ ...prevState, [key]: !objOfStates[key] }));
+                              }}
+                              type="checkbox" checked={objOfStates[key]!} style={{ "transform": "scale(1.6)" }} />
+                          </div>
+                        }
+                      </a>
+                    )
                   })
                 }
               </div>
@@ -283,10 +334,11 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
               </div>
             }
           </div>
-        </div>
+        </div >
       )
     }
   }
 }
 
 export default HabitsList
+

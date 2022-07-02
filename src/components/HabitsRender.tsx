@@ -21,6 +21,7 @@ const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsA
     const [agentsToUpd, setAgentsToUpd] = useState<{ [x: string]: AccessModes; }>({});
     const [habitsToday, setHabitsToday] = useState<Habit[]>([]);
     const [categoryArray, setCategoryArray] = useState<string[]>([]);
+    const [habitDoSave, setHabitDoSave] = useState<boolean>(false);
     const [habitInp, setHabitInp] = useState<Habit>({
         id: null, title: "", content: "", startDate: null, lastCheckInDate: null, recurrence: "daily", bestStreak: null,
         currentStreak: null, stat: null, category: "", url: "", access: null, prevBestStreak: null, prevLastCheckIn: null
@@ -32,6 +33,10 @@ const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsA
             <div className="row h-100">
                 <div className="col h-100 border border-5 border-end-0 d-flex justify-content-center align-items-center p-0">
                     <HabitsList
+                        habitDoSave={habitDoSave}
+                        setHabitDoSave={setHabitDoSave}
+                        habitInp={habitInp}
+                        setHabitInp={setHabitInp}
                         categoryArray={categoryArray}
                         setCategoryArray={setCategoryArray}
                         habitsToday={habitsToday}
@@ -54,6 +59,8 @@ const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsA
                 </div>
                 <div className="col h-100 border border-5">
                     {(viewerStatus || creatorStatus) && <HabitsCreator
+                        habitDoSave={habitDoSave}
+                        setHabitDoSave={setHabitDoSave}
                         categoryArray={categoryArray}
                         setCategoryArray={setCategoryArray}
                         agentsToUpd={agentsToUpd}

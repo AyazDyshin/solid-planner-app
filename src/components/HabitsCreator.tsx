@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import { publicAccess } from "rdf-namespaces/dist/schema";
 import { setPubAccess, shareWith } from "../services/access";
-import { saveHabit, editNote, deleteEntry, editHabit } from "../services/SolidPod";
+import { saveHabit, deleteEntry, editHabit } from "../services/SolidPod";
 import { useSession } from "@inrupt/solid-ui-react";
 import { constructDate, setStreaks } from "../services/helpers";
 import AccessModal from "../modals/AccessModal";
@@ -51,10 +51,13 @@ interface Props {
   }>>;
   categoryArray: string[];
   setCategoryArray: React.Dispatch<React.SetStateAction<string[]>>;
+  habitDoSave: boolean;
+  setHabitDoSave: React.Dispatch<React.SetStateAction<boolean>>;
 }
 const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, isEdit, setIsEdit, creatorStatus, setCreatorStatus,
   viewerStatus, setViewerStatus, habitToView, setHabitToView, habitsArray, setHabitsArray, newEntryCr, setNewEntryCr,
-  accUpdObj, setAccUpdObj, publicAccess, setPublicAccess, agentsToUpd, setAgentsToUpd, categoryArray, setCategoryArray
+  accUpdObj, setAccUpdObj, publicAccess, setPublicAccess, agentsToUpd, setAgentsToUpd, categoryArray, setCategoryArray,
+  habitDoSave, setHabitDoSave
 }: Props) => {
   const { session, fetch } = useSession();
   const { webId } = session.info;
@@ -68,11 +71,12 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
   const [contactsList, setContactsList] = useState<{ [x: string]: AccessModes; }>({});
   const [sharedModalState, setSharedModalState] = useState<boolean>(false);
   useEffect(() => {
-    if (arrOfChanges.length !== 0) {
+    if (arrOfChanges.length !== 0 || habitChanged) {
       handleSave();
     }
     if (viewerStatus) {
       // handle 
+      setCreatorStatus(false);
       setHabitInp(habitToView!);
     }
     else {
@@ -82,13 +86,13 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
       });
       setIsEdit(true);
     }
-  }, [viewerStatus, habitToView, creatorStatus]);
+  }, [viewerStatus, habitToView, creatorStatus, habitDoSave]);
 
 
   const handleSave = async () => {
     setIsEdit(false);
-    setViewerStatus(false);
     if (creatorStatus) {
+      setViewerStatus(false);
       setCreatorStatus(false);
       let date = new Date();
       let newHabit = {
@@ -103,9 +107,11 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
         currentStreak: null, stat: false, category: null, url: null, access: null, prevBestStreak: null, prevLastCheckIn: null
       });
       setArrOfChanges([]);
+      setHabitChanged(false);
       await saveHabit(webId, fetch, habitInp);
     }
-    else if (arrOfChanges.length !== 0 || Object.keys(accUpdObj).length !== 0 || habitChanged) {
+    else if (viewerStatus && (arrOfChanges.length !== 0 || Object.keys(accUpdObj).length !== 0 || habitChanged)) {
+      setViewerStatus(false);
       let habitToUpd = habitInp;
       if (Object.keys(accUpdObj).length !== 0) {
         if (accUpdObj["public"]) {
@@ -145,15 +151,17 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
       updArr[index] = habitToUpd;
       setHabitsArray(updArr);
       setNewEntryCr(!newEntryCr);
-
-      if (arrOfChanges.length !== 0 || habitChanged) {
-        await editHabit(webId, fetch, habitInp);
-      }
       setHabitInp({
         id: null, title: null, content: null, startDate: null, lastCheckInDate: null, recurrence: "daily", bestStreak: null,
-        currentStreak: null, stat: null, category: null, url: null, access: null, prevBestStreak: null, prevLastCheckIn: null
+        currentStreak: null, stat: false, category: null, url: null, access: null, prevBestStreak: null, prevLastCheckIn: null
       });
+      setHabitChanged(false);
       setArrOfChanges([]);
+      if (arrOfChanges.length !== 0 || habitChanged) {
+        console.log("are we here?");
+        await editHabit(webId, fetch, habitInp);
+      }
+
     }
 
     if (Object.keys(accUpdObj).length !== 0) {
@@ -273,15 +281,15 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
             <InputGroup.Text style={{ 'width': '50%' }}>
               {habitInp.startDate ? constructDate(habitInp.startDate) : constructDate(new Date())}</InputGroup.Text>
           </InputGroup>}
-          {viewerStatus && <InputGroup className="w-100">
+          {viewerStatus && (habitInp.stat !== null) && <InputGroup className="w-100">
             <InputGroup.Text className="text-center" id="basic-addon1" style={{ 'width': '50%' }}>Status:</InputGroup.Text>
-            <div className="form-check form-switch d-flex justify-content-center align-items-center disabled">
-              <input className="form-check-input" {...(!isEdit && { disabled: true })} type="checkbox" style={{ "transform": "scale(1.6)", "marginLeft": "-0.5em" }}
+            <div className="form-check form-switch d-flex justify-content-center align-items-center">
+              <input className="form-check-input"  {...(!isEdit && { disabled: true })} type="checkbox" style={{ "transform": "scale(1.6)", "marginLeft": "-0.5em" }}
                 onChange={() => {
                   setHabitInp((prevState) => ({ ...prevState, stat: !habitInp.stat }));
                   setHabitChanged(true);
                 }}
-                checked={habitInp.stat!}
+                checked={habitInp.stat}
                 role="switch" id="flexSwitchCheckDefault" />
             </div>
           </InputGroup>}

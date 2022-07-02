@@ -45,6 +45,8 @@ export const thingToHabit = async (toChange: Thing | null, webId: string, fetch:
   if (!toChange) {
     return null;
   }
+  console.log("we are in thing to habit");
+  console.log(toChange.url);
   let updTitle = getStringNoLocale(toChange, DCTERMS.title) ? getStringNoLocale(toChange, DCTERMS.title) : "";
   let updContent = getStringNoLocale(toChange, schema.text) ? getStringNoLocale(toChange, schema.text) : "";
   let updId = getInteger(toChange, schema.identifier) ? getInteger(toChange, schema.identifier) :
@@ -94,6 +96,8 @@ export const thingToHabit = async (toChange: Thing | null, webId: string, fetch:
     access: getAcc[0] ? getAcc[0] : null,
     ...(getAcc[1] && { shareList: getAcc[1] })
   };
+  console.log("what we retur");
+  console.log(habit);
   return habit;
   //   status
 }
@@ -323,6 +327,8 @@ export const saveNote = async (webId: string, fetch: fetcher, note: Note) => {
 }
 
 export const saveHabit = async (webId: string, fetch: fetcher, habit: Habit) => {
+  console.log("we are here333");
+  console.log("are we here?? mb");
   const defFolder = await getDefaultFolder(webId, fetch);
   const habitsFolder = `${defFolder}habits/`;
   let dataSet = await getSolidDataset(habitsFolder, {
@@ -369,48 +375,149 @@ export const saveHabit = async (webId: string, fetch: fetcher, habit: Habit) => 
 }
 
 export const editHabit = async (webId: string, fetch: fetcher, habitToSave: Habit) => {
-  if (!habitToSave.url || !habitToSave.id) {
+  if (!habitToSave.id) {
     await saveHabit(webId, fetch, habitToSave);
     return;
   }
-  //url, title, content, startDate, lastCheckInDate, recurrence, bestStreak, currentStreak, status, category
-  let newHabit = buildThing(createThing({ url: habitToSave.url }))
-    .addUrl(RDF.type, voc.Habit)
-    .addInteger(schema.identifier, habitToSave.id)
-    .addStringNoLocale(DCTERMS.title, habitToSave.title ? habitToSave.title : "")
-    .addStringNoLocale(schema.text, habitToSave.content ? habitToSave.content : "")
-    .addDate("http://example.org/startDate", habitToSave.startDate ? habitToSave.startDate : new Date())
-    .addStringNoLocale("http://example.org/recurrence", habitToSave.recurrence ? habitToSave.recurrence : "daily")
-    .build();
-  if (habitToSave.lastCheckInDate) {
-    newHabit = setDate(newHabit, "http://example.org/lastCheckIn", habitToSave.lastCheckInDate);
-  }
-  if (habitToSave.bestStreak) {
-    newHabit = setInteger(newHabit, "http://example.org/bestStreak", habitToSave.bestStreak);
-  }
-  if (habitToSave.currentStreak) {
-    newHabit = setInteger(newHabit, "http://example.org/currentStreak", habitToSave.currentStreak);
-  }
-  if (habitToSave.stat) {
-    newHabit = setBoolean(newHabit, "http://example.org/status", habitToSave.stat);
-  }
-  if (habitToSave.category) {
-    newHabit = setStringNoLocale(newHabit, otherV.category, habitToSave.category);
-  }
-  if (habitToSave.custom) {
-    let customToUpload;
-    if (typeof habitToSave.custom === 'number') {
-      customToUpload = habitToSave.custom.toString();
+  let urlsArr = await getAllUrlFromPublicIndex(webId, fetch, "habit");
+  let updUrlsArr = await Promise.all(urlsArr.map(async (url) => {
+    const data = await getSolidDataset(url, { fetch: fetch });
+    if (isContainer(data)) {
+      let allNotes = getContainedResourceUrlAll(data);
+      let updArr = await Promise.all(allNotes.map(async (url) => {
+        let newDs = await getSolidDataset(url, { fetch: fetch });
+        let newThing = getThing(newDs, url);
+        if (newThing) {
+          let thingId = getInteger(newThing, schema.identifier);
+          if (thingId === habitToSave.id) {
+            if (habitToSave.title) {
+              newThing = setStringNoLocale(newThing, DCTERMS.title, habitToSave.title);
+            }
+            if (habitToSave.content) {
+              newThing = setStringNoLocale(newThing, schema.text, habitToSave.content);
+            }
+            if (habitToSave.recurrence) {
+              newThing = setStringNoLocale(newThing, "http://example.org/recurrence", habitToSave.recurrence);
+            }
+            if (habitToSave.lastCheckInDate) {
+              newThing = setDate(newThing, "http://example.org/lastCheckIn", habitToSave.lastCheckInDate);
+            }
+            if (habitToSave.bestStreak) {
+              newThing = setInteger(newThing, "http://example.org/bestStreak", habitToSave.bestStreak);
+            }
+            if (habitToSave.currentStreak) {
+              newThing = setInteger(newThing, "http://example.org/currentStreak", habitToSave.currentStreak);
+            }
+            if (habitToSave.stat) {
+              newThing = setBoolean(newThing, "http://example.org/status", habitToSave.stat);
+            }
+            if (habitToSave.category) {
+              newThing = setStringNoLocale(newThing, otherV.category, habitToSave.category);
+            }
+            if (habitToSave.custom) {
+              let customToUpload;
+              if (typeof habitToSave.custom === 'number') {
+                customToUpload = habitToSave.custom.toString();
+              }
+              else {
+                customToUpload = habitToSave.custom.join(" ");
+              }
+              newThing = addStringNoLocale(newThing, "http://example.org/custom", customToUpload)
+            };
+            //handle?
+            let updDataSet = setThing(newDs, newThing!);
+            const savedDataSet = await saveSolidDatasetAt(url, updDataSet,
+              { fetch: fetch });
+          }
+        }
+      }));
+      return updArr;
     }
     else {
-      customToUpload = habitToSave.custom.join(" ");
+      let newThingArr = getThingAll(data);
+      if (newThingArr) {
+        newThingArr.forEach(async (newThing) => {
+          let thingId = getInteger(newThing, schema.identifier);
+          if (thingId === habitToSave.id) {
+            if (habitToSave.title) {
+              newThing = setStringNoLocale(newThing, DCTERMS.title, habitToSave.title);
+            }
+            if (habitToSave.content) {
+              newThing = setStringNoLocale(newThing, schema.text, habitToSave.content);
+            }
+            if (habitToSave.recurrence) {
+              newThing = setStringNoLocale(newThing, "http://example.org/recurrence", habitToSave.recurrence);
+            }
+            if (habitToSave.lastCheckInDate) {
+              newThing = setDate(newThing, "http://example.org/lastCheckIn", habitToSave.lastCheckInDate);
+            }
+            if (habitToSave.bestStreak) {
+              newThing = setInteger(newThing, "http://example.org/bestStreak", habitToSave.bestStreak);
+            }
+            if (habitToSave.currentStreak) {
+              newThing = setInteger(newThing, "http://example.org/currentStreak", habitToSave.currentStreak);
+            }
+            if (habitToSave.stat) {
+              newThing = setBoolean(newThing, "http://example.org/status", habitToSave.stat);
+            }
+            if (habitToSave.category) {
+              newThing = setStringNoLocale(newThing, otherV.category, habitToSave.category);
+            }
+            if (habitToSave.custom) {
+              let customToUpload;
+              if (typeof habitToSave.custom === 'number') {
+                customToUpload = habitToSave.custom.toString();
+              }
+              else {
+                customToUpload = habitToSave.custom.join(" ");
+              }
+              newThing = addStringNoLocale(newThing, "http://example.org/custom", customToUpload)
+            };
+            let updDataSet = setThing(data, newThing!);
+            await saveSolidDatasetAt(url, updDataSet, { fetch: fetch });
+          }
+        });
+      }
     }
-    newHabit = addStringNoLocale(newHabit, "http://example.org/custom", customToUpload)
-  };
-  let newDs = await getSolidDataset(habitToSave.url, { fetch: fetch });
-  let updDataSet = setThing(newDs, newHabit);
-  const savedDataSet = await saveSolidDatasetAt(habitToSave.url, updDataSet,
-    { fetch: fetch });
+  }));
+  // //url, title, content, startDate, lastCheckInDate, recurrence, bestStreak, currentStreak, status, category
+  // let newHabit = buildThing(createThing({ url: habitToSave.url! }))
+  //   .addUrl(RDF.type, voc.Habit)
+  //   .addInteger(schema.identifier, habitToSave.id)
+  //   .addStringNoLocale(DCTERMS.title, habitToSave.title ? habitToSave.title : "")
+  //   .addStringNoLocale(schema.text, habitToSave.content ? habitToSave.content : "")
+  //   .addDate("http://example.org/startDate", habitToSave.startDate ? habitToSave.startDate : new Date())
+  //   .addStringNoLocale("http://example.org/recurrence", habitToSave.recurrence ? habitToSave.recurrence : "daily")
+  //   .build();
+  // if (habitToSave.lastCheckInDate) {
+  //   newHabit = setDate(newHabit, "http://example.org/lastCheckIn", habitToSave.lastCheckInDate);
+  // }
+  // if (habitToSave.bestStreak) {
+  //   newHabit = setInteger(newHabit, "http://example.org/bestStreak", habitToSave.bestStreak);
+  // }
+  // if (habitToSave.currentStreak) {
+  //   newHabit = setInteger(newHabit, "http://example.org/currentStreak", habitToSave.currentStreak);
+  // }
+  // if (habitToSave.stat) {
+  //   newHabit = setBoolean(newHabit, "http://example.org/status", habitToSave.stat);
+  // }
+  // if (habitToSave.category) {
+  //   newHabit = setStringNoLocale(newHabit, otherV.category, habitToSave.category);
+  // }
+  // if (habitToSave.custom) {
+  //   let customToUpload;
+  //   if (typeof habitToSave.custom === 'number') {
+  //     customToUpload = habitToSave.custom.toString();
+  //   }
+  //   else {
+  //     customToUpload = habitToSave.custom.join(" ");
+  //   }
+  //   newHabit = addStringNoLocale(newHabit, "http://example.org/custom", customToUpload)
+  // };
+  // let newDs = await getSolidDataset(habitToSave.url!, { fetch: fetch });
+  // let updDataSet = setThing(newDs, newHabit);
+  // const savedDataSet = await saveSolidDatasetAt(habitToSave.url!, updDataSet,
+  //   { fetch: fetch });
 };
 
 export const editNote = async (webId: string, fetch: fetcher, note: Note, changes: string[]) => {

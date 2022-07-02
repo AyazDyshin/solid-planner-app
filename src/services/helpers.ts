@@ -64,15 +64,19 @@ const setStreaksDefaultCases = (habit: Habit) => {
     }
     else {
         if (functionToUse(today, habit.lastCheckInDate) > 0) {
+            habit.prevLastCheckIn = habit.lastCheckInDate;
             habit.lastCheckInDate = today;
+            habit.prevBestStreak = habit.bestStreak;
             habit = habitUpdBest(habit);
             habit.currentStreak = 0;
             return habit;
         }
         else { //if (differenceInCalendarDays(today, habit.lastCheckInDate) <= 0)
             if (!isSameDay(today, habit.lastCheckInDate)) {
+                habit.prevLastCheckIn = habit.lastCheckInDate;
                 habit.lastCheckInDate = today;
                 habit.currentStreak = habit.currentStreak! + 1;
+                habit.prevBestStreak = habit.bestStreak;
                 habit = habitUpdBest(habit);
                 return habit;
             }
@@ -82,7 +86,10 @@ const setStreaksDefaultCases = (habit: Habit) => {
         }
     }
 }
+
 export const setStreaks = (habit: Habit) => {
+    console.log("before set");
+    console.log(habit);
     let today = new Date();
     if (habit.stat) {
         if (!habit.currentStreak || habit.currentStreak === 0) { // case for when habit is checked, but doesn't have current streak
@@ -112,8 +119,10 @@ export const setStreaks = (habit: Habit) => {
                     else {
                         if (typeof habit.custom === 'number') {
                             if (differenceInCalendarDays(today, habit.lastCheckInDate) === habit.custom - 1) {
+                                habit.prevLastCheckIn = habit.lastCheckInDate;
                                 habit.lastCheckInDate = today;
                                 habit.currentStreak = habit.currentStreak + 1;
+                                habit.prevBestStreak = habit.bestStreak;
                                 habit = habitUpdBest(habit);
                                 return habit;
                             }
@@ -135,8 +144,10 @@ export const setStreaks = (habit: Habit) => {
                                     return habit;
                                 }
                                 else {
+                                    habit.prevLastCheckIn = habit.lastCheckInDate;
                                     habit.lastCheckInDate = today;
                                     habit.currentStreak = habit.currentStreak + 1;
+                                    habit.prevBestStreak = habit.bestStreak;
                                     habit = habitUpdBest(habit);
                                     return habit;
                                 }
@@ -155,6 +166,21 @@ export const setStreaks = (habit: Habit) => {
         }
     }
     else {
+        if (habit.lastCheckInDate && isSameDay(habit.lastCheckInDate, today)) {
+            habit.lastCheckInDate = habit.prevLastCheckIn;
+            habit.bestStreak = habit.prevBestStreak;
+            habit.prevLastCheckIn = null;
+            habit.prevBestStreak = null;
+            if (habit.currentStreak) {
+                if (habit.currentStreak <= 1) {
+                    habit.currentStreak = 0;
+                }
+                else {
+                    habit.currentStreak = habit.currentStreak - 1;
+                }
+            }
+            return habit;
+        }
         let checkHabit = getHabitsToday([habit]);
         if (checkHabit.length !== 0) {
             habit = habitUpdBest(habit);
@@ -166,7 +192,6 @@ export const setStreaks = (habit: Habit) => {
         }
     }
 }
-
 
 const checkWeekDay = (habit: Habit) => {
     let today = new Date();
@@ -200,8 +225,11 @@ const habitUpdBest = (habit: Habit) => {
     }
     return habit;
 }
-export const getHabitsToday = (allHabits: Habit[]) => {
+export const getHabitsToday = (allHab: Habit[]) => {
 
+    console.log("what we got;");
+    console.log(allHab);
+    let allHabits = allHab;
     let today = new Date();
     let habitsToday = allHabits.filter((habit) => {
         if (!habit.stat) {
@@ -231,13 +259,19 @@ export const getHabitsToday = (allHabits: Habit[]) => {
             }
         }
         else {
+            console.log("do we get here????");
+            console.log(today);
+            console.log(habit.lastCheckInDate);
+            console.log(habit.startDate);
             let toCheckDate = habit.lastCheckInDate ? habit.lastCheckInDate : habit.startDate;
             let updDate = toCheckDate ? toCheckDate : new Date();
             switch (habit.recurrence) {
                 case "daily": {
                     //handle
                     if (isSameDay(updDate, today)) return true;
+
                     else {
+                        console.log("here rb?");
                         habit.stat = false;
                         return true;
                     }
@@ -306,6 +340,8 @@ export const getHabitsToday = (allHabits: Habit[]) => {
             }
         }
     });
+    console.log("what we give");
+    console.log(habitsToday);
     return habitsToday;
 }
 

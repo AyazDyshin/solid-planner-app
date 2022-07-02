@@ -2,7 +2,6 @@ import { Contact } from "rdf-namespaces/dist/vcard";
 import ContactsRender from "./ContactsRender";
 import HabitsRender from "./HabitsRender";
 import NotesHabitsRender from "./NotesHabitsRender";
-import SettingsPage from "./SettingsPage";
 import { Habit, Note } from "./types";
 
 interface Props {
@@ -61,8 +60,6 @@ const ContentToRender = ({ active, viewerStatus, setViewerStatus, habitsFetched,
             return (
                 <ContactsRender />
             );
-        case "settings":
-            return (<SettingsPage />);
         default:
             return (<div>Error</div>);
     }

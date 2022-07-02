@@ -12,7 +12,7 @@ import {
 } from "../services/SolidPod";
 import NotesList from "./NotesList";
 import { accessObject, Note } from "./types";
-// need to upgrade for habits case
+
 interface Props {
     creatorStatus: boolean;
     setCreatorStatus: React.Dispatch<React.SetStateAction<boolean>>;
@@ -67,36 +67,9 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
     const [currentCategory, setCurrentCategory] = useState<string | null>(null);
     const [currentAccess, setCurrentAccess] = useState<string | null>(null);
     const [notesToShow, setNotesToShow] = useState<Note[]>([]);
-    const [isLoading,setIsLoading] = useState<boolean>(true);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
     useEffect(() => {
         setIsLoading(true);
-        // const perfSave = async () => {
-        //     if (doNoteSave || arrOfChanges.length !== 0) {
-        //         if (doNoteSave) {
-        //             await saveNote(webId, fetch, NoteInp);
-        //         }
-        //         else if (arrOfChanges.length !== 0) {
-        //             await editNote(webId, fetch, NoteInp, arrOfChanges);
-        //         }
-        //         if (Object.keys(accUpdObj).length !== 0) {
-        //             if (accUpdObj["public"]) {
-        //                 await setPubAccess(webId, publicAccess, noteToView!.url, fetch);
-        //             }
-        //             else if (accUpdObj["agent"]) {
-
-        //                 for (let item in agentsToUpd) {
-        //                     await shareWith(webId, noteToView!.url, fetch, agentsToUpd[item], item);
-
-        //                 }
-        //             }
-        //         }
-        //         setCreatorStatus(false);
-        //         setNoteInp({ id: null, title: "", content: "", category: "", url: "", access: null });
-        //         setIsEdit(false);
-        //         setArrOfChanges([]);
-        //         setDoNoteSave(false);
-        //     }
-        // }
         const fetchNotes = async () => {
             let filteredNotes: Note[]
             if (!notesFetched) {
@@ -122,44 +95,6 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
             setNotesToShow(filteredNotes);
             setIsLoading(false);
         }
-        // const fetchNotes = async (otherId?: string) => {
-        //     await perfSave();
-        //     let ret: never[] | [(ThingPersisted | null)[], string[]] = [];
-        //     let transformedArr = [];
-        //     if (refetch) {
-        //         ret = await fetchAllEntries(webId, fetch, "note",
-        //             ((currentCategory) ? currentCategory : undefined), ((currentAccess) ? currentAccess : undefined));
-        //         setRefetch(false);
-        //         const [updNotesArray, updCategoriesArray] = ret!;
-        //         transformedArr = await Promise.all(updNotesArray.map(async (thing) => {
-        //             return await thingToNote(thing, webId, fetch);
-        //         }));
-        //         transformedArr = transformedArr.filter((item) => item !== null);
-        //         setAllNotes(transformedArr as Note[]);
-        //     }
-        //     else {
-        //         transformedArr = allNotes;
-        //     }
-        //     //handle
-
-        //     if (currentAccess || currentCategory) {
-        //         if (currentCategory) {
-        //             transformedArr
-        //         }
-        //     }
-
-        //     // add fetch all habits here
-        //     setNotesArray(transformedArr);
-
-        //     setCategoryArray(updCategoriesArray);
-        //     setDoNoteSave(false);
-        //     setIsLoadingContents(false);
-
-        // }
-        // if (active === "notes") {
-        //     setIsLoadingContents(true);
-        //     fetchNotes();
-        // }
         fetchNotes();
     }, [newEntryCr, currentCategory, currentAccess]);
 
@@ -171,20 +106,20 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
         )
     }
     else {
-        if ((notesToShow.length === 0) &&!(currentAccess || currentCategory)){
+        if ((notesToShow.length === 0) && !(currentAccess || currentCategory)) {
 
-                return (
-                    <div className="card text-center">
-                        <div className="card-body">
-                            <h5 className="card-title">You don't have any notes yet!</h5>
-                            <p className="card-text">Let's fix this</p>
-                            <a className="btn btn-primary" onClick={() => {
-                                setCreatorStatus(true);
-                                setViewerStatus(false);
-                            }}>create</a>
-                        </div>
+            return (
+                <div className="card text-center">
+                    <div className="card-body">
+                        <h5 className="card-title">You don't have any notes yet!</h5>
+                        <p className="card-text">Let's fix this</p>
+                        <a className="btn btn-primary" onClick={() => {
+                            setCreatorStatus(true);
+                            setViewerStatus(false);
+                        }}>create</a>
                     </div>
-                );
+                </div>
+            );
         }
         else {
             return (

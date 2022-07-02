@@ -34,7 +34,7 @@ const NoPermissions = ({ refresh, setRefresh }: Props) => {
                     <div><strong>Done?</strong></div>
                     <div className="d-flex justify-content-around">
                         <Button variant="primary" onClick={() => { setRefresh(!refresh) }}><MdRefresh /> retry</Button>
-                        <LogoutButton>
+                            <LogoutButton>
                             <Button variant="primary"><FiLogOut /> Log Out</Button>
                         </LogoutButton>
                     </div>

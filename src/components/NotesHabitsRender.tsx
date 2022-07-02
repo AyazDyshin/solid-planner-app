@@ -30,7 +30,6 @@ interface Props {
 // this is needed to render the respective creator component
 const NotesHabitsRender = ({ active, viewerStatus, setViewerStatus, creatorStatus, setCreatorStatus, isEdit,
     setIsEdit, notesArray, setNotesArray, isLoadingContents, setIsLoadingContents, notesFetched, setNotesFetched }: Props) => {
-
     const [newEntryCr, setNewEntryCr] = useState<boolean>(false);
     const [noteToView, setNoteToView] = useState<Note | null>(null);
     const [categoryArray, setCategoryArray] = useState<string[]>([]);
@@ -40,7 +39,6 @@ const NotesHabitsRender = ({ active, viewerStatus, setViewerStatus, creatorStatu
     const [publicAccess, setPublicAccess] = useState<accessObject>({ read: false, append: false, write: false });
     const [accUpdObj, setAccUpdObj] = useState<{ [x: string]: boolean; }>({});
     const [agentsToUpd, setAgentsToUpd] = useState<{ [x: string]: AccessModes; }>({});
-
 
     return (
         <div className="container-fluid pad">

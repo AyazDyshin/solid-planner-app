@@ -5,11 +5,11 @@ import MainContent from "./components/MainContent";
 import { useSession } from "@inrupt/solid-ui-react";
 import { Spinner } from "react-bootstrap";
 import { checkPermissions } from "./services/access";
+import { ErrorBoundary } from 'react-error-boundary'
 
 const App: React.FC = () => {
 
   const { session, sessionRequestInProgress } = useSession();
-  //console.log("here");
   const render = () => {
     // Checks if data loading is in progress
     if (sessionRequestInProgress) {
@@ -32,9 +32,9 @@ const App: React.FC = () => {
       }
       //case for when the user is logged in
       else {
-        
+
         return (
-          <MainContent />
+            <MainContent />
         )
       }
     }

@@ -9,6 +9,7 @@ import { ControlledStorage } from "rdf-namespaces/dist/space";
 import { recordDefaultFolder } from "../services/SolidPod";
 import { Habit, Note } from "./types";
 import { getDefaultFolder } from "../services/podGetters";
+import NoPermissions from "./NoPermissions";
 // This is the root component that first renders NavBar and then other content
 // Passes active and setActive hooks, which represent the currently clicked tab
 const MainContent = () => {
@@ -29,7 +30,7 @@ const MainContent = () => {
   const [notesFetched, setNotesFetched] = useState<boolean>(false);
   const [habitsFetched, setHabitsFetched] = useState<boolean>(false);
   const [habitsArray, setHabitsArray] = useState<Habit[]>([]);
-
+  const [refresh, setRefresh] = useState<boolean>(false);
   useEffect(() => {
     let check = async () => {
       setIsLoading(true);
@@ -43,7 +44,7 @@ const MainContent = () => {
       setIsLoading(false);
     }
     check();
-  }, []);
+  }, [refresh]);
   if (isLoading) {
     return (
       <div className="h-100 d-flex justify-content-center align-items-center">
@@ -99,7 +100,10 @@ const MainContent = () => {
     }
     else {
       return (
-        <div> You didn't grant us permissions!!!</div>
+        <NoPermissions
+        refresh={refresh}
+        setRefresh={setRefresh}
+         />
       )
     }
   }

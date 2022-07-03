@@ -121,12 +121,9 @@ export const thingToHabit = async (toChange: Thing | null, webId: string, fetch:
 //     createPrefLink(webId, fetch);
 //   }
 // }
-
-export const recordDefaultFolder = async (webId: string, fetch: fetcher) => {
+export const repairDefaultFolder = async (webId: string, fetch: fetcher) => {
   const storagePref = await getStoragePref(webId, fetch);
   let defaultFolderPath = `${storagePref}SolidPlannerApp`;
-  let notesPath = `${defaultFolderPath}/notes/`;
-  let habitsPath = `${defaultFolderPath}/habits/`;
   const prefFileLocation = await getPrefLink(webId, fetch);
   let dataSet;
   try {
@@ -137,24 +134,35 @@ export const recordDefaultFolder = async (webId: string, fetch: fetcher) => {
   catch (error) {
     let message = 'Unknown Error';
     if (error instanceof Error) message = error.message;
-    // throwError(new Error(`error when fetching preference file, it either doesn't exist, or has different location from the one specified in the webId, error: ${message}`));
     throw new Error(`error when fetching preference file, it either doesn't exist, or has different location from the one specified in the webId, error: ${message}`);
   }
   let aThing = getThing(dataSet, prefFileLocation);
   if (!aThing) {
-    // throwError(new Error("preference file does not exist"));
     throw new Error("preference file does not exist");
   }
   aThing = addUrl(aThing, voc.defaultFolder, updUrlForFolder(defaultFolderPath));
   dataSet = setThing(dataSet, aThing);
-  await createDefFolder(webId, defaultFolderPath, fetch);
-  const updDataSet = await saveSolidDatasetAt(prefFileLocation!, dataSet, { fetch: fetch });
-  await createEntriesInTypeIndex(webId, fetch, notesPath, "note");
-  await createEntriesInTypeIndex(webId, fetch, habitsPath, "habit");
+  await saveSolidDatasetAt(prefFileLocation, dataSet, { fetch: fetch });
+}
+
+export const recordDefaultFolder = async (webId: string, fetch: fetcher) => {
+  await repairDefaultFolder(webId, fetch);
+  await createDefFolder(webId, fetch);
+  await createEntriesInTypeIndex(webId, fetch, "note");
+  await createEntriesInTypeIndex(webId, fetch, "habit");
 }
 
 
-export const createEntriesInTypeIndex = async (webId: string, fetch: fetcher, url: string, entryType: string) => {
+export const createEntriesInTypeIndex = async (webId: string, fetch: fetcher, entryType: string) => {
+  const storagePref = await getStoragePref(webId, fetch);
+  let defaultFolderPath = `${storagePref}SolidPlannerApp`;
+  let url = "";
+  if (entryType === 'note') {
+    url = `${defaultFolderPath}/notes/`;
+  }
+  else {
+    url = `${defaultFolderPath}/habits/`;
+  }
   const pubicTypeIndexUrl = await getPublicTypeIndexUrl(webId, fetch);
   let dataSet;
   try {
@@ -165,7 +173,6 @@ export const createEntriesInTypeIndex = async (webId: string, fetch: fetcher, ur
   catch (error) {
     let message = 'Unknown Error';
     if (error instanceof Error) message = error.message;
-    // throwError(new Error(`error when fetching public type index file, it either doesn't exist, or has different location from the one specified in the webId, error: ${message}`));
     throw new Error(`error when fetching public type index file, it either doesn't exist, or has different location from the one specified in the webId, error: ${message}`);
   }
   let aThing = buildThing(createThing())
@@ -177,7 +184,11 @@ export const createEntriesInTypeIndex = async (webId: string, fetch: fetcher, ur
 }
 
 
-export const recordAccessType = async (webId: string, fetch: fetcher, type: string) => {
+export const recordAccessType = async (webId: string, fetch: fetcher) => {
+  const storagePref = await getStoragePref(webId, fetch);
+  let defFolderUrl = `${storagePref}SolidPlannerApp`;
+  let type = await isWacOrAcp(`${updUrlForFolder(defFolderUrl)}`, fetch);
+
   const prefFileLocation = await getPrefLink(webId, fetch);
   let dataSet;
   try {
@@ -204,47 +215,69 @@ export const recordAccessType = async (webId: string, fetch: fetcher, type: stri
 }
 
 
-export const createDefFolder = async (webId: string, defFolderUrl: string, fetch: fetcher) => {
+export const createDefFolder = async (webId: string, fetch: fetcher) => {
+  const storagePref = await getStoragePref(webId, fetch);
+  let defFolderUrl = `${storagePref}SolidPlannerApp`;
   try {
-    await createContainerAt(`${updUrlForFolder(defFolderUrl)}`, {
-      fetch: fetch
-    });
+    let b = await getSolidDataset(`${updUrlForFolder(defFolderUrl)}`, { fetch: fetch });
   }
-  catch (error) {
-    let message = 'Unknown Error';
-    if (error instanceof Error) message = error.message;
-    // throwError(new Error(`error when trying to create a folder for notes, error: ${message}`));
-    throw new Error(`error when trying to create a folder for notes, error: ${message}`);
+  catch {
+    try {
+      await createContainerAt(`${updUrlForFolder(defFolderUrl)}`, {
+        fetch: fetch
+      });
+    }
+    catch (error) {
+      let message = 'Unknown Error';
+      if (error instanceof Error) message = error.message;
+      throw new Error(`error when trying to create a folder for notes, error: ${message}`);
+    }
   }
+
   let type = await isWacOrAcp(`${updUrlForFolder(defFolderUrl)}`, fetch);
-  await recordAccessType(webId, fetch, type);
+  await recordAccessType(webId, fetch);
   await setPubAccess(webId, { read: true, append: false, write: false }, `${updUrlForFolder(defFolderUrl)}`, fetch);
   try {
-    await createContainerAt(`${updUrlForFolder(defFolderUrl)}notes/`, {
+    let s = await getSolidDataset(`${updUrlForFolder(defFolderUrl)}notes/`, {
       fetch: fetch
     });
   }
-  catch (error) {
-    let message = 'Unknown Error';
-    if (error instanceof Error) message = error.message;
-    // throwError(new Error(`error when trying to create a folder for notes, error: ${message}`));
-    throw new Error(`error when trying to create a folder for notes, error: ${message}`);
+  catch {
+    try {
+      await createContainerAt(`${updUrlForFolder(defFolderUrl)}notes/`, {
+        fetch: fetch
+      });
+    }
+    catch (error) {
+      let message = 'Unknown Error';
+      if (error instanceof Error) message = error.message;
+      throw new Error(`error when trying to create a folder for notes, error: ${message}`);
+    }
   }
+
   if (type === "wac") {
     await initializeAcl(`${updUrlForFolder(defFolderUrl)}notes/`, fetch);
   }
   await setPubAccess(webId, { read: true, append: false, write: false }, `${updUrlForFolder(defFolderUrl)}notes/`, fetch);
   try {
-    await createContainerAt(`${updUrlForFolder(defFolderUrl)}habits/`, {
+    let b = await getSolidDataset(`${updUrlForFolder(defFolderUrl)}habits/`, {
       fetch: fetch
     });
   }
-  catch (error) {
-    let message = 'Unknown Error';
-    if (error instanceof Error) message = error.message;
-    //  throwError(new Error(`error when trying to create a folder for habits in specified folder, error: ${message}`));
-    throw new Error(`error when trying to create a folder for habits in specified folder, error: ${message}`);
+  catch {
+    try {
+      await createContainerAt(`${updUrlForFolder(defFolderUrl)}habits/`, {
+        fetch: fetch
+      });
+    }
+    catch (error) {
+      let message = 'Unknown Error';
+      if (error instanceof Error) message = error.message;
+      //  throwError(new Error(`error when trying to create a folder for habits in specified folder, error: ${message}`));
+      throw new Error(`error when trying to create a folder for habits in specified folder, error: ${message}`);
+    }
   }
+
   if (type === "wac") {
     await initializeAcl(`${updUrlForFolder(defFolderUrl)}habits/`, fetch);
   }
@@ -265,7 +298,6 @@ export const fetchAllEntries = async (webId: string, fetch: fetcher, entry: stri
     else {
       let message = 'Unknown Error';
       if (error instanceof Error) message = error.message;
-      //throwError(new Error(`Couldn't fetch notes from your public type index, error: ${message}`));
       throw new Error(`Couldn't fetch notes from your public type index, error: ${message}`);
     }
   }
@@ -277,12 +309,16 @@ export const fetchAllEntries = async (webId: string, fetch: fetcher, entry: stri
     catch (error) {
       if (other) return null;
       else {
-        let message = 'Unknown Error';
-        if (error instanceof Error) message = error.message;
-        // throwError(new Error(`Couldn't fetch a resource that is listed in your Public type index ${url} this might happen because it 
-        // is listed in public type index, but doesn't exist in your POD, error: ${message}`));
-        throw new Error(`Couldn't fetch a resource that is listed in your Public type index ${url} this might happen because it 
-      is listed in public type index, but doesn't exist in your POD, error: ${message}`);
+        try {
+          await createDefFolder(webId, fetch);
+          data = await getSolidDataset(url, { fetch: fetch });
+        }
+        catch (error) {
+          let message = 'Unknown Error';
+          if (error instanceof Error) message = error.message;
+          throw new Error(`Couldn't fetch a resource that is listed in your Public type index ${url} this might happen because it 
+        is listed in public type index, but doesn't exist in your POD, error: ${message}`);
+        }
       }
     }
     if (isContainer(data)) {
@@ -297,7 +333,6 @@ export const fetchAllEntries = async (webId: string, fetch: fetcher, entry: stri
           else {
             let message = 'Unknown Error';
             if (error instanceof Error) message = error.message;
-            //throwError(new Error(`error while fetching one of the notes in container: ${url} note url: ${noteUrl}, error: ${message}`));
             throw new Error(`error while fetching one of the notes in container: ${url} note url: ${noteUrl}, error: ${message}`);
           }
         }
@@ -336,11 +371,17 @@ export const saveNote = async (webId: string, fetch: fetcher, note: Note) => {
     });
   }
   catch (error) {
-    //repair
-    let message = 'Unknown Error';
-    if (error instanceof Error) message = error.message;
-    // throwError(new Error(`Error when trying to fetch notes folder,url: ${notesFolder} error: ${message}`));
-    throw new Error(`Error when trying to fetch notes folder,url: ${notesFolder} error: ${message}`);
+    try {
+      await createDefFolder(webId, fetch);
+      dataSet = await getSolidDataset(notesFolder, {
+        fetch: fetch
+      });
+    }
+    catch (error) {
+      let message = 'Unknown Error';
+      if (error instanceof Error) message = error.message;
+      throw new Error(`Error when trying to fetch notes folder,url: ${notesFolder} error: ${message}`);
+    }
   }
   const id = note.id === null ? Date.now() + Math.floor(Math.random() * 1000) : note.id;
   const noteUrl = `${notesFolder}${id}.ttl`;
@@ -544,44 +585,6 @@ export const editHabit = async (webId: string, fetch: fetcher, habitToSave: Habi
       }
     }
   }));
-  // //url, title, content, startDate, lastCheckInDate, recurrence, bestStreak, currentStreak, status, category
-  // let newHabit = buildThing(createThing({ url: habitToSave.url! }))
-  //   .addUrl(RDF.type, voc.Habit)
-  //   .addInteger(schema.identifier, habitToSave.id)
-  //   .addStringNoLocale(DCTERMS.title, habitToSave.title ? habitToSave.title : "")
-  //   .addStringNoLocale(schema.text, habitToSave.content ? habitToSave.content : "")
-  //   .addDate("http://example.org/startDate", habitToSave.startDate ? habitToSave.startDate : new Date())
-  //   .addStringNoLocale("http://example.org/recurrence", habitToSave.recurrence ? habitToSave.recurrence : "daily")
-  //   .build();
-  // if (habitToSave.lastCheckInDate) {
-  //   newHabit = setDate(newHabit, "http://example.org/lastCheckIn", habitToSave.lastCheckInDate);
-  // }
-  // if (habitToSave.bestStreak) {
-  //   newHabit = setInteger(newHabit, "http://example.org/bestStreak", habitToSave.bestStreak);
-  // }
-  // if (habitToSave.currentStreak) {
-  //   newHabit = setInteger(newHabit, "http://example.org/currentStreak", habitToSave.currentStreak);
-  // }
-  // if (habitToSave.stat) {
-  //   newHabit = setBoolean(newHabit, "http://example.org/status", habitToSave.stat);
-  // }
-  // if (habitToSave.category) {
-  //   newHabit = setStringNoLocale(newHabit, otherV.category, habitToSave.category);
-  // }
-  // if (habitToSave.custom) {
-  //   let customToUpload;
-  //   if (typeof habitToSave.custom === 'number') {
-  //     customToUpload = habitToSave.custom.toString();
-  //   }
-  //   else {
-  //     customToUpload = habitToSave.custom.join(" ");
-  //   }
-  //   newHabit = addStringNoLocale(newHabit, "http://example.org/custom", customToUpload)
-  // };
-  // let newDs = await getSolidDataset(habitToSave.url!, { fetch: fetch });
-  // let updDataSet = setThing(newDs, newHabit);
-  // const savedDataSet = await saveSolidDatasetAt(habitToSave.url!, updDataSet,
-  //   { fetch: fetch });
 };
 
 export const editNote = async (webId: string, fetch: fetcher, note: Note, changes: string[]) => {
@@ -600,7 +603,6 @@ export const editNote = async (webId: string, fetch: fetcher, note: Note, change
         catch (error) {
           let message = 'Unknown Error';
           if (error instanceof Error) message = error.message;
-          // throwError(new Error(`Error when fetching dataset url: ${url} error: ${message}`));
           throw new Error(`Error when fetching dataset url: ${url} error: ${message}`);
         }
         let newThing = getThing(newDs, url);
@@ -718,7 +720,6 @@ export const fetchContacts = async (webId: string, fetch: fetcher) => {
   catch (error) {
     let message = 'Unknown Error';
     if (error instanceof Error) message = error.message;
-    //throwError(new Error(`couldn't fetch file with contacts, ${message}`));
     throw new Error(`couldn't fetch file with contacts, ${message}`);
   }
   const allPeople = getThingAll(newDs);
@@ -733,7 +734,6 @@ export const fetchContacts = async (webId: string, fetch: fetcher) => {
       catch (error) {
         let message = 'Unknown Error';
         if (error instanceof Error) message = error.message;
-        // throwError(new Error(`couldn't fetch one of the contacts, file url: ${personDsUrl}, error: ${message}`));
         throw new Error(`couldn't fetch one of the contacts, file url: ${personDsUrl}, error: ${message}`);
       }
       const allThingsPersonDs = getThingAll(personDs);

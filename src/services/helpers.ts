@@ -5,6 +5,7 @@ import {
     isSameDay, isSameWeek, isSameMonth, isSameYear, differenceInCalendarDays, getDay,
     differenceInCalendarWeeks, differenceInCalendarMonths, differenceInCalendarYears
 } from 'date-fns';
+import React from "react";
 
 //function that extracts main part from the user's webId
 export const modifyWebId = (webId: string): string => {
@@ -13,6 +14,18 @@ export const modifyWebId = (webId: string): string => {
     return `${updArr.join("/")}/`;
 }
 
+
+export const useAsyncError = () => {
+    const [_, setError] = React.useState();
+    return React.useCallback(
+        (e: Error) => {
+            setError(() => {
+                throw e;
+            });
+        },
+        [setError],
+    );
+};
 
 export const getNumberFromDay = (day: string) => {
     switch (day) {

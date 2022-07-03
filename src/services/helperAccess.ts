@@ -4,6 +4,9 @@ import { AccessControlResource } from "@inrupt/solid-client/dist/acp/control";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import { ACL, ACP } from "@inrupt/vocab-solid";
 import { accessObject, fetcher } from "../components/types";
+import { useAsyncError } from "./helpers";
+
+//const throwError = useAsyncError();
 
 export function hasAccessibleAcr(resource: { internal_acp: any; }) {
     return (typeof resource.internal_acp === "object" &&
@@ -16,9 +19,10 @@ export function getAcr(
     resource: { internal_acp: { acr: AccessControlResource; }; }
 ): AccessControlResource {
     if (!hasAccessibleAcr(resource)) {
-        throw new Error(
-            ` The current user does not have permission to see who currently has access to this resource, or the user's POD Server does not support Access Control Resources`
-        );
+        // throwError(new Error(
+        //     ` The current user does not have permission to see who currently has access to this resource, or the user's POD Server does not support Access Control Resources`
+        // ));
+        throw new Error(` The current user does not have permission to see who currently has access to this resource, or the user's POD Server does not support Access Control Resources`);
     }
     return resource.internal_acp.acr;
 }
@@ -32,15 +36,20 @@ export const changeAccessAcp = async (url: string, access: accessObject, agent: 
         );
     }
     catch (error) {
-        throw new Error(`Error when fetching dataset url:${url} error: ${error}`);
+        let message = 'Unknown Error';
+        if (error instanceof Error) message = error.message;
+       // throwError(new Error(`Error when fetching dataset url:${url} error: ${message}`));
+        throw new Error(`Error when fetching dataset url:${url} error: ${message}`);
     }
     if (!hasAccessibleAcr(resourceWithAcr)) {
+       // throwError(new Error(`The current user does not have permission to see who currently has access to this resource url: ${url}`));
         throw new Error(`The current user does not have permission to see who currently has access to this resource url: ${url}`);
     }
 
     let res = agent === ACP.PublicAgent ? await universalAccess.setPublicAccess(url, access, { fetch: fetch }) : await universalAccess.setAgentAccess(url, agent, access, { fetch: fetch });
 
     if (!res) {
+      //  throwError(new Error(`The current user does not have permission to change access rights to this resource url: ${url}`));
         throw new Error(`The current user does not have permission to change access rights to this resource url: ${url}`);
     }
     let updResource = resourceWithAcr as WithAccessibleAcr;
@@ -96,9 +105,13 @@ export const getAcpMatchersAndPolices = async (url: string, fetch: fetcher) => {
         );
     }
     catch (error) {
-        throw new Error(`Error when fetching dataset url:${url} error: ${error}`);
+        let message = 'Unknown Error';
+        if (error instanceof Error) message = error.message;
+      //  throwError(new Error(`Error when fetching dataset url:${url} error: ${message}`));
+        throw new Error(`Error when fetching dataset url:${url} error: ${message}`);
     }
     if (!hasAccessibleAcr(resourceWithAcr)) {
+       // throwError(new Error(`The current user does not have permission to see who currently has access to this resource url: ${url}`));
         throw new Error(`The current user does not have permission to see who currently has access to this resource url: ${url}`);
     }
     const updResource = resourceWithAcr as WithAccessibleAcr;

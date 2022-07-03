@@ -5,12 +5,18 @@ import MainContent from "./components/MainContent";
 import { useSession } from "@inrupt/solid-ui-react";
 import { Spinner } from "react-bootstrap";
 import { checkPermissions } from "./services/access";
-import { ErrorBoundary } from 'react-error-boundary'
-
+import { FallbackProps } from 'react-error-boundary';
+import NoPermissions from "./components/NoPermissions";
+import ErrorComponent from "./components/ErrorComponent";
+import ErrorBoundary from "./components/ErrorBoundary";
 const App: React.FC = () => {
 
   const { session, sessionRequestInProgress } = useSession();
+  const [refresh, setRefresh] = useState<boolean>(false);
   const render = () => {
+    useEffect(() => {
+
+    }, [refresh])
     // Checks if data loading is in progress
     if (sessionRequestInProgress) {
       return (
@@ -34,7 +40,9 @@ const App: React.FC = () => {
       else {
 
         return (
+          <ErrorBoundary>
             <MainContent />
+          </ErrorBoundary >
         )
       }
     }

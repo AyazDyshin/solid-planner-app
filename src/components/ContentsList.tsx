@@ -3,7 +3,7 @@ import { useSession } from "@inrupt/solid-ui-react";
 import { useEffect, useState } from "react";
 import { Button, Spinner } from "react-bootstrap";
 import { setPubAccess, shareWith } from "../services/access";
-import { extractCategories, filterByAccess, filterByCategory } from "../services/helpers";
+import { extractCategories, filterByAccess, filterByCategory, useAsyncError } from "../services/helpers";
 import {
     fetchAllEntries, recordDefaultFolder, thingToNote, saveNote,
     editNote, fetchContacts, checkContacts

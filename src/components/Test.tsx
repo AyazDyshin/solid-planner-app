@@ -29,6 +29,7 @@ import { ACP } from '@inrupt/vocab-solid';
 import { changeAccessAcp } from '../services/helperAccess';
 import { fdatasync } from 'fs';
 import { getResourceInfoWithAcr, getSolidDatasetWithAcr, WithAccessibleAcr } from '@inrupt/solid-client/dist/acp/acp';
+import { useAsyncError } from '../services/helpers';
 
 
 const Test = () => {
@@ -38,7 +39,7 @@ const Test = () => {
   const { dataset, error } = useDataset();
   const [stat, setStat] = useState<string | null>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
-
+  const throwError = useAsyncError();
   const gets = async () => {
     //const socket = new WebSocket("wss://inrtester2.inrupt.net/SolidPlannerApp/");
     //console.log(socket);
@@ -48,11 +49,13 @@ const Test = () => {
     //   { read: true, append: true, write: true }, { fetch: fetch });
     // let secondPubAccess = await universalAccess.getPublicAccess("https://pod.inrupt.com/podsptester/toTest/", { fetch: fetch });
     // let checkResourceACR = await acp_ess_2.getSolidDatasetWithAcr("https://pod.inrupt.com/podsptester/toTest/", { fetch: fetch });
-    throw new Error("we are testing");
+    //throwError(new Error("we are testing"));
+    // setState(() => { throw new Error("we are testing") });
+   // throw new Error("hhhhhh");
   }
 
 
-  gets();
+ // gets();
 
 
   return (

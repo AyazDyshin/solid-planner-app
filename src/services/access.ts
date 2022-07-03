@@ -6,6 +6,7 @@ import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import { ACP } from "@inrupt/vocab-solid";
 import { accessObject, fetcher } from "../components/types";
 import { changeAccessAcp, getAcpAccess } from "./helperAccess";
+import { useAsyncError } from "./helpers";
 import { getAccessType, getStoragePref } from "./podGetters";
 
 /* 
@@ -13,7 +14,7 @@ this function is used to defaultAccessControlAgentMatcherAppendPolicyialize Acl 
 once getPublicAccess function from universalAccess module will be fixed, this function won't be needed.
 ref: https://github.com/inrupt/solid-client-js/issues/1549
 */
-
+//const throwError = useAsyncError();
 export const initializeAcl = async (url: string, fetch: fetcher) => {
     let myDatasetWithAcl
     try {
@@ -21,16 +22,23 @@ export const initializeAcl = async (url: string, fetch: fetcher) => {
     }
 
     catch (error) {
-        throw new Error(`Error when fetching dataset, url: ${url} error: ${error}`);
+        let message = 'Unknown Error';
+        if (error instanceof Error) message = error.message;
+        //  throwError(new Error(`Error when fetching dataset, url: ${url} error: ${message}`));
+        throw new Error(`Error when fetching dataset, url: ${url} error: ${message}`);
     }
     let resourceAcl;
     if (!hasResourceAcl(myDatasetWithAcl)) {
         if (!hasAccessibleAcl(myDatasetWithAcl)) {
+            // throwError(new Error(`The current user does not have permission to change access rights to this resource, url: ${url}`));
             throw new Error(
                 `The current user does not have permission to change access rights to this resource, url: ${url}`
             );
         }
         if (!hasFallbackAcl(myDatasetWithAcl)) {
+            // throwError(new Error(
+            //     `The current user does not have permission to see who currently has access to this resource, url: ${url}`
+            // ));
             throw new Error(
                 `The current user does not have permission to see who currently has access to this resource, url: ${url}`
             );
@@ -64,6 +72,7 @@ export const setPubAccess = async (webId: string, accessObj: accessObject, url: 
                 write: accessObj.write
             }, { fetch: fetch });
             if (!upd) {
+                //  throwError(new Error(`You don't have permissions to changes the access type of this resource, url: ${url}`));
                 throw new Error(`You don't have permissions to changes the access type of this resource, url: ${url}`);
             };
         }
@@ -76,10 +85,12 @@ export const setPubAccess = async (webId: string, accessObj: accessObject, url: 
                     write: accessObj.write
                 }, { fetch: fetch });
                 if (!upd) {
+                    //  throwError(new Error(`You don't have permissions to changes the access type of this resource, url: ${url}`));
                     throw new Error(`You don't have permissions to changes the access type of this resource, url: ${url}`);
                 };
             }
             catch {
+                // throwError(new Error(`You don't have permissions to change the access type of this resource, url: ${url}`));
                 throw new Error(`You don't have permissions to change the access type of this resource, url: ${url}`);
             }
         }
@@ -103,6 +114,7 @@ export const shareWith = async (webId: string, url: string, fetch: fetcher, acce
                 write: accessObj.write
             }, { fetch: fetch });
             if (!upd) {
+                //throwError(new Error(`The current user does not have permission to change access rights to this resource, url: ${url}`));
                 throw new Error(`The current user does not have permission to change access rights to this resource, url: ${url}`);
             }
         }
@@ -116,11 +128,13 @@ export const shareWith = async (webId: string, url: string, fetch: fetcher, acce
                     write: accessObj.write
                 }, { fetch: fetch });
                 if (!upd) {
+                    //   throwError(new Error(`The current user does not have permission to change access rights to this resource, url: ${url}`));
                     throw new Error(`The current user does not have permission to change access rights to this resource, url: ${url}`);
                 }
             }
 
             catch {
+                //  throwError(new Error(`The current user does not have permission to change access rights to this resource, url: ${url}`));
                 throw new Error(`The current user does not have permission to change access rights to this resource, url: ${url}`);
             }
         }
@@ -138,6 +152,7 @@ export const getSharedList = async (webId: string, url: string, fetch: fetcher) 
         try {
             const allAgents = await universalAccess.getAgentAccessAll(url, { fetch: fetch });
             if (!allAgents) {
+                //  throwError(new Error(`The current user does not have permission to see who currently has access to this resource, url: ${url}`));
                 throw new Error(`The current user does not have permission to see who currently has access to this resource, url: ${url}`);
             }
             let accObj: Record<string, AccessModes> = {};
@@ -153,6 +168,7 @@ export const getSharedList = async (webId: string, url: string, fetch: fetcher) 
                 await initializeAcl(url, fetch);
                 const allAgents = await universalAccess.getAgentAccessAll(url, { fetch: fetch });
                 if (!allAgents) {
+                    //  throwError(new Error(`The current user does not have permission to see who currently has access to this resource, url: ${url}`));
                     throw new Error(`The current user does not have permission to see who currently has access to this resource, url: ${url}`);
                 }
                 let accObj: Record<string, AccessModes> = {};
@@ -164,6 +180,7 @@ export const getSharedList = async (webId: string, url: string, fetch: fetcher) 
                 return accObj;
             }
             catch {
+                // throwError(new Error(`The current user does not have permission to see who currently has access to this resource, url: ${url}`));
                 throw new Error(`The current user does not have permission to see who currently has access to this resource, url: ${url}`);
             }
         }
@@ -183,6 +200,7 @@ export const getPubAccess = async (webId: string, url: string, fetch: fetcher) =
         try {
             let pubAcc = await universalAccess.getPublicAccess(url, { fetch: fetch });
             if (!pubAcc) {
+                // throwError(new Error(`The current user does not have permission to see who currently has access to this resource, url: ${url}`));
                 throw new Error(`The current user does not have permission to see who currently has access to this resource, url: ${url}`);
             }
             return pubAcc;
@@ -192,11 +210,13 @@ export const getPubAccess = async (webId: string, url: string, fetch: fetcher) =
                 await initializeAcl(url, fetch);
                 let pubAcc = await universalAccess.getPublicAccess(url, { fetch: fetch });
                 if (!pubAcc) {
+                    //  throwError(new Error(`The current user does not have permission to see who currently has access to this resource, url: ${url}`));
                     throw new Error(`The current user does not have permission to see who currently has access to this resource, url: ${url}`);
                 }
                 return pubAcc;
             }
             catch (error) {
+                // throwError(new Error(`The current user does not have permission to see who currently has access to this resource, url: ${url}`));
                 throw new Error(`The current user does not have permission to see who currently has access to this resource, url: ${url}`);
             }
         }
@@ -219,6 +239,7 @@ export const isWacOrAcp = async (url: string, fetch: fetcher) => {
             dataSetWithAcr = await acp_ess_2.getSolidDatasetWithAcr(url, { fetch: fetch });
         }
         catch {
+            // throwError(new Error(`Couldn't fetch a dataSet from user's POD, this might be due to server error, or due to not having permission`));
             throw new Error(`Couldn't fetch a dataSet from user's POD, this might be due to server error, or due to not having permission`);
 
         }

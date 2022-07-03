@@ -100,9 +100,9 @@ const MainContent = () => {
     else {
       return (
         <NoPermissions
-        refresh={refresh}
-        setRefresh={setRefresh}
-         />
+          refresh={refresh}
+          setRefresh={setRefresh}
+        />
       )
     }
   }

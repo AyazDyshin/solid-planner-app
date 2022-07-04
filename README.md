@@ -19,8 +19,7 @@ The [node](https://nodejs.org/en/download/) with minimum version: v16.14.0.
 ## Steps to run the application
 ## Download the code
 
-Get the application code from [https://github.com/AyazDyshin/solid-planner-app] https://github.com/AyazDyshin/solid-planner-app
-By either downloading the code or cloning the repository.
+Get the application code from https://github.com/AyazDyshin/solid-planner-app by either downloading the code or by cloning the repository.
 ### Installing dependencies
 
 Go to the root directory of the application and run the following command in the terminal to install all dependencies:
@@ -36,4 +35,4 @@ To start the development server, run the following command:
 ```bash
 npm start
 ```
-The application will be deployed on: [http://localhost:8080/] http://localhost:8080/.
+The application will be deployed on: http://localhost:8080/.

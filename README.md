@@ -11,8 +11,11 @@ The live version of the application is hosted using GitHub Pages and is availabl
 ## Local development prerequisites
 
 To run the application locally:
+
 the following is required:
+
  The [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) package management with minimum version: 8.3.1.
+ 
 The [node](https://nodejs.org/en/download/) with minimum version: v16.14.0.
 
 ## Steps to run the application

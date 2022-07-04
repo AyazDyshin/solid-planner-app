@@ -8,16 +8,15 @@ and is bundled using [Webpack](https://webpack.js.org/).
 
 The live version of the application is hosted using GitHub Pages and is available here: [https://ayazdyshin.github.io/solid-planner-app/](https://ayazdyshin.github.io/solid-planner-app/).
 
-## Local development prerequisites
-
+## Running the application locally
+### Local development prerequisites
 To run the application locally, the following is required:
 
  The [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) package management with minimum version: 8.3.1.
  
 The [node](https://nodejs.org/en/download/) with minimum version: v16.14.0.
 
-## Steps to run the application
-## Download the code
+### Download the code
 
 Get the application code from https://github.com/AyazDyshin/solid-planner-app by either downloading the code or by cloning the repository.
 ### Installing dependencies
@@ -36,3 +35,7 @@ To start the development server, run the following command:
 npm start
 ```
 The application will be deployed on: http://localhost:8080/.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+

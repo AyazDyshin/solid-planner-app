@@ -34,8 +34,9 @@ To start the development server, run the following command:
 ```bash
 npm start
 ```
-The application will be deployed on: http://localhost:8080/.
+The application will be deployed on: http://localhost:8080/
 
+## License
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 

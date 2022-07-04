@@ -53,13 +53,13 @@ export const thingToHabit = async (toChange: Thing | null, webId: string, fetch:
   let updId = getInteger(toChange, schema.identifier) ? getInteger(toChange, schema.identifier) :
     Date.now() + Math.floor(Math.random() * 1000);
   let updCategory = getStringNoLocale(toChange, otherV.category);
-  let updStartDate = getDate(toChange, "http://example.org/startDate");
-  let updLastCheckInDate = getDate(toChange, "http://example.org/lastCheckInDate");
-  let updBestStreak = getInteger(toChange, "http://example.org/bestStreak");
-  let updCurrentStreak = getInteger(toChange, "http://example.org/currentStreak");
-  let updStatus = getBoolean(toChange, "http://example.org/status");
-  let updRecurrence = getStringNoLocale(toChange, "http://example.org/recurrence");
-  let updCustom = getStringNoLocale(toChange, "http://example.org/custom");
+  let updStartDate = getDate(toChange, "http://www.oegov.org/core/owl/gc#startDate");
+  let updLastCheckInDate = getDate(toChange, voc.lastCheckInDate);
+  let updBestStreak = getInteger(toChange, voc.bestStreak);
+  let updCurrentStreak = getInteger(toChange, voc.currentStreak);
+  let updStatus = getBoolean(toChange, "http://dbpedia.org/ontology/status");
+  let updRecurrence = getStringNoLocale(toChange, voc.recurrence);
+  let updCustom = getStringNoLocale(toChange, voc.custom);
 
   let newCustomValue: number[] | number | null = null;
   if (updCustom) {
@@ -432,8 +432,8 @@ export const saveHabit = async (webId: string, fetch: fetcher, habit: Habit) => 
     .addInteger(schema.identifier, id)
     .addStringNoLocale(DCTERMS.title, titleUpd)
     .addStringNoLocale(schema.text, contentUpd)
-    .addDate("http://example.org/startDate", startDate)
-    .addStringNoLocale("http://example.org/recurrence", habit.recurrence ? habit.recurrence : "daily")
+    .addDate("http://www.oegov.org/core/owl/gc#startDate", startDate)
+    .addStringNoLocale(voc.recurrence, habit.recurrence ? habit.recurrence : "daily")
     .build();
 
   if (habit.category) newHabit = addStringNoLocale(newHabit, otherV.category, habit.category);
@@ -446,10 +446,10 @@ export const saveHabit = async (webId: string, fetch: fetcher, habit: Habit) => 
     else {
       customToUpload = habit.custom.join(" ");
     }
-    newHabit = addStringNoLocale(newHabit, "http://example.org/custom", customToUpload);
+    newHabit = addStringNoLocale(newHabit, voc.custom, customToUpload);
   };
   if (habit.stat) {
-    newHabit = addBoolean(newHabit, "http://example.org/status", habit.stat)
+    newHabit = addBoolean(newHabit, "http://dbpedia.org/ontology/status", habit.stat)
   }
   dataSet = setThing(dataSet, newHabit);
   await saveSolidDatasetAt(habitUrl, dataSet, { fetch: fetch });
@@ -502,19 +502,19 @@ export const editHabit = async (webId: string, fetch: fetcher, habitToSave: Habi
               newThing = setStringNoLocale(newThing, schema.text, habitToSave.content);
             }
             if (habitToSave.recurrence) {
-              newThing = setStringNoLocale(newThing, "http://example.org/recurrence", habitToSave.recurrence);
+              newThing = setStringNoLocale(newThing, voc.recurrence, habitToSave.recurrence);
             }
             if (habitToSave.lastCheckInDate) {
-              newThing = setDate(newThing, "http://example.org/lastCheckIn", habitToSave.lastCheckInDate);
+              newThing = setDate(newThing, voc.lastCheckInDate, habitToSave.lastCheckInDate);
             }
             if (habitToSave.bestStreak) {
-              newThing = setInteger(newThing, "http://example.org/bestStreak", habitToSave.bestStreak);
+              newThing = setInteger(newThing, voc.bestStreak, habitToSave.bestStreak);
             }
             if (habitToSave.currentStreak) {
-              newThing = setInteger(newThing, "http://example.org/currentStreak", habitToSave.currentStreak);
+              newThing = setInteger(newThing, voc.currentStreak, habitToSave.currentStreak);
             }
             if (habitToSave.stat) {
-              newThing = setBoolean(newThing, "http://example.org/status", habitToSave.stat);
+              newThing = setBoolean(newThing, "http://dbpedia.org/ontology/status", habitToSave.stat);
             }
             if (habitToSave.category) {
               newThing = setStringNoLocale(newThing, otherV.category, habitToSave.category);
@@ -527,7 +527,7 @@ export const editHabit = async (webId: string, fetch: fetcher, habitToSave: Habi
               else {
                 customToUpload = habitToSave.custom.join(" ");
               }
-              newThing = addStringNoLocale(newThing, "http://example.org/custom", customToUpload)
+              newThing = addStringNoLocale(newThing, voc.custom, customToUpload)
             };
             //handle?
             let updDataSet = setThing(newDs, newThing!);
@@ -551,19 +551,19 @@ export const editHabit = async (webId: string, fetch: fetcher, habitToSave: Habi
               newThing = setStringNoLocale(newThing, schema.text, habitToSave.content);
             }
             if (habitToSave.recurrence) {
-              newThing = setStringNoLocale(newThing, "http://example.org/recurrence", habitToSave.recurrence);
+              newThing = setStringNoLocale(newThing, voc.recurrence, habitToSave.recurrence);
             }
             if (habitToSave.lastCheckInDate) {
-              newThing = setDate(newThing, "http://example.org/lastCheckIn", habitToSave.lastCheckInDate);
+              newThing = setDate(newThing, voc.lastCheckInDate, habitToSave.lastCheckInDate);
             }
             if (habitToSave.bestStreak) {
-              newThing = setInteger(newThing, "http://example.org/bestStreak", habitToSave.bestStreak);
+              newThing = setInteger(newThing, voc.bestStreak, habitToSave.bestStreak);
             }
             if (habitToSave.currentStreak) {
-              newThing = setInteger(newThing, "http://example.org/currentStreak", habitToSave.currentStreak);
+              newThing = setInteger(newThing, voc.currentStreak, habitToSave.currentStreak);
             }
             if (habitToSave.stat) {
-              newThing = setBoolean(newThing, "http://example.org/status", habitToSave.stat);
+              newThing = setBoolean(newThing, "http://dbpedia.org/ontology/status", habitToSave.stat);
             }
             if (habitToSave.category) {
               newThing = setStringNoLocale(newThing, otherV.category, habitToSave.category);
@@ -576,7 +576,7 @@ export const editHabit = async (webId: string, fetch: fetcher, habitToSave: Habi
               else {
                 customToUpload = habitToSave.custom.join(" ");
               }
-              newThing = addStringNoLocale(newThing, "http://example.org/custom", customToUpload)
+              newThing = addStringNoLocale(newThing, voc.custom, customToUpload)
             };
             let updDataSet = setThing(data, newThing!);
             await saveSolidDatasetAt(url, updDataSet, { fetch: fetch });

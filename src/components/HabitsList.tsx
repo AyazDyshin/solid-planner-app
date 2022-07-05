@@ -37,11 +37,16 @@ interface Props {
   setHabitDoSave: React.Dispatch<React.SetStateAction<boolean>>;
   currentView: string;
   setCurrentView: React.Dispatch<React.SetStateAction<string>>;
+  storagePref: string;
+  prefFileLocation: string;
+  publicTypeIndexUrl: string;
+  podType: string;
+  defFolder: string | null;
 }
 const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorStatus, habitsFetched, setHabitsFetched,
-  habitsArray, setHabitsArray, isEdit, setIsEdit, habitToView, setHabitToView, newEntryCr, setNewEntryCr,
+  habitsArray, setHabitsArray, isEdit, setIsEdit, habitToView, setHabitToView, newEntryCr, setNewEntryCr, storagePref,
   habitsToday, setHabitsToday, categoryArray, setCategoryArray, habitInp, setHabitInp, habitDoSave, setHabitDoSave, currentView,
-  setCurrentView
+  setCurrentView, prefFileLocation, publicTypeIndexUrl, podType, defFolder
 }: Props) => {
   const { session, fetch } = useSession();
   const { webId } = session.info;
@@ -62,9 +67,9 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
     const fetchHabits = async (otherId?: string) => {
       let filteredHabits: Habit[] = [];
       if (!habitsFetched) {
-        let habitArr = await fetchAllEntries(webId, fetch, "habit");
+        let habitArr = await fetchAllEntries(webId, fetch, "habit", storagePref, prefFileLocation, publicTypeIndexUrl, podType);
         for (let i = 0; i < habitArr.length; i++) {
-          let item = await thingToHabit(habitArr[i], webId, fetch);
+          let item = await thingToHabit(habitArr[i], webId, fetch, storagePref, prefFileLocation, podType);
           if (item) {
             filteredHabits.push(item);
           }
@@ -130,7 +135,7 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
   const handleSave = async () => {
     await Promise.all(habitsToSave.map(async (habit) => {
       let updHabit = setStreaks(habit);
-      editHabit(webId, fetch, updHabit);
+      editHabit(webId, fetch, updHabit, storagePref, defFolder, prefFileLocation, publicTypeIndexUrl, podType);
     }))
   };
 
@@ -141,7 +146,7 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
     newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
     setViewerStatus(false);
     setCreatorStatus(false);
-    await deleteEntry(webId, fetch, id, "habit");
+    await deleteEntry(webId, fetch, id, "habit", storagePref, publicTypeIndexUrl);
   }
   if (!habitsFetched || isLoading) {
     return (

@@ -3,7 +3,7 @@ import { useSession } from "@inrupt/solid-ui-react";
 import { useEffect, useState } from "react";
 import { Button, Spinner } from "react-bootstrap";
 import { setPubAccess, shareWith } from "../services/access";
-import { extractCategories, filterByAccess, filterByCategory, useAsyncError } from "../services/helpers";
+import { extractCategories, filterByAccess, filterByCategory } from "../services/helpers";
 import {
     fetchAllEntries, recordDefaultFolder, thingToNote, saveNote,
     editNote, fetchContacts, checkContacts
@@ -50,12 +50,17 @@ interface Props {
     }>>;
     notesFetched: boolean;
     setNotesFetched: React.Dispatch<React.SetStateAction<boolean>>;
+    storagePref: string;
+    publicTypeIndexUrl: string;
+    prefFileLocation: string;
+    podType: string;
 }
 
-const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, setNewEntryCr,
+const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, setNewEntryCr, storagePref,
     noteToView, setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, categoryArray, setCategoryArray, doNoteSave,
     setDoNoteSave, NoteInp, setNoteInp, arrOfChanges, setArrOfChanges, agentsToUpd, setAgentsToUpd, notesArray, setNotesArray,
-    isLoadingContents, setIsLoadingContents, publicAccess, accUpdObj, setAccUpdObj, notesFetched, setNotesFetched
+    isLoadingContents, setIsLoadingContents, publicAccess, accUpdObj, setAccUpdObj, notesFetched, setNotesFetched,
+    publicTypeIndexUrl, prefFileLocation, podType
 }: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
@@ -71,9 +76,10 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
         const fetchNotes = async () => {
             let filteredNotes: Note[]
             if (!notesFetched) {
-                let noteArr = await fetchAllEntries(webId, fetch, "note");
+                let noteArr = await fetchAllEntries(webId, fetch, "note", storagePref, prefFileLocation, publicTypeIndexUrl,
+                    podType);
                 let transformedArr = await Promise.all(noteArr.map(async (thing) => {
-                    return await thingToNote(thing, webId, fetch);
+                    return await thingToNote(thing, webId, fetch, storagePref, prefFileLocation, podType);
                 }));
                 transformedArr = transformedArr.filter((item) => item !== null) as Note[];
                 let updType = transformedArr as Note[];
@@ -122,6 +128,8 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
         else {
             return (
                 <NotesList
+                    publicTypeIndexUrl={publicTypeIndexUrl}
+                    storagePref={storagePref}
                     newEntryCr={newEntryCr}
                     setNewEntryCr={setNewEntryCr}
                     notesToShow={notesToShow}

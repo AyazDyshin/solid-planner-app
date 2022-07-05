@@ -29,7 +29,7 @@ interface Props {
 const Navbar = ({ links, active, setActive, viewerStatus, setViewerStatus,
     creatorStatus, setCreatorStatus, isEdit, setIsEdit,
     notesArray, setNotesArray, isLoadingContents, setIsLoadingContents, notesFetched, setNotesFetched }: Props) => {
-    const { session, fetch } = useSession();
+    const { session} = useSession();
     const { webId } = session.info;
     if (webId === undefined) {
         throw new Error(`Error, couldn't get user's WebId`);
@@ -61,8 +61,6 @@ const Navbar = ({ links, active, setActive, viewerStatus, setViewerStatus,
                             onClick={(e) => {
                                 e.preventDefault();
                                 setActive(link);
-                                // perfFetch(link);
-                                //setIsLoadingContents(true);
                                 setViewerStatus(false);
                                 setCreatorStatus(false);
                                 setIsEdit(false);

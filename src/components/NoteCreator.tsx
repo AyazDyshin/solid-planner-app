@@ -50,10 +50,15 @@ interface Props {
     }>>;
     notesArray: Note[];
     setNotesArray: React.Dispatch<React.SetStateAction<Note[]>>;
+    storagePref: string;
+    defFolder: string | null;
+    prefFileLocation: string;
+    podType: string;
+    publicTypeIndexUrl: string;
 }
 //component of creation and saving a note the user's pod
-const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
-    setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit,
+const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFolder, podType, publicTypeIndexUrl,
+    setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, prefFileLocation,
     setCreatorStatus, creatorStatus, categoryArray, setCategoryArray, doNoteSave, setDoNoteSave, NoteInp,
     setNoteInp, arrOfChanges, setArrOfChanges, accUpdObj, setAccUpdObj, agentsToUpd, setAgentsToUpd,
     publicAccess, setPublicAccess, notesArray, setNotesArray
@@ -106,7 +111,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
             setNewEntryCr(!newEntryCr);
             setNoteInp({ id: null, title: "", content: "", category: "", url: "", access: null });
             setArrOfChanges([]);
-            await saveNote(webId, fetch, NoteInp);
+            await saveNote(webId, fetch, NoteInp, storagePref, defFolder, prefFileLocation, podType);
         }
         else if (viewerStatus && (arrOfChanges.length !== 0 || Object.keys(accUpdObj).length !== 0)) {
             setViewerStatus(false);
@@ -152,7 +157,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
             setNoteInp({ id: null, title: "", content: "", category: "", url: "", access: null });
             setArrOfChanges([]);
             if (arrOfChanges.length !== 0) {
-                await editNote(webId, fetch, NoteInp, arrOfChanges);
+                await editNote(webId, fetch, NoteInp, arrOfChanges, storagePref, publicTypeIndexUrl);
             }
         }
 
@@ -161,7 +166,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
                 if (!NoteInp) {
                     throw new Error("Error, note to view wasn't provided");
                 }
-                await setPubAccess(webId, publicAccess, NoteInp.url, fetch);
+                await setPubAccess(webId, publicAccess, NoteInp.url, fetch, storagePref, prefFileLocation, podType);
             }
             else if (accUpdObj["agent"]) {
 
@@ -169,7 +174,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
                     if (!NoteInp) {
                         throw new Error("Error, note to view wasn't provided");
                     }
-                    await shareWith(webId, NoteInp!.url, fetch, agentsToUpd[item], item);
+                    await shareWith(webId, NoteInp!.url, fetch, agentsToUpd[item], item, storagePref, prefFileLocation, podType);
 
                 }
             }
@@ -190,7 +195,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
         if (!NoteInp) {
             throw new Error("Error, note to view wasn't provided");
         }
-        await deleteEntry(webId ?? "", fetch, NoteInp.id!, "note");
+        await deleteEntry(webId ?? "", fetch, NoteInp.id!, "note", storagePref, publicTypeIndexUrl);
     }
 
     return (
@@ -243,6 +248,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView,
                 setCategoryArray={setCategoryArray}
             />
             <AccessModal
+                storagePref={storagePref}
                 agentsToUpd={agentsToUpd}
                 setAgentsToUpd={setAgentsToUpd}
                 accUpdObj={accUpdObj}

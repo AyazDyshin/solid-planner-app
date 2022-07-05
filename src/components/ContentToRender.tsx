@@ -22,17 +22,27 @@ interface Props {
     setHabitsFetched: React.Dispatch<React.SetStateAction<boolean>>;
     habitsArray: Habit[];
     setHabitsArray: React.Dispatch<React.SetStateAction<Habit[]>>;
+    storagePref: string;
+    defFolder: string | null;
+    prefFileLocation: string;
+    podType: string;
+    publicTypeIndexUrl: string;
 }
 // this component decides what to render based on "active" property ie clicked tab
 // while seems redundant at the moment will be useful once other tabs will be implemented
 const ContentToRender = ({ active, viewerStatus, setViewerStatus, habitsFetched, setHabitsFetched, habitsArray, setHabitsArray,
-    creatorStatus, setCreatorStatus, isEdit, setIsEdit, notesArray,
-    setNotesArray, isLoadingContents, setIsLoadingContents, notesFetched, setNotesFetched }: Props) => {
+    creatorStatus, setCreatorStatus, isEdit, setIsEdit, notesArray, storagePref, defFolder, prefFileLocation, podType,
+    setNotesArray, isLoadingContents, setIsLoadingContents, notesFetched, setNotesFetched, publicTypeIndexUrl }: Props) => {
 
     switch (active) {
         case "notes":
             return (
                 <NotesHabitsRender
+                    publicTypeIndexUrl={publicTypeIndexUrl}
+                    podType={podType}
+                    prefFileLocation={prefFileLocation}
+                    defFolder={defFolder}
+                    storagePref={storagePref}
                     notesFetched={notesFetched}
                     setNotesFetched={setNotesFetched}
                     isLoadingContents={isLoadingContents}
@@ -50,6 +60,11 @@ const ContentToRender = ({ active, viewerStatus, setViewerStatus, habitsFetched,
         case "habits":
             return (
                 <HabitsRender
+                    defFolder={defFolder}
+                    podType={podType}
+                    publicTypeIndexUrl={publicTypeIndexUrl}
+                    prefFileLocation={prefFileLocation}
+                    storagePref={storagePref}
                     habitsFetched={habitsFetched}
                     setHabitsFetched={setHabitsFetched}
                     habitsArray={habitsArray}
@@ -58,7 +73,12 @@ const ContentToRender = ({ active, viewerStatus, setViewerStatus, habitsFetched,
             )
         case "contacts":
             return (
-                <ContactsRender />
+                <ContactsRender
+                    podType={podType}
+                    prefFileLocation={prefFileLocation}
+                    publicTypeIndexUrl={publicTypeIndexUrl}
+                    storagePref={storagePref}
+                />
             );
         default:
             return (<div>Error</div>);

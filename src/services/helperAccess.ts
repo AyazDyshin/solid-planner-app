@@ -4,7 +4,6 @@ import { AccessControlResource } from "@inrupt/solid-client/dist/acp/control";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import { ACL, ACP } from "@inrupt/vocab-solid";
 import { accessObject, fetcher } from "../components/types";
-import { useAsyncError } from "./helpers";
 
 //const throwError = useAsyncError();
 

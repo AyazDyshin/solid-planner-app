@@ -8,8 +8,14 @@ interface Props {
     setHabitsFetched: React.Dispatch<React.SetStateAction<boolean>>;
     habitsArray: Habit[];
     setHabitsArray: React.Dispatch<React.SetStateAction<Habit[]>>;
+    storagePref: string;
+    prefFileLocation: string;
+    publicTypeIndexUrl: string;
+    podType: string;
+    defFolder: string | null;
 }
-const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsArray }: Props) => {
+const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsArray, storagePref, prefFileLocation,
+    publicTypeIndexUrl, podType, defFolder }: Props) => {
     const [viewerStatus, setViewerStatus] = useState<boolean>(false);
     const [creatorStatus, setCreatorStatus] = useState<boolean>(false);
     const [arrOfChanges, setArrOfChanges] = useState<string[]>([]);
@@ -34,6 +40,10 @@ const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsA
             <div className="row h-100">
                 <div className="col h-100 border border-5 border-end-0 d-flex justify-content-center align-items-center p-0">
                     <HabitsList
+                        defFolder={defFolder}
+                        podType={podType}
+                        publicTypeIndexUrl={publicTypeIndexUrl}
+                        prefFileLocation={prefFileLocation}
                         currentView={currentView}
                         setCurrentView={setCurrentView}
                         habitDoSave={habitDoSave}
@@ -58,10 +68,16 @@ const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsA
                         setCreatorStatus={setCreatorStatus}
                         isEdit={isEdit}
                         setIsEdit={setIsEdit}
+                        storagePref={storagePref}
                     />
                 </div>
                 <div className="col h-100 border border-5">
                     {(viewerStatus || creatorStatus) && <HabitsCreator
+                        publicTypeIndexUrl={publicTypeIndexUrl}
+                        podType={podType}
+                        prefFileLocation={prefFileLocation}
+                        defFolder={defFolder}
+                        storagePref={storagePref}
                         currentView={currentView}
                         setCurrentView={setCurrentView}
                         habitDoSave={habitDoSave}

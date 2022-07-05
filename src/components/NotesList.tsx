@@ -35,10 +35,12 @@ interface Props {
   currentAccess: string | null;
   newEntryCr: boolean;
   setNewEntryCr: React.Dispatch<React.SetStateAction<boolean>>;
+  storagePref: string;
+  publicTypeIndexUrl: string;
 }
 
-const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, notesToShow, setNotesToShow,
-  viewerStatus, setViewerStatus, setCreatorStatus, isEdit, setIsEdit, categoryArray, setCategoryArray,
+const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, notesToShow, setNotesToShow, storagePref,
+  viewerStatus, setViewerStatus, setCreatorStatus, isEdit, setIsEdit, categoryArray, setCategoryArray, publicTypeIndexUrl,
   setCurrentCategory, currentCategory, setCurrentAccess, currentAccess, newEntryCr, setNewEntryCr }: Props) => {
 
   const { session, fetch } = useSession();
@@ -67,7 +69,7 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, notes
     newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
     setViewerStatus(false);
     setCreatorStatus(false);
-    await deleteEntry(webId, fetch, id, "note");
+    await deleteEntry(webId, fetch, id, "note", storagePref, publicTypeIndexUrl);
   }
 
   return (
@@ -192,7 +194,7 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, notes
                   </OverlayTrigger>}
                   {note.title}
                   {
-                    note.id && 
+                    note.id &&
                     <Button variant="outline-danger"
                       className="ms-auto me-2 px-1 py-1"
                       style={{ color: "red" }}

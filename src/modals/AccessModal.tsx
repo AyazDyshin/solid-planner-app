@@ -36,12 +36,13 @@ interface Props {
     setAgentsToUpd: React.Dispatch<React.SetStateAction<{
         [x: string]: AccessModes;
     }>>;
+    storagePref: string;
     habitInp?: Habit;
     setHabitInp?: React.Dispatch<React.SetStateAction<Habit>>;
 }
 //a popup window to prompt user to set access type
 const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, setNoteInp, contactsList, setContactsList, accUpdObj, setAccUpdObj,
-    setArrOfChanges, publicAccess, setPublicAccess, habitInp, setHabitInp,
+    setArrOfChanges, publicAccess, setPublicAccess, habitInp, setHabitInp, storagePref,
     agentsToUpd, setAgentsToUpd }: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
@@ -71,10 +72,10 @@ const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, setNoteIn
             setWebIdOpen(false);
             //handle
             let inputToUse = NoteInp ? NoteInp : habitInp;
-            if (!inputToUse){
+            if (!inputToUse) {
                 throw new Error("Error, entry to set access for wasn't provided");
             }
-            if (!inputToUse.access){
+            if (!inputToUse.access) {
                 throw new Error("Error, entry to set access for wasn't provided");
             }
             let key = Object.keys(inputToUse.access)[0];
@@ -84,10 +85,10 @@ const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, setNoteIn
             if (inputToUse.shareList) shList = inputToUse.shareList;
             else shList = {};
             setSharedList(shList);
-            let contactsStatus = await checkContacts(webId, fetch);
+            let contactsStatus = await checkContacts(webId, fetch, storagePref);
             setContactsStat(contactsStatus);
             if (contactsStatus) {
-                const namesAndIds = await fetchContacts(webId, fetch);
+                const namesAndIds = await fetchContacts(webId, fetch, storagePref);
                 let contObj: { [x: string]: string | null; } = {};
 
                 namesAndIds.map((pair) => {

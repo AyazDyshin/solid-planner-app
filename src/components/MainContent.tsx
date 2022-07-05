@@ -5,7 +5,6 @@ import Test from "./Test";
 import { checkPermissions, isWacOrAcp } from "../services/access";
 import { useSession } from "@inrupt/solid-ui-react";
 import { Spinner } from "react-bootstrap";
-import { ControlledStorage } from "rdf-namespaces/dist/space";
 import { recordDefaultFolder } from "../services/SolidPod";
 import { Habit, Note } from "./types";
 import { getDefaultFolder, getPrefLink, getPublicTypeIndexUrl, getStoragePref } from "../services/podGetters";
@@ -31,10 +30,11 @@ const MainContent = () => {
   const [habitsFetched, setHabitsFetched] = useState<boolean>(false);
   const [habitsArray, setHabitsArray] = useState<Habit[]>([]);
   const [refresh, setRefresh] = useState<boolean>(false);
-  const [storagePref, setStoragePref] = useState<string | null>(null);
+  const [storagePref, setStoragePref] = useState<string>("");
   const [prefFileLocation, setPrefFileLocation] = useState<string>("");
   const [publicTypeIndexUrl, setPublicTypeIndexUrl] = useState<string>("");
   const [podType, setPodType] = useState<string>("");
+  const [defFolder, setDefFolder] = useState<string | null>(null);
   useEffect(() => {
     let check = async () => {
       setIsLoading(true);
@@ -56,6 +56,7 @@ const MainContent = () => {
         await recordDefaultFolder(webId, fetch, updStoragePref, updPrefFileLocation, updPublicTypeIndexUrl, updPodType);
       }
       defFolderUpd = await getDefaultFolder(webId, fetch, updPrefFileLocation);
+      setDefFolder(defFolderUpd);
       let result = await checkPermissions(webId, fetch, updStoragePref, updPodType);
       setPermissionStatus(result);
       setIsLoading(false);
@@ -94,6 +95,11 @@ const MainContent = () => {
             setIsEdit={setIsEdit}
           />
           <ContentToRender
+            publicTypeIndexUrl={publicTypeIndexUrl}
+            podType={podType}
+            prefFileLocation={prefFileLocation}
+            defFolder={defFolder}
+            storagePref={storagePref}
             habitsFetched={habitsFetched}
             setHabitsFetched={setHabitsFetched}
             habitsArray={habitsArray}

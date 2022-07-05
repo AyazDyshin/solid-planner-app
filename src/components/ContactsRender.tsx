@@ -9,8 +9,13 @@ import NotesList from "./NotesList";
 import NoteViewer from "./NoteViewer";
 import { Note } from "./types";
 import ViewNotes from "./ViewNotes";
-
-const ContactsRender = () => {
+interface Props {
+    storagePref: string;
+    publicTypeIndexUrl: string;
+    prefFileLocation: string;
+    podType: string;
+}
+const ContactsRender = ({ storagePref, publicTypeIndexUrl, prefFileLocation, podType }: Props) => {
     const { session, fetch } = useSession();
     const [contactsFdrStatus, setContactsFdrStatus] = useState<boolean>(false);
     const { webId } = session.info;
@@ -27,18 +32,19 @@ const ContactsRender = () => {
     useEffect(() => {
         const initialize = async () => {
             setIsLoading(true);
-            let contactsStatus = await checkContacts(webId, fetch);
+            let contactsStatus = await checkContacts(webId, fetch, storagePref);
             setContactsFdrStatus(contactsStatus);
             if (contactsStatus) {
-                const namesAndIds = await fetchContacts(webId, fetch);
+                const namesAndIds = await fetchContacts(webId, fetch, storagePref);
                 setContactsArr(namesAndIds);
                 const namesArr = namesAndIds.map((pair) => pair[0] ? pair[0] : pair[1]);
 
             }
             if (otherWebId) {
-                let notesArrUpd = await fetchAllEntries(otherWebId, fetch, "note", true);
+                let notesArrUpd = await fetchAllEntries(otherWebId, fetch, "note", storagePref, prefFileLocation,
+                    publicTypeIndexUrl, podType, true);
                 let transformedArr = await Promise.all(notesArrUpd.map(async (thing) => {
-                    return await thingToNote(thing, otherWebId, fetch);
+                    return await thingToNote(thing, otherWebId, fetch, storagePref, prefFileLocation, podType);
                 }));
                 setNotesArray(transformedArr.filter((item) => item !== null));
             }

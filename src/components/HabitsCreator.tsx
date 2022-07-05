@@ -54,11 +54,16 @@ interface Props {
   setHabitDoSave: React.Dispatch<React.SetStateAction<boolean>>;
   currentView: string;
   setCurrentView: React.Dispatch<React.SetStateAction<string>>;
+  storagePref: string;
+  defFolder: string | null;
+  prefFileLocation: string;
+  podType: string;
+  publicTypeIndexUrl: string;
 }
 const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, isEdit, setIsEdit, creatorStatus, setCreatorStatus,
   viewerStatus, setViewerStatus, habitToView, setHabitToView, habitsArray, setHabitsArray, newEntryCr, setNewEntryCr,
   accUpdObj, setAccUpdObj, publicAccess, setPublicAccess, agentsToUpd, setAgentsToUpd, categoryArray, setCategoryArray,
-  habitDoSave, setHabitDoSave, currentView, setCurrentView
+  habitDoSave, setHabitDoSave, currentView, setCurrentView, storagePref, defFolder, prefFileLocation, publicTypeIndexUrl, podType
 }: Props) => {
   const { session, fetch } = useSession();
   const { webId } = session.info;
@@ -111,7 +116,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
       });
       setArrOfChanges([]);
       setHabitChanged(false);
-      await saveHabit(webId, fetch, habitInp);
+      await saveHabit(webId, fetch, habitInp, storagePref, defFolder, prefFileLocation, podType);
     }
     else if (viewerStatus && (arrOfChanges.length !== 0 || Object.keys(accUpdObj).length !== 0 || habitChanged)) {
       setViewerStatus(false);
@@ -161,7 +166,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
       setHabitChanged(false);
       setArrOfChanges([]);
       if (arrOfChanges.length !== 0 || habitChanged) {
-        await editHabit(webId, fetch, habitInp);
+        await editHabit(webId, fetch, habitInp, storagePref, defFolder, prefFileLocation, publicTypeIndexUrl, podType);
       }
 
     }
@@ -175,7 +180,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
           throw new Error("error: provided habit doesn't have url");
 
         }
-        await setPubAccess(webId, publicAccess, habitInp.url, fetch);
+        await setPubAccess(webId, publicAccess, habitInp.url, fetch, storagePref, prefFileLocation, podType);
       }
       else if (accUpdObj["agent"]) {
         if (!habitInp) {
@@ -186,7 +191,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
 
         }
         for (let item in agentsToUpd) {
-          await shareWith(webId, habitInp.url, fetch, agentsToUpd[item], item);
+          await shareWith(webId, habitInp.url, fetch, agentsToUpd[item], item, storagePref, prefFileLocation, podType);
 
         }
       }
@@ -204,7 +209,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
       throw new Error("error: provided habit to delete, doesn't have id");
 
     }
-    await deleteEntry(webId, fetch, habitInp.id, "habit");
+    await deleteEntry(webId, fetch, habitInp.id, "habit", storagePref, publicTypeIndexUrl);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -350,6 +355,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
         setCategoryModalState={setCategoryModalState}
       />
       <AccessModal
+        storagePref={storagePref}
         agentsToUpd={agentsToUpd}
         setAgentsToUpd={setAgentsToUpd}
         accUpdObj={accUpdObj}

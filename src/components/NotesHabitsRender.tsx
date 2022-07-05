@@ -19,6 +19,11 @@ interface Props {
     setIsLoadingContents: React.Dispatch<React.SetStateAction<boolean>>;
     notesFetched: boolean;
     setNotesFetched: React.Dispatch<React.SetStateAction<boolean>>;
+    storagePref: string;
+    defFolder: string | null;
+    prefFileLocation: string;
+    podType: string;
+    publicTypeIndexUrl: string;
 }
 // Component that is responsible for rendering content of notes and habits tab
 // splits the content in two halves, left half: "FolderPickerOrContent"
@@ -27,8 +32,9 @@ interface Props {
 // this is needed to update the left side view, ie list of entries existing in the user's pod
 // "creatorStatus" and "setCreatorStatus" are hooks to monitor if create button was pressed,
 // this is needed to render the respective creator component
-const NotesHabitsRender = ({ active, viewerStatus, setViewerStatus, creatorStatus, setCreatorStatus, isEdit,
-    setIsEdit, notesArray, setNotesArray, isLoadingContents, setIsLoadingContents, notesFetched, setNotesFetched }: Props) => {
+const NotesHabitsRender = ({ active, viewerStatus, setViewerStatus, creatorStatus, setCreatorStatus, isEdit, storagePref, defFolder,
+    setIsEdit, notesArray, setNotesArray, isLoadingContents, setIsLoadingContents, notesFetched, setNotesFetched, podType,
+    prefFileLocation, publicTypeIndexUrl }: Props) => {
     const [newEntryCr, setNewEntryCr] = useState<boolean>(false);
     const [noteToView, setNoteToView] = useState<Note | null>(null);
     const [categoryArray, setCategoryArray] = useState<string[]>([]);
@@ -44,6 +50,10 @@ const NotesHabitsRender = ({ active, viewerStatus, setViewerStatus, creatorStatu
             <div className="row h-100">
                 <div className="col h-100 border border-5 border-end-0 d-flex justify-content-center align-items-center p-0">
                     <ContentsList
+                        podType={podType}
+                        prefFileLocation={prefFileLocation}
+                        publicTypeIndexUrl={publicTypeIndexUrl}
+                        storagePref={storagePref}
                         notesFetched={notesFetched}
                         setNotesFetched={setNotesFetched}
                         agentsToUpd={agentsToUpd}
@@ -77,7 +87,13 @@ const NotesHabitsRender = ({ active, viewerStatus, setViewerStatus, creatorStatu
                     />
                 </div>
                 <div className="col h-100 border border-5">
+
                     {(viewerStatus || creatorStatus) && <NoteCreator
+                        publicTypeIndexUrl={publicTypeIndexUrl}
+                        podType={podType}
+                        prefFileLocation={prefFileLocation}
+                        defFolder={defFolder}
+                        storagePref={storagePref}
                         notesArray={notesArray}
                         setNotesArray={setNotesArray}
                         agentsToUpd={agentsToUpd}

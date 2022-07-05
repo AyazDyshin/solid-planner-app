@@ -119,7 +119,7 @@ export const getDefaultFolder = async (webId: string, fetch: fetcher): Promise<s
 }
 
 
-export const getAccessType = async (webId: string, fetch: fetcher) => {
+export const getAccessType = async (webId: string, fetch: fetcher, storagePref: string) => {
     const prefFileLocation = await getPrefLink(webId, fetch);
     let dataSet
     try {
@@ -138,7 +138,7 @@ export const getAccessType = async (webId: string, fetch: fetcher) => {
     }
     let type = await getStringNoLocale(aThing, voc.accessType);
     if (type === null) {
-        await recordAccessType(webId, fetch);
+        await recordAccessType(webId, fetch, storagePref);
         try {
             dataSet = await getSolidDataset(prefFileLocation, {
                 fetch: fetch
@@ -162,7 +162,7 @@ export const getAccessType = async (webId: string, fetch: fetcher) => {
 }
 
 
-export const getAllUrlFromPublicIndex = async (webId: string, fetch: fetcher, type: string) => {
+export const getAllUrlFromPublicIndex = async (webId: string, fetch: fetcher, type: string, storagePref: string) => {
     let typeToGet = (type === "note" ? schema.TextDigitalDocument : voc.Habit);
     const publicTypeIndexUrl = await getPublicTypeIndexUrl(webId, fetch);
     let dataSet;
@@ -179,10 +179,10 @@ export const getAllUrlFromPublicIndex = async (webId: string, fetch: fetcher, ty
         .map((thing) => getUrl(thing, solid.instance)).filter((url) => url) as string[];
     if (updThings === []) {
         if (type === 'note') {
-            await createEntriesInTypeIndex(webId, fetch, "note");
+            await createEntriesInTypeIndex(webId, fetch, "note", storagePref);
         }
         else {
-            await createEntriesInTypeIndex(webId, fetch, "habit");
+            await createEntriesInTypeIndex(webId, fetch, "habit", storagePref);
         }
         try {
             dataSet = await getSolidDataset(publicTypeIndexUrl, { fetch: fetch });

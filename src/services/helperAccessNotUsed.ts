@@ -4,11 +4,9 @@ import { RDF } from "@inrupt/vocab-common-rdf";
 import { ACP } from "@inrupt/vocab-solid";
 import { accessObject, fetcher } from "../components/types";
 import { getAcr } from "./helperAccess";
-import { getStoragePref } from "./podGetters";
 
 //not used
-export const initializePolicies = async (webId: string, fetch: fetcher, url: string, access: accessObject, agent: string) => {
-    let storagePref = await getStoragePref(webId, fetch);
+export const initializePolicies = async (webId: string, fetch: fetcher, url: string, access: accessObject, agent: string, storagePref: string) => {
     let policiesUrl = `${storagePref}policies/`;
     let myRulesAndPoliciesSolidDataset = await getSolidDataset(
         policiesUrl,
@@ -94,10 +92,10 @@ export const initializePolicies = async (webId: string, fetch: fetcher, url: str
 }
 
 //not used
-export const setAccessForResource = async (webId: string, fetch: fetcher, url: string, access: accessObject, agent: string) => {
-    let storagePref = await getStoragePref(webId, fetch);
+export const setAccessForResource = async (webId: string, fetch: fetcher, url: string, access: accessObject,
+    agent: string, storagePref: string) => {
     let policiesUrl = `${storagePref}policies/`;
-    await initializePolicies(webId, fetch, url, access, agent);
+    await initializePolicies(webId, fetch, url, access, agent, storagePref);
 
     const resourceWithAcr = await acp_ess_1.getSolidDatasetWithAcr(
         url,
@@ -129,8 +127,7 @@ export const setAccessForResource = async (webId: string, fetch: fetcher, url: s
 }
 
 // not used
-export const addPoliciesToResource = async (webId: string, fetch: fetcher, url: string) => {
-    let storagePref = await getStoragePref(webId, fetch);
+export const addPoliciesToResource = async (webId: string, fetch: fetcher, url: string, storagePref: string) => {
     let policiesUrl = `${storagePref}policies/`;
     const resourceWithAcr = await acp_ess_1.getSolidDatasetWithAcr(
         url,

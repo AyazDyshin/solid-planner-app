@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import Navbar from "./Navbar";
 import ContentToRender from "./ContentToRender";
 import Test from "./Test";
-import { checkPermissions } from "../services/access";
+import { checkPermissions, isWacOrAcp } from "../services/access";
 import { useSession } from "@inrupt/solid-ui-react";
 import { Spinner } from "react-bootstrap";
 import { ControlledStorage } from "rdf-namespaces/dist/space";
 import { recordDefaultFolder } from "../services/SolidPod";
 import { Habit, Note } from "./types";
-import { getDefaultFolder } from "../services/podGetters";
+import { getDefaultFolder, getStoragePref } from "../services/podGetters";
 import NoPermissions from "./NoPermissions";
 // This is the root component that first renders NavBar and then other content
 // Passes active and setActive hooks, which represent the currently clicked tab
@@ -31,17 +31,19 @@ const MainContent = () => {
   const [habitsFetched, setHabitsFetched] = useState<boolean>(false);
   const [habitsArray, setHabitsArray] = useState<Habit[]>([]);
   const [refresh, setRefresh] = useState<boolean>(false);
-  const [defFolder, setDefFolder] = useState<string | null>(null);
+  const [storagePref, setStoragePref] = useState<string | null>(null);
   useEffect(() => {
     let check = async () => {
       setIsLoading(true);
+      let updStoragePref = await getStoragePref(webId, fetch);
+      setStoragePref(updStoragePref);
+      let type = await isWacOrAcp(updStoragePref, fetch);
       let defFolderUpd = await getDefaultFolder(webId, fetch);
       if (!defFolderUpd) {
-        await recordDefaultFolder(webId, fetch);
+        await recordDefaultFolder(webId, fetch, updStoragePref);
       }
       defFolderUpd = await getDefaultFolder(webId, fetch);
-      setDefFolder(defFolderUpd);
-       let result = await checkPermissions(webId, fetch);
+      let result = await checkPermissions(webId, fetch, updStoragePref, type);
       setPermissionStatus(result);
       setIsLoading(false);
     }

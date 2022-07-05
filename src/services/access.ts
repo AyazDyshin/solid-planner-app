@@ -6,14 +6,13 @@ import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import { ACP } from "@inrupt/vocab-solid";
 import { accessObject, fetcher } from "../components/types";
 import { changeAccessAcp, getAcpAccess } from "./helperAccess";
-import { getAccessType, getStoragePref } from "./podGetters";
+import { getAccessType } from "./podGetters";
 
 /* 
 this function is used to defaultAccessControlAgentMatcherAppendPolicyialize Acl for resources stored on PODs utilizing WAC access type that don't have acl attached,
 once getPublicAccess function from universalAccess module will be fixed, this function won't be needed.
 ref: https://github.com/inrupt/solid-client-js/issues/1549
 */
-//const throwError = useAsyncError();
 export const initializeAcl = async (url: string, fetch: fetcher) => {
     let myDatasetWithAcl
     try {
@@ -23,13 +22,11 @@ export const initializeAcl = async (url: string, fetch: fetcher) => {
     catch (error) {
         let message = 'Unknown Error';
         if (error instanceof Error) message = error.message;
-        //  throwError(new Error(`Error when fetching dataset, url: ${url} error: ${message}`));
         throw new Error(`Error when fetching dataset, url: ${url} error: ${message}`);
     }
     let resourceAcl;
     if (!hasResourceAcl(myDatasetWithAcl)) {
         if (!hasAccessibleAcl(myDatasetWithAcl)) {
-            // throwError(new Error(`The current user does not have permission to change access rights to this resource, url: ${url}`));
             throw new Error(
                 `The current user does not have permission to change access rights to this resource, url: ${url}`
             );
@@ -49,20 +46,20 @@ export const initializeAcl = async (url: string, fetch: fetcher) => {
     await saveAclFor(myDatasetWithAcl, resourceAcl, { fetch: fetch });
 }
 
-export const determineAccess = async (webId: string, url: string, fetch: fetcher) => {
+export const determineAccess = async (webId: string, url: string, fetch: fetcher, storagePref: string) => {
 
     let accType;
-    const pubAcc = await getPubAccess(webId, url, fetch);
+    const pubAcc = await getPubAccess(webId, url, fetch, storagePref);
     pubAcc.read ? accType = { "public": pubAcc } : accType = { "private": pubAcc };
     let retShared = null;
-    const sharedList = await getSharedList(webId, url, fetch);
+    const sharedList = await getSharedList(webId, url, fetch, storagePref);
     if (!(Object.keys(sharedList).length === 0)) retShared = sharedList;
     return [accType, retShared];
 }
 // This function is used to set public Access type for both WAC and ACP PODs, sets access type to either public or private
 // ie give read permission to general public or not.
-export const setPubAccess = async (webId: string, accessObj: accessObject, url: string, fetch: fetcher) => {
-    let type = await getAccessType(webId, fetch);
+export const setPubAccess = async (webId: string, accessObj: accessObject, url: string, fetch: fetcher, storagePref: string) => {
+    let type = await getAccessType(webId, fetch, storagePref);
     if (type === "wac") {
         try {
             let upd = await universalAccess.setPublicAccess(url, {
@@ -100,9 +97,10 @@ export const setPubAccess = async (webId: string, accessObj: accessObject, url: 
 }
 
 // this function is used to give read permission to specific Agents. Used for both WAC and ACP PODs
-export const shareWith = async (webId: string, url: string, fetch: fetcher, accessObj: accessObject, shareWith: string) => {
+export const shareWith = async (webId: string, url: string, fetch: fetcher, accessObj: accessObject,
+    shareWith: string, storagePref: string) => {
 
-    let type = await getAccessType(webId, fetch);
+    let type = await getAccessType(webId, fetch, storagePref);
 
     if (type === "wac") {
         try {
@@ -144,8 +142,8 @@ export const shareWith = async (webId: string, url: string, fetch: fetcher, acce
     }
 }
 
-export const getSharedList = async (webId: string, url: string, fetch: fetcher) => {
-    let type = await getAccessType(webId, fetch);
+export const getSharedList = async (webId: string, url: string, fetch: fetcher, storagePref: string) => {
+    let type = await getAccessType(webId, fetch, storagePref);
 
     if (type === "wac") {
         try {
@@ -192,9 +190,9 @@ export const getSharedList = async (webId: string, url: string, fetch: fetcher) 
 
 
 
-export const getPubAccess = async (webId: string, url: string, fetch: fetcher) => {
+export const getPubAccess = async (webId: string, url: string, fetch: fetcher, storagePref: string) => {
 
-    let type = await getAccessType(webId, fetch);
+    let type = await getAccessType(webId, fetch, storagePref);
     if (type === "wac") {
         try {
             let pubAcc = await universalAccess.getPublicAccess(url, { fetch: fetch });
@@ -247,16 +245,14 @@ export const isWacOrAcp = async (url: string, fetch: fetcher) => {
     return "acp";
 }
 
-export const checkPermissions = async (webId: string, fetch: fetcher) => {
+export const checkPermissions = async (webId: string, fetch: fetcher, storage: string, type: string) => {
 
     try {
-        let storage = await getStoragePref(webId, fetch);
-        let type = await isWacOrAcp(storage, fetch);
         if (type === "acp") {
             return true;
         }
         else {
-            let b = await createContainerAt(`${storage}planerAppTester1/`, { fetch: fetch });
+            await createContainerAt(`${storage}planerAppTester1/`, { fetch: fetch });
             await initializeAcl(`${storage}planerAppTester1/`, fetch);
             let upd = await universalAccess.setPublicAccess(`${storage}planerAppTester1/`, {
                 read: true,
@@ -271,7 +267,7 @@ export const checkPermissions = async (webId: string, fetch: fetcher) => {
             if ((upd.read && upd.write && upd.append && upd.controlRead && upd.controlWrite) === false) {
                 return false;
             }
-            let h = await deleteContainer(`${storage}planerAppTester1/`, { fetch: fetch });
+            await deleteContainer(`${storage}planerAppTester1/`, { fetch: fetch });
         }
     }
     catch (error) {

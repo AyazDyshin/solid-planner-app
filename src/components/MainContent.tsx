@@ -31,14 +31,17 @@ const MainContent = () => {
   const [habitsFetched, setHabitsFetched] = useState<boolean>(false);
   const [habitsArray, setHabitsArray] = useState<Habit[]>([]);
   const [refresh, setRefresh] = useState<boolean>(false);
+  const [defFolder, setDefFolder] = useState<string | null>(null);
   useEffect(() => {
     let check = async () => {
       setIsLoading(true);
-      const defFolderUpd = await getDefaultFolder(webId, fetch);
+      let defFolderUpd = await getDefaultFolder(webId, fetch);
       if (!defFolderUpd) {
-        let heh = await recordDefaultFolder(webId, fetch);
+        await recordDefaultFolder(webId, fetch);
       }
-      let result = await checkPermissions(webId, fetch);
+      defFolderUpd = await getDefaultFolder(webId, fetch);
+      setDefFolder(defFolderUpd);
+       let result = await checkPermissions(webId, fetch);
       setPermissionStatus(result);
       setIsLoading(false);
     }

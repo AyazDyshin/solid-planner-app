@@ -1,7 +1,6 @@
 import { getSolidDataset, getThing, getUrl, getStringNoLocale, getThingAll } from "@inrupt/solid-client";
 import { space, solid, schema } from "rdf-namespaces";
 import { fetcher, voc } from "../components/types";
-import { useAsyncError } from "./helpers";
 import { createEntriesInTypeIndex, recordAccessType, repairDefaultFolder } from "./SolidPod";
 //const throwError = useAsyncError();
 export const getPrefLink = async (webId: string, fetch: fetcher) => {
@@ -95,27 +94,27 @@ export const getDefaultFolder = async (webId: string, fetch: fetcher): Promise<s
         throw new Error("preference file is empty");
     }
     let defFolderUrl = await getUrl(aThing, voc.defaultFolder);
-    if (!defFolderUrl) {
-        await repairDefaultFolder(webId, fetch);
-        try {
-            dataSet = await getSolidDataset(prefFileLocation, {
-                fetch: fetch
-            });
-        }
-        catch (error) {
-            let message = 'Unknown Error';
-            if (error instanceof Error) message = error.message;
-            throw new Error(`couldn't fetch preference file, this might be due to the fact that it doesn't exist, error: ${message}`);
-        }
-        let aThing = await getThing(dataSet, prefFileLocation);
-        if (!aThing) {
-            throw new Error("preference file is empty");
-        }
-        defFolderUrl = await getUrl(aThing, voc.defaultFolder);
-        if (!defFolderUrl) {
-            throw new Error("couldn't get default folder file location from user's preference file");
-        }
-    }
+    // if (!defFolderUrl) {
+    //     await repairDefaultFolder(webId, fetch);
+    //     try {
+    //         dataSet = await getSolidDataset(prefFileLocation, {
+    //             fetch: fetch
+    //         });
+    //     }
+    //     catch (error) {
+    //         let message = 'Unknown Error';
+    //         if (error instanceof Error) message = error.message;
+    //         throw new Error(`couldn't fetch preference file, this might be due to the fact that it doesn't exist, error: ${message}`);
+    //     }
+    //     let aThing = await getThing(dataSet, prefFileLocation);
+    //     if (!aThing) {
+    //         throw new Error("preference file is empty");
+    //     }
+    //     defFolderUrl = await getUrl(aThing, voc.defaultFolder);
+    //     if (!defFolderUrl) {
+    //         throw new Error("couldn't get default folder file location from user's preference file");
+    //     }
+    // }
     return defFolderUrl;
 }
 

@@ -14,19 +14,6 @@ export const modifyWebId = (webId: string): string => {
     return `${updArr.join("/")}/`;
 }
 
-
-export const useAsyncError = () => {
-    const [_, setError] = React.useState();
-    return React.useCallback(
-        (e: Error) => {
-            setError(() => {
-                throw e;
-            });
-        },
-        [setError],
-    );
-};
-
 export const getNumberFromDay = (day: string) => {
     switch (day) {
         case "monday":

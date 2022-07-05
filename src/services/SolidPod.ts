@@ -9,7 +9,7 @@ import { DCTERMS, RDF } from '@inrupt/vocab-common-rdf';
 import { solid, schema, foaf, vcard } from 'rdf-namespaces';
 import { Note, fetcher, Habit, voc, otherV } from '../components/types';
 import { determineAccess, initializeAcl, isWacOrAcp, setPubAccess } from './access';
-import { updUrlForFolder, useAsyncError } from './helpers';
+import { updUrlForFolder } from './helpers';
 import { getStoragePref, getPrefLink, getPublicTypeIndexUrl, getAllUrlFromPublicIndex, getDefaultFolder, getAccessType } from './podGetters';
 
 //const throwError = useAsyncError();
@@ -405,8 +405,6 @@ export const saveNote = async (webId: string, fetch: fetcher, note: Note) => {
 }
 
 export const saveHabit = async (webId: string, fetch: fetcher, habit: Habit) => {
-  console.log("we are here333");
-  console.log("are we here?? mb");
   const defFolder = await getDefaultFolder(webId, fetch);
   const habitsFolder = `${defFolder}habits/`;
   let dataSet;

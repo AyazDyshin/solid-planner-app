@@ -10,11 +10,11 @@ import { solid, schema, foaf, vcard } from 'rdf-namespaces';
 import { Note, fetcher, Habit, voc, otherV } from '../components/types';
 import { determineAccess, initializeAcl, isWacOrAcp, setPubAccess } from './access';
 import { updUrlForFolder } from './helpers';
-import { getPrefLink, getPublicTypeIndexUrl, getAllUrlFromPublicIndex, getDefaultFolder, getAccessType } from './podGetters';
+import { getPublicTypeIndexUrl, getAllUrlFromPublicIndex, getAccessType } from './podGetters';
 
 //const throwError = useAsyncError();
 //function that transforms var of type Thing to var of Type Note
-export const thingToNote = async (toChange: Thing | null, webId: string, fetch: fetcher, storagePref: string) => {
+export const thingToNote = async (toChange: Thing | null, webId: string, fetch: fetcher, storagePref: string, prefFileLocation: string) => {
   if (!toChange) {
     return null;
   }
@@ -25,7 +25,7 @@ export const thingToNote = async (toChange: Thing | null, webId: string, fetch: 
   let updCategory = getStringNoLocale(toChange, otherV.category);
   let getAcc;
   try {
-    getAcc = await determineAccess(webId, toChange.url, fetch, storagePref);
+    getAcc = await determineAccess(webId, toChange.url, fetch, storagePref, prefFileLocation);
   }
   catch {
     getAcc = [null];
@@ -42,7 +42,7 @@ export const thingToNote = async (toChange: Thing | null, webId: string, fetch: 
   return note;
 }
 
-export const thingToHabit = async (toChange: Thing | null, webId: string, fetch: fetcher, storagePref: string) => {
+export const thingToHabit = async (toChange: Thing | null, webId: string, fetch: fetcher, storagePref: string, prefFileLocation: string) => {
   if (!toChange) {
     return null;
   }
@@ -72,7 +72,7 @@ export const thingToHabit = async (toChange: Thing | null, webId: string, fetch:
 
   let getAcc;
   try {
-    getAcc = await determineAccess(webId, toChange.url, fetch, storagePref);
+    getAcc = await determineAccess(webId, toChange.url, fetch, storagePref, prefFileLocation);
   }
   catch {
     getAcc = [null];
@@ -119,9 +119,8 @@ export const thingToHabit = async (toChange: Thing | null, webId: string, fetch:
 //     createPrefLink(webId, fetch);
 //   }
 // }
-export const repairDefaultFolder = async (webId: string, fetch: fetcher, storagePref: string) => {
+export const repairDefaultFolder = async (webId: string, fetch: fetcher, storagePref: string, prefFileLocation: string) => {
   let defaultFolderPath = `${storagePref}SolidPlannerApp`;
-  const prefFileLocation = await getPrefLink(webId, fetch);
   let dataSet;
   try {
     dataSet = await getSolidDataset(prefFileLocation, {
@@ -142,9 +141,9 @@ export const repairDefaultFolder = async (webId: string, fetch: fetcher, storage
   await saveSolidDatasetAt(prefFileLocation, dataSet, { fetch: fetch });
 }
 
-export const recordDefaultFolder = async (webId: string, fetch: fetcher, storagePref: string) => {
-  await repairDefaultFolder(webId, fetch, storagePref);
-  await createDefFolder(webId, fetch, storagePref);
+export const recordDefaultFolder = async (webId: string, fetch: fetcher, storagePref: string, prefFileLocation: string) => {
+  await repairDefaultFolder(webId, fetch, storagePref, prefFileLocation);
+  await createDefFolder(webId, fetch, storagePref, prefFileLocation);
   await createEntriesInTypeIndex(webId, fetch, "note", storagePref);
   await createEntriesInTypeIndex(webId, fetch, "habit", storagePref);
 }
@@ -180,11 +179,10 @@ export const createEntriesInTypeIndex = async (webId: string, fetch: fetcher, en
 }
 
 
-export const recordAccessType = async (webId: string, fetch: fetcher, storagePref: string) => {
+export const recordAccessType = async (webId: string, fetch: fetcher, storagePref: string, prefFileLocation: string) => {
   let defFolderUrl = `${storagePref}SolidPlannerApp`;
   let type = await isWacOrAcp(`${updUrlForFolder(defFolderUrl)}`, fetch);
 
-  const prefFileLocation = await getPrefLink(webId, fetch);
   let dataSet;
   try {
     dataSet = await getSolidDataset(prefFileLocation, {
@@ -210,7 +208,7 @@ export const recordAccessType = async (webId: string, fetch: fetcher, storagePre
 }
 
 
-export const createDefFolder = async (webId: string, fetch: fetcher, storagePref: string) => {
+export const createDefFolder = async (webId: string, fetch: fetcher, storagePref: string, prefFileLocation: string) => {
 
   let defFolderUrl = `${storagePref}SolidPlannerApp`;
   try {
@@ -230,8 +228,8 @@ export const createDefFolder = async (webId: string, fetch: fetcher, storagePref
   }
 
   let type = await isWacOrAcp(`${updUrlForFolder(defFolderUrl)}`, fetch);
-  await recordAccessType(webId, fetch, storagePref);
-  await setPubAccess(webId, { read: true, append: false, write: false }, `${updUrlForFolder(defFolderUrl)}`, fetch, storagePref);
+  await recordAccessType(webId, fetch, storagePref, prefFileLocation);
+  await setPubAccess(webId, { read: true, append: false, write: false }, `${updUrlForFolder(defFolderUrl)}`, fetch, storagePref, prefFileLocation);
   try {
     let s = await getSolidDataset(`${updUrlForFolder(defFolderUrl)}notes/`, {
       fetch: fetch
@@ -253,7 +251,7 @@ export const createDefFolder = async (webId: string, fetch: fetcher, storagePref
   if (type === "wac") {
     await initializeAcl(`${updUrlForFolder(defFolderUrl)}notes/`, fetch);
   }
-  await setPubAccess(webId, { read: true, append: false, write: false }, `${updUrlForFolder(defFolderUrl)}notes/`, fetch, storagePref);
+  await setPubAccess(webId, { read: true, append: false, write: false }, `${updUrlForFolder(defFolderUrl)}notes/`, fetch, storagePref, prefFileLocation);
   try {
     let b = await getSolidDataset(`${updUrlForFolder(defFolderUrl)}habits/`, {
       fetch: fetch
@@ -276,11 +274,12 @@ export const createDefFolder = async (webId: string, fetch: fetcher, storagePref
   if (type === "wac") {
     await initializeAcl(`${updUrlForFolder(defFolderUrl)}habits/`, fetch);
   }
-  await setPubAccess(webId, { read: true, append: false, write: false }, `${updUrlForFolder(defFolderUrl)}habits/`, fetch, storagePref);
+  await setPubAccess(webId, { read: true, append: false, write: false }, `${updUrlForFolder(defFolderUrl)}habits/`, fetch, storagePref, prefFileLocation);
 }
 
 
-export const fetchAllEntries = async (webId: string, fetch: fetcher, entry: string, storagePref: string, other?: boolean) => {
+export const fetchAllEntries = async (webId: string, fetch: fetcher, entry: string, storagePref: string, prefFileLocation: string,
+  other?: boolean) => {
   let arrayOfCategories: string[] = [];
   let urlsArr
   try {
@@ -305,7 +304,7 @@ export const fetchAllEntries = async (webId: string, fetch: fetcher, entry: stri
       if (other) return null;
       else {
         try {
-          await createDefFolder(webId, fetch, storagePref);
+          await createDefFolder(webId, fetch, storagePref, prefFileLocation);
           data = await getSolidDataset(url, { fetch: fetch });
         }
         catch (error) {
@@ -356,8 +355,8 @@ export const fetchAllEntries = async (webId: string, fetch: fetcher, entry: stri
 }
 
 
-export const saveNote = async (webId: string, fetch: fetcher, note: Note, storagePref: string) => {
-  const defFolder = await getDefaultFolder(webId, fetch);
+export const saveNote = async (webId: string, fetch: fetcher, note: Note, storagePref: string,
+  defFolder: string | null, prefFileLocation: string) => {
   const notesFolder = `${defFolder}notes/`;
   let dataSet;
   try {
@@ -367,7 +366,7 @@ export const saveNote = async (webId: string, fetch: fetcher, note: Note, storag
   }
   catch (error) {
     try {
-      await createDefFolder(webId, fetch, storagePref);
+      await createDefFolder(webId, fetch, storagePref, prefFileLocation);
       dataSet = await getSolidDataset(notesFolder, {
         fetch: fetch
       });
@@ -392,15 +391,15 @@ export const saveNote = async (webId: string, fetch: fetcher, note: Note, storag
 
   dataSet = setThing(dataSet, newNote);
   await saveSolidDatasetAt(noteUrl, dataSet, { fetch: fetch });
-  let type = await getAccessType(webId, fetch, storagePref);
+  let type = await getAccessType(webId, fetch, storagePref, prefFileLocation);
   if (type === "wac") {
     await initializeAcl(noteUrl, fetch);
   };
-  await setPubAccess(webId, { read: false, append: false, write: false }, noteUrl, fetch, storagePref);
+  await setPubAccess(webId, { read: false, append: false, write: false }, noteUrl, fetch, storagePref, prefFileLocation);
 }
 
-export const saveHabit = async (webId: string, fetch: fetcher, habit: Habit, storagePref: string) => {
-  const defFolder = await getDefaultFolder(webId, fetch);
+export const saveHabit = async (webId: string, fetch: fetcher, habit: Habit, storagePref: string,
+  defFolder: string | null, prefFileLocation: string) => {
   const habitsFolder = `${defFolder}habits/`;
   let dataSet;
   try {
@@ -411,7 +410,6 @@ export const saveHabit = async (webId: string, fetch: fetcher, habit: Habit, sto
   catch (error) {
     let message = 'Unknown Error';
     if (error instanceof Error) message = error.message;
-    //  throwError(new Error(`Error when trying to fetch habits folder, url: ${habitsFolder} error: ${message}`));
     throw new Error(`Error when trying to fetch habits folder, url: ${habitsFolder} error: ${message}`);
   }
   const id = habit.id === null ? Date.now() + Math.floor(Math.random() * 1000) : habit.id;
@@ -446,17 +444,18 @@ export const saveHabit = async (webId: string, fetch: fetcher, habit: Habit, sto
   }
   dataSet = setThing(dataSet, newHabit);
   await saveSolidDatasetAt(habitUrl, dataSet, { fetch: fetch });
-  let type = await getAccessType(webId, fetch, storagePref);
+  let type = await getAccessType(webId, fetch, storagePref, prefFileLocation);
   if (type === "wac") {
     await initializeAcl(habitUrl, fetch);
   };
-  await setPubAccess(webId, { read: false, append: false, write: false }, habitUrl, fetch, storagePref);
+  await setPubAccess(webId, { read: false, append: false, write: false }, habitUrl, fetch, storagePref, prefFileLocation);
   //lastCheckInDate, bestStreak, currentStreak, status
 }
 
-export const editHabit = async (webId: string, fetch: fetcher, habitToSave: Habit, storagePref: string) => {
+export const editHabit = async (webId: string, fetch: fetcher, habitToSave: Habit, storagePref: string,
+  defFolder: string | null, prefFileLocation: string) => {
   if (!habitToSave.id) {
-    await saveHabit(webId, fetch, habitToSave, storagePref);
+    await saveHabit(webId, fetch, habitToSave, storagePref, defFolder, prefFileLocation);
     return;
   }
   let urlsArr = await getAllUrlFromPublicIndex(webId, fetch, "habit", storagePref);

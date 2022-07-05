@@ -76,8 +76,8 @@ export const getPublicTypeIndexUrl = async (webId: string, fetch: fetcher) => {
 }
 
 
-export const getDefaultFolder = async (webId: string, fetch: fetcher): Promise<string | null> => {
-    const prefFileLocation = await getPrefLink(webId, fetch);
+export const getDefaultFolder = async (webId: string, fetch: fetcher, prefFileLocation: string): Promise<string | null> => {
+
     let dataSet
     try {
         dataSet = await getSolidDataset(prefFileLocation, {
@@ -119,8 +119,7 @@ export const getDefaultFolder = async (webId: string, fetch: fetcher): Promise<s
 }
 
 
-export const getAccessType = async (webId: string, fetch: fetcher, storagePref: string) => {
-    const prefFileLocation = await getPrefLink(webId, fetch);
+export const getAccessType = async (webId: string, fetch: fetcher, storagePref: string, prefFileLocation: string) => {
     let dataSet
     try {
         dataSet = await getSolidDataset(prefFileLocation, {
@@ -138,7 +137,7 @@ export const getAccessType = async (webId: string, fetch: fetcher, storagePref: 
     }
     let type = await getStringNoLocale(aThing, voc.accessType);
     if (type === null) {
-        await recordAccessType(webId, fetch, storagePref);
+        await recordAccessType(webId, fetch, storagePref,prefFileLocation);
         try {
             dataSet = await getSolidDataset(prefFileLocation, {
                 fetch: fetch

@@ -97,7 +97,8 @@ export const getDefaultFolder = async (webId: string, fetch: fetcher, prefFileLo
 }
 
 
-export const getAccessType = async (webId: string, fetch: fetcher, storagePref: string, prefFileLocation: string) => {
+export const getAccessType = async (webId: string, fetch: fetcher, storagePref: string, prefFileLocation: string,
+    podType: string) => {
     let dataSet
     try {
         dataSet = await getSolidDataset(prefFileLocation, {
@@ -115,7 +116,7 @@ export const getAccessType = async (webId: string, fetch: fetcher, storagePref: 
     }
     let type = await getStringNoLocale(aThing, voc.accessType);
     if (type === null) {
-        await recordAccessType(webId, fetch, storagePref, prefFileLocation);
+        await recordAccessType(webId, fetch, storagePref, prefFileLocation, podType);
         try {
             dataSet = await getSolidDataset(prefFileLocation, {
                 fetch: fetch
@@ -157,10 +158,10 @@ export const getAllUrlFromPublicIndex = async (webId: string, fetch: fetcher, ty
         .map((thing) => getUrl(thing, solid.instance)).filter((url) => url) as string[];
     if (updThings === []) {
         if (type === 'note') {
-            await createEntriesInTypeIndex(webId, fetch, "note", storagePref,publicTypeIndexUrl);
+            await createEntriesInTypeIndex(webId, fetch, "note", storagePref, publicTypeIndexUrl);
         }
         else {
-            await createEntriesInTypeIndex(webId, fetch, "habit", storagePref,publicTypeIndexUrl);
+            await createEntriesInTypeIndex(webId, fetch, "habit", storagePref, publicTypeIndexUrl);
         }
         try {
             dataSet = await getSolidDataset(publicTypeIndexUrl, { fetch: fetch });

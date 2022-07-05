@@ -34,6 +34,7 @@ const MainContent = () => {
   const [storagePref, setStoragePref] = useState<string | null>(null);
   const [prefFileLocation, setPrefFileLocation] = useState<string>("");
   const [publicTypeIndexUrl, setPublicTypeIndexUrl] = useState<string>("");
+  const [podType, setPodType] = useState<string>("");
   useEffect(() => {
     let check = async () => {
       setIsLoading(true);
@@ -47,13 +48,15 @@ const MainContent = () => {
       let updPublicTypeIndexUrl = await getPublicTypeIndexUrl(webId, fetch);
       setPublicTypeIndexUrl(updPublicTypeIndexUrl);
 
-      let type = await isWacOrAcp(updStoragePref, fetch);
+      let updPodType = await isWacOrAcp(updStoragePref, fetch);
+      setPodType(updPodType);
+
       let defFolderUpd = await getDefaultFolder(webId, fetch, updPrefFileLocation);
       if (!defFolderUpd) {
-        await recordDefaultFolder(webId, fetch, updStoragePref, updPrefFileLocation, updPublicTypeIndexUrl);
+        await recordDefaultFolder(webId, fetch, updStoragePref, updPrefFileLocation, updPublicTypeIndexUrl, updPodType);
       }
       defFolderUpd = await getDefaultFolder(webId, fetch, updPrefFileLocation);
-      let result = await checkPermissions(webId, fetch, updStoragePref, type);
+      let result = await checkPermissions(webId, fetch, updStoragePref, updPodType);
       setPermissionStatus(result);
       setIsLoading(false);
     }

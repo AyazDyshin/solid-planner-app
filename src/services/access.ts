@@ -46,21 +46,22 @@ export const initializeAcl = async (url: string, fetch: fetcher) => {
     await saveAclFor(myDatasetWithAcl, resourceAcl, { fetch: fetch });
 }
 
-export const determineAccess = async (webId: string, url: string, fetch: fetcher, storagePref: string, prefFileLocation: string) => {
+export const determineAccess = async (webId: string, url: string, fetch: fetcher, storagePref: string, prefFileLocation: string,
+    podType: string) => {
 
     let accType;
-    const pubAcc = await getPubAccess(webId, url, fetch, storagePref, prefFileLocation);
+    const pubAcc = await getPubAccess(webId, url, fetch, storagePref, prefFileLocation, podType);
     pubAcc.read ? accType = { "public": pubAcc } : accType = { "private": pubAcc };
     let retShared = null;
-    const sharedList = await getSharedList(webId, url, fetch, storagePref, prefFileLocation);
+    const sharedList = await getSharedList(webId, url, fetch, storagePref, prefFileLocation, podType);
     if (!(Object.keys(sharedList).length === 0)) retShared = sharedList;
     return [accType, retShared];
 }
 // This function is used to set public Access type for both WAC and ACP PODs, sets access type to either public or private
 // ie give read permission to general public or not.
 export const setPubAccess = async (webId: string, accessObj: accessObject, url: string, fetch: fetcher,
-    storagePref: string, prefFileLocation: string) => {
-    let type = await getAccessType(webId, fetch, storagePref, prefFileLocation);
+    storagePref: string, prefFileLocation: string, podType: string) => {
+    let type = await getAccessType(webId, fetch, storagePref, prefFileLocation, podType);
     if (type === "wac") {
         try {
             let upd = await universalAccess.setPublicAccess(url, {
@@ -99,9 +100,9 @@ export const setPubAccess = async (webId: string, accessObj: accessObject, url: 
 
 // this function is used to give read permission to specific Agents. Used for both WAC and ACP PODs
 export const shareWith = async (webId: string, url: string, fetch: fetcher, accessObj: accessObject,
-    shareWith: string, storagePref: string, prefFileLocation: string) => {
+    shareWith: string, storagePref: string, prefFileLocation: string, podType: string) => {
 
-    let type = await getAccessType(webId, fetch, storagePref, prefFileLocation);
+    let type = await getAccessType(webId, fetch, storagePref, prefFileLocation, podType);
 
     if (type === "wac") {
         try {
@@ -143,8 +144,9 @@ export const shareWith = async (webId: string, url: string, fetch: fetcher, acce
     }
 }
 
-export const getSharedList = async (webId: string, url: string, fetch: fetcher, storagePref: string, prefFileLocation: string) => {
-    let type = await getAccessType(webId, fetch, storagePref, prefFileLocation);
+export const getSharedList = async (webId: string, url: string, fetch: fetcher, storagePref: string, prefFileLocation: string,
+    podType: string) => {
+    let type = await getAccessType(webId, fetch, storagePref, prefFileLocation, podType);
 
     if (type === "wac") {
         try {
@@ -191,9 +193,10 @@ export const getSharedList = async (webId: string, url: string, fetch: fetcher, 
 
 
 
-export const getPubAccess = async (webId: string, url: string, fetch: fetcher, storagePref: string, prefFileLocation: string) => {
+export const getPubAccess = async (webId: string, url: string, fetch: fetcher, storagePref: string, prefFileLocation: string,
+    podType: string) => {
 
-    let type = await getAccessType(webId, fetch, storagePref, prefFileLocation);
+    let type = await getAccessType(webId, fetch, storagePref, prefFileLocation, podType);
     if (type === "wac") {
         try {
             let pubAcc = await universalAccess.getPublicAccess(url, { fetch: fetch });

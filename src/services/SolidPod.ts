@@ -141,15 +141,19 @@ export const repairDefaultFolder = async (webId: string, fetch: fetcher, storage
   await saveSolidDatasetAt(prefFileLocation, dataSet, { fetch: fetch });
 }
 
-export const recordDefaultFolder = async (webId: string, fetch: fetcher, storagePref: string, prefFileLocation: string) => {
+export const recordDefaultFolder = async (webId: string, fetch: fetcher, storagePref: string, prefFileLocation: string,
+  publicTypeIndexUrl: string
+) => {
   await repairDefaultFolder(webId, fetch, storagePref, prefFileLocation);
   await createDefFolder(webId, fetch, storagePref, prefFileLocation);
-  await createEntriesInTypeIndex(webId, fetch, "note", storagePref);
-  await createEntriesInTypeIndex(webId, fetch, "habit", storagePref);
+  await createEntriesInTypeIndex(webId, fetch, "note", storagePref, publicTypeIndexUrl);
+  await createEntriesInTypeIndex(webId, fetch, "habit", storagePref, publicTypeIndexUrl);
 }
 
 
-export const createEntriesInTypeIndex = async (webId: string, fetch: fetcher, entryType: string, storagePref: string) => {
+export const createEntriesInTypeIndex = async (webId: string, fetch: fetcher, entryType: string, storagePref: string,
+  publicTypeIndexUrl: string
+) => {
   let defaultFolderPath = `${storagePref}SolidPlannerApp`;
   let url = "";
   if (entryType === 'note') {
@@ -158,10 +162,9 @@ export const createEntriesInTypeIndex = async (webId: string, fetch: fetcher, en
   else {
     url = `${defaultFolderPath}/habits/`;
   }
-  const pubicTypeIndexUrl = await getPublicTypeIndexUrl(webId, fetch);
   let dataSet;
   try {
-    dataSet = await getSolidDataset(pubicTypeIndexUrl, {
+    dataSet = await getSolidDataset(publicTypeIndexUrl, {
       fetch: fetch
     });
   }
@@ -175,7 +178,7 @@ export const createEntriesInTypeIndex = async (webId: string, fetch: fetcher, en
     .addIri(solid.instance, url)
     .build();
   dataSet = setThing(dataSet, aThing);
-  const updDataSet = await saveSolidDatasetAt(pubicTypeIndexUrl, dataSet, { fetch: fetch });
+  const updDataSet = await saveSolidDatasetAt(publicTypeIndexUrl, dataSet, { fetch: fetch });
 }
 
 
@@ -279,11 +282,11 @@ export const createDefFolder = async (webId: string, fetch: fetcher, storagePref
 
 
 export const fetchAllEntries = async (webId: string, fetch: fetcher, entry: string, storagePref: string, prefFileLocation: string,
-  other?: boolean) => {
+  publicTypeIndexUrl: string, other?: boolean) => {
   let arrayOfCategories: string[] = [];
   let urlsArr
   try {
-    urlsArr = await getAllUrlFromPublicIndex(webId, fetch, entry, storagePref);
+    urlsArr = await getAllUrlFromPublicIndex(webId, fetch, entry, storagePref, publicTypeIndexUrl);
   }
   catch (error) {
     if (other) {
@@ -453,12 +456,12 @@ export const saveHabit = async (webId: string, fetch: fetcher, habit: Habit, sto
 }
 
 export const editHabit = async (webId: string, fetch: fetcher, habitToSave: Habit, storagePref: string,
-  defFolder: string | null, prefFileLocation: string) => {
+  defFolder: string | null, prefFileLocation: string, publicTypeIndexUrl: string) => {
   if (!habitToSave.id) {
     await saveHabit(webId, fetch, habitToSave, storagePref, defFolder, prefFileLocation);
     return;
   }
-  let urlsArr = await getAllUrlFromPublicIndex(webId, fetch, "habit", storagePref);
+  let urlsArr = await getAllUrlFromPublicIndex(webId, fetch, "habit", storagePref, publicTypeIndexUrl);
   let updUrlsArr = await Promise.all(urlsArr.map(async (url) => {
     let data: any;
     try {
@@ -579,8 +582,9 @@ export const editHabit = async (webId: string, fetch: fetcher, habitToSave: Habi
   }));
 };
 
-export const editNote = async (webId: string, fetch: fetcher, note: Note, changes: string[], storagePref: string) => {
-  let urlsArr = await getAllUrlFromPublicIndex(webId, fetch, "note", storagePref);
+export const editNote = async (webId: string, fetch: fetcher, note: Note, changes: string[], storagePref: string,
+  publicTypeIndexUrl: string) => {
+  let urlsArr = await getAllUrlFromPublicIndex(webId, fetch, "note", storagePref, publicTypeIndexUrl);
   let updUrlsArr = await Promise.all(urlsArr.map(async (url) => {
     //handle?
     let data = await getSolidDataset(url, { fetch: fetch });
@@ -646,8 +650,9 @@ export const editNote = async (webId: string, fetch: fetcher, note: Note, change
   }));
 }
 
-export const deleteEntry = async (webId: string, fetch: fetcher, id: number, type: string, storagePref: string) => {
-  let urlsArr = await getAllUrlFromPublicIndex(webId, fetch, type, storagePref);
+export const deleteEntry = async (webId: string, fetch: fetcher, id: number, type: string, storagePref: string,
+  publicTypeIndexUrl: string) => {
+  let urlsArr = await getAllUrlFromPublicIndex(webId, fetch, type, storagePref, publicTypeIndexUrl);
   let updUrlsArr = await Promise.all(urlsArr.map(async (url) => {
     //handle??
     let data = await getSolidDataset(url, { fetch: fetch });

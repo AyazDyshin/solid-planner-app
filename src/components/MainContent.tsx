@@ -8,7 +8,7 @@ import { Spinner } from "react-bootstrap";
 import { ControlledStorage } from "rdf-namespaces/dist/space";
 import { recordDefaultFolder } from "../services/SolidPod";
 import { Habit, Note } from "./types";
-import { getDefaultFolder, getPrefLink, getStoragePref } from "../services/podGetters";
+import { getDefaultFolder, getPrefLink, getPublicTypeIndexUrl, getStoragePref } from "../services/podGetters";
 import NoPermissions from "./NoPermissions";
 // This is the root component that first renders NavBar and then other content
 // Passes active and setActive hooks, which represent the currently clicked tab
@@ -33,17 +33,24 @@ const MainContent = () => {
   const [refresh, setRefresh] = useState<boolean>(false);
   const [storagePref, setStoragePref] = useState<string | null>(null);
   const [prefFileLocation, setPrefFileLocation] = useState<string>("");
+  const [publicTypeIndexUrl, setPublicTypeIndexUrl] = useState<string>("");
   useEffect(() => {
     let check = async () => {
       setIsLoading(true);
+
       let updStoragePref = await getStoragePref(webId, fetch);
       setStoragePref(updStoragePref);
+
       let updPrefFileLocation = await getPrefLink(webId, fetch);
       setPrefFileLocation(updPrefFileLocation);
+
+      let updPublicTypeIndexUrl = await getPublicTypeIndexUrl(webId, fetch);
+      setPublicTypeIndexUrl(updPublicTypeIndexUrl);
+
       let type = await isWacOrAcp(updStoragePref, fetch);
       let defFolderUpd = await getDefaultFolder(webId, fetch, updPrefFileLocation);
       if (!defFolderUpd) {
-        await recordDefaultFolder(webId, fetch, updStoragePref, updPrefFileLocation);
+        await recordDefaultFolder(webId, fetch, updStoragePref, updPrefFileLocation, updPublicTypeIndexUrl);
       }
       defFolderUpd = await getDefaultFolder(webId, fetch, updPrefFileLocation);
       let result = await checkPermissions(webId, fetch, updStoragePref, type);

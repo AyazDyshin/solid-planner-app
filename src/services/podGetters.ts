@@ -2,7 +2,6 @@ import { getSolidDataset, getThing, getUrl, getStringNoLocale, getThingAll } fro
 import { space, solid, schema } from "rdf-namespaces";
 import { fetcher, voc } from "../components/types";
 import { createEntriesInTypeIndex, recordAccessType, repairDefaultFolder } from "./SolidPod";
-//const throwError = useAsyncError();
 export const getPrefLink = async (webId: string, fetch: fetcher) => {
     let dataSet;
     try {
@@ -94,27 +93,6 @@ export const getDefaultFolder = async (webId: string, fetch: fetcher, prefFileLo
         throw new Error("preference file is empty");
     }
     let defFolderUrl = await getUrl(aThing, voc.defaultFolder);
-    // if (!defFolderUrl) {
-    //     await repairDefaultFolder(webId, fetch);
-    //     try {
-    //         dataSet = await getSolidDataset(prefFileLocation, {
-    //             fetch: fetch
-    //         });
-    //     }
-    //     catch (error) {
-    //         let message = 'Unknown Error';
-    //         if (error instanceof Error) message = error.message;
-    //         throw new Error(`couldn't fetch preference file, this might be due to the fact that it doesn't exist, error: ${message}`);
-    //     }
-    //     let aThing = await getThing(dataSet, prefFileLocation);
-    //     if (!aThing) {
-    //         throw new Error("preference file is empty");
-    //     }
-    //     defFolderUrl = await getUrl(aThing, voc.defaultFolder);
-    //     if (!defFolderUrl) {
-    //         throw new Error("couldn't get default folder file location from user's preference file");
-    //     }
-    // }
     return defFolderUrl;
 }
 
@@ -137,7 +115,7 @@ export const getAccessType = async (webId: string, fetch: fetcher, storagePref: 
     }
     let type = await getStringNoLocale(aThing, voc.accessType);
     if (type === null) {
-        await recordAccessType(webId, fetch, storagePref,prefFileLocation);
+        await recordAccessType(webId, fetch, storagePref, prefFileLocation);
         try {
             dataSet = await getSolidDataset(prefFileLocation, {
                 fetch: fetch
@@ -161,9 +139,10 @@ export const getAccessType = async (webId: string, fetch: fetcher, storagePref: 
 }
 
 
-export const getAllUrlFromPublicIndex = async (webId: string, fetch: fetcher, type: string, storagePref: string) => {
+export const getAllUrlFromPublicIndex = async (webId: string, fetch: fetcher, type: string, storagePref: string,
+    publicTypeIndexUrl: string
+) => {
     let typeToGet = (type === "note" ? schema.TextDigitalDocument : voc.Habit);
-    const publicTypeIndexUrl = await getPublicTypeIndexUrl(webId, fetch);
     let dataSet;
     try {
         dataSet = await getSolidDataset(publicTypeIndexUrl, { fetch: fetch });
@@ -178,10 +157,10 @@ export const getAllUrlFromPublicIndex = async (webId: string, fetch: fetcher, ty
         .map((thing) => getUrl(thing, solid.instance)).filter((url) => url) as string[];
     if (updThings === []) {
         if (type === 'note') {
-            await createEntriesInTypeIndex(webId, fetch, "note", storagePref);
+            await createEntriesInTypeIndex(webId, fetch, "note", storagePref,publicTypeIndexUrl);
         }
         else {
-            await createEntriesInTypeIndex(webId, fetch, "habit", storagePref);
+            await createEntriesInTypeIndex(webId, fetch, "habit", storagePref,publicTypeIndexUrl);
         }
         try {
             dataSet = await getSolidDataset(publicTypeIndexUrl, { fetch: fetch });

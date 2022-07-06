@@ -14,7 +14,7 @@ import { first } from 'lodash';
 import { schema, space, vcard } from 'rdf-namespaces';
 import { pim } from '@inrupt/solid-client/dist/constants';
 import {
-  fetchContacts
+  fetchContacts, thingToNote
 } from '../services/SolidPod';
 import { access } from "@inrupt/solid-client";
 import { object, updated } from 'rdf-namespaces/dist/as';
@@ -41,22 +41,29 @@ const Test = () => {
   const gets = async () => {
     //const socket = new WebSocket("wss://inrtester2.inrupt.net/SolidPlannerApp/");
     //console.log(socket);
-    // await createContainerAt("https://pod.inrupt.com/podsptester/toTest/", { fetch: fetch });
-    // let firstPubAccess = await universalAccess.getPublicAccess("https://pod.inrupt.com/podsptester/toTest/", { fetch: fetch });
-    // await universalAccess.setPublicAccess("https://pod.inrupt.com/podsptester/toTest/",
-    //   { read: true, append: true, write: true }, { fetch: fetch });
-    // let secondPubAccess = await universalAccess.getPublicAccess("https://pod.inrupt.com/podsptester/toTest/", { fetch: fetch });
-    // let checkResourceACR = await acp_ess_2.getSolidDatasetWithAcr("https://pod.inrupt.com/podsptester/toTest/", { fetch: fetch });
+    //  await createContainerAt("https://pod.inrupt.com/podsptester/toTest/", { fetch: fetch });
+    //  let firstPubAccess = await universalAccess.getPublicAccess("https://pod.inrupt.com/podsptester/toTest/", { fetch: fetch });
+    //  await universalAccess.setPublicAccess("https://pod.inrupt.com/podsptester/toTest/",
+    //    { read: true, append: true, write: true }, { fetch: fetch });
+    //  let secondPubAccess = await universalAccess.getPublicAccess("https://pod.inrupt.com/podsptester/toTest/", { fetch: fetch });
+    //  let checkResourceACR = await acp_ess_2.getSolidDatasetWithAcr("https://pod.inrupt.com/podsptester/toTest/", { fetch: fetch });
+    // console.log(firstPubAccess);
+    // console.log(secondPubAccess);
+    // console.log(checkResourceACR);
     //throwError(new Error("we are testing"));
     // setState(() => { throw new Error("we are testing") });
     // throw new Error("hhhhhh");
-   // let b = await getSolidDataset(webId ?? "", { fetch: fetch });
+    // let b = await getSolidDataset(webId ?? "", { fetch: fetch });
     //let c = getThing(b, webId);
     //console.log(c);
+    // let b = await getSolidDataset("https://inrtester2.inrupt.net/SolidPlannerApp/notes/1656934556864.ttl", { fetch: fetch });
+    // let thing = getThing(b, "https://inrtester2.inrupt.net/SolidPlannerApp/notes/1656934556864.ttl");
+    // let note = thingToNote(thing, webId ?? "", fetch, "inrtester2.inrupt.net/", "https://inrtester2.inrupt.net/settings/prefs.ttl", "wac");
+    // console.log(note);
   }
 
 
-  //gets();
+  gets();
 
 
   return (

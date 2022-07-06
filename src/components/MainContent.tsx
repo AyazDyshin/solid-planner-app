@@ -57,8 +57,8 @@ const MainContent = () => {
       }
       defFolderUpd = await getDefaultFolder(webId, fetch, updPrefFileLocation);
       setDefFolder(defFolderUpd);
-      let result = await checkPermissions(webId, fetch, updStoragePref, updPodType);
-      setPermissionStatus(result);
+    //  let result = await checkPermissions(webId, fetch, updStoragePref, updPodType);
+      setPermissionStatus(true);
       setIsLoading(false);
     }
     check();
@@ -76,7 +76,6 @@ const MainContent = () => {
     if (permissionStatus) {
       return (
         <div>
-          <Test />
           <Navbar
             notesFetched={notesFetched}
             setNotesFetched={setNotesFetched}

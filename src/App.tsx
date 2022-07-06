@@ -9,9 +9,11 @@ import { FallbackProps } from 'react-error-boundary';
 import NoPermissions from "./components/NoPermissions";
 import ErrorComponent from "./components/ErrorComponent";
 import ErrorBoundary from "./components/ErrorBoundary";
+import Test from "./components/Test";
 const App: React.FC = () => {
+  const { session, sessionRequestInProgress, fetch } = useSession();
+  const { webId } = session.info;
 
-  const { session, sessionRequestInProgress } = useSession();
   const [refresh, setRefresh] = useState<boolean>(false);
   const render = () => {
     useEffect(() => {

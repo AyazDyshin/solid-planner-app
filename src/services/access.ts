@@ -48,7 +48,7 @@ export const initializeAcl = async (url: string, fetch: fetcher) => {
 
 export const determineAccess = async (webId: string, url: string, fetch: fetcher, storagePref: string, prefFileLocation: string,
     podType: string) => {
-
+    console.log("in det Access");
     let accType;
     const pubAcc = await getPubAccess(webId, url, fetch, storagePref, prefFileLocation, podType);
     pubAcc.read ? accType = { "public": pubAcc } : accType = { "private": pubAcc };
@@ -146,9 +146,8 @@ export const shareWith = async (webId: string, url: string, fetch: fetcher, acce
 
 export const getSharedList = async (webId: string, url: string, fetch: fetcher, storagePref: string, prefFileLocation: string,
     podType: string) => {
-    let type = await getAccessType(webId, fetch, storagePref, prefFileLocation, podType);
 
-    if (type === "wac") {
+    if (podType === "wac") {
         try {
             const allAgents = await universalAccess.getAgentAccessAll(url, { fetch: fetch });
             if (!allAgents) {
@@ -195,9 +194,7 @@ export const getSharedList = async (webId: string, url: string, fetch: fetcher, 
 
 export const getPubAccess = async (webId: string, url: string, fetch: fetcher, storagePref: string, prefFileLocation: string,
     podType: string) => {
-
-    let type = await getAccessType(webId, fetch, storagePref, prefFileLocation, podType);
-    if (type === "wac") {
+    if (podType === "wac") {
         try {
             let pubAcc = await universalAccess.getPublicAccess(url, { fetch: fetch });
             if (!pubAcc) {

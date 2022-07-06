@@ -285,6 +285,7 @@ export const createDefFolder = async (webId: string, fetch: fetcher, storagePref
 
 export const fetchAllEntries = async (webId: string, fetch: fetcher, entry: string, storagePref: string, prefFileLocation: string,
   publicTypeIndexUrl: string, podType: string, other?: boolean) => {
+    console.log("we are fetching all");
   let arrayOfCategories: string[] = [];
   let urlsArr
   try {

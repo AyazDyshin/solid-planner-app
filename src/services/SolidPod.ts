@@ -3,7 +3,7 @@ import {
   addUrl, setThing, saveSolidDatasetAt, createContainerAt, Thing, getInteger,
   getStringNoLocale, removeThing, getContainedResourceUrlAll, deleteSolidDataset,
   setStringNoLocale, addStringNoLocale, isContainer, addInteger,
-  buildThing, setDate, getDate, getBoolean, addBoolean, setInteger, setBoolean, addDate, getDateAll
+  buildThing, setDate, getDate, getBoolean, addBoolean, setInteger, setBoolean, addDate, getDateAll, removeDate
 } from '@inrupt/solid-client';
 import { DCTERMS, RDF } from '@inrupt/vocab-common-rdf';
 import { solid, schema, foaf, vcard } from 'rdf-namespaces';
@@ -406,26 +406,6 @@ export const checkFolderExistence = async (webId: string, fetch: fetcher, storag
   return dataSet;
 }
 
-export const getAllCheckIns = async (webId: string, fetch: fetcher, storagePref: string,
-  defFolder: string | null, prefFileLocation: string, podType: string, habitUrl: string) => {
-  let entryId = getIdPart(habitUrl);
-  const checkInsFolder = `${defFolder}checkIns/`;
-  const checkInUrl = `${checkInsFolder}${entryId}`;
-  await checkFolderExistence(webId, fetch, storagePref, prefFileLocation, podType, checkInsFolder);
-  let newDs;
-  try {
-    newDs = await getSolidDataset(checkInUrl, { fetch: fetch });
-  }
-  catch {
-    return null;
-  }
-  let thingWithDate = getThing(newDs, checkInUrl);
-  console.log(thingWithDate);
-  //handle
-  let allDates = getDateAll(thingWithDate!, voc.checkInDate);
-  console.log(allDates);
-}
-
 export const saveCheckIn = async (webId: string, fetch: fetcher, storagePref: string,
   defFolder: string | null, prefFileLocation: string, podType: string, habitUrl: string, dateToSave: Date) => {
   const checkInsFolder = `${defFolder}checkIns/`;
@@ -716,6 +696,46 @@ export const editNote = async (webId: string, fetch: fetcher, note: Note, change
       }
     }
   }));
+}
+
+export const getAllCheckIns = async (webId: string, fetch: fetcher, storagePref: string,
+  defFolder: string | null, prefFileLocation: string, podType: string, habitUrl: string) => {
+  let entryId = getIdPart(habitUrl);
+  const checkInsFolder = `${defFolder}checkIns/`;
+  const checkInUrl = `${checkInsFolder}${entryId}`;
+  await checkFolderExistence(webId, fetch, storagePref, prefFileLocation, podType, checkInsFolder);
+  let newDs;
+  try {
+    newDs = await getSolidDataset(checkInUrl, { fetch: fetch });
+  }
+  catch {
+    return null;
+  }
+  let thingWithDate = getThing(newDs, checkInUrl);
+  //handle
+  let allDates = getDateAll(thingWithDate!, voc.checkInDate);
+  return allDates;
+}
+
+export const deleteCheckIn = async (webId: string, fetch: fetcher, storagePref: string,
+  defFolder: string | null, prefFileLocation: string, podType: string, habitUrl: string, dateToDelete: Date) => {
+  let entryId = getIdPart(habitUrl);
+  const checkInsFolder = `${defFolder}checkIns/`;
+  const checkInUrl = `${checkInsFolder}${entryId}`;
+  await checkFolderExistence(webId, fetch, storagePref, prefFileLocation, podType, checkInsFolder);
+  let newDs;
+  try {
+    newDs = await getSolidDataset(checkInUrl, { fetch: fetch });
+  }
+  catch {
+    return null;
+  }
+  //handle
+  let thingWithDate = getThing(newDs, checkInUrl);
+  thingWithDate = removeDate(thingWithDate!, voc.checkInDate, dateToDelete);
+  newDs = setThing(newDs, thingWithDate!);
+  await saveSolidDatasetAt(checkInUrl, newDs, { fetch: fetch });
+
 }
 
 export const deleteEntry = async (webId: string, fetch: fetcher, id: number, type: string, storagePref: string,

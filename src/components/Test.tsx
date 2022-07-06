@@ -14,7 +14,7 @@ import { first } from 'lodash';
 import { schema, space, vcard } from 'rdf-namespaces';
 import { pim } from '@inrupt/solid-client/dist/constants';
 import {
-  fetchContacts, saveCheckIn, thingToNote
+  fetchContacts, getAllCheckIns, saveCheckIn, thingToNote
 } from '../services/SolidPod';
 import { access } from "@inrupt/solid-client";
 import { object, updated } from 'rdf-namespaces/dist/as';
@@ -64,21 +64,25 @@ const Test = () => {
     let be = new Date();
     let bu = new Date();
     bu.setFullYear(2000);
-  //   await createContainerAt("https://inrtester2.inrupt.net/test2/", { fetch: fetch });
-  //   let b = await getSolidDataset("https://inrtester2.inrupt.net/test2/", { fetch: fetch });
-  //   let newDates = buildThing(createThing({ url: "https://inrtester2.inrupt.net/test2/upd.ttl" }))
-  //     .addUrl(RDF.type, "https://example.com/DateList")
-  //     .addDate("https://example.com/date", be)
-  //     .addDate("https://example.com/date", bu)
-  //     .build();
-  //   b = setThing(b, newDates);
-  //   await saveSolidDatasetAt("https://inrtester2.inrupt.net/test2/", b, { fetch: fetch });
-   await saveCheckIn(webId??"",fetch, "https://inrtester2.inrupt.net/","https://inrtester2.inrupt.net/SolidPlannerApp/","https://inrtester2.inrupt.net/settings/prefs.ttl",
-   "wac","https://inrtester2.inrupt.net/SolidPlannerApp/notes/12331312312313.ttl",bu);
+    //   await createContainerAt("https://inrtester2.inrupt.net/test2/", { fetch: fetch });
+    //   let b = await getSolidDataset("https://inrtester2.inrupt.net/test2/", { fetch: fetch });
+    //   let newDates = buildThing(createThing({ url: "https://inrtester2.inrupt.net/test2/upd.ttl" }))
+    //     .addUrl(RDF.type, "https://example.com/DateList")
+    //     .addDate("https://example.com/date", be)
+    //     .addDate("https://example.com/date", bu)
+    //     .build();
+    //   b = setThing(b, newDates);
+    //   await saveSolidDatasetAt("https://inrtester2.inrupt.net/test2/", b, { fetch: fetch });
+    await saveCheckIn(webId ?? "", fetch, "https://inrtester2.inrupt.net/", "https://inrtester2.inrupt.net/SolidPlannerApp/", "https://inrtester2.inrupt.net/settings/prefs.ttl",
+      "wac", "https://inrtester2.inrupt.net/SolidPlannerApp/notes/12331312312313.ttl", bu);
+    await saveCheckIn(webId ?? "", fetch, "https://inrtester2.inrupt.net/", "https://inrtester2.inrupt.net/SolidPlannerApp/", "https://inrtester2.inrupt.net/settings/prefs.ttl",
+      "wac", "https://inrtester2.inrupt.net/SolidPlannerApp/notes/12331312312313.ttl", be);
+    await getAllCheckIns(webId ?? "", fetch, "https://inrtester2.inrupt.net/", "https://inrtester2.inrupt.net/SolidPlannerApp/", "https://inrtester2.inrupt.net/settings/prefs.ttl",
+      "wac", "https://inrtester2.inrupt.net/SolidPlannerApp/notes/12331312312313.ttl");
   }
 
 
- gets();
+  gets();
 
 
   return (

@@ -72,6 +72,8 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
     const [notesToShow, setNotesToShow] = useState<Note[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     useEffect(() => {
+        console.log("in contents");
+
         setIsLoading(true);
         const fetchNotes = async () => {
             let filteredNotes: Note[]

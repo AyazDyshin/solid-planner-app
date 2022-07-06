@@ -3,13 +3,13 @@ import {
   addUrl, setThing, saveSolidDatasetAt, createContainerAt, Thing, getInteger,
   getStringNoLocale, removeThing, getContainedResourceUrlAll, deleteSolidDataset,
   setStringNoLocale, addStringNoLocale, isContainer, addInteger,
-  buildThing, setDate, getDate, getBoolean, addBoolean, setInteger, setBoolean
+  buildThing, setDate, getDate, getBoolean, addBoolean, setInteger, setBoolean, addDate
 } from '@inrupt/solid-client';
 import { DCTERMS, RDF } from '@inrupt/vocab-common-rdf';
 import { solid, schema, foaf, vcard } from 'rdf-namespaces';
 import { Note, fetcher, Habit, voc, otherV } from '../components/types';
 import { determineAccess, initializeAcl, isWacOrAcp, setPubAccess } from './access';
-import { updUrlForFolder } from './helpers';
+import { getIdPart, updUrlForFolder } from './helpers';
 import { getAllUrlFromPublicIndex, getAccessType } from './podGetters';
 
 //const throwError = useAsyncError();
@@ -280,12 +280,33 @@ export const createDefFolder = async (webId: string, fetch: fetcher, storagePref
   }
   await setPubAccess(webId, { read: true, append: false, write: false }, `${updUrlForFolder(defFolderUrl)}habits/`, fetch,
     storagePref, prefFileLocation, podType);
+  try {
+    let s = await getSolidDataset(`${updUrlForFolder(defFolderUrl)}checkIns/`, {
+      fetch: fetch
+    });
+  }
+  catch {
+    try {
+      await createContainerAt(`${updUrlForFolder(defFolderUrl)}checkIns/`, {
+        fetch: fetch
+      });
+    }
+    catch (error) {
+      let message = 'Unknown Error';
+      if (error instanceof Error) message = error.message;
+      throw new Error(`error when trying to create a folder for notes, error: ${message}`);
+    }
+  }
+  if (podType === "wac") {
+    await initializeAcl(`${updUrlForFolder(defFolderUrl)}checkIns/`, fetch);
+  }
+  await setPubAccess(webId, { read: true, append: false, write: false }, `${updUrlForFolder(defFolderUrl)}checkIns/`, fetch,
+    storagePref, prefFileLocation, podType);
 }
 
 
 export const fetchAllEntries = async (webId: string, fetch: fetcher, entry: string, storagePref: string, prefFileLocation: string,
   publicTypeIndexUrl: string, podType: string, other?: boolean) => {
-    console.log("we are fetching all");
   let arrayOfCategories: string[] = [];
   let urlsArr
   try {
@@ -360,6 +381,56 @@ export const fetchAllEntries = async (webId: string, fetch: fetcher, entry: stri
   return retValue;
 }
 
+export const saveCheckIn = async (webId: string, fetch: fetcher, storagePref: string,
+  defFolder: string | null, prefFileLocation: string, podType: string, habitUrl: string, dateToSave: Date) => {
+  const checkInsFolder = `${defFolder}checkIns/`;
+  let dataSet;
+  try {
+    dataSet = await getSolidDataset(checkInsFolder, {
+      fetch: fetch
+    });
+  }
+
+  catch (error) {
+    try {
+      await createDefFolder(webId, fetch, storagePref, prefFileLocation, podType);
+      dataSet = await getSolidDataset(checkInsFolder, {
+        fetch: fetch
+      });
+    }
+    catch (error) {
+      let message = 'Unknown Error';
+      if (error instanceof Error) message = error.message;
+      throw new Error(`Error when trying to fetch notes folder,url: ${checkInsFolder} error: ${message}`);
+    }
+  }
+  let entryId = getIdPart(habitUrl);
+  const checkInUrl = `${checkInsFolder}${entryId}`;
+  let allUrl = getContainedResourceUrlAll(dataSet);
+  if (allUrl.includes(checkInUrl)) {
+    let newDs = await getSolidDataset(checkInUrl, { fetch: fetch });
+    let thing = getThing(newDs, checkInUrl);
+    //handle
+    thing = addDate(thing!, voc.checkInDate, dateToSave);
+    console.log(thing);
+    newDs = setThing(newDs, thing!);
+    await saveSolidDatasetAt(checkInUrl, newDs, { fetch: fetch });
+  }
+  else {
+    let newDatesList = buildThing(createThing({ url: checkInUrl }))
+      .addUrl(RDF.type, voc.DatesList)
+      .addDate(voc.checkInDate, dateToSave)
+      .build();
+    console.log(checkInUrl);
+    dataSet = setThing(dataSet, newDatesList);
+    await saveSolidDatasetAt(checkInUrl, dataSet, { fetch: fetch });
+    if (podType === "wac") {
+      await initializeAcl(checkInUrl, fetch);
+    };
+    await setPubAccess(webId, { read: false, append: false, write: false }, checkInUrl, fetch, storagePref,
+      prefFileLocation, podType);
+  }
+}
 
 export const saveNote = async (webId: string, fetch: fetcher, note: Note, storagePref: string,
   defFolder: string | null, prefFileLocation: string, podType: string) => {
@@ -397,8 +468,7 @@ export const saveNote = async (webId: string, fetch: fetcher, note: Note, storag
 
   dataSet = setThing(dataSet, newNote);
   await saveSolidDatasetAt(noteUrl, dataSet, { fetch: fetch });
-  let type = await getAccessType(webId, fetch, storagePref, prefFileLocation, podType);
-  if (type === "wac") {
+  if (podType === "wac") {
     await initializeAcl(noteUrl, fetch);
   };
   await setPubAccess(webId, { read: false, append: false, write: false }, noteUrl, fetch, storagePref,
@@ -451,8 +521,7 @@ export const saveHabit = async (webId: string, fetch: fetcher, habit: Habit, sto
   }
   dataSet = setThing(dataSet, newHabit);
   await saveSolidDatasetAt(habitUrl, dataSet, { fetch: fetch });
-  let type = await getAccessType(webId, fetch, storagePref, prefFileLocation, podType);
-  if (type === "wac") {
+  if (podType === "wac") {
     await initializeAcl(habitUrl, fetch);
   };
   await setPubAccess(webId, { read: false, append: false, write: false }, habitUrl, fetch, storagePref, prefFileLocation, podType);

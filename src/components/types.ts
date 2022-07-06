@@ -37,6 +37,7 @@ export type accessObject = { read: boolean, append: boolean, write: boolean };
 
 export enum voc {
   Habit = "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#Habit",
+  DatesList = "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#DatesList",
   accessType = "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#accessType",
   defaultFolder = "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#defaultFolder",
   recurrence = "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#recurrence",
@@ -44,6 +45,7 @@ export enum voc {
   lastCheckInDate = "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#lastCheckInDate",
   bestStreak = "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#bestStreak",
   currentStreak = "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#currentStreak",
+  checkInDate = "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#checkInDate",
 }
 
 export enum otherV {

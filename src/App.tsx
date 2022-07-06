@@ -40,11 +40,10 @@ const App: React.FC = () => {
       }
       //case for when the user is logged in
       else {
-
         return (
-          <ErrorBoundary>
+        
             <MainContent />
-          </ErrorBoundary >
+         
         )
       }
     }

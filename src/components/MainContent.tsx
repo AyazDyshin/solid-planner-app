@@ -36,6 +36,7 @@ const MainContent = () => {
   const [podType, setPodType] = useState<string>("");
   const [defFolder, setDefFolder] = useState<string | null>(null);
   useEffect(() => {
+    console.log("we are here");
     let check = async () => {
       setIsLoading(true);
 
@@ -57,7 +58,7 @@ const MainContent = () => {
       }
       defFolderUpd = await getDefaultFolder(webId, fetch, updPrefFileLocation);
       setDefFolder(defFolderUpd);
-    //  let result = await checkPermissions(webId, fetch, updStoragePref, updPodType);
+      //  let result = await checkPermissions(webId, fetch, updStoragePref, updPodType);
       setPermissionStatus(true);
       setIsLoading(false);
     }
@@ -76,6 +77,7 @@ const MainContent = () => {
     if (permissionStatus) {
       return (
         <div>
+          <Test />
           <Navbar
             notesFetched={notesFetched}
             setNotesFetched={setNotesFetched}

@@ -30,9 +30,9 @@ const ErrorBoundary = ({ children }: Props) => {
                 <Card className="w-50 text-center">
                     <Card.Body>
                         <Card.Title>Error!</Card.Title>
-                        <Card.Text>
-                            <div style={{ color: "red" }}>{error.toString()}</div>
-                        </Card.Text>
+
+                        <div style={{ color: "red" }}>{error.toString()}</div>
+
                         <Button onClick={resetError} variant="info">reset</Button>
                     </Card.Body>
                 </Card>

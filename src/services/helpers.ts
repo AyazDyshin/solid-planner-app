@@ -14,6 +14,11 @@ export const modifyWebId = (webId: string): string => {
     return `${updArr.join("/")}/`;
 }
 
+export const getIdPart = (url: string) => {
+    let arr = url.split("/");
+    return arr[arr.length - 1];
+}
+
 export const getNumberFromDay = (day: string) => {
     switch (day) {
         case "monday":

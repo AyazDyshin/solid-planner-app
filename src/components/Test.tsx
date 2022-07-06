@@ -14,7 +14,7 @@ import { first } from 'lodash';
 import { schema, space, vcard } from 'rdf-namespaces';
 import { pim } from '@inrupt/solid-client/dist/constants';
 import {
-  fetchContacts, thingToNote
+  fetchContacts, saveCheckIn, thingToNote
 } from '../services/SolidPod';
 import { access } from "@inrupt/solid-client";
 import { object, updated } from 'rdf-namespaces/dist/as';
@@ -29,6 +29,7 @@ import { ACP } from '@inrupt/vocab-solid';
 import { changeAccessAcp } from '../services/helperAccess';
 import { fdatasync } from 'fs';
 import { getResourceInfoWithAcr, getSolidDatasetWithAcr, WithAccessibleAcr } from '@inrupt/solid-client/dist/acp/acp';
+import { getIdPart } from '../services/helpers';
 
 
 const Test = () => {
@@ -60,10 +61,24 @@ const Test = () => {
     // let thing = getThing(b, "https://inrtester2.inrupt.net/SolidPlannerApp/notes/1656934556864.ttl");
     // let note = thingToNote(thing, webId ?? "", fetch, "inrtester2.inrupt.net/", "https://inrtester2.inrupt.net/settings/prefs.ttl", "wac");
     // console.log(note);
+    let be = new Date();
+    let bu = new Date();
+    bu.setFullYear(2000);
+  //   await createContainerAt("https://inrtester2.inrupt.net/test2/", { fetch: fetch });
+  //   let b = await getSolidDataset("https://inrtester2.inrupt.net/test2/", { fetch: fetch });
+  //   let newDates = buildThing(createThing({ url: "https://inrtester2.inrupt.net/test2/upd.ttl" }))
+  //     .addUrl(RDF.type, "https://example.com/DateList")
+  //     .addDate("https://example.com/date", be)
+  //     .addDate("https://example.com/date", bu)
+  //     .build();
+  //   b = setThing(b, newDates);
+  //   await saveSolidDatasetAt("https://inrtester2.inrupt.net/test2/", b, { fetch: fetch });
+   await saveCheckIn(webId??"",fetch, "https://inrtester2.inrupt.net/","https://inrtester2.inrupt.net/SolidPlannerApp/","https://inrtester2.inrupt.net/settings/prefs.ttl",
+   "wac","https://inrtester2.inrupt.net/SolidPlannerApp/notes/12331312312313.ttl",bu);
   }
 
 
-  gets();
+ gets();
 
 
   return (

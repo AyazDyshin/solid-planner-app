@@ -1,6 +1,6 @@
 import { useSession } from '@inrupt/solid-ui-react';
 import { useEffect, useState } from 'react';
-import { fetchAllEntries, thingToHabit, editHabit, deleteEntry } from '../services/SolidPod';
+import { fetchAllEntries, thingToHabit, editHabit, deleteEntry, performCheckInUpdate } from '../services/SolidPod';
 import { BsPlusLg } from "react-icons/bs";
 import { Habit } from './types';
 import { extractCategories, filterByAccess, filterByCategory, getHabitsToday, setStreaks } from '../services/helpers';
@@ -74,13 +74,6 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
             filteredHabits.push(item);
           }
         }
-        // let tempArr = await Promise.all(habitArr.map(async (thing) => {
-        //   let toRet = await thingToHabit(thing, webId, fetch);
-        //   if (toRet) {
-        //     filteredHabits.push(toRet);
-        //   }
-        //   return thing;
-        // }));
         setHabitsArray(filteredHabits);
         setHabitsFetched(true);
       }
@@ -134,8 +127,11 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
   };
   const handleSave = async () => {
     await Promise.all(habitsToSave.map(async (habit) => {
-      let updHabit = setStreaks(habit);
-      editHabit(webId, fetch, updHabit, storagePref, defFolder, prefFileLocation, publicTypeIndexUrl, podType);
+      let [updHabit, checkInToUpload] = setStreaks(habit);
+      if (typeof checkInToUpload !== "number") {
+        await performCheckInUpdate(webId, fetch, storagePref, defFolder, prefFileLocation, podType, checkInToUpload);
+      }
+      await editHabit(webId, fetch, updHabit, storagePref, defFolder, prefFileLocation, publicTypeIndexUrl, podType);
     }))
   };
 
@@ -146,6 +142,8 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
     newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
     setViewerStatus(false);
     setCreatorStatus(false);
+    console.log("we are here in handle del");
+    console.log();
     await deleteEntry(webId, fetch, id, "habit", storagePref, publicTypeIndexUrl);
   }
   if (!habitsFetched || isLoading) {

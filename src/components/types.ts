@@ -50,5 +50,6 @@ export enum voc {
 
 export enum otherV {
   category = "http://dbpedia.org/ontology/category",
-
 }
+
+export type returnCheckIn = { action: string; url: string | null; date: Date; } | number;

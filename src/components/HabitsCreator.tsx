@@ -1,6 +1,6 @@
 import "../styles.css";
 import { Button, ButtonGroup, Dropdown, DropdownButton, FormControl, InputGroup } from 'react-bootstrap';
-import { accessObject, Habit } from './types';
+import { accessObject, Habit, returnCheckIn } from './types';
 import { BsThreeDots, BsShare } from "react-icons/bs";
 import { FiEdit } from "react-icons/fi";
 import { RiDeleteBin6Line, RiUserSharedLine } from "react-icons/ri";
@@ -9,7 +9,7 @@ import { MdSaveAlt } from "react-icons/md";
 import { useEffect, useState } from "react";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import { setPubAccess, shareWith } from "../services/access";
-import { saveHabit, deleteEntry, editHabit } from "../services/SolidPod";
+import { saveHabit, deleteEntry, editHabit, performCheckInUpdate } from "../services/SolidPod";
 import { useSession } from "@inrupt/solid-ui-react";
 import { constructDate, setStreaks } from "../services/helpers";
 import AccessModal from "../modals/AccessModal";
@@ -99,14 +99,20 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
 
   const handleSave = async () => {
     setIsEdit(false);
+    let checkInToUpload: returnCheckIn = 0;
     if (creatorStatus) {
       setViewerStatus(false);
       setCreatorStatus(false);
       let date = new Date();
+      let idToSave = Date.now() + Math.floor(Math.random() * 1000);
+      console.log("id to save");
+      console.log(idToSave);
       let newHabit = {
-        ...habitInp, id: Date.now() + Math.floor(Math.random() * 1000), startDate: date,
+        ...habitInp, id: idToSave, startDate: date,
         access: { "private": { read: false, append: false, write: false } }
       }
+      let habitUrl = await saveHabit(webId, fetch, newHabit, storagePref, defFolder, prefFileLocation, podType);
+      newHabit.url = habitUrl;
       setHabitInp(newHabit);
       setHabitsArray((prevState) => ([...prevState, newHabit]));
       setNewEntryCr(!newEntryCr);
@@ -116,7 +122,8 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
       });
       setArrOfChanges([]);
       setHabitChanged(false);
-      await saveHabit(webId, fetch, habitInp, storagePref, defFolder, prefFileLocation, podType);
+
+
     }
     else if (viewerStatus && (arrOfChanges.length !== 0 || Object.keys(accUpdObj).length !== 0 || habitChanged)) {
       setViewerStatus(false);
@@ -126,7 +133,6 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
           let newAccess: Record<string, AccessModes>;
           if (!publicAccess.read && !publicAccess.append && !publicAccess.write) {
             newAccess = { "private": publicAccess };
-
           }
           else {
             newAccess = { "public": publicAccess };
@@ -148,14 +154,13 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
             }
           });
           if (Object.keys(updShareList).length === 0) updShareList = undefined;
-
           habitToUpd = { ...habitToUpd, shareList: updShareList }
         }
         setAccUpdObj({});
       }
       let index = habitsArray.findIndex(item => item.id === habitToUpd.id);
       let updArr = habitsArray;
-      habitToUpd = setStreaks(habitToUpd);
+      [habitToUpd, checkInToUpload] = setStreaks(habitToUpd);
       updArr[index] = habitToUpd;
       setHabitsArray(updArr);
       setNewEntryCr(!newEntryCr);
@@ -168,9 +173,10 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
       if (arrOfChanges.length !== 0 || habitChanged) {
         await editHabit(webId, fetch, habitInp, storagePref, defFolder, prefFileLocation, publicTypeIndexUrl, podType);
       }
-
     }
-
+    if (typeof checkInToUpload !== "number") {
+      await performCheckInUpdate(webId, fetch, storagePref, defFolder, prefFileLocation, podType, checkInToUpload);
+    }
     if (Object.keys(accUpdObj).length !== 0) {
       if (accUpdObj["public"]) {
         if (!habitInp) {

@@ -35,15 +35,18 @@ const App: React.FC = () => {
       if (!session.info.isLoggedIn) {
         //case for when user is not logged in
         return (
-          <LogInPage />
+          <ErrorBoundary>
+            <LogInPage />
+          </ErrorBoundary>
         );
       }
       //case for when the user is logged in
       else {
         return (
-        
+          <ErrorBoundary>
             <MainContent />
-         
+          </ErrorBoundary>
+
         )
       }
     }

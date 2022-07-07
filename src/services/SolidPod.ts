@@ -7,7 +7,7 @@ import {
 } from '@inrupt/solid-client';
 import { DCTERMS, RDF } from '@inrupt/vocab-common-rdf';
 import { solid, schema, foaf, vcard } from 'rdf-namespaces';
-import { Note, fetcher, Habit, voc, otherV } from '../components/types';
+import { Note, fetcher, Habit, voc, otherV, returnCheckIn } from '../components/types';
 import { determineAccess, initializeAcl, isWacOrAcp, setPubAccess } from './access';
 import { getIdPart, updUrlForFolder } from './helpers';
 import { getAllUrlFromPublicIndex, getAccessType } from './podGetters';
@@ -42,6 +42,7 @@ export const thingToNote = async (toChange: Thing | null, webId: string, fetch: 
   };
   return note;
 }
+
 
 export const thingToHabit = async (toChange: Thing | null, webId: string, fetch: fetcher, storagePref: string,
   prefFileLocation: string, podType: string) => {
@@ -100,27 +101,8 @@ export const thingToHabit = async (toChange: Thing | null, webId: string, fetch:
   console.log("what we retur");
   console.log(habit);
   return habit;
-  //   status
 }
-// creates a link to preference file in user's webId card #here
-// export const createPrefLink = async (webId: string, fetch: fetcher) => {
-//   let dataSet;
-//   dataSet = await getSolidDataset(webId, {
-//     fetch: fetch
-//   });
-//   let aThing = getThing(dataSet, webId);
-//   const urlToPrefs = `${modifyWebId(webId)}settings/prefs.ttl`;
-//   aThing = addUrl(aThing!, space.preferencesFile, urlToPrefs);
-//   dataSet = setThing(dataSet, aThing);
-//   const updDataSet = saveSolidDatasetAt(webId, dataSet, { fetch: fetch });
-// }
 
-// export const checkAndCreatePrefLink = async (webId: string, fetch: fetcher) => {
-//   const checkedPrefLink = await getPrefLink(webId, fetch);
-//   if (!checkedPrefLink) {
-//     createPrefLink(webId, fetch);
-//   }
-// }
 export const repairDefaultFolder = async (webId: string, fetch: fetcher, storagePref: string, prefFileLocation: string) => {
   let defaultFolderPath = `${storagePref}SolidPlannerApp`;
   let dataSet;
@@ -150,7 +132,6 @@ export const recordDefaultFolder = async (webId: string, fetch: fetcher, storage
   await createEntriesInTypeIndex(webId, fetch, "note", storagePref, publicTypeIndexUrl);
   await createEntriesInTypeIndex(webId, fetch, "habit", storagePref, publicTypeIndexUrl);
 }
-
 
 export const createEntriesInTypeIndex = async (webId: string, fetch: fetcher, entryType: string, storagePref: string,
   publicTypeIndexUrl: string
@@ -195,21 +176,17 @@ export const recordAccessType = async (webId: string, fetch: fetcher, storagePre
   catch (error) {
     let message = 'Unknown Error';
     if (error instanceof Error) message = error.message;
-    //throwError(new Error(`error when fetching preference file, it either doesn't exist, or has different location from the one specified in the webId, error: ${message}`));
     throw new Error(`error when fetching preference file, it either doesn't exist, or has different location from the one specified in the webId, error: ${message}`);
   }
   let aThing = getThing(dataSet, prefFileLocation);
 
   if (!aThing) {
-    // throwError(new Error("preference file does not exist"));
     throw new Error("preference file does not exist");
   }
-
   aThing = addStringNoLocale(aThing, voc.accessType, podType);
   dataSet = setThing(dataSet, aThing);
   const updDataSet = await saveSolidDatasetAt(prefFileLocation!, dataSet, { fetch: fetch });
 }
-
 
 export const createDefFolder = async (webId: string, fetch: fetcher, storagePref: string, prefFileLocation: string,
   podType: string) => {
@@ -230,7 +207,6 @@ export const createDefFolder = async (webId: string, fetch: fetcher, storagePref
       throw new Error(`error when trying to create a folder for notes, error: ${message}`);
     }
   }
-
   await recordAccessType(webId, fetch, storagePref, prefFileLocation, podType);
   await setPubAccess(webId, { read: true, append: false, write: false }, `${updUrlForFolder(defFolderUrl)}`, fetch,
     storagePref, prefFileLocation, podType);
@@ -406,6 +382,23 @@ export const checkFolderExistence = async (webId: string, fetch: fetcher, storag
   return dataSet;
 }
 
+export const performCheckInUpdate = async (webId: string, fetch: fetcher, storagePref: string,
+  defFolder: string | null, prefFileLocation: string, podType: string, updObj: returnCheckIn) => {
+  if (typeof updObj === 'number') return;
+  else {
+    if (updObj.action === "add") {
+      //handle
+      await saveCheckIn(webId, fetch, storagePref, defFolder, prefFileLocation, podType, updObj.url!, updObj.date);
+    }
+    else if (updObj.action === "delete") {
+      await deleteCheckIn(webId, fetch, storagePref, defFolder, prefFileLocation, podType, updObj.url!, updObj.date);
+    }
+    else {
+      return;
+    }
+  }
+}
+
 export const saveCheckIn = async (webId: string, fetch: fetcher, storagePref: string,
   defFolder: string | null, prefFileLocation: string, podType: string, habitUrl: string, dateToSave: Date) => {
   const checkInsFolder = `${defFolder}checkIns/`;
@@ -501,6 +494,7 @@ export const saveHabit = async (webId: string, fetch: fetcher, habit: Habit, sto
     await initializeAcl(habitUrl, fetch);
   };
   await setPubAccess(webId, { read: false, append: false, write: false }, habitUrl, fetch, storagePref, prefFileLocation, podType);
+  return habitUrl;
 }
 
 export const editHabit = async (webId: string, fetch: fetcher, habitToSave: Habit, storagePref: string,
@@ -740,6 +734,8 @@ export const deleteCheckIn = async (webId: string, fetch: fetcher, storagePref: 
 
 export const deleteEntry = async (webId: string, fetch: fetcher, id: number, type: string, storagePref: string,
   publicTypeIndexUrl: string) => {
+  console.log("this is id to del");
+  console.log(id);
   let urlsArr = await getAllUrlFromPublicIndex(webId, fetch, type, storagePref, publicTypeIndexUrl);
   let updUrlsArr = await Promise.all(urlsArr.map(async (url) => {
     //handle??
@@ -754,13 +750,13 @@ export const deleteEntry = async (webId: string, fetch: fetcher, id: number, typ
         catch (error) {
           let message = 'Unknown Error';
           if (error instanceof Error) message = error.message;
-          //  throwError(new Error(`Error when fetching dataset url: ${url} error: ${message}`));
           throw new Error(`Error when fetching dataset url: ${url} error: ${message}`);
         }
         let newThing = getThing(newDs, url);
         if (newThing) {
           let thingId = getInteger(newThing, schema.identifier);
           if (thingId === id) {
+            console.log("we are deleting!!1")
             await deleteSolidDataset(newDs, { fetch: fetch });
           }
         }
@@ -773,6 +769,7 @@ export const deleteEntry = async (webId: string, fetch: fetcher, id: number, typ
         newThingArr.forEach(async (newThing) => {
           let thingId = getInteger(newThing, schema.identifier);
           if (thingId === id) {
+            console.log("we are deleting!!1");
             let newData = removeThing(data, newThing);
             await saveSolidDatasetAt(url, newData, { fetch: fetch });
           }

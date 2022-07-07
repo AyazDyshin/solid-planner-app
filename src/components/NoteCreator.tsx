@@ -105,13 +105,14 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
         if (creatorStatus) {
             setViewerStatus(false);
             setCreatorStatus(false);
-            let newNote = { ...NoteInp, id: Date.now() + Math.floor(Math.random() * 1000), access: { "private": { read: false, append: false, write: false } } }
+            let idToSave = Date.now() + Math.floor(Math.random() * 1000);
+            let newNote = { ...NoteInp, id: idToSave, access: { "private": { read: false, append: false, write: false } } }
             setNoteInp(newNote);
             setNotesArray((prevState) => ([...prevState, newNote]));
             setNewEntryCr(!newEntryCr);
             setNoteInp({ id: null, title: "", content: "", category: "", url: "", access: null });
             setArrOfChanges([]);
-            await saveNote(webId, fetch, NoteInp, storagePref, defFolder, prefFileLocation, podType);
+            await saveNote(webId, fetch, newNote, storagePref, defFolder, prefFileLocation, podType);
         }
         else if (viewerStatus && (arrOfChanges.length !== 0 || Object.keys(accUpdObj).length !== 0)) {
             setViewerStatus(false);

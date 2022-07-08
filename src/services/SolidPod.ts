@@ -8,9 +8,9 @@ import {
 import { DCTERMS, RDF } from '@inrupt/vocab-common-rdf';
 import { solid, schema, foaf, vcard } from 'rdf-namespaces';
 import { Note, fetcher, Habit, voc, otherV, returnCheckIn } from '../components/types';
-import { determineAccess, initializeAcl, isWacOrAcp, setPubAccess } from './access';
+import { determineAccess, initializeAcl, setPubAccess } from './access';
 import { getIdPart, updUrlForFolder } from './helpers';
-import { getAllUrlFromPublicIndex, getAccessType } from './podGetters';
+import { getAllUrlFromPublicIndex } from './podGetters';
 
 //const throwError = useAsyncError();
 //function that transforms var of type Thing to var of Type Note

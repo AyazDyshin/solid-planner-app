@@ -14,6 +14,7 @@ import AccessModal from "../modals/AccessModal";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import SharedModal from "../modals/SharedModal";
 import { setPubAccess, shareWith } from "../services/access";
+import React from 'react';
 
 interface Props {
     newEntryCr: boolean;
@@ -171,7 +172,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
             }
             else if (accUpdObj["agent"]) {
 
-                for (let item in agentsToUpd) {
+                for (const item in agentsToUpd) {
                     if (!NoteInp) {
                         throw new Error("Error, note to view wasn't provided");
                     }
@@ -190,7 +191,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
         setIsEdit(false);
         setViewerStatus(false);
         setCreatorStatus(false);
-        let updArr = notesArray.filter((note) => note.id !== NoteInp.id);
+        const updArr = notesArray.filter((note) => note.id !== NoteInp.id);
         setNotesArray(updArr);
         newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
         if (!NoteInp) {

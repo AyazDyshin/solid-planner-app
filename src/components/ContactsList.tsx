@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Note } from "./types";
+import {  useState } from "react";
+import React from 'react';
 
 interface Props {
     contactsArr: (string | null)[][],

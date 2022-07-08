@@ -122,9 +122,8 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
       });
       setArrOfChanges([]);
       setHabitChanged(false);
-
-
     }
+    
     else if (viewerStatus && (arrOfChanges.length !== 0 || Object.keys(accUpdObj).length !== 0 || habitChanged)) {
       setViewerStatus(false);
       let habitToUpd = habitInp;

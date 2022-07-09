@@ -90,7 +90,8 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
     else {
       setHabitInp({
         id: null, title: null, content: null, startDate: null, lastCheckInDate: null, recurrence: "daily", bestStreak: null,
-        currentStreak: null, stat: false, category: null, url: null, access: null, prevBestStreak: null, prevLastCheckIn: null
+        currentStreak: null, stat: false, category: null, url: null, access: null, prevBestStreak: null, prevLastCheckIn: null,
+        checkInList: null
       });
       setIsEdit(true);
     }
@@ -99,31 +100,28 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
 
   const handleSave = async () => {
     setIsEdit(false);
-    let checkInToUpload: returnCheckIn = 0;
     if (creatorStatus) {
       setViewerStatus(false);
       setCreatorStatus(false);
       let date = new Date();
       let idToSave = Date.now() + Math.floor(Math.random() * 1000);
-      console.log("id to save");
-      console.log(idToSave);
       let newHabit = {
         ...habitInp, id: idToSave, startDate: date,
         access: { "private": { read: false, append: false, write: false } }
       }
-      let habitUrl = await saveHabit(webId, fetch, newHabit, storagePref, defFolder, prefFileLocation, podType);
-      newHabit.url = habitUrl;
       setHabitInp(newHabit);
       setHabitsArray((prevState) => ([...prevState, newHabit]));
       setNewEntryCr(!newEntryCr);
       setHabitInp({
         id: null, title: null, content: null, startDate: null, lastCheckInDate: null, recurrence: "daily", bestStreak: null,
-        currentStreak: null, stat: false, category: null, url: null, access: null, prevBestStreak: null, prevLastCheckIn: null
+        currentStreak: null, stat: false, category: null, url: null, access: null, prevBestStreak: null, prevLastCheckIn: null,
+        checkInList: null
       });
       setArrOfChanges([]);
       setHabitChanged(false);
+      await saveHabit(webId, fetch, newHabit, storagePref, defFolder, prefFileLocation, podType);
     }
-    
+
     else if (viewerStatus && (arrOfChanges.length !== 0 || Object.keys(accUpdObj).length !== 0 || habitChanged)) {
       setViewerStatus(false);
       let habitToUpd = habitInp;
@@ -159,22 +157,21 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
       }
       let index = habitsArray.findIndex(item => item.id === habitToUpd.id);
       let updArr = habitsArray;
-      [habitToUpd, checkInToUpload] = setStreaks(habitToUpd);
+      habitToUpd = setStreaks(habitToUpd);
       updArr[index] = habitToUpd;
+      console.log("this is habitToUpd");
+      console.log(habitToUpd);
       setHabitsArray(updArr);
       setNewEntryCr(!newEntryCr);
       setHabitInp({
         id: null, title: null, content: null, startDate: null, lastCheckInDate: null, recurrence: "daily", bestStreak: null,
-        currentStreak: null, stat: false, category: null, url: null, access: null, prevBestStreak: null, prevLastCheckIn: null
+        currentStreak: null, stat: false, category: null, url: null, access: null, prevBestStreak: null, prevLastCheckIn: null, checkInList: null
       });
       setHabitChanged(false);
       setArrOfChanges([]);
       if (arrOfChanges.length !== 0 || habitChanged) {
         await editHabit(webId, fetch, habitInp, storagePref, defFolder, prefFileLocation, publicTypeIndexUrl, podType);
       }
-    }
-    if (typeof checkInToUpload !== "number") {
-      await performCheckInUpdate(webId, fetch, storagePref, defFolder, prefFileLocation, podType, checkInToUpload);
     }
     if (Object.keys(accUpdObj).length !== 0) {
       if (accUpdObj["public"]) {

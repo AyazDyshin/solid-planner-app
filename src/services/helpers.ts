@@ -37,7 +37,7 @@ export const getNumberFromDay = (day: string) => {
             return 6;
     }
 }
-const setStreaksDefaultCases = (habit: Habit): [Habit, returnCheckIn] => {
+const setStreaksDefaultCases = (habit: Habit): Habit => {
     let functionToUse;
     let today = new Date();
     let toReturn: returnCheckIn = 0;
@@ -64,41 +64,43 @@ const setStreaksDefaultCases = (habit: Habit): [Habit, returnCheckIn] => {
     }
     if (!habit.lastCheckInDate) { // habit has current streak>0 but doesn't have last check in 
         habit.lastCheckInDate = today; // means wrong data recording, repair it
-        toReturn = { action: "add", url: habit.url, date: today };
         habit.currentStreak = 1;
         habit = habitUpdBest(habit);
-        return [habit, toReturn];
+        if (!habit.checkInList) habit.checkInList = [today];
+        else habit.checkInList.push(today);
+        return habit;
     }
     else {
         if (functionToUse(today, habit.lastCheckInDate) > 0) {
             habit.prevLastCheckIn = habit.lastCheckInDate;
             habit.lastCheckInDate = today;
-            toReturn = { action: "add", url: habit.url, date: today };
             habit.prevBestStreak = habit.bestStreak;
             habit = habitUpdBest(habit);
             habit.currentStreak = 0;
-            return [habit, toReturn];
+            if (!habit.checkInList) habit.checkInList = [today];
+            else habit.checkInList.push(today);
+            return habit;
         }
         else { //if (differenceInCalendarDays(today, habit.lastCheckInDate) <= 0)
             if (!isSameDay(today, habit.lastCheckInDate)) {
                 habit.prevLastCheckIn = habit.lastCheckInDate;
                 habit.lastCheckInDate = today;
-                toReturn = { action: "add", url: habit.url, date: today };
                 habit.currentStreak = habit.currentStreak! + 1;
                 habit.prevBestStreak = habit.bestStreak;
                 habit = habitUpdBest(habit);
-                return [habit, toReturn];
+                if (!habit.checkInList) habit.checkInList = [today];
+                else habit.checkInList.push(today);
+                return habit;
             }
             else {
-                return [habit, 0];
+                return habit;
             }
         }
     }
 }
 
-export const setStreaks = (habit: Habit): [Habit, returnCheckIn] => {
+export const setStreaks = (habit: Habit): Habit => {
     let today = new Date();
-    let toReturn: returnCheckIn = 0;
     if (habit.stat) {
         if (!habit.currentStreak || habit.currentStreak === 0) { // case for when habit is checked, but doesn't have current streak
             habit.currentStreak = 1;
@@ -106,8 +108,9 @@ export const setStreaks = (habit: Habit): [Habit, returnCheckIn] => {
                 habit.bestStreak = 1;
             }
             habit.lastCheckInDate = today;
-            toReturn = { action: "add", url: habit.url, date: today };
-            return [habit, toReturn];
+            if (!habit.checkInList) habit.checkInList = [today];
+            else habit.checkInList.push(today);
+            return habit;
         }
         else { //case for when habit is checked but has current streak >0 
             switch (habit.recurrence) {
@@ -121,29 +124,30 @@ export const setStreaks = (habit: Habit): [Habit, returnCheckIn] => {
                 case "custom": {
                     if (!habit.lastCheckInDate) { // habit has current streak>0 but doesn't have last check in 
                         habit.lastCheckInDate = today; // means wrong data recording, repair it
-                        toReturn = { action: "add", url: habit.url, date: today };
                         habit.currentStreak = 1;
                         habit = habitUpdBest(habit);
-                        return [habit, toReturn];
+                        if (!habit.checkInList) habit.checkInList = [today];
+                        else habit.checkInList.push(today);
+                        return habit;
                     }
                     else {
                         if (typeof habit.custom === 'number') {
                             if (differenceInCalendarDays(today, habit.lastCheckInDate) === habit.custom - 1) {
                                 habit.prevLastCheckIn = habit.lastCheckInDate;
                                 habit.lastCheckInDate = today;
-                                toReturn = { action: "add", url: habit.url, date: today };
-                                let b = { action: "add", url: habit.url, date: today };
                                 habit.currentStreak = habit.currentStreak + 1;
                                 habit.prevBestStreak = habit.bestStreak;
                                 habit = habitUpdBest(habit);
-                                return [habit, toReturn];
+                                if (!habit.checkInList) habit.checkInList = [today];
+                                else habit.checkInList.push(today);
+                                return habit;
                             }
                             else if (isSameDay(today, habit.lastCheckInDate)) {
-                                return [habit, 0];
+                                return habit;
                             }
                             else { //wrong data recorded shouldn't be set to true
                                 habit.stat = false;
-                                return [habit, 0];
+                                return habit;
                             }
                         }
                         else if (!habit.custom) {
@@ -153,34 +157,35 @@ export const setStreaks = (habit: Habit): [Habit, returnCheckIn] => {
                         else {
                             if (checkWeekDay(habit)) {
                                 if (isSameDay(today, habit.lastCheckInDate)) {
-                                    return [habit, 0];
+                                    return habit;
                                 }
                                 else {
                                     habit.prevLastCheckIn = habit.lastCheckInDate;
                                     habit.lastCheckInDate = today;
-                                    toReturn = { action: "add", url: habit.url, date: today };
                                     habit.currentStreak = habit.currentStreak + 1;
                                     habit.prevBestStreak = habit.bestStreak;
                                     habit = habitUpdBest(habit);
-                                    return [habit, toReturn];
+                                    if (!habit.checkInList) habit.checkInList = [today];
+                                    else habit.checkInList.push(today);
+                                    return habit;
                                 }
                             }
                             else { //wrong data recorded shouldn't be set to true
                                 habit.stat = false;
-                                return [habit, 0];
+                                return habit;
                             }
                         }
                     }
                 }
                 default: {
-                    return [habit, 0];
+                    return habit;
                 }
             }
         }
     }
     else {
         if (habit.lastCheckInDate && isSameDay(habit.lastCheckInDate, today)) {
-            toReturn = { action: "delete", url: habit.url, date: habit.lastCheckInDate };
+            if (habit.checkInList) habit.checkInList = habit.checkInList.filter(date => date !== habit.lastCheckInDate);
             habit.lastCheckInDate = habit.prevLastCheckIn;
             habit.bestStreak = habit.prevBestStreak;
             habit.prevLastCheckIn = null;
@@ -193,9 +198,10 @@ export const setStreaks = (habit: Habit): [Habit, returnCheckIn] => {
                     habit.currentStreak = habit.currentStreak - 1;
                 }
             }
-            return [habit, toReturn];
+
+            return habit;
         }
-        return [habit, 0];
+        return habit;
     }
 }
 

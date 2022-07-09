@@ -127,10 +127,7 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
   };
   const handleSave = async () => {
     await Promise.all(habitsToSave.map(async (habit) => {
-      let [updHabit, checkInToUpload] = setStreaks(habit);
-      if (typeof checkInToUpload !== "number") {
-        await performCheckInUpdate(webId, fetch, storagePref, defFolder, prefFileLocation, podType, checkInToUpload);
-      }
+      let updHabit = setStreaks(habit);
       await editHabit(webId, fetch, updHabit, storagePref, defFolder, prefFileLocation, publicTypeIndexUrl, podType);
     }))
   };
@@ -142,8 +139,6 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
     newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
     setViewerStatus(false);
     setCreatorStatus(false);
-    console.log("we are here in handle del");
-    console.log();
     await deleteEntry(webId, fetch, id, "habit", storagePref, publicTypeIndexUrl);
   }
   if (!habitsFetched || isLoading) {

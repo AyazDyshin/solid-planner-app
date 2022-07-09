@@ -61,7 +61,7 @@ export const thingToHabit = async (toChange: Thing | null, webId: string, fetch:
   let updStatus = getBoolean(toChange, "http://dbpedia.org/ontology/status");
   let updRecurrence = getStringNoLocale(toChange, voc.recurrence);
   let updCustom = getStringNoLocale(toChange, voc.custom);
-
+  let updCheckInList = getDateAll(toChange, voc.checkInDate);
   let newCustomValue: number[] | number | null = null;
   if (updCustom) {
     let customArr = updCustom.split(" ");
@@ -93,13 +93,12 @@ export const thingToHabit = async (toChange: Thing | null, webId: string, fetch:
     url: toChange.url,
     startDate: updStartDate,
     custom: newCustomValue,
+    checkInList: updCheckInList,
     prevBestStreak: null,
     prevLastCheckIn: null,
     access: getAcc[0] ? getAcc[0] : null,
     ...(getAcc[1] && { shareList: getAcc[1] })
   };
-  console.log("what we retur");
-  console.log(habit);
   return habit;
 }
 
@@ -488,6 +487,12 @@ export const saveHabit = async (webId: string, fetch: fetcher, habit: Habit, sto
   if (habit.stat) {
     newHabit = addBoolean(newHabit, "http://dbpedia.org/ontology/status", habit.stat)
   }
+
+  if (habit.checkInList) {
+    habit.checkInList.forEach((date) => {
+      newHabit = addDate(newHabit, voc.checkInDate, date);
+    });
+  }
   dataSet = setThing(dataSet, newHabit);
   await saveSolidDatasetAt(habitUrl, dataSet, { fetch: fetch });
   if (podType === "wac") {
@@ -503,6 +508,7 @@ export const editHabit = async (webId: string, fetch: fetcher, habitToSave: Habi
     await saveHabit(webId, fetch, habitToSave, storagePref, defFolder, prefFileLocation, podType);
     return;
   }
+
   let urlsArr = await getAllUrlFromPublicIndex(webId, fetch, "habit", storagePref, publicTypeIndexUrl);
   let updUrlsArr = await Promise.all(urlsArr.map(async (url) => {
     let data: any;
@@ -512,7 +518,6 @@ export const editHabit = async (webId: string, fetch: fetcher, habitToSave: Habi
     catch (error) {
       let message = 'Unknown Error';
       if (error instanceof Error) message = error.message;
-      // throwError(new Error(`Error when fetching dataset url: ${url} error: ${message}`));
       throw new Error(`Error when fetching dataset url: ${url} error: ${message}`);
     }
     if (isContainer(data)) {
@@ -525,7 +530,6 @@ export const editHabit = async (webId: string, fetch: fetcher, habitToSave: Habi
         catch (error) {
           let message = 'Unknown Error';
           if (error instanceof Error) message = error.message;
-          //  throwError(new Error(`Error when fetching dataset url: ${url} error: ${message}`));
           throw new Error(`Error when fetching dataset url: ${url} error: ${message}`);
         }
         let newThing = getThing(newDs, url);
@@ -556,6 +560,10 @@ export const editHabit = async (webId: string, fetch: fetcher, habitToSave: Habi
             if (habitToSave.category) {
               newThing = setStringNoLocale(newThing, otherV.category, habitToSave.category);
             }
+            if (habitToSave.checkInList && newThing) {
+              console.log("hereeeeeeeee");
+              habitToSave.checkInList.forEach(date => newThing = addDate(newThing!, voc.checkInDate, date));
+            }
             if (habitToSave.custom) {
               let customToUpload;
               if (typeof habitToSave.custom === 'number') {
@@ -567,6 +575,8 @@ export const editHabit = async (webId: string, fetch: fetcher, habitToSave: Habi
               newThing = addStringNoLocale(newThing, voc.custom, customToUpload)
             };
             //handle?
+            console.log("this is the thing!!");
+            console.log(newThing);
             let updDataSet = setThing(newDs, newThing!);
             const savedDataSet = await saveSolidDatasetAt(url, updDataSet,
               { fetch: fetch });

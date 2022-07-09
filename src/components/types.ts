@@ -26,9 +26,11 @@ export interface Habit {
   stat: boolean | null;
   category: string | null;
   access: Record<string, AccessModes> | null;
+  checkInList: Date[] | null;
   shareList?: Record<string, AccessModes>;
   custom?: number[] | number | null;
 }
+
 export type withCategory = object & { category: string | null; };
 
 export type fetcher = (((input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>) & ((input: RequestInfo | URL, init?: RequestInit | undefined) => Promise<Response>)) | undefined;

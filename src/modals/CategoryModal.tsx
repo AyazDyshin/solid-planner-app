@@ -4,6 +4,7 @@ import { Modal, Button, FormControl, InputGroup, DropdownButton, Dropdown } from
 import { Note, Habit } from "../components/types";
 
 interface Props {
+    setEntryChanged: React.Dispatch<React.SetStateAction<boolean>>;
     categoryModalState: boolean;
     setCategoryModalState: React.Dispatch<React.SetStateAction<boolean>>;
     setNoteInp?: React.Dispatch<React.SetStateAction<Note>>;
@@ -11,13 +12,12 @@ interface Props {
     habitInp?: Habit;
     setHabitInp?: React.Dispatch<React.SetStateAction<Habit>>;
     viewerStatus: boolean;
-    setArrOfChanges: React.Dispatch<React.SetStateAction<string[]>>;
     categoryArray: string[];
     setCategoryArray: React.Dispatch<React.SetStateAction<string[]>>;
 }
 //a popup window to prompt user to pick a folder
 const CategoryModal = ({ categoryModalState, setCategoryModalState, setNoteInp,
-    noteInp, viewerStatus, setArrOfChanges, categoryArray, setCategoryArray, habitInp, setHabitInp }: Props) => {
+    noteInp, viewerStatus, categoryArray, setCategoryArray, habitInp, setHabitInp, setEntryChanged }: Props) => {
     const { session } = useSession();
     const { webId } = session.info;
     const [input, setInput] = useState<string>("");
@@ -25,14 +25,14 @@ const CategoryModal = ({ categoryModalState, setCategoryModalState, setNoteInp,
     const handleSave = () => {
         if (noteInp && setNoteInp) {
             if (noteInp.category !== input.trim()) {
-                if (viewerStatus) setArrOfChanges((prevState) => ([...prevState, "category"]));
+                if (viewerStatus) setEntryChanged(true);
                 setNoteInp({ ...noteInp, category: input.trim() });
                 setInput("");
             }
         }
         else if (habitInp && setHabitInp) {
             if (habitInp.category !== input.trim()) {
-                if (viewerStatus) setArrOfChanges((prevState) => ([...prevState, "category"]));
+                if (viewerStatus) setEntryChanged(true);
                 setHabitInp({ ...habitInp, category: input.trim() });
                 setInput("");
             }

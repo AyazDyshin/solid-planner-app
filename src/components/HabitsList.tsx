@@ -125,11 +125,19 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
     setViewerStatus(false);
     setCreatorStatus(true);
   };
-  const handleSave = async () => {
-    await Promise.all(habitsToSave.map(async (habit) => {
-      let updHabit = setStreaks(habit);
-      await editHabit(webId, fetch, updHabit, storagePref, defFolder, prefFileLocation, publicTypeIndexUrl, podType);
-    }))
+  const handleSave = async (toSave: Habit) => {
+    let updHabit = setStreaks(toSave);
+    await editHabit(webId, fetch, updHabit, storagePref, defFolder, prefFileLocation, publicTypeIndexUrl, podType);
+    // console.log("we are here");
+    // console.log(habitsToSave);
+    // await Promise.all(habitsToSave.map(async (habit) => {
+    //   console.log("this is habit");
+    //   console.log(habit);
+    //   let updHabit = setStreaks(habit);
+    //   console.log("now this is habit");
+    //   console.log(updHabit);
+    //   await editHabit(webId, fetch, updHabit, storagePref, defFolder, prefFileLocation, publicTypeIndexUrl, podType);
+    // }))
   };
 
   const handleDelete = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, id: number) => {
@@ -246,10 +254,6 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                   <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentCategory(null)}><RiArrowGoBackFill /> reset</Dropdown.Item></>)}
               </DropdownButton>
             }
-            {
-              (currentView === 'today') &&
-              <Button variant="secondary" className="ms-auto my-1" onClick={handleSave}><MdSaveAlt /> save</Button>
-            }
             <OverlayTrigger placement="left" overlay={
               <Popover>
                 <Popover.Body className="py-1 px-1">
@@ -271,7 +275,8 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                     return (
                       <a
                         key={`${habit.id}${Date.now() + key + Math.floor(Math.random() * 1000)}`}
-                        className={`list-group-item px-1 d-flex list-group-item-action ${activeHabit === habit.id ? 'active' : ''}`}
+                        className={`list-group-item px-1 align-items-center 
+                        d-flex list-group-item-action ${activeHabit === habit.id ? 'active' : ''}`}
                         onClick={(e) => {
                           e.preventDefault();
                           setIsEdit(false);
@@ -281,6 +286,32 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                           setCreatorStatus(false);
                         }}
                       >
+                        {
+                          (habitsToShow[key].stat !== null) && (objOfStates[key] !== null) &&
+                          <div className="ms-2 me-3 mt-0 mb-1"
+                            key={Date.now() + key + Math.floor(Math.random() * 1000)}
+                            style={{ display: "inline-block" }}>
+                            <input className="form-check-input secondary"
+                              {...(!(currentView === 'today') && { disabled: true })}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                //handleSave();
+                              }}
+                              onChange={() => {
+                                let tempArr = habitsToShow;
+                                tempArr[key].stat = !habit.stat;
+                                setHabitsToShow(tempArr);
+                                console.log(tempArr);
+                                let toSave = tempArr[key];
+                                console.log(toSave);
+                                // setHabitsToSave((prevState) => ([...prevState, habit]));
+                                setObjOfStates((prevState) => ({ ...prevState, [key]: !objOfStates[key] }));
+                                handleSave(toSave);
+
+                              }}
+                              type="checkbox" checked={objOfStates[key]!} style={{ "transform": "scale(1.7)" }} />
+                          </div>
+                        }
                         <div style={{ display: "inline-block" }}>
                           {habit.recurrence && <Badge pill bg="info" className="me-1">{habit.recurrence}</Badge>}
                           {habit.category && <Badge pill bg="info" className="me-1">{habit.category}</Badge>}
@@ -336,30 +367,11 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                           </div>
                         </OverlayTrigger>}
                         {habit.title}
-                        {
-                          (habitsToShow[key].stat !== null) && (objOfStates[key] !== null) &&
-                          <div className="ms-auto me-3 mt-0"
-                            key={Date.now() + key + Math.floor(Math.random() * 1000)}
-                            style={{ display: "inline-block", "marginLeft": "auto" }}>
-                            <input className="form-check-input secondary"
-                              {...(!(currentView === 'today') && { disabled: true })}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                              }}
-                              onChange={() => {
-                                let tempArr = habitsToShow;
-                                tempArr[key].stat = !habit.stat;
-                                setHabitsToShow(tempArr);
-                                setHabitsToSave((prevState) => ([...prevState, habit]));
-                                setObjOfStates((prevState) => ({ ...prevState, [key]: !objOfStates[key] }));
-                              }}
-                              type="checkbox" checked={objOfStates[key]!} style={{ "transform": "scale(1.7)" }} />
-                          </div>
-                        }
+
                         {
                           habit.id &&
                           <Button variant="outline-danger"
-                            className="px-1 py-1"
+                            className="px-1 py-1 ms-auto"
                             style={{ color: "red" }}
                             onClick={(e) => { handleDelete(e, habit.id!) }}
                           ><RiDeleteBin6Line /></Button>

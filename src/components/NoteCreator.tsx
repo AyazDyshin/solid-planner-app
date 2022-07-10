@@ -33,8 +33,6 @@ interface Props {
     setDoNoteSave: React.Dispatch<React.SetStateAction<boolean>>;
     NoteInp: Note;
     setNoteInp: React.Dispatch<React.SetStateAction<Note>>;
-    arrOfChanges: string[];
-    setArrOfChanges: React.Dispatch<React.SetStateAction<string[]>>;
     publicAccess: accessObject;
     setPublicAccess: React.Dispatch<React.SetStateAction<accessObject>>;
     accUpdObj: {
@@ -61,7 +59,7 @@ interface Props {
 const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFolder, podType, publicTypeIndexUrl,
     setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, prefFileLocation,
     setCreatorStatus, creatorStatus, categoryArray, setCategoryArray, doNoteSave, setDoNoteSave, NoteInp,
-    setNoteInp, arrOfChanges, setArrOfChanges, accUpdObj, setAccUpdObj, agentsToUpd, setAgentsToUpd,
+    setNoteInp, accUpdObj, setAccUpdObj, agentsToUpd, setAgentsToUpd,
     publicAccess, setPublicAccess, notesArray, setNotesArray
 }: Props) => {
 
@@ -74,10 +72,10 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
     const [accessModalState, setAccessModalState] = useState<boolean>(false);
     const [sharedModalState, setSharedModalState] = useState<boolean>(false);
     const [contactsList, setContactsList] = useState<{ [x: string]: AccessModes; }>({});
-
+    const [noteChanged, setNoteChanged] = useState<boolean>(false);
     useEffect(() => {
 
-        if (arrOfChanges.length !== 0) {
+        if (noteChanged) {
             handleSave();
         }
         if (viewerStatus) {
@@ -93,12 +91,12 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
     }, [viewerStatus, noteToView, creatorStatus]);
 
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setNoteInp(prevState => ({ ...prevState, [e.target.name]: e.target.value }));
-        if (!arrOfChanges.includes(e.target.name)) {
-            setArrOfChanges((prevState) => ([...prevState, e.target.name]));
-        }
-    };
+    // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     setNoteInp(prevState => ({ ...prevState, [e.target.name]: e.target.value }));
+    //     if (!arrOfChanges.includes(e.target.name)) {
+    //         setArrOfChanges((prevState) => ([...prevState, e.target.name]));
+    //     }
+    // };
 
     const handleSave = async () => {
         setIsEdit(false);
@@ -112,10 +110,10 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
             setNotesArray((prevState) => ([...prevState, newNote]));
             setNewEntryCr(!newEntryCr);
             setNoteInp({ id: null, title: "", content: "", category: "", url: "", access: null });
-            setArrOfChanges([]);
+            setNoteChanged(false);
             await saveNote(webId, fetch, newNote, storagePref, defFolder, prefFileLocation, podType);
         }
-        else if (viewerStatus && (arrOfChanges.length !== 0 || Object.keys(accUpdObj).length !== 0)) {
+        else if (viewerStatus && (noteChanged || Object.keys(accUpdObj).length !== 0)) {
             setViewerStatus(false);
             let noteToUpd = NoteInp;
             if (Object.keys(accUpdObj).length !== 0) {
@@ -157,10 +155,10 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
             setNotesArray(updArr);
             setNewEntryCr(!newEntryCr);
             setNoteInp({ id: null, title: "", content: "", category: "", url: "", access: null });
-            setArrOfChanges([]);
-            if (arrOfChanges.length !== 0) {
-                await editNote(webId, fetch, NoteInp, arrOfChanges, storagePref, publicTypeIndexUrl);
+            if (noteChanged) {
+                await editNote(webId, fetch, NoteInp, storagePref, publicTypeIndexUrl);
             }
+            setNoteChanged(false);
         }
 
         if (Object.keys(accUpdObj).length !== 0) {
@@ -200,6 +198,10 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
         await deleteEntry(webId ?? "", fetch, NoteInp.id!, "note", storagePref, publicTypeIndexUrl);
     }
 
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setNoteInp(prevState => ({ ...prevState, [e.target.name]: e.target.value }));
+        setNoteChanged(true);
+    };
     return (
         <div>
             <InputGroup className="mb-2 mt-2">
@@ -240,11 +242,11 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
                 onChange={handleChange}
             />
             <CategoryModal
+                setEntryChanged={setNoteChanged}
                 categoryModalState={categoryModalState}
                 setCategoryModalState={setCategoryModalState}
                 setNoteInp={setNoteInp}
                 noteInp={NoteInp}
-                setArrOfChanges={setArrOfChanges}
                 viewerStatus={viewerStatus}
                 categoryArray={categoryArray}
                 setCategoryArray={setCategoryArray}
@@ -263,7 +265,6 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
                 setAccessModalState={setAccessModalState}
                 setNoteInp={setNoteInp}
                 NoteInp={NoteInp}
-                setArrOfChanges={setArrOfChanges}
             />
             <SharedModal
                 agentsToUpd={agentsToUpd}
@@ -276,7 +277,6 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
                 setSharedModalState={setSharedModalState}
                 setNoteInp={setNoteInp}
                 NoteInp={NoteInp}
-                setArrOfChanges={setArrOfChanges}
                 viewerStatus={viewerStatus}
                 categoryArray={categoryArray}
                 setCategoryArray={setCategoryArray}

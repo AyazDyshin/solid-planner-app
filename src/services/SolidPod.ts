@@ -504,6 +504,8 @@ export const saveHabit = async (webId: string, fetch: fetcher, habit: Habit, sto
 
 export const editHabit = async (webId: string, fetch: fetcher, habitToSave: Habit, storagePref: string,
   defFolder: string | null, prefFileLocation: string, publicTypeIndexUrl: string, podType: string) => {
+  console.log("what we get:");
+  console.log(habitToSave);
   if (!habitToSave.id) {
     await saveHabit(webId, fetch, habitToSave, storagePref, defFolder, prefFileLocation, podType);
     return;
@@ -554,14 +556,13 @@ export const editHabit = async (webId: string, fetch: fetcher, habitToSave: Habi
             if (habitToSave.currentStreak) {
               newThing = setInteger(newThing, voc.currentStreak, habitToSave.currentStreak);
             }
-            if (habitToSave.stat) {
+            if (habitToSave.stat !== null) {
               newThing = setBoolean(newThing, "http://dbpedia.org/ontology/status", habitToSave.stat);
             }
             if (habitToSave.category) {
               newThing = setStringNoLocale(newThing, otherV.category, habitToSave.category);
             }
             if (habitToSave.checkInList && newThing) {
-              console.log("hereeeeeeeee");
               habitToSave.checkInList.forEach(date => newThing = addDate(newThing!, voc.checkInDate, date));
             }
             if (habitToSave.custom) {
@@ -634,7 +635,7 @@ export const editHabit = async (webId: string, fetch: fetcher, habitToSave: Habi
   }));
 };
 
-export const editNote = async (webId: string, fetch: fetcher, note: Note, changes: string[], storagePref: string,
+export const editNote = async (webId: string, fetch: fetcher, note: Note, storagePref: string,
   publicTypeIndexUrl: string) => {
   let urlsArr = await getAllUrlFromPublicIndex(webId, fetch, "note", storagePref, publicTypeIndexUrl);
   let updUrlsArr = await Promise.all(urlsArr.map(async (url) => {
@@ -657,19 +658,17 @@ export const editNote = async (webId: string, fetch: fetcher, note: Note, change
         if (newThing) {
           let thingId = getInteger(newThing, schema.identifier);
           if (thingId === note.id) {
-            let updArr = changes.map((change) => {
-              switch (change) {
-                case "title":
-                  newThing = setStringNoLocale(newThing!, DCTERMS.title, note.title!);
-                  break;
-                case "content":
-                  newThing = setStringNoLocale(newThing!, schema.text, note.content!);
-                  break;
-                case "category":
-                  newThing = setStringNoLocale(newThing!, otherV.category, note.category!);
-              }
-            });
-            //handle?
+            if (note.title) {
+              newThing = setStringNoLocale(newThing!, DCTERMS.title, note.title!);
+            }
+            if (note.content) {
+              newThing = setStringNoLocale(newThing!, schema.text, note.content!);
+
+            }
+            if (note.category) {
+              newThing = setStringNoLocale(newThing!, otherV.category, note.category!);
+
+            }
             let updDataSet = setThing(newDs, newThing!);
             const savedDataSet = await saveSolidDatasetAt(url, updDataSet,
               { fetch: fetch });
@@ -684,15 +683,18 @@ export const editNote = async (webId: string, fetch: fetcher, note: Note, change
         newThingArr.forEach(async (newThing) => {
           let thingId = getInteger(newThing, schema.identifier);
           if (thingId === note.id) {
-            let updArr = changes.map((change) => {
-              switch (change) {
-                case "title":
-                  newThing = setStringNoLocale(newThing!, DCTERMS.title, note.title!);
-                  break;
-                case "content":
-                  newThing = setStringNoLocale(newThing!, schema.text, note.content!);
-              }
-            });
+            if (note.title) {
+              newThing = setStringNoLocale(newThing!, DCTERMS.title, note.title!);
+            }
+            if (note.content) {
+              newThing = setStringNoLocale(newThing!, schema.text, note.content!);
+
+            }
+            if (note.category) {
+              newThing = setStringNoLocale(newThing!, otherV.category, note.category!);
+
+            }
+
             let updDataSet = setThing(data, newThing!);
             await saveSolidDatasetAt(url, updDataSet, { fetch: fetch });
           }

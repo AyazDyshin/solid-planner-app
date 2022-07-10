@@ -15,7 +15,6 @@ interface Props {
     setAccessModalState: React.Dispatch<React.SetStateAction<boolean>>;
     setNoteInp?: React.Dispatch<React.SetStateAction<Note>>;
     NoteInp?: Note;
-    setArrOfChanges: React.Dispatch<React.SetStateAction<string[]>>;
     publicAccess: accessObject;
     setPublicAccess: React.Dispatch<React.SetStateAction<accessObject>>;
     contactsList: {
@@ -41,8 +40,8 @@ interface Props {
     setHabitInp?: React.Dispatch<React.SetStateAction<Habit>>;
 }
 //a popup window to prompt user to set access type
-const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, setNoteInp, contactsList, setContactsList, accUpdObj, setAccUpdObj,
-    setArrOfChanges, publicAccess, setPublicAccess, habitInp, setHabitInp, storagePref,
+const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, setNoteInp, contactsList, setContactsList, accUpdObj,
+    setAccUpdObj, publicAccess, setPublicAccess, habitInp, setHabitInp, storagePref,
     agentsToUpd, setAgentsToUpd }: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;

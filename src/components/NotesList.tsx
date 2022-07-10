@@ -3,11 +3,10 @@ import { getInteger, getStringNoLocale, Thing } from "@inrupt/solid-client";
 import { useSession } from "@inrupt/solid-ui-react";
 import { RefAttributes, useEffect, useState } from "react";
 import "../styles.css";
-import { Dropdown, DropdownButton, Badge, Overlay, Tooltip, OverlayTrigger, TooltipProps, Popover, PopoverProps, Button } from "react-bootstrap";
+import { Dropdown, DropdownButton, Badge, OverlayTrigger, Popover, PopoverProps, Button } from "react-bootstrap";
 import SaveModal from "./SaveModal";
 import { Note } from "./types";
 import { RiArrowDropDownLine, RiArrowGoBackFill } from "react-icons/ri";
-import { AiOutlinePlus } from "react-icons/ai";
 import { BsPlusLg } from "react-icons/bs";
 import { BiFolder } from "react-icons/bi";
 import { VscTypeHierarchySuper } from "react-icons/vsc";
@@ -131,7 +130,8 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, notes
               notesToShow.map((note, index) => {
                 return <a
                   key={`${note.id}${Date.now() + index + Math.floor(Math.random() * 1000)}`}
-                  className={`list-group-item px-1 d-flex list-group-item-action ${activeNote === note.id ? 'active' : ''}`}
+                  className={`list-group-item align-items-center 
+                  px-1 d-flex list-group-item-action ${activeNote === note.id ? 'active' : ''}`}
                   onClick={(e) => {
                     e.preventDefault();
                     setIsEdit(false);

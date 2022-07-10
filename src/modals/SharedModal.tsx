@@ -14,7 +14,6 @@ interface Props {
     setHabitInp?: React.Dispatch<React.SetStateAction<Habit>>;
     habitInp?: Habit;
     viewerStatus: boolean;
-    setArrOfChanges: React.Dispatch<React.SetStateAction<string[]>>;
     categoryArray: string[];
     setCategoryArray: React.Dispatch<React.SetStateAction<string[]>>;
     publicAccess: accessObject;
@@ -34,7 +33,7 @@ interface Props {
 }
 //a popup window to prompt user to pick a folder
 const SharedModal = ({ sharedModalState, setSharedModalState, setNoteInp,
-    NoteInp, viewerStatus, setArrOfChanges, categoryArray, setCategoryArray, publicAccess,
+    NoteInp, viewerStatus, categoryArray, setCategoryArray, publicAccess,
     accUpdObj, setAccUpdObj, agentsToUpd, setAgentsToUpd, setPublicAccess, habitInp, setHabitInp }: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
@@ -49,10 +48,10 @@ const SharedModal = ({ sharedModalState, setSharedModalState, setNoteInp,
             setIsLoading(true);
             let inputToUse = NoteInp ? NoteInp : habitInp;
 
-            if (!inputToUse){
+            if (!inputToUse) {
                 throw new Error("Error, entry to set access for wasn't provided");
             }
-            if (!inputToUse.access){
+            if (!inputToUse.access) {
                 throw new Error("Error, entry to set access for wasn't provided");
             }
             let key = Object.keys(inputToUse.access)[0];

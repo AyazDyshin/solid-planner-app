@@ -16,19 +16,12 @@ interface Props {
     setCreatorStatus: React.Dispatch<React.SetStateAction<boolean>>;
     isEdit: boolean;
     setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
-    notesArray: Note[];
-    setNotesArray: React.Dispatch<React.SetStateAction<Note[]>>;
-    isLoadingContents: boolean;
-    setIsLoadingContents: React.Dispatch<React.SetStateAction<boolean>>;
-    notesFetched: boolean;
-    setNotesFetched: React.Dispatch<React.SetStateAction<boolean>>;
 }
 // this component renders NavBar, it iterates over "links" array and creates corresponding links
 // clicking on the links sets "active" to the links value
 // logout functionality is implemented using "LogoutButton" component from @inrupt/solid-ui-react
 const Navbar = ({ links, active, setActive, viewerStatus, setViewerStatus,
-    creatorStatus, setCreatorStatus, isEdit, setIsEdit,
-    notesArray, setNotesArray, isLoadingContents, setIsLoadingContents, notesFetched, setNotesFetched }: Props) => {
+    creatorStatus, setCreatorStatus, isEdit, setIsEdit }: Props) => {
     const { session} = useSession();
     const { webId } = session.info;
     if (webId === undefined) {

@@ -20,8 +20,6 @@ import SharedModal from "../modals/SharedModal";
 interface Props {
   habitInp: Habit;
   setHabitInp: React.Dispatch<React.SetStateAction<Habit>>;
-  arrOfChanges: string[];
-  setArrOfChanges: React.Dispatch<React.SetStateAction<string[]>>;
   isEdit: boolean;
   setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
   viewerStatus: boolean;
@@ -60,7 +58,7 @@ interface Props {
   podType: string;
   publicTypeIndexUrl: string;
 }
-const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, isEdit, setIsEdit, creatorStatus, setCreatorStatus,
+const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus, setCreatorStatus,
   viewerStatus, setViewerStatus, habitToView, setHabitToView, habitsArray, setHabitsArray, newEntryCr, setNewEntryCr,
   accUpdObj, setAccUpdObj, publicAccess, setPublicAccess, agentsToUpd, setAgentsToUpd, categoryArray, setCategoryArray,
   habitDoSave, setHabitDoSave, currentView, setCurrentView, storagePref, defFolder, prefFileLocation, publicTypeIndexUrl, podType
@@ -77,7 +75,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
   const [contactsList, setContactsList] = useState<{ [x: string]: AccessModes; }>({});
   const [sharedModalState, setSharedModalState] = useState<boolean>(false);
   useEffect(() => {
-    if (arrOfChanges.length !== 0 || habitChanged) {
+    if (habitChanged) {
       handleSave();
     }
     if (viewerStatus) {
@@ -97,32 +95,34 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
     }
   }, [viewerStatus, habitToView, creatorStatus, habitDoSave]);
 
+  const saveHabitFromCreator = async () => {
+    setViewerStatus(false);
+    setCreatorStatus(false);
+    let date = new Date();
+    let idToSave = Date.now() + Math.floor(Math.random() * 1000);
+    let newHabit = {
+      ...habitInp, id: idToSave, startDate: date,
+      access: { "private": { read: false, append: false, write: false } }
+    }
+    setHabitInp(newHabit);
+    setHabitsArray((prevState) => ([...prevState, newHabit]));
+    setNewEntryCr(!newEntryCr);
+    setHabitInp({
+      id: null, title: null, content: null, startDate: null, lastCheckInDate: null, recurrence: "daily", bestStreak: null,
+      currentStreak: null, stat: false, category: null, url: null, access: null, prevBestStreak: null, prevLastCheckIn: null,
+      checkInList: null
+    });
+    setHabitChanged(false);
+    await saveHabit(webId, fetch, newHabit, storagePref, defFolder, prefFileLocation, podType);
+  }
 
   const handleSave = async () => {
     setIsEdit(false);
     if (creatorStatus) {
-      setViewerStatus(false);
-      setCreatorStatus(false);
-      let date = new Date();
-      let idToSave = Date.now() + Math.floor(Math.random() * 1000);
-      let newHabit = {
-        ...habitInp, id: idToSave, startDate: date,
-        access: { "private": { read: false, append: false, write: false } }
-      }
-      setHabitInp(newHabit);
-      setHabitsArray((prevState) => ([...prevState, newHabit]));
-      setNewEntryCr(!newEntryCr);
-      setHabitInp({
-        id: null, title: null, content: null, startDate: null, lastCheckInDate: null, recurrence: "daily", bestStreak: null,
-        currentStreak: null, stat: false, category: null, url: null, access: null, prevBestStreak: null, prevLastCheckIn: null,
-        checkInList: null
-      });
-      setArrOfChanges([]);
-      setHabitChanged(false);
-      await saveHabit(webId, fetch, newHabit, storagePref, defFolder, prefFileLocation, podType);
+      await saveHabitFromCreator();
     }
 
-    else if (viewerStatus && (arrOfChanges.length !== 0 || Object.keys(accUpdObj).length !== 0 || habitChanged)) {
+    else if (viewerStatus && (Object.keys(accUpdObj).length !== 0 || habitChanged)) {
       setViewerStatus(false);
       let habitToUpd = habitInp;
       if (Object.keys(accUpdObj).length !== 0) {
@@ -159,8 +159,6 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
       let updArr = habitsArray;
       habitToUpd = setStreaks(habitToUpd);
       updArr[index] = habitToUpd;
-      console.log("this is habitToUpd");
-      console.log(habitToUpd);
       setHabitsArray(updArr);
       setNewEntryCr(!newEntryCr);
       setHabitInp({
@@ -168,8 +166,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
         currentStreak: null, stat: false, category: null, url: null, access: null, prevBestStreak: null, prevLastCheckIn: null, checkInList: null
       });
       setHabitChanged(false);
-      setArrOfChanges([]);
-      if (arrOfChanges.length !== 0 || habitChanged) {
+      if (habitChanged) {
         await editHabit(webId, fetch, habitInp, storagePref, defFolder, prefFileLocation, publicTypeIndexUrl, podType);
       }
     }
@@ -214,12 +211,12 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
     await deleteEntry(webId, fetch, habitInp.id, "habit", storagePref, publicTypeIndexUrl);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setHabitInp(prevState => ({ ...prevState, [e.target.name]: e.target.value }));
-    if (!arrOfChanges.includes(e.target.name)) {
-      setArrOfChanges((prevState) => ([...prevState, e.target.name]));
-    }
-  };
+  // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   setHabitInp(prevState => ({ ...prevState, [e.target.name]: e.target.value }));
+  //   if (!arrOfChanges.includes(e.target.name)) {
+  //     setArrOfChanges((prevState) => ([...prevState, e.target.name]));
+  //   }
+  // };
 
   const handleEdit = () => {
     isEdit ? setIsEdit(false) : setIsEdit(true);
@@ -235,7 +232,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
           aria-label="title"
           value={habitInp.title === null ? "" : habitInp.title}
           {...(!isEdit && { disabled: true })}
-          onChange={handleChange} />
+          onChange={() => { setHabitChanged(true) }} />
 
         <ButtonGroup>
           <Button variant="secondary" onClick={handleSave}><MdSaveAlt /> save</Button>
@@ -275,7 +272,6 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
                 <Dropdown.Item onClick={() => {
                   setHabitInp(prevState => ({ ...prevState, recurrence: 'daily' }));
                   setHabitInp(prevState => ({ ...prevState, custom: null }));
-
                   setHabitChanged(true);
                 }}>daily</Dropdown.Item>
                 <Dropdown.Item onClick={() => {
@@ -337,7 +333,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
           name="content"
           className="ms-2"
           value={habitInp.content === null ? "" : habitInp.content}
-          onChange={handleChange}
+          onChange={() => { setHabitChanged(true) }}
         />
       </div>
       <CustomHabitModal
@@ -347,7 +343,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
         setHabitInp={setHabitInp}
       />
       <CategoryModal
-        setArrOfChanges={setArrOfChanges}
+        setEntryChanged={setHabitChanged}
         categoryArray={categoryArray}
         setCategoryArray={setCategoryArray}
         habitInp={habitInp}
@@ -370,7 +366,6 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
         setAccessModalState={setAccessModalState}
         setHabitInp={setHabitInp}
         habitInp={habitInp}
-        setArrOfChanges={setArrOfChanges}
       />
 
       <SharedModal
@@ -384,7 +379,6 @@ const HabitsCreator = ({ habitInp, setHabitInp, arrOfChanges, setArrOfChanges, i
         setSharedModalState={setSharedModalState}
         setHabitInp={setHabitInp}
         habitInp={habitInp}
-        setArrOfChanges={setArrOfChanges}
         viewerStatus={viewerStatus}
         categoryArray={categoryArray}
         setCategoryArray={setCategoryArray}

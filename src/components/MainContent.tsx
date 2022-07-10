@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import Navbar from "./Navbar";
 import ContentToRender from "./ContentToRender";
 import Test from "./Test";
-import { checkPermissions, isWacOrAcp } from "../services/access";
+import { isWacOrAcp } from "../services/access";
 import { useSession } from "@inrupt/solid-ui-react";
 import { Spinner } from "react-bootstrap";
 import { recordDefaultFolder } from "../services/SolidPod";
 import { Habit, Note } from "./types";
 import { getDefaultFolder, getPrefLink, getPublicTypeIndexUrl, getStoragePref } from "../services/podGetters";
 import NoPermissions from "./NoPermissions";
+
 // This is the root component that first renders NavBar and then other content
 // Passes active and setActive hooks, which represent the currently clicked tab
 const MainContent = () => {
@@ -77,14 +78,7 @@ const MainContent = () => {
     if (permissionStatus) {
       return (
         <div>
-          <Test />
           <Navbar
-            notesFetched={notesFetched}
-            setNotesFetched={setNotesFetched}
-            isLoadingContents={isLoadingContents}
-            setIsLoadingContents={setIsLoadingContents}
-            notesArray={notesArray}
-            setNotesArray={setNotesArray}
             creatorStatus={creatorStatus}
             setCreatorStatus={setCreatorStatus}
             viewerStatus={viewerStatus}

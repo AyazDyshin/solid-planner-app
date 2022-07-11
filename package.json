@@ -27,6 +27,7 @@
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-react": "^7.16.7",
     "@babel/preset-typescript": "^7.16.7",
+    "@types/react-color": "^3.0.6",
     "babel-loader": "^8.2.4",
     "css-loader": "^6.7.1",
     "gh-pages": "^3.2.3",
@@ -40,6 +41,8 @@
     "webpack-dev-server": "^4.8.1"
   },
   "dependencies": {
+    "@fullcalendar/daygrid": "^5.11.0",
+    "@fullcalendar/react": "^5.11.1",
     "@inrupt/solid-client": "^1.23.1",
     "@inrupt/solid-client-notifications": "^1.0.0",
     "@inrupt/solid-ui-react": "^2.8.0",
@@ -56,6 +59,7 @@
     "rdf-namespaces": "^1.9.2",
     "react": "^18.0.0",
     "react-bootstrap": "^2.4.0",
+    "react-color": "^2.19.3",
     "react-dom": "^18.0.0",
     "react-error-boundary": "^3.1.4",
     "react-icons": "^4.4.0",

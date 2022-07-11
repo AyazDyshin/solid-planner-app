@@ -234,7 +234,6 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
                         ><RiDeleteBin6Line /> delete</Dropdown.Item>}
                     </DropdownButton>
                 </ButtonGroup>
-
             </InputGroup>
             <FormControl {...(!isEdit && { disabled: true })} as="textarea" aria-label="textarea" style={{ 'resize': 'none', 'height': '80%' }}
                 name="content"

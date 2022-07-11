@@ -1,6 +1,6 @@
 import { useSession } from '@inrupt/solid-ui-react';
 import { useEffect, useState } from 'react';
-import { fetchAllEntries, thingToHabit, editHabit, deleteEntry, performCheckInUpdate } from '../services/SolidPod';
+import { fetchAllEntries, thingToHabit, editHabit, deleteEntry } from '../services/SolidPod';
 import { BsPlusLg } from "react-icons/bs";
 import { Habit } from './types';
 import { extractCategories, filterByAccess, filterByCategory, getHabitsToday, setStreaks } from '../services/helpers';
@@ -127,17 +127,8 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
   };
   const handleSave = async (toSave: Habit) => {
     let updHabit = setStreaks(toSave);
+    setNewEntryCr(!newEntryCr);
     await editHabit(webId, fetch, updHabit, storagePref, defFolder, prefFileLocation, publicTypeIndexUrl, podType);
-    // console.log("we are here");
-    // console.log(habitsToSave);
-    // await Promise.all(habitsToSave.map(async (habit) => {
-    //   console.log("this is habit");
-    //   console.log(habit);
-    //   let updHabit = setStreaks(habit);
-    //   console.log("now this is habit");
-    //   console.log(updHabit);
-    //   await editHabit(webId, fetch, updHabit, storagePref, defFolder, prefFileLocation, publicTypeIndexUrl, podType);
-    // }))
   };
 
   const handleDelete = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, id: number) => {
@@ -254,7 +245,7 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                   <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentCategory(null)}><RiArrowGoBackFill /> reset</Dropdown.Item></>)}
               </DropdownButton>
             }
-            <OverlayTrigger placement="left" overlay={
+            <OverlayTrigger placement="right" overlay={
               <Popover>
                 <Popover.Body className="py-1 px-1">
                   Create a new habit
@@ -295,7 +286,6 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                               {...(!(currentView === 'today') && { disabled: true })}
                               onClick={(e) => {
                                 e.stopPropagation();
-                                //handleSave();
                               }}
                               onChange={() => {
                                 let tempArr = habitsToShow;
@@ -304,7 +294,6 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                                 console.log(tempArr);
                                 let toSave = tempArr[key];
                                 console.log(toSave);
-                                // setHabitsToSave((prevState) => ([...prevState, habit]));
                                 setObjOfStates((prevState) => ({ ...prevState, [key]: !objOfStates[key] }));
                                 handleSave(toSave);
 
@@ -313,7 +302,7 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                           </div>
                         }
                         <div style={{ display: "inline-block" }}>
-                          {habit.recurrence && <Badge pill bg="info" className="me-1">{habit.recurrence}</Badge>}
+                          {habit.recurrence && <Badge style={{ "backgroundColor": 'red!important' }} className="me-1">{habit.recurrence}</Badge>}
                           {habit.category && <Badge pill bg="info" className="me-1">{habit.category}</Badge>}
                         </div>
                         <div style={{ display: "inline-block" }}>

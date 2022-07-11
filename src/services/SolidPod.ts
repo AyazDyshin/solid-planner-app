@@ -63,6 +63,9 @@ export const thingToHabit = async (toChange: Thing | null, webId: string, fetch:
   let updCustom = getStringNoLocale(toChange, voc.custom);
   let updCheckInList = getDateAll(toChange, voc.checkInDate);
   let newCustomValue: number[] | number | null = null;
+
+  let getColor = getStringNoLocale(toChange, schema.color);
+  let updColor = getColor ? getColor : "#3e619b";
   if (updCustom) {
     let customArr = updCustom.split(" ");
     if (customArr.length === 1 && parseInt(customArr[0])) {
@@ -81,6 +84,7 @@ export const thingToHabit = async (toChange: Thing | null, webId: string, fetch:
     getAcc = [null];
   }
   const habit: Habit = {
+    color: updColor,
     stat: updStatus ? true : false,
     id: updId,
     title: updTitle,
@@ -255,28 +259,6 @@ export const createDefFolder = async (webId: string, fetch: fetcher, storagePref
   }
   await setPubAccess(webId, { read: true, append: false, write: false }, `${updUrlForFolder(defFolderUrl)}habits/`, fetch,
     storagePref, prefFileLocation, podType);
-  try {
-    let s = await getSolidDataset(`${updUrlForFolder(defFolderUrl)}checkIns/`, {
-      fetch: fetch
-    });
-  }
-  catch {
-    try {
-      await createContainerAt(`${updUrlForFolder(defFolderUrl)}checkIns/`, {
-        fetch: fetch
-      });
-    }
-    catch (error) {
-      let message = 'Unknown Error';
-      if (error instanceof Error) message = error.message;
-      throw new Error(`error when trying to create a folder for notes, error: ${message}`);
-    }
-  }
-  if (podType === "wac") {
-    await initializeAcl(`${updUrlForFolder(defFolderUrl)}checkIns/`, fetch);
-  }
-  await setPubAccess(webId, { read: true, append: false, write: false }, `${updUrlForFolder(defFolderUrl)}checkIns/`, fetch,
-    storagePref, prefFileLocation, podType);
 }
 
 
@@ -379,23 +361,6 @@ export const checkFolderExistence = async (webId: string, fetch: fetcher, storag
     }
   }
   return dataSet;
-}
-
-export const performCheckInUpdate = async (webId: string, fetch: fetcher, storagePref: string,
-  defFolder: string | null, prefFileLocation: string, podType: string, updObj: returnCheckIn) => {
-  if (typeof updObj === 'number') return;
-  else {
-    if (updObj.action === "add") {
-      //handle
-      await saveCheckIn(webId, fetch, storagePref, defFolder, prefFileLocation, podType, updObj.url!, updObj.date);
-    }
-    else if (updObj.action === "delete") {
-      await deleteCheckIn(webId, fetch, storagePref, defFolder, prefFileLocation, podType, updObj.url!, updObj.date);
-    }
-    else {
-      return;
-    }
-  }
 }
 
 export const saveCheckIn = async (webId: string, fetch: fetcher, storagePref: string,
@@ -502,15 +467,54 @@ export const saveHabit = async (webId: string, fetch: fetcher, habit: Habit, sto
   return habitUrl;
 }
 
+export const setHabitThing = (habitToSave: Habit, newThing: Thing) => {
+  if (habitToSave.title) {
+    newThing = setStringNoLocale(newThing, DCTERMS.title, habitToSave.title);
+  }
+  if (habitToSave.content) {
+    newThing = setStringNoLocale(newThing, schema.text, habitToSave.content);
+  }
+  if (habitToSave.recurrence) {
+    newThing = setStringNoLocale(newThing, voc.recurrence, habitToSave.recurrence);
+  }
+  if (habitToSave.lastCheckInDate) {
+    newThing = setDate(newThing, voc.lastCheckInDate, habitToSave.lastCheckInDate);
+  }
+  if (habitToSave.bestStreak) {
+    newThing = setInteger(newThing, voc.bestStreak, habitToSave.bestStreak);
+  }
+  if (habitToSave.currentStreak) {
+    newThing = setInteger(newThing, voc.currentStreak, habitToSave.currentStreak);
+  }
+  if (habitToSave.stat !== null) {
+    newThing = setBoolean(newThing, "http://dbpedia.org/ontology/status", habitToSave.stat);
+  }
+  if (habitToSave.category) {
+    newThing = setStringNoLocale(newThing, otherV.category, habitToSave.category);
+  }
+  if (habitToSave.checkInList && newThing) {
+    habitToSave.checkInList.forEach(date => newThing = addDate(newThing!, voc.checkInDate, date));
+  }
+  if (habitToSave.custom) {
+    let customToUpload;
+    if (typeof habitToSave.custom === 'number') {
+      customToUpload = habitToSave.custom.toString();
+    }
+    else {
+      customToUpload = habitToSave.custom.join(" ");
+    }
+    newThing = addStringNoLocale(newThing, voc.custom, customToUpload)
+  };
+  newThing = addStringNoLocale(newThing, schema.color, habitToSave.color);
+  return newThing;
+}
+
 export const editHabit = async (webId: string, fetch: fetcher, habitToSave: Habit, storagePref: string,
   defFolder: string | null, prefFileLocation: string, publicTypeIndexUrl: string, podType: string) => {
-  console.log("what we get:");
-  console.log(habitToSave);
   if (!habitToSave.id) {
     await saveHabit(webId, fetch, habitToSave, storagePref, defFolder, prefFileLocation, podType);
     return;
   }
-
   let urlsArr = await getAllUrlFromPublicIndex(webId, fetch, "habit", storagePref, publicTypeIndexUrl);
   let updUrlsArr = await Promise.all(urlsArr.map(async (url) => {
     let data: any;
@@ -538,46 +542,8 @@ export const editHabit = async (webId: string, fetch: fetcher, habitToSave: Habi
         if (newThing) {
           let thingId = getInteger(newThing, schema.identifier);
           if (thingId === habitToSave.id) {
-            if (habitToSave.title) {
-              newThing = setStringNoLocale(newThing, DCTERMS.title, habitToSave.title);
-            }
-            if (habitToSave.content) {
-              newThing = setStringNoLocale(newThing, schema.text, habitToSave.content);
-            }
-            if (habitToSave.recurrence) {
-              newThing = setStringNoLocale(newThing, voc.recurrence, habitToSave.recurrence);
-            }
-            if (habitToSave.lastCheckInDate) {
-              newThing = setDate(newThing, voc.lastCheckInDate, habitToSave.lastCheckInDate);
-            }
-            if (habitToSave.bestStreak) {
-              newThing = setInteger(newThing, voc.bestStreak, habitToSave.bestStreak);
-            }
-            if (habitToSave.currentStreak) {
-              newThing = setInteger(newThing, voc.currentStreak, habitToSave.currentStreak);
-            }
-            if (habitToSave.stat !== null) {
-              newThing = setBoolean(newThing, "http://dbpedia.org/ontology/status", habitToSave.stat);
-            }
-            if (habitToSave.category) {
-              newThing = setStringNoLocale(newThing, otherV.category, habitToSave.category);
-            }
-            if (habitToSave.checkInList && newThing) {
-              habitToSave.checkInList.forEach(date => newThing = addDate(newThing!, voc.checkInDate, date));
-            }
-            if (habitToSave.custom) {
-              let customToUpload;
-              if (typeof habitToSave.custom === 'number') {
-                customToUpload = habitToSave.custom.toString();
-              }
-              else {
-                customToUpload = habitToSave.custom.join(" ");
-              }
-              newThing = addStringNoLocale(newThing, voc.custom, customToUpload)
-            };
+            newThing = setHabitThing(habitToSave, newThing);
             //handle?
-            console.log("this is the thing!!");
-            console.log(newThing);
             let updDataSet = setThing(newDs, newThing!);
             const savedDataSet = await saveSolidDatasetAt(url, updDataSet,
               { fetch: fetch });
@@ -592,40 +558,7 @@ export const editHabit = async (webId: string, fetch: fetcher, habitToSave: Habi
         newThingArr.forEach(async (newThing) => {
           let thingId = getInteger(newThing, schema.identifier);
           if (thingId === habitToSave.id) {
-            if (habitToSave.title) {
-              newThing = setStringNoLocale(newThing, DCTERMS.title, habitToSave.title);
-            }
-            if (habitToSave.content) {
-              newThing = setStringNoLocale(newThing, schema.text, habitToSave.content);
-            }
-            if (habitToSave.recurrence) {
-              newThing = setStringNoLocale(newThing, voc.recurrence, habitToSave.recurrence);
-            }
-            if (habitToSave.lastCheckInDate) {
-              newThing = setDate(newThing, voc.lastCheckInDate, habitToSave.lastCheckInDate);
-            }
-            if (habitToSave.bestStreak) {
-              newThing = setInteger(newThing, voc.bestStreak, habitToSave.bestStreak);
-            }
-            if (habitToSave.currentStreak) {
-              newThing = setInteger(newThing, voc.currentStreak, habitToSave.currentStreak);
-            }
-            if (habitToSave.stat) {
-              newThing = setBoolean(newThing, "http://dbpedia.org/ontology/status", habitToSave.stat);
-            }
-            if (habitToSave.category) {
-              newThing = setStringNoLocale(newThing, otherV.category, habitToSave.category);
-            }
-            if (habitToSave.custom) {
-              let customToUpload;
-              if (typeof habitToSave.custom === 'number') {
-                customToUpload = habitToSave.custom.toString();
-              }
-              else {
-                customToUpload = habitToSave.custom.join(" ");
-              }
-              newThing = addStringNoLocale(newThing, voc.custom, customToUpload)
-            };
+            newThing = setHabitThing(habitToSave, newThing);
             let updDataSet = setThing(data, newThing!);
             await saveSolidDatasetAt(url, updDataSet, { fetch: fetch });
           }
@@ -702,46 +635,6 @@ export const editNote = async (webId: string, fetch: fetcher, note: Note, storag
       }
     }
   }));
-}
-
-export const getAllCheckIns = async (webId: string, fetch: fetcher, storagePref: string,
-  defFolder: string | null, prefFileLocation: string, podType: string, habitUrl: string) => {
-  let entryId = getIdPart(habitUrl);
-  const checkInsFolder = `${defFolder}checkIns/`;
-  const checkInUrl = `${checkInsFolder}${entryId}`;
-  await checkFolderExistence(webId, fetch, storagePref, prefFileLocation, podType, checkInsFolder);
-  let newDs;
-  try {
-    newDs = await getSolidDataset(checkInUrl, { fetch: fetch });
-  }
-  catch {
-    return null;
-  }
-  let thingWithDate = getThing(newDs, checkInUrl);
-  //handle
-  let allDates = getDateAll(thingWithDate!, voc.checkInDate);
-  return allDates;
-}
-
-export const deleteCheckIn = async (webId: string, fetch: fetcher, storagePref: string,
-  defFolder: string | null, prefFileLocation: string, podType: string, habitUrl: string, dateToDelete: Date) => {
-  let entryId = getIdPart(habitUrl);
-  const checkInsFolder = `${defFolder}checkIns/`;
-  const checkInUrl = `${checkInsFolder}${entryId}`;
-  await checkFolderExistence(webId, fetch, storagePref, prefFileLocation, podType, checkInsFolder);
-  let newDs;
-  try {
-    newDs = await getSolidDataset(checkInUrl, { fetch: fetch });
-  }
-  catch {
-    return null;
-  }
-  //handle
-  let thingWithDate = getThing(newDs, checkInUrl);
-  thingWithDate = removeDate(thingWithDate!, voc.checkInDate, dateToDelete);
-  newDs = setThing(newDs, thingWithDate!);
-  await saveSolidDatasetAt(checkInUrl, newDs, { fetch: fetch });
-
 }
 
 export const deleteEntry = async (webId: string, fetch: fetcher, id: number, type: string, storagePref: string,

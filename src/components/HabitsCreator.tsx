@@ -1,6 +1,6 @@
 import "../styles.css";
-import { Button, ButtonGroup, Dropdown, DropdownButton, FormControl, InputGroup } from 'react-bootstrap';
-import { accessObject, Habit, returnCheckIn } from './types';
+import { Button, ButtonGroup, Dropdown, DropdownButton, FormControl, InputGroup, OverlayTrigger, Popover, Tooltip } from 'react-bootstrap';
+import { accessObject, Habit } from './types';
 import { BsThreeDots, BsShare } from "react-icons/bs";
 import { FiEdit } from "react-icons/fi";
 import { RiDeleteBin6Line, RiUserSharedLine } from "react-icons/ri";
@@ -9,13 +9,15 @@ import { MdSaveAlt } from "react-icons/md";
 import { useEffect, useState } from "react";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import { setPubAccess, shareWith } from "../services/access";
-import { saveHabit, deleteEntry, editHabit, performCheckInUpdate } from "../services/SolidPod";
+import { saveHabit, deleteEntry, editHabit } from "../services/SolidPod";
 import { useSession } from "@inrupt/solid-ui-react";
 import { constructDate, setStreaks } from "../services/helpers";
 import AccessModal from "../modals/AccessModal";
 import CustomHabitModal from "../modals/CustomHabitModal";
 import CategoryModal from "../modals/CategoryModal";
 import SharedModal from "../modals/SharedModal";
+import { ColorResult, TwitterPicker } from "react-color";
+import CalendarModal from "../modals/CalendarModal";
 
 interface Props {
   habitInp: Habit;
@@ -74,6 +76,10 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
   const [accessModalState, setAccessModalState] = useState<boolean>(false);
   const [contactsList, setContactsList] = useState<{ [x: string]: AccessModes; }>({});
   const [sharedModalState, setSharedModalState] = useState<boolean>(false);
+  const [testCol, setTestCol] = useState<string>("red");
+  const [showColorPicker, setShowColorPicker] = useState<boolean>(false);
+  const [calendarModalState, setCalendarModalState] = useState<boolean>(false);
+
   useEffect(() => {
     if (habitChanged) {
       handleSave();
@@ -89,7 +95,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
       setHabitInp({
         id: null, title: null, content: null, startDate: null, lastCheckInDate: null, recurrence: "daily", bestStreak: null,
         currentStreak: null, stat: false, category: null, url: null, access: null, prevBestStreak: null, prevLastCheckIn: null,
-        checkInList: null
+        checkInList: null, color: "#3e619b"
       });
       setIsEdit(true);
     }
@@ -110,12 +116,22 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
     setHabitInp({
       id: null, title: null, content: null, startDate: null, lastCheckInDate: null, recurrence: "daily", bestStreak: null,
       currentStreak: null, stat: false, category: null, url: null, access: null, prevBestStreak: null, prevLastCheckIn: null,
-      checkInList: null
+      checkInList: null, color: "#3e619b"
     });
     setHabitChanged(false);
     await saveHabit(webId, fetch, newHabit, storagePref, defFolder, prefFileLocation, podType);
   }
-
+  const getColor = (color: ColorResult) => {
+    setShowColorPicker(!showColorPicker);
+    let toSet: string = color.hex;
+    setHabitInp(prevState => ({ ...prevState, ["color"]: color.hex }));
+    setHabitChanged(true);
+  }
+  const popover = (
+    <Popover.Body>
+      <TwitterPicker triangle="hide" onChangeComplete={getColor} />
+    </Popover.Body>
+  );
   const handleSave = async () => {
     setIsEdit(false);
     if (creatorStatus) {
@@ -163,7 +179,8 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
       setNewEntryCr(!newEntryCr);
       setHabitInp({
         id: null, title: null, content: null, startDate: null, lastCheckInDate: null, recurrence: "daily", bestStreak: null,
-        currentStreak: null, stat: false, category: null, url: null, access: null, prevBestStreak: null, prevLastCheckIn: null, checkInList: null
+        currentStreak: null, stat: false, category: null, url: null, access: null, prevBestStreak: null, prevLastCheckIn: null,
+        checkInList: null, color: "#3e619b"
       });
       setHabitChanged(false);
       if (habitChanged) {
@@ -211,12 +228,10 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
     await deleteEntry(webId, fetch, habitInp.id, "habit", storagePref, publicTypeIndexUrl);
   };
 
-  // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   setHabitInp(prevState => ({ ...prevState, [e.target.name]: e.target.value }));
-  //   if (!arrOfChanges.includes(e.target.name)) {
-  //     setArrOfChanges((prevState) => ([...prevState, e.target.name]));
-  //   }
-  // };
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setHabitInp(prevState => ({ ...prevState, [e.target.name]: e.target.value }));
+    setHabitChanged(true);
+  };
 
   const handleEdit = () => {
     isEdit ? setIsEdit(false) : setIsEdit(true);
@@ -224,7 +239,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
   };
 
   return (
-    <div className="h-100">
+    <div>
       <InputGroup className="mb-2 mt-2">
         <InputGroup.Text id="basic-addon1">Title:</InputGroup.Text>
         <FormControl
@@ -232,7 +247,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
           aria-label="title"
           value={habitInp.title === null ? "" : habitInp.title}
           {...(!isEdit && { disabled: true })}
-          onChange={() => { setHabitChanged(true) }} />
+          onChange={handleChange} />
 
         <ButtonGroup>
           <Button variant="secondary" onClick={handleSave}><MdSaveAlt /> save</Button>
@@ -255,8 +270,8 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
             ><RiDeleteBin6Line /> delete</Dropdown.Item>}
           </DropdownButton>
         </ButtonGroup>
-
       </InputGroup>
+
       <div className="d-flex">
         <div className="d-flex-column w-50">
           <InputGroup className="w-100">
@@ -327,15 +342,31 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
               {habitInp.bestStreak ? habitInp.bestStreak : "0"}
             </InputGroup.Text>
           </InputGroup>}
+          <InputGroup className="w-100">
+            <InputGroup.Text className="text-center" id="basic-addon1" style={{ 'width': '50%' }}>Color:</InputGroup.Text>
+
+            <OverlayTrigger placement="right" overlay={popover} show={showColorPicker}>
+              <Button onClick={() => setShowColorPicker(!showColorPicker)} style={{ "backgroundColor": habitInp.color, 'width': '25%' }}>
+              </Button>
+            </OverlayTrigger>
+          </InputGroup>
         </div>
         <FormControl {...(!isEdit && { disabled: true })} as="textarea" aria-label="textarea"
-          style={{ 'resize': 'none', 'height': '80%', 'boxSizing': 'border-box', 'width': '50%' }}
+          style={{ 'resize': 'none', 'height': '80%', 'boxSizing': 'border-box', 'width': '40%' }}
           name="content"
-          className="ms-2"
+          className="ms-2 p-1"
           value={habitInp.content === null ? "" : habitInp.content}
-          onChange={() => { setHabitChanged(true) }}
+          onChange={handleChange}
         />
       </div>
+      <div className="d-flex justify-content-center ">
+        <Button onClick={() => setCalendarModalState(true)}> View in a calendar</Button>
+      </div>
+      <CalendarModal
+        calendarModalState={calendarModalState}
+        setCalendarModalState={setCalendarModalState}
+        habitInp={habitInp}
+      />
       <CustomHabitModal
         customHabitModalState={customHabitModalState}
         setCustomHabitModalState={setCustomHabitModalState}

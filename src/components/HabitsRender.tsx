@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import HabitsCreator from './HabitsCreator'
 import HabitsList from './HabitsList'
 import { accessObject, Habit } from './types';
+
 interface Props {
     habitsFetched: boolean;
     setHabitsFetched: React.Dispatch<React.SetStateAction<boolean>>;
@@ -14,6 +15,7 @@ interface Props {
     podType: string;
     defFolder: string | null;
 }
+
 const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsArray, storagePref, prefFileLocation,
     publicTypeIndexUrl, podType, defFolder }: Props) => {
     const [viewerStatus, setViewerStatus] = useState<boolean>(false);
@@ -30,7 +32,8 @@ const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsA
     const [habitDoSave, setHabitDoSave] = useState<boolean>(false);
     const [habitInp, setHabitInp] = useState<Habit>({
         id: null, title: "", content: "", startDate: null, lastCheckInDate: null, recurrence: "daily", bestStreak: null,
-        currentStreak: null, stat: null, category: "", url: "", access: null, prevBestStreak: null, prevLastCheckIn: null
+        currentStreak: null, stat: null, category: "", url: "", access: null, prevBestStreak: null, prevLastCheckIn: null,
+        checkInList: null, color: "#3e619b"
     });
     const [currentView, setCurrentView] = useState<string>("today");
 
@@ -100,8 +103,6 @@ const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsA
                         setCreatorStatus={setCreatorStatus}
                         habitInp={habitInp}
                         setHabitInp={setHabitInp}
-                        arrOfChanges={arrOfChanges}
-                        setArrOfChanges={setArrOfChanges}
                         viewerStatus={viewerStatus}
                         setViewerStatus={setViewerStatus}
                         isEdit={isEdit}

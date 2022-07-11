@@ -1,8 +1,7 @@
-import { getStringNoLocale, ThingPersisted } from "@inrupt/solid-client";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
-import { Habit, returnCheckIn, withCategory } from "../components/types";
+import { Habit, returnCheckIn } from "../components/types";
 import {
-    isSameDay, isSameWeek, isSameMonth, isSameYear, differenceInCalendarDays, getDay,
+    isSameDay, isSameWeek, isSameMonth, isSameYear, differenceInCalendarDays, getDay, format,
     differenceInCalendarWeeks, differenceInCalendarMonths, differenceInCalendarYears, differenceInWeeks, differenceInMonths
 } from 'date-fns';
 import React from "react";
@@ -498,5 +497,19 @@ export const filterByAccess = <T extends { category: string | null; access: Reco
 
         default:
             return [];
+    }
+}
+
+export const checkInsToObj = (habit: Habit): { title: string; date: string; backgroundColor: string; }[] => {
+    if (habit.checkInList) {
+        let arrToRet: { title: string; date: string; backgroundColor: string; }[] = [];
+        habit.checkInList.forEach((checkIn) => {
+            let dateVal = format(checkIn, "yyyy-MM-dd");
+            arrToRet.push({ title: `${habit.title}`, date: dateVal, backgroundColor: habit.color });
+        });
+        return arrToRet;
+    }
+    else {
+        return [];
     }
 }

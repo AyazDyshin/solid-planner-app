@@ -27,6 +27,7 @@ export interface Habit {
   category: string | null;
   access: Record<string, AccessModes> | null;
   checkInList: Date[] | null;
+  color: string;
   shareList?: Record<string, AccessModes>;
   custom?: number[] | number | null;
 }

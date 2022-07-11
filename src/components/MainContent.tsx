@@ -2,13 +2,15 @@ import { useEffect, useState } from "react";
 import Navbar from "./Navbar";
 import ContentToRender from "./ContentToRender";
 import Test from "./Test";
-import { isWacOrAcp } from "../services/access";
+import { checkPermissions, isWacOrAcp } from "../services/access";
 import { useSession } from "@inrupt/solid-ui-react";
 import { Spinner } from "react-bootstrap";
 import { recordDefaultFolder } from "../services/SolidPod";
 import { Habit, Note } from "./types";
 import { getDefaultFolder, getPrefLink, getPublicTypeIndexUrl, getStoragePref } from "../services/podGetters";
 import NoPermissions from "./NoPermissions";
+import TestCalendar from "./TestCalendar";
+import ColorPickerTest from "./ColorPickerTest";
 
 // This is the root component that first renders NavBar and then other content
 // Passes active and setActive hooks, which represent the currently clicked tab
@@ -37,7 +39,6 @@ const MainContent = () => {
   const [podType, setPodType] = useState<string>("");
   const [defFolder, setDefFolder] = useState<string | null>(null);
   useEffect(() => {
-    console.log("we are here");
     let check = async () => {
       setIsLoading(true);
 
@@ -59,8 +60,8 @@ const MainContent = () => {
       }
       defFolderUpd = await getDefaultFolder(webId, fetch, updPrefFileLocation);
       setDefFolder(defFolderUpd);
-      //  let result = await checkPermissions(webId, fetch, updStoragePref, updPodType);
-      setPermissionStatus(true);
+      let result = await checkPermissions(webId, fetch, updStoragePref, updPodType);
+      setPermissionStatus(result);
       setIsLoading(false);
     }
     check();
@@ -78,6 +79,9 @@ const MainContent = () => {
     if (permissionStatus) {
       return (
         <div>
+          <Test />
+          {/* <TestCalendar /> */}
+          {/* <ColorPickerTest /> */}
           <Navbar
             creatorStatus={creatorStatus}
             setCreatorStatus={setCreatorStatus}

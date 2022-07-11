@@ -1,6 +1,6 @@
 import { useSession } from "@inrupt/solid-ui-react";
 import { useState } from "react";
-import { Modal, Button, Form, FormControl, InputGroup } from "react-bootstrap";
+import { Modal, Button, FormControl, InputGroup } from "react-bootstrap";
 import { modifyWebId } from "../services/helpers";
 
 interface Props {
@@ -17,7 +17,7 @@ const FolderPickerModal = ({ modalState, setModalState, defFolderUrlToUp, setDef
     const { webId } = session.info;
     const [input, setInput] = useState<string>("");
     const urlToShow = modifyWebId(webId ?? "Error, no webId");
-    
+
     return (
         <Modal show={modalState}>
             <Modal.Header closeButton onClick={() => { setModalState(false) }}>

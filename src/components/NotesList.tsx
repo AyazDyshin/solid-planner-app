@@ -55,10 +55,8 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, notes
 
 
   const handleCreate = () => {
-
     setViewerStatus(false);
     setCreatorStatus(true);
-
   }
 
   const handleDelete = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, id: number) => {

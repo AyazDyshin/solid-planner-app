@@ -118,8 +118,6 @@ const NotesHabitsRender = ({ active, viewerStatus, setViewerStatus, creatorStatu
                         setDoNoteSave={setDoNoteSave}
                         NoteInp={NoteInp}
                         setNoteInp={setNoteInp}
-                        arrOfChanges={arrOfChanges}
-                        setArrOfChanges={setArrOfChanges}
                     />
                     }
                 </div>

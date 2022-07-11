@@ -1,6 +1,6 @@
 import { CombinedDataProvider, useSession, Image, Text, useDataset } from '@inrupt/solid-ui-react';
 import { Button, Form } from 'react-bootstrap';
-import { Note } from './types';
+import { Habit, Note } from './types';
 import { useEffect, useState } from 'react';
 import {
   buildThing, createContainerInContainer, createSolidDataset, createThing, getContainedResourceUrlAll, getDatetime,
@@ -14,8 +14,7 @@ import { first } from 'lodash';
 import { schema, space, vcard } from 'rdf-namespaces';
 import { pim } from '@inrupt/solid-client/dist/constants';
 import {
-  deleteCheckIn,
-  fetchContacts, getAllCheckIns, saveCheckIn, thingToNote
+  saveCheckIn, thingToNote
 } from '../services/SolidPod';
 import { access } from "@inrupt/solid-client";
 import { object, updated } from 'rdf-namespaces/dist/as';
@@ -30,8 +29,11 @@ import { ACP } from '@inrupt/vocab-solid';
 import { changeAccessAcp } from '../services/helperAccess';
 import { fdatasync } from 'fs';
 import { getResourceInfoWithAcr, getSolidDatasetWithAcr, WithAccessibleAcr } from '@inrupt/solid-client/dist/acp/acp';
-import { getIdPart } from '../services/helpers';
-
+import { getIdPart, checkInsToObj, setStreaks, getHabitsToday } from '../services/helpers';
+import {
+  isSameDay, isSameWeek, isSameMonth, isSameYear, differenceInCalendarDays, getDay, format,
+  differenceInCalendarWeeks, differenceInCalendarMonths, differenceInCalendarYears, differenceInWeeks, differenceInMonths
+} from 'date-fns';
 
 const Test = () => {
   const { session, fetch } = useSession();
@@ -41,6 +43,24 @@ const Test = () => {
   const [stat, setStat] = useState<string | null>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const gets = async () => {
+
+    let prevDate = new Date();
+    prevDate.setDate(10);
+    let today = new Date();
+    let b = differenceInCalendarDays(today, prevDate);
+    console.log(b);
+    // let habToTest: Habit = {
+    //   id: null, title: "biba", content: null, startDate: null, lastCheckInDate: null, recurrence: "daily", bestStreak: null,
+    //   currentStreak: null, stat: true, category: null, url: null, access: null, prevBestStreak: null, prevLastCheckIn: null,
+    //   checkInList: null, color: "#3e619b"
+    // }
+    // let b = setStreaks(habToTest);
+    // b.lastCheckInDate = prevDate;
+    // let c = getHabitsToday([b]);
+    // c[0].stat = true;
+    // let d = setStreaks(c[0]);
+    // console.log(d);
+
     //const socket = new WebSocket("wss://inrtester2.inrupt.net/SolidPlannerApp/");
     //console.log(socket);
     //  await createContainerAt("https://pod.inrupt.com/podsptester/toTest/", { fetch: fetch });
@@ -62,9 +82,7 @@ const Test = () => {
     // let thing = getThing(b, "https://inrtester2.inrupt.net/SolidPlannerApp/notes/1656934556864.ttl");
     // let note = thingToNote(thing, webId ?? "", fetch, "inrtester2.inrupt.net/", "https://inrtester2.inrupt.net/settings/prefs.ttl", "wac");
     // console.log(note);
-    let be = new Date();
-    let bu = new Date();
-    bu.setFullYear(2000);
+
     //   await createContainerAt("https://inrtester2.inrupt.net/test2/", { fetch: fetch });
     //   let b = await getSolidDataset("https://inrtester2.inrupt.net/test2/", { fetch: fetch });
     //   let newDates = buildThing(createThing({ url: "https://inrtester2.inrupt.net/test2/upd.ttl" }))
@@ -78,18 +96,18 @@ const Test = () => {
     //   "wac", "https://inrtester2.inrupt.net/SolidPlannerApp/notes/12331312312313.ttl", bu);
     // await saveCheckIn(webId ?? "", fetch, "https://inrtester2.inrupt.net/", "https://inrtester2.inrupt.net/SolidPlannerApp/", "https://inrtester2.inrupt.net/settings/prefs.ttl",
     //   "wac", "https://inrtester2.inrupt.net/SolidPlannerApp/notes/12331312312313.ttl", be);
-    let check1 = await getAllCheckIns(webId ?? "", fetch, "https://inrtester2.inrupt.net/", "https://inrtester2.inrupt.net/SolidPlannerApp/", "https://inrtester2.inrupt.net/settings/prefs.ttl",
-      "wac", "https://inrtester2.inrupt.net/SolidPlannerApp/notes/12331312312313.ttl");
-    await deleteCheckIn(webId ?? "", fetch, "https://inrtester2.inrupt.net/", "https://inrtester2.inrupt.net/SolidPlannerApp/", "https://inrtester2.inrupt.net/settings/prefs.ttl",
-      "wac", "https://inrtester2.inrupt.net/SolidPlannerApp/notes/12331312312313.ttl", be);
-    let check2 = await getAllCheckIns(webId ?? "", fetch, "https://inrtester2.inrupt.net/", "https://inrtester2.inrupt.net/SolidPlannerApp/", "https://inrtester2.inrupt.net/settings/prefs.ttl",
-      "wac", "https://inrtester2.inrupt.net/SolidPlannerApp/notes/12331312312313.ttl");
-    console.log(check1);
-    console.log(check2);
+    //   let check1 = await getAllCheckIns(webId ?? "", fetch, "https://inrtester2.inrupt.net/", "https://inrtester2.inrupt.net/SolidPlannerApp/", "https://inrtester2.inrupt.net/settings/prefs.ttl",
+    //     "wac", "https://inrtester2.inrupt.net/SolidPlannerApp/notes/12331312312313.ttl");
+    //   await deleteCheckIn(webId ?? "", fetch, "https://inrtester2.inrupt.net/", "https://inrtester2.inrupt.net/SolidPlannerApp/", "https://inrtester2.inrupt.net/settings/prefs.ttl",
+    //     "wac", "https://inrtester2.inrupt.net/SolidPlannerApp/notes/12331312312313.ttl", be);
+    //   let check2 = await getAllCheckIns(webId ?? "", fetch, "https://inrtester2.inrupt.net/", "https://inrtester2.inrupt.net/SolidPlannerApp/", "https://inrtester2.inrupt.net/settings/prefs.ttl",
+    //     "wac", "https://inrtester2.inrupt.net/SolidPlannerApp/notes/12331312312313.ttl");
+    //   console.log(check1);
+    //   console.log(check2);
   }
 
 
- // gets();
+  gets();
 
 
   return (

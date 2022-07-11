@@ -79,7 +79,7 @@ const MainContent = () => {
     if (permissionStatus) {
       return (
         <div>
-          <Test />
+          {/* <Test /> */}
           {/* <TestCalendar /> */}
           {/* <ColorPickerTest /> */}
           <Navbar

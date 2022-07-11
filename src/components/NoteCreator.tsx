@@ -90,14 +90,6 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
         }
     }, [viewerStatus, noteToView, creatorStatus]);
 
-
-    // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     setNoteInp(prevState => ({ ...prevState, [e.target.name]: e.target.value }));
-    //     if (!arrOfChanges.includes(e.target.name)) {
-    //         setArrOfChanges((prevState) => ([...prevState, e.target.name]));
-    //     }
-    // };
-
     const handleSave = async () => {
         setIsEdit(false);
 
@@ -105,7 +97,12 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
             setViewerStatus(false);
             setCreatorStatus(false);
             let idToSave = Date.now() + Math.floor(Math.random() * 1000);
-            let newNote = { ...NoteInp, id: idToSave, access: { "private": { read: false, append: false, write: false } } }
+            let newNote = {
+                ...NoteInp, url: `${defFolder}notes/${idToSave}.ttl`, id: idToSave,
+                access: { "private": { read: false, append: false, write: false } }
+            }
+            // if (newNote.url === null) setNoteInp((prevState) => ({ ...prevState, url: `${defFolder}notes/${idToSave}.ttl` }));
+
             setNoteInp(newNote);
             setNotesArray((prevState) => ([...prevState, newNote]));
             setNewEntryCr(!newEntryCr);
@@ -154,11 +151,18 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
             updArr[index] = noteToUpd;
             setNotesArray(updArr);
             setNewEntryCr(!newEntryCr);
+            let newNote = NoteInp;
             setNoteInp({ id: null, title: "", content: "", category: "", url: "", access: null });
             if (noteChanged) {
-                await editNote(webId, fetch, NoteInp, storagePref, publicTypeIndexUrl);
+                setNoteChanged(false);
+                if (!newNote.url) {
+                    await saveNote(webId, fetch, newNote, storagePref, defFolder, prefFileLocation, podType);
+                }
+                else {
+                    await editNote(webId, fetch, newNote, storagePref, publicTypeIndexUrl);
+                }
             }
-            setNoteChanged(false);
+
         }
 
         if (Object.keys(accUpdObj).length !== 0) {
@@ -195,7 +199,8 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
         if (!NoteInp) {
             throw new Error("Error, note to view wasn't provided");
         }
-        await deleteEntry(webId ?? "", fetch, NoteInp.id!, "note", storagePref, publicTypeIndexUrl);
+        //handle
+        await deleteEntry(webId ?? "", fetch, NoteInp.url!, "note", storagePref, publicTypeIndexUrl);
     }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

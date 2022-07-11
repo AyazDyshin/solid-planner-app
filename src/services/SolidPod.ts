@@ -363,45 +363,44 @@ export const checkFolderExistence = async (webId: string, fetch: fetcher, storag
   return dataSet;
 }
 
-export const saveCheckIn = async (webId: string, fetch: fetcher, storagePref: string,
-  defFolder: string | null, prefFileLocation: string, podType: string, habitUrl: string, dateToSave: Date) => {
-  const checkInsFolder = `${defFolder}checkIns/`;
-  let dataSet = await checkFolderExistence(webId, fetch, storagePref, prefFileLocation, podType, checkInsFolder);
-  let entryId = getIdPart(habitUrl);
-  const checkInUrl = `${checkInsFolder}${entryId}`;
-  let allUrl = getContainedResourceUrlAll(dataSet);
-  if (allUrl.includes(checkInUrl)) {
-    let newDs = await getSolidDataset(checkInUrl, { fetch: fetch });
-    let thing = getThing(newDs, checkInUrl);
-    //handle
-    thing = addDate(thing!, voc.checkInDate, dateToSave);
-    newDs = setThing(newDs, thing!);
-    await saveSolidDatasetAt(checkInUrl, newDs, { fetch: fetch });
-  }
-  else {
-    let newDatesList = buildThing(createThing({ url: checkInUrl }))
-      .addUrl(RDF.type, voc.DatesList)
-      .addDate(voc.checkInDate, dateToSave)
-      .build();
-    dataSet = setThing(dataSet, newDatesList);
-    await saveSolidDatasetAt(checkInUrl, dataSet, { fetch: fetch });
-    if (podType === "wac") {
-      await initializeAcl(checkInUrl, fetch);
-    };
-    await setPubAccess(webId, { read: false, append: false, write: false }, checkInUrl, fetch, storagePref,
-      prefFileLocation, podType);
-  }
-}
+// export const saveCheckIn = async (webId: string, fetch: fetcher, storagePref: string,
+//   defFolder: string | null, prefFileLocation: string, podType: string, habitUrl: string, dateToSave: Date) => {
+//   const checkInsFolder = `${defFolder}checkIns/`;
+//   let dataSet = await checkFolderExistence(webId, fetch, storagePref, prefFileLocation, podType, checkInsFolder);
+//   let entryId = getIdPart(habitUrl);
+//   const checkInUrl = `${checkInsFolder}${entryId}`;
+//   let allUrl = getContainedResourceUrlAll(dataSet);
+//   if (allUrl.includes(checkInUrl)) {
+//     let newDs = await getSolidDataset(checkInUrl, { fetch: fetch });
+//     let thing = getThing(newDs, checkInUrl);
+//     //handle
+//     thing = addDate(thing!, voc.checkInDate, dateToSave);
+//     newDs = setThing(newDs, thing!);
+//     await saveSolidDatasetAt(checkInUrl, newDs, { fetch: fetch });
+//   }
+//   else {
+//     let newDatesList = buildThing(createThing({ url: checkInUrl }))
+//       .addUrl(RDF.type, voc.DatesList)
+//       .addDate(voc.checkInDate, dateToSave)
+//       .build();
+//     dataSet = setThing(dataSet, newDatesList);
+//     await saveSolidDatasetAt(checkInUrl, dataSet, { fetch: fetch });
+//     if (podType === "wac") {
+//       await initializeAcl(checkInUrl, fetch);
+//     };
+//     await setPubAccess(webId, { read: false, append: false, write: false }, checkInUrl, fetch, storagePref,
+//       prefFileLocation, podType);
+//   }
+// }
 
 export const saveNote = async (webId: string, fetch: fetcher, note: Note, storagePref: string,
   defFolder: string | null, prefFileLocation: string, podType: string) => {
   const notesFolder = `${defFolder}notes/`;
   let dataSet = await checkFolderExistence(webId, fetch, storagePref, prefFileLocation, podType, notesFolder);
   const id = note.id === null ? Date.now() + Math.floor(Math.random() * 1000) : note.id;
-  const noteUrl = `${notesFolder}${id}.ttl`;
   const titleUpd = note.title === null ? "" : note.title;
   const contentUpd = note.content === null ? "" : note.content;
-  let newNote = buildThing(createThing({ url: noteUrl }))
+  let newNote = buildThing(createThing({ url: note.url }))
     .addUrl(RDF.type, schema.TextDigitalDocument)
     .addStringNoLocale(DCTERMS.title, titleUpd)
     .addStringNoLocale(schema.text, contentUpd)
@@ -410,11 +409,11 @@ export const saveNote = async (webId: string, fetch: fetcher, note: Note, storag
   if (note.category) newNote = addStringNoLocale(newNote, otherV.category, note.category);
 
   dataSet = setThing(dataSet, newNote);
-  await saveSolidDatasetAt(noteUrl, dataSet, { fetch: fetch });
+  await saveSolidDatasetAt(note.url, dataSet, { fetch: fetch });
   if (podType === "wac") {
-    await initializeAcl(noteUrl, fetch);
+    await initializeAcl(note.url, fetch);
   };
-  await setPubAccess(webId, { read: false, append: false, write: false }, noteUrl, fetch, storagePref,
+  await setPubAccess(webId, { read: false, append: false, write: false }, note.url, fetch, storagePref,
     prefFileLocation, podType);
 }
 
@@ -528,29 +527,28 @@ export const editHabit = async (webId: string, fetch: fetcher, habitToSave: Habi
     }
     if (isContainer(data)) {
       let allNotes = getContainedResourceUrlAll(data);
-      let updArr = await Promise.all(allNotes.map(async (url) => {
+      if (allNotes.includes(habitToSave.url!)) {
         let newDs
         try {
-          newDs = await getSolidDataset(url, { fetch: fetch });
+          newDs = await getSolidDataset(habitToSave.url!, { fetch: fetch });
         }
         catch (error) {
           let message = 'Unknown Error';
           if (error instanceof Error) message = error.message;
-          throw new Error(`Error when fetching dataset url: ${url} error: ${message}`);
+          throw new Error(`Error when fetching dataset url: ${habitToSave.url!} error: ${message}`);
         }
-        let newThing = getThing(newDs, url);
+        let newThing = getThing(newDs, habitToSave.url!);
         if (newThing) {
           let thingId = getInteger(newThing, schema.identifier);
           if (thingId === habitToSave.id) {
             newThing = setHabitThing(habitToSave, newThing);
             //handle?
             let updDataSet = setThing(newDs, newThing!);
-            const savedDataSet = await saveSolidDatasetAt(url, updDataSet,
+            const savedDataSet = await saveSolidDatasetAt(habitToSave.url!, updDataSet,
               { fetch: fetch });
           }
         }
-      }));
-      return updArr;
+      }
     }
     else {
       let newThingArr = getThingAll(data);
@@ -572,22 +570,28 @@ export const editNote = async (webId: string, fetch: fetcher, note: Note, storag
   publicTypeIndexUrl: string) => {
   let urlsArr = await getAllUrlFromPublicIndex(webId, fetch, "note", storagePref, publicTypeIndexUrl);
   let updUrlsArr = await Promise.all(urlsArr.map(async (url) => {
-    //handle?
-    let data = await getSolidDataset(url, { fetch: fetch });
-
+    let data: any;
+    try {
+      data = await getSolidDataset(url, { fetch: fetch });
+    }
+    catch (error) {
+      let message = 'Unknown Error';
+      if (error instanceof Error) message = error.message;
+      throw new Error(`Error when fetching dataset url: ${url} error: ${message}`);
+    }
     if (isContainer(data)) {
       let allNotes = getContainedResourceUrlAll(data);
-      let updArr = await Promise.all(allNotes.map(async (url) => {
+      if (allNotes.includes(note.url)) {
         let newDs;
         try {
-          newDs = await getSolidDataset(url, { fetch: fetch });
+          newDs = await getSolidDataset(note.url, { fetch: fetch });
         }
         catch (error) {
           let message = 'Unknown Error';
           if (error instanceof Error) message = error.message;
-          throw new Error(`Error when fetching dataset url: ${url} error: ${message}`);
+          throw new Error(`Error when fetching dataset url: ${note.url} error: ${message}`);
         }
-        let newThing = getThing(newDs, url);
+        let newThing = getThing(newDs, note.url);
         if (newThing) {
           let thingId = getInteger(newThing, schema.identifier);
           if (thingId === note.id) {
@@ -603,12 +607,14 @@ export const editNote = async (webId: string, fetch: fetcher, note: Note, storag
 
             }
             let updDataSet = setThing(newDs, newThing!);
-            const savedDataSet = await saveSolidDatasetAt(url, updDataSet,
+            const savedDataSet = await saveSolidDatasetAt(note.url, updDataSet,
               { fetch: fetch });
           }
         }
-      }));
-      return updArr;
+      }
+      else {
+        throw new Error(`Error when trying to edit note, url: ${note.url} doesn't exist in POD`);
+      }
     }
     else {
       let newThingArr = getThingAll(data);
@@ -637,44 +643,22 @@ export const editNote = async (webId: string, fetch: fetcher, note: Note, storag
   }));
 }
 
-export const deleteEntry = async (webId: string, fetch: fetcher, id: number, type: string, storagePref: string,
+export const deleteEntry = async (webId: string, fetch: fetcher, urlToDelete: string, type: string, storagePref: string,
   publicTypeIndexUrl: string) => {
-  console.log("this is id to del");
-  console.log(id);
+  const constructUrlToDelte = `${storagePref}`
   let urlsArr = await getAllUrlFromPublicIndex(webId, fetch, type, storagePref, publicTypeIndexUrl);
   let updUrlsArr = await Promise.all(urlsArr.map(async (url) => {
-    //handle??
     let data = await getSolidDataset(url, { fetch: fetch });
     if (isContainer(data)) {
       let allNotes = getContainedResourceUrlAll(data);
-      let updArr = await Promise.all(allNotes.map(async (url) => {
-        let newDs;
-        try {
-          newDs = await getSolidDataset(url, { fetch: fetch });
-        }
-        catch (error) {
-          let message = 'Unknown Error';
-          if (error instanceof Error) message = error.message;
-          throw new Error(`Error when fetching dataset url: ${url} error: ${message}`);
-        }
-        let newThing = getThing(newDs, url);
-        if (newThing) {
-          let thingId = getInteger(newThing, schema.identifier);
-          if (thingId === id) {
-            console.log("we are deleting!!1")
-            await deleteSolidDataset(newDs, { fetch: fetch });
-          }
-        }
-      }));
-      return updArr;
+      if (allNotes.includes(urlToDelete)) await deleteSolidDataset(urlToDelete, { fetch: fetch });
+      return url;
     }
     else {
       let newThingArr = getThingAll(data);
       if (newThingArr) {
         newThingArr.forEach(async (newThing) => {
-          let thingId = getInteger(newThing, schema.identifier);
-          if (thingId === id) {
-            console.log("we are deleting!!1");
+          if (newThing.url === urlToDelete) {
             let newData = removeThing(data, newThing);
             await saveSolidDatasetAt(url, newData, { fetch: fetch });
           }

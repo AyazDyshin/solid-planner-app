@@ -107,9 +107,11 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
     let date = new Date();
     let idToSave = Date.now() + Math.floor(Math.random() * 1000);
     let newHabit = {
-      ...habitInp, id: idToSave, startDate: date,
+      ...habitInp, id: idToSave, startDate: date, url: `${defFolder}habits/${idToSave}.ttl`,
       access: { "private": { read: false, append: false, write: false } }
     }
+    // if (newHabit.url === null) newHabit = { ...newHabit, url: `${defFolder}habits/${idToSave}.ttl` }
+
     setHabitInp(newHabit);
     setHabitsArray((prevState) => ([...prevState, newHabit]));
     setNewEntryCr(!newEntryCr);
@@ -177,15 +179,22 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
       updArr[index] = habitToUpd;
       setHabitsArray(updArr);
       setNewEntryCr(!newEntryCr);
+      let newHabit = habitInp;
       setHabitInp({
         id: null, title: null, content: null, startDate: null, lastCheckInDate: null, recurrence: "daily", bestStreak: null,
         currentStreak: null, stat: false, category: null, url: null, access: null, prevBestStreak: null, prevLastCheckIn: null,
         checkInList: null, color: "#3e619b"
       });
-      setHabitChanged(false);
       if (habitChanged) {
-        await editHabit(webId, fetch, habitInp, storagePref, defFolder, prefFileLocation, publicTypeIndexUrl, podType);
+        setHabitChanged(false);
+        if (!newHabit.url) {
+          await saveHabit(webId, fetch, newHabit, storagePref, defFolder, prefFileLocation, podType);
+        }
+        else {
+          await editHabit(webId, fetch, newHabit, storagePref, defFolder, prefFileLocation, publicTypeIndexUrl, podType);
+        }
       }
+
     }
     if (Object.keys(accUpdObj).length !== 0) {
       if (accUpdObj["public"]) {
@@ -225,7 +234,8 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
       throw new Error("error: provided habit to delete, doesn't have id");
 
     }
-    await deleteEntry(webId, fetch, habitInp.id, "habit", storagePref, publicTypeIndexUrl);
+    //handle
+    await deleteEntry(webId, fetch, habitInp.url!, "habit", storagePref, publicTypeIndexUrl);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

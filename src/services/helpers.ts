@@ -70,7 +70,7 @@ const setStreaksDefaultCases = (habit: Habit): Habit => {
         return habit;
     }
     else {
-        if (functionToUse(today, habit.lastCheckInDate) > 0) {
+        if (functionToUse(today, habit.lastCheckInDate) > 1) {
             habit.prevLastCheckIn = habit.lastCheckInDate;
             habit.lastCheckInDate = today;
             habit.prevBestStreak = habit.bestStreak;

@@ -43,12 +43,12 @@ const Test = () => {
   const [stat, setStat] = useState<string | null>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const gets = async () => {
-
     let prevDate = new Date();
     prevDate.setDate(10);
     let today = new Date();
     let b = differenceInCalendarDays(today, prevDate);
     console.log(b);
+
     // let habToTest: Habit = {
     //   id: null, title: "biba", content: null, startDate: null, lastCheckInDate: null, recurrence: "daily", bestStreak: null,
     //   currentStreak: null, stat: true, category: null, url: null, access: null, prevBestStreak: null, prevLastCheckIn: null,

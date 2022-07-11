@@ -651,7 +651,12 @@ export const deleteEntry = async (webId: string, fetch: fetcher, urlToDelete: st
     let data = await getSolidDataset(url, { fetch: fetch });
     if (isContainer(data)) {
       let allNotes = getContainedResourceUrlAll(data);
-      if (allNotes.includes(urlToDelete)) await deleteSolidDataset(urlToDelete, { fetch: fetch });
+      if (allNotes.includes(urlToDelete)) {
+        await deleteSolidDataset(urlToDelete, { fetch: fetch });
+      }
+      else {
+        throw new Error(`Error when trying to edit note, url: ${urlToDelete} doesn't exist in POD`);
+      }
       return url;
     }
     else {

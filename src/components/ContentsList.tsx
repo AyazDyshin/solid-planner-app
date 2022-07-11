@@ -54,13 +54,15 @@ interface Props {
     publicTypeIndexUrl: string;
     prefFileLocation: string;
     podType: string;
+    noteUpdInProgress: boolean;
+    setNoteUpdInProgress: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, setNewEntryCr, storagePref,
     noteToView, setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, categoryArray, setCategoryArray, doNoteSave,
     setDoNoteSave, NoteInp, setNoteInp, arrOfChanges, setArrOfChanges, agentsToUpd, setAgentsToUpd, notesArray, setNotesArray,
     isLoadingContents, setIsLoadingContents, publicAccess, accUpdObj, setAccUpdObj, notesFetched, setNotesFetched,
-    publicTypeIndexUrl, prefFileLocation, podType
+    publicTypeIndexUrl, prefFileLocation, podType, noteUpdInProgress, setNoteUpdInProgress
 }: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
@@ -128,6 +130,8 @@ const ContentsList = ({ creatorStatus, setCreatorStatus, active, newEntryCr, set
         else {
             return (
                 <NotesList
+                    noteUpdInProgress={noteUpdInProgress}
+                    setNoteUpdInProgress={setNoteUpdInProgress}
                     publicTypeIndexUrl={publicTypeIndexUrl}
                     storagePref={storagePref}
                     newEntryCr={newEntryCr}

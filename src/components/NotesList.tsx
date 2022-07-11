@@ -36,11 +36,15 @@ interface Props {
   setNewEntryCr: React.Dispatch<React.SetStateAction<boolean>>;
   storagePref: string;
   publicTypeIndexUrl: string;
+  noteUpdInProgress: boolean;
+  setNoteUpdInProgress: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, notesToShow, setNotesToShow, storagePref,
   viewerStatus, setViewerStatus, setCreatorStatus, isEdit, setIsEdit, categoryArray, setCategoryArray, publicTypeIndexUrl,
-  setCurrentCategory, currentCategory, setCurrentAccess, currentAccess, newEntryCr, setNewEntryCr }: Props) => {
+  setCurrentCategory, currentCategory, setCurrentAccess, currentAccess, newEntryCr, setNewEntryCr,
+  noteUpdInProgress, setNoteUpdInProgress
+}: Props) => {
 
   const { session, fetch } = useSession();
   const { webId } = session.info;
@@ -49,24 +53,39 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, notes
   }
   const [activeNote, setActiveNote] = useState<number | null>(null);
   const [saveModalState, setSaveModalState] = useState<boolean>(false);
-
+  const [performDelete, setPerformDelete] = useState<boolean>(false);
+  const [urlToDelete, setUrlToDelete] = useState<string | null>(null);
   const accessArray = ["public", "private", "shared"];
-
-
 
   const handleCreate = () => {
     setViewerStatus(false);
     setCreatorStatus(true);
   }
+  useEffect(() => {
+    const deleteNote = async () => {
+      if (urlToDelete) {
+        await deleteEntry(webId, fetch, urlToDelete, "note", storagePref, publicTypeIndexUrl);
+        setPerformDelete(false);
+        setUrlToDelete(null);
+      }
+      else {
+        throw new Error("note your are trying to delete doesn't exist");
+      }
+    }
+    if (performDelete && !noteUpdInProgress) {
+      deleteNote();
+    }
+  }, [noteUpdInProgress,performDelete])
 
-  const handleDelete = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, id: number) => {
+  const handleDelete = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, url: string) => {
     e.stopPropagation();
-    let updArr = notesArray.filter((note) => note.id !== id);
+    let updArr = notesArray.filter((note) => note.url !== url);
     setNotesArray(updArr);
     newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
     setViewerStatus(false);
     setCreatorStatus(false);
-    await deleteEntry(webId, fetch, id, "note", storagePref, publicTypeIndexUrl);
+    setPerformDelete(true);
+    setUrlToDelete(url);
   }
 
   return (
@@ -196,7 +215,7 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, notes
                     <Button variant="outline-danger"
                       className="ms-auto me-2 px-1 py-1"
                       style={{ color: "red" }}
-                      onClick={(e) => { handleDelete(e, note.id!) }}
+                      onClick={(e) => { handleDelete(e, note.url!) }}
                     ><RiDeleteBin6Line /></Button>
                   }
                 </a>

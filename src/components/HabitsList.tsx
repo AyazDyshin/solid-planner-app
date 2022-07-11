@@ -131,14 +131,14 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
     await editHabit(webId, fetch, updHabit, storagePref, defFolder, prefFileLocation, publicTypeIndexUrl, podType);
   };
 
-  const handleDelete = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, id: number) => {
+  const handleDelete = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, url: string) => {
     e.stopPropagation();
-    let updArr = habitsArray.filter((habit) => habit.id !== id);
+    let updArr = habitsArray.filter((habit) => habit.url !== url);
     setHabitsArray(updArr);
     newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
     setViewerStatus(false);
     setCreatorStatus(false);
-    await deleteEntry(webId, fetch, id, "habit", storagePref, publicTypeIndexUrl);
+    await deleteEntry(webId, fetch, url, "habit", storagePref, publicTypeIndexUrl);
   }
   if (!habitsFetched || isLoading) {
     return (
@@ -362,7 +362,7 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                           <Button variant="outline-danger"
                             className="px-1 py-1 ms-auto"
                             style={{ color: "red" }}
-                            onClick={(e) => { handleDelete(e, habit.id!) }}
+                            onClick={(e) => { handleDelete(e, habit.url!) }}
                           ><RiDeleteBin6Line /></Button>
                         }
                       </a>

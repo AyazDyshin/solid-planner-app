@@ -44,12 +44,14 @@ const NotesHabitsRender = ({ active, viewerStatus, setViewerStatus, creatorStatu
     const [publicAccess, setPublicAccess] = useState<accessObject>({ read: false, append: false, write: false });
     const [accUpdObj, setAccUpdObj] = useState<{ [x: string]: boolean; }>({});
     const [agentsToUpd, setAgentsToUpd] = useState<{ [x: string]: AccessModes; }>({});
-
+    const [noteUpdInProgress, setNoteUpdInProgress] = useState<boolean>(false);
     return (
         <div className="container-fluid pad">
             <div className="row h-100">
                 <div className="col h-100 border border-5 border-end-0 d-flex justify-content-center align-items-center p-0">
                     <ContentsList
+                        noteUpdInProgress={noteUpdInProgress}
+                        setNoteUpdInProgress={setNoteUpdInProgress}
                         podType={podType}
                         prefFileLocation={prefFileLocation}
                         publicTypeIndexUrl={publicTypeIndexUrl}
@@ -89,6 +91,8 @@ const NotesHabitsRender = ({ active, viewerStatus, setViewerStatus, creatorStatu
                 <div className="col h-100 border border-5">
 
                     {(viewerStatus || creatorStatus) && <NoteCreator
+                        noteUpdInProgress={noteUpdInProgress}
+                        setNoteUpdInProgress={setNoteUpdInProgress}
                         publicTypeIndexUrl={publicTypeIndexUrl}
                         podType={podType}
                         prefFileLocation={prefFileLocation}

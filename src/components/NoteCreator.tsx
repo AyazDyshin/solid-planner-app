@@ -49,6 +49,8 @@ interface Props {
     }>>;
     notesArray: Note[];
     setNotesArray: React.Dispatch<React.SetStateAction<Note[]>>;
+    noteUpdInProgress: boolean;
+    setNoteUpdInProgress: React.Dispatch<React.SetStateAction<boolean>>;
     storagePref: string;
     defFolder: string | null;
     prefFileLocation: string;
@@ -59,7 +61,7 @@ interface Props {
 const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFolder, podType, publicTypeIndexUrl,
     setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, prefFileLocation,
     setCreatorStatus, creatorStatus, categoryArray, setCategoryArray, doNoteSave, setDoNoteSave, NoteInp,
-    setNoteInp, accUpdObj, setAccUpdObj, agentsToUpd, setAgentsToUpd,
+    setNoteInp, accUpdObj, setAccUpdObj, agentsToUpd, setAgentsToUpd, noteUpdInProgress, setNoteUpdInProgress,
     publicAccess, setPublicAccess, notesArray, setNotesArray
 }: Props) => {
 
@@ -108,7 +110,9 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
             setNewEntryCr(!newEntryCr);
             setNoteInp({ id: null, title: "", content: "", category: "", url: "", access: null });
             setNoteChanged(false);
+            setNoteUpdInProgress(true);
             await saveNote(webId, fetch, newNote, storagePref, defFolder, prefFileLocation, podType);
+            setNoteUpdInProgress(false);
         }
         else if (viewerStatus && (noteChanged || Object.keys(accUpdObj).length !== 0)) {
             setViewerStatus(false);
@@ -156,10 +160,14 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
             if (noteChanged) {
                 setNoteChanged(false);
                 if (!newNote.url) {
+                    setNoteUpdInProgress(true);
                     await saveNote(webId, fetch, newNote, storagePref, defFolder, prefFileLocation, podType);
+                    setNoteUpdInProgress(false);
                 }
                 else {
+                    setNoteUpdInProgress(true);
                     await editNote(webId, fetch, newNote, storagePref, publicTypeIndexUrl);
+                    setNoteUpdInProgress(false);
                 }
             }
 

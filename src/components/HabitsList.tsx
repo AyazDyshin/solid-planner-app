@@ -42,11 +42,13 @@ interface Props {
   publicTypeIndexUrl: string;
   podType: string;
   defFolder: string | null;
+  habitUpdInProgress: boolean;
+  setHabitUpdInProgress: React.Dispatch<React.SetStateAction<boolean>>;
 }
 const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorStatus, habitsFetched, setHabitsFetched,
   habitsArray, setHabitsArray, isEdit, setIsEdit, habitToView, setHabitToView, newEntryCr, setNewEntryCr, storagePref,
   habitsToday, setHabitsToday, categoryArray, setCategoryArray, habitInp, setHabitInp, habitDoSave, setHabitDoSave, currentView,
-  setCurrentView, prefFileLocation, publicTypeIndexUrl, podType, defFolder
+  setCurrentView, prefFileLocation, publicTypeIndexUrl, podType, defFolder, habitUpdInProgress, setHabitUpdInProgress
 }: Props) => {
   const { session, fetch } = useSession();
   const { webId } = session.info;
@@ -62,6 +64,8 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
   const [currentStatus, setCurrentStatus] = useState<string | null>("undone");
   const [habitsToSave, setHabitsToSave] = useState<Habit[]>([]);
   const [objOfStates, setObjOfStates] = useState<{ [x: number]: boolean | null; }>({});
+  const [performDelete, setPerformDelete] = useState<boolean>(false);
+  const [urlToDelete, setUrlToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchHabits = async (otherId?: string) => {
@@ -121,6 +125,23 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
     fetchHabits();
 
   }, [newEntryCr, currentCategory, currentAccess, currentView, currentStatus]);
+
+  useEffect(() => {
+    const deleteNote = async () => {
+      if (urlToDelete) {
+        await deleteEntry(webId, fetch, urlToDelete, "note", storagePref, publicTypeIndexUrl);
+        setPerformDelete(false);
+        setUrlToDelete(null);
+      }
+      else {
+        throw new Error("note your are trying to delete doesn't exist");
+      }
+    }
+    if (performDelete && !habitUpdInProgress) {
+      deleteNote();
+    }
+  }, [habitUpdInProgress, performDelete]);
+
   const handleCreate = () => {
     setViewerStatus(false);
     setCreatorStatus(true);
@@ -138,7 +159,9 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
     newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
     setViewerStatus(false);
     setCreatorStatus(false);
-    await deleteEntry(webId, fetch, url, "habit", storagePref, publicTypeIndexUrl);
+    setPerformDelete(true);
+    setUrlToDelete(url);
+    // await deleteEntry(webId, fetch, url, "habit", storagePref, publicTypeIndexUrl);
   }
   if (!habitsFetched || isLoading) {
     return (

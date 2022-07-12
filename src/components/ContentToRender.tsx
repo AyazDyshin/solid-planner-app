@@ -1,7 +1,7 @@
 import { Contact } from "rdf-namespaces/dist/vcard";
 import ContactsRender from "./ContactsRender";
 import HabitsRender from "./HabitsRender";
-import NotesHabitsRender from "./NotesHabitsRender";
+import NotesRender from "./NotesRender";
 import { Habit, Note } from "./types";
 
 interface Props {
@@ -37,7 +37,7 @@ const ContentToRender = ({ active, viewerStatus, setViewerStatus, habitsFetched,
     switch (active) {
         case "notes":
             return (
-                <NotesHabitsRender
+                <NotesRender
                     publicTypeIndexUrl={publicTypeIndexUrl}
                     podType={podType}
                     prefFileLocation={prefFileLocation}

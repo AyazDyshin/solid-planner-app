@@ -36,13 +36,15 @@ const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsA
         checkInList: null, color: "#3e619b"
     });
     const [currentView, setCurrentView] = useState<string>("today");
-
+    const [habitUpdInProgress, setHabitUpdInProgress] = useState<boolean>(false);
 
     return (
         <div className="container-fluid pad">
             <div className="row h-100">
                 <div className="col h-100 border border-5 border-end-0 d-flex justify-content-center align-items-center p-0">
                     <HabitsList
+                        habitUpdInProgress={habitUpdInProgress}
+                        setHabitUpdInProgress={setHabitUpdInProgress}
                         defFolder={defFolder}
                         podType={podType}
                         publicTypeIndexUrl={publicTypeIndexUrl}
@@ -76,6 +78,8 @@ const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsA
                 </div>
                 <div className="col h-100 border border-5">
                     {(viewerStatus || creatorStatus) && <HabitsCreator
+                        habitUpdInProgress={habitUpdInProgress}
+                        setHabitUpdInProgress={setHabitUpdInProgress}
                         publicTypeIndexUrl={publicTypeIndexUrl}
                         podType={podType}
                         prefFileLocation={prefFileLocation}

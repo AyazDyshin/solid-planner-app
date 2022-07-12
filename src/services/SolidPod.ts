@@ -645,6 +645,7 @@ export const editNote = async (webId: string, fetch: fetcher, note: Note, storag
 
 export const deleteEntry = async (webId: string, fetch: fetcher, urlToDelete: string, type: string, storagePref: string,
   publicTypeIndexUrl: string) => {
+  console.log(`deleteting : ${urlToDelete}`);
   const constructUrlToDelte = `${storagePref}`
   let urlsArr = await getAllUrlFromPublicIndex(webId, fetch, type, storagePref, publicTypeIndexUrl);
   let updUrlsArr = await Promise.all(urlsArr.map(async (url) => {

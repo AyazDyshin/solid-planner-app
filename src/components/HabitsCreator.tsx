@@ -59,11 +59,14 @@ interface Props {
   prefFileLocation: string;
   podType: string;
   publicTypeIndexUrl: string;
+  habitUpdInProgress: boolean;
+  setHabitUpdInProgress: React.Dispatch<React.SetStateAction<boolean>>;
 }
 const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus, setCreatorStatus,
   viewerStatus, setViewerStatus, habitToView, setHabitToView, habitsArray, setHabitsArray, newEntryCr, setNewEntryCr,
   accUpdObj, setAccUpdObj, publicAccess, setPublicAccess, agentsToUpd, setAgentsToUpd, categoryArray, setCategoryArray,
-  habitDoSave, setHabitDoSave, currentView, setCurrentView, storagePref, defFolder, prefFileLocation, publicTypeIndexUrl, podType
+  habitDoSave, setHabitDoSave, currentView, setCurrentView, storagePref, defFolder, prefFileLocation, publicTypeIndexUrl, podType,
+  habitUpdInProgress, setHabitUpdInProgress
 }: Props) => {
   const { session, fetch } = useSession();
   const { webId } = session.info;
@@ -79,6 +82,8 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
   const [testCol, setTestCol] = useState<string>("red");
   const [showColorPicker, setShowColorPicker] = useState<boolean>(false);
   const [calendarModalState, setCalendarModalState] = useState<boolean>(false);
+  const [performDelete, setPerformDelete] = useState<boolean>(false);
+  const [urlToDelete, setUrlToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     if (habitChanged) {
@@ -101,6 +106,22 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
     }
   }, [viewerStatus, habitToView, creatorStatus, habitDoSave]);
 
+  useEffect(() => {
+    const deleteNote = async () => {
+      if (urlToDelete) {
+        await deleteEntry(webId, fetch, urlToDelete, "note", storagePref, publicTypeIndexUrl);
+        setPerformDelete(false);
+        setUrlToDelete(null);
+      }
+      else {
+        throw new Error("note your are trying to delete doesn't exist");
+      }
+    }
+    if (performDelete && !habitUpdInProgress) {
+      deleteNote();
+    }
+  }, [habitUpdInProgress, performDelete]);
+
   const saveHabitFromCreator = async () => {
     setViewerStatus(false);
     setCreatorStatus(false);
@@ -110,7 +131,6 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
       ...habitInp, id: idToSave, startDate: date, url: `${defFolder}habits/${idToSave}.ttl`,
       access: { "private": { read: false, append: false, write: false } }
     }
-    // if (newHabit.url === null) newHabit = { ...newHabit, url: `${defFolder}habits/${idToSave}.ttl` }
 
     setHabitInp(newHabit);
     setHabitsArray((prevState) => ([...prevState, newHabit]));
@@ -121,7 +141,9 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
       checkInList: null, color: "#3e619b"
     });
     setHabitChanged(false);
+    setHabitUpdInProgress(true);
     await saveHabit(webId, fetch, newHabit, storagePref, defFolder, prefFileLocation, podType);
+    setHabitUpdInProgress(false);
   }
   const getColor = (color: ColorResult) => {
     setShowColorPicker(!showColorPicker);
@@ -188,7 +210,9 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
       if (habitChanged) {
         setHabitChanged(false);
         if (!newHabit.url) {
+          setHabitUpdInProgress(true);
           await saveHabit(webId, fetch, newHabit, storagePref, defFolder, prefFileLocation, podType);
+          setHabitUpdInProgress(false);
         }
         else {
           await editHabit(webId, fetch, newHabit, storagePref, defFolder, prefFileLocation, publicTypeIndexUrl, podType);
@@ -235,6 +259,8 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
 
     }
     //handle
+    setPerformDelete(true);
+    setUrlToDelete(habitInp.url!);
     await deleteEntry(webId, fetch, habitInp.url!, "habit", storagePref, publicTypeIndexUrl);
   };
 

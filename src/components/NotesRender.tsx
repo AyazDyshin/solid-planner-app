@@ -1,10 +1,10 @@
-import { Thing } from "@inrupt/solid-client";
 import { useState } from "react";
 import "../styles.css";
 import { accessObject, Note } from "./types";
-import ContentsList from "./ContentsList";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import NoteCreator from "./NoteCreator";
+import NotesList from "./NotesList";
+
 interface Props {
     active: string;
     viewerStatus: boolean;
@@ -32,7 +32,7 @@ interface Props {
 // this is needed to update the left side view, ie list of entries existing in the user's pod
 // "creatorStatus" and "setCreatorStatus" are hooks to monitor if create button was pressed,
 // this is needed to render the respective creator component
-const NotesHabitsRender = ({ active, viewerStatus, setViewerStatus, creatorStatus, setCreatorStatus, isEdit, storagePref, defFolder,
+const NotesRender = ({ active, viewerStatus, setViewerStatus, creatorStatus, setCreatorStatus, isEdit, storagePref, defFolder,
     setIsEdit, notesArray, setNotesArray, isLoadingContents, setIsLoadingContents, notesFetched, setNotesFetched, podType,
     prefFileLocation, publicTypeIndexUrl }: Props) => {
     const [newEntryCr, setNewEntryCr] = useState<boolean>(false);
@@ -45,11 +45,12 @@ const NotesHabitsRender = ({ active, viewerStatus, setViewerStatus, creatorStatu
     const [accUpdObj, setAccUpdObj] = useState<{ [x: string]: boolean; }>({});
     const [agentsToUpd, setAgentsToUpd] = useState<{ [x: string]: AccessModes; }>({});
     const [noteUpdInProgress, setNoteUpdInProgress] = useState<boolean>(false);
+
     return (
         <div className="container-fluid pad">
             <div className="row h-100">
                 <div className="col h-100 border border-5 border-end-0 d-flex justify-content-center align-items-center p-0">
-                    <ContentsList
+                    <NotesList
                         noteUpdInProgress={noteUpdInProgress}
                         setNoteUpdInProgress={setNoteUpdInProgress}
                         podType={podType}
@@ -58,17 +59,8 @@ const NotesHabitsRender = ({ active, viewerStatus, setViewerStatus, creatorStatu
                         storagePref={storagePref}
                         notesFetched={notesFetched}
                         setNotesFetched={setNotesFetched}
-                        agentsToUpd={agentsToUpd}
-                        setAgentsToUpd={setAgentsToUpd}
-                        accUpdObj={accUpdObj}
-                        setAccUpdObj={setAccUpdObj}
-                        publicAccess={publicAccess}
-                        isLoadingContents={isLoadingContents}
-                        setIsLoadingContents={setIsLoadingContents}
                         notesArray={notesArray}
                         setNotesArray={setNotesArray}
-                        active={active}
-                        creatorStatus={creatorStatus}
                         setCreatorStatus={setCreatorStatus}
                         newEntryCr={newEntryCr}
                         setNewEntryCr={setNewEntryCr}
@@ -80,12 +72,6 @@ const NotesHabitsRender = ({ active, viewerStatus, setViewerStatus, creatorStatu
                         setIsEdit={setIsEdit}
                         categoryArray={categoryArray}
                         setCategoryArray={setCategoryArray}
-                        doNoteSave={doNoteSave}
-                        setDoNoteSave={setDoNoteSave}
-                        NoteInp={NoteInp}
-                        setNoteInp={setNoteInp}
-                        arrOfChanges={arrOfChanges}
-                        setArrOfChanges={setArrOfChanges}
                     />
                 </div>
                 <div className="col h-100 border border-5">
@@ -130,4 +116,4 @@ const NotesHabitsRender = ({ active, viewerStatus, setViewerStatus, creatorStatu
     );
 }
 
-export default NotesHabitsRender;
+export default NotesRender;

@@ -15,6 +15,7 @@ import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import SharedModal from "../modals/SharedModal";
 import { setPubAccess, shareWith } from "../services/access";
 import React from 'react';
+import DeleteModal from "../modals/DeleteModal";
 
 interface Props {
     newEntryCr: boolean;
@@ -75,8 +76,11 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
     const [sharedModalState, setSharedModalState] = useState<boolean>(false);
     const [contactsList, setContactsList] = useState<{ [x: string]: AccessModes; }>({});
     const [noteChanged, setNoteChanged] = useState<boolean>(false);
-    useEffect(() => {
+    const [performDelete, setPerformDelete] = useState<boolean>(false);
+    const [urlToDelete, setUrlToDelete] = useState<string | null>(null);
+    const [deleteModalState, setDeleteModalState] = useState<boolean>(false);
 
+    useEffect(() => {
         if (noteChanged) {
             handleSave();
         }
@@ -91,6 +95,25 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
             setIsEdit(true);
         }
     }, [viewerStatus, noteToView, creatorStatus]);
+
+    // useEffect(() => {
+    //     console.log("in creator");
+    //     console.log(performDelete);
+    //     console.log(noteUpdInProgress);
+    //     const deleteNote = async () => {
+    //         if (urlToDelete) {
+    //             await deleteEntry(webId, fetch, urlToDelete, "note", storagePref, publicTypeIndexUrl);
+    //             setPerformDelete(false);
+    //             setUrlToDelete(null);
+    //         }
+    //         else {
+    //             throw new Error("note your are trying to delete doesn't exist");
+    //         }
+    //     }
+    //     if (performDelete && !noteUpdInProgress) {
+    //         deleteNote();
+    //     }
+    // }, [noteUpdInProgress, performDelete])
 
     const handleSave = async () => {
         setIsEdit(false);
@@ -112,7 +135,9 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
             setNoteChanged(false);
             setNoteUpdInProgress(true);
             await saveNote(webId, fetch, newNote, storagePref, defFolder, prefFileLocation, podType);
+            //setTimeout(() => { setNoteUpdInProgress(false); }, 2000);
             setNoteUpdInProgress(false);
+            console.log("finish upd");
         }
         else if (viewerStatus && (noteChanged || Object.keys(accUpdObj).length !== 0)) {
             setViewerStatus(false);
@@ -122,7 +147,6 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
                     let newAccess: Record<string, AccessModes>;
                     if (!publicAccess.read && !publicAccess.append && !publicAccess.write) {
                         newAccess = { "private": publicAccess };
-
                     }
                     else {
                         newAccess = { "public": publicAccess };
@@ -165,9 +189,9 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
                     setNoteUpdInProgress(false);
                 }
                 else {
-                    setNoteUpdInProgress(true);
+                    //setNoteUpdInProgress(true);
                     await editNote(webId, fetch, newNote, storagePref, publicTypeIndexUrl);
-                    setNoteUpdInProgress(false);
+                    // setNoteUpdInProgress(false);
                 }
             }
 
@@ -198,17 +222,19 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
     }
 
     const handleDelete = async () => {
-        setIsEdit(false);
-        setViewerStatus(false);
-        setCreatorStatus(false);
-        const updArr = notesArray.filter((note) => note.id !== NoteInp.id);
-        setNotesArray(updArr);
-        newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
+        // setIsEdit(false);
+        // setViewerStatus(false);
+        // setCreatorStatus(false);
+        // const updArr = notesArray.filter((note) => note.url !== NoteInp.url);
+        // setNotesArray(updArr);
+        // newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
         if (!NoteInp) {
             throw new Error("Error, note to view wasn't provided");
         }
         //handle
-        await deleteEntry(webId ?? "", fetch, NoteInp.url!, "note", storagePref, publicTypeIndexUrl);
+        setUrlToDelete(NoteInp.url!);
+        setDeleteModalState(true);
+        // await deleteEntry(webId ?? "", fetch, NoteInp.url!, "note", storagePref, publicTypeIndexUrl);
     }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -252,6 +278,22 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
                 name="content"
                 value={NoteInp.content === null ? "" : NoteInp.content}
                 onChange={handleChange}
+            />
+            <DeleteModal
+                deleteModalState={deleteModalState}
+                setDeleteModalState={setDeleteModalState}
+                urlToDelete={urlToDelete}
+                setUrlToDelete={setUrlToDelete}
+                entryType={"note"}
+                storagePref={storagePref}
+                newEntryCr={newEntryCr}
+                setNewEntryCr={setNewEntryCr}
+                publicTypeIndexUrl={publicTypeIndexUrl}
+                noteUpdInProgress={noteUpdInProgress}
+                notesArray={notesArray}
+                setNotesArray={setNotesArray}
+                setViewerStatus={setViewerStatus}
+                setCreatorStatus={setCreatorStatus}
             />
             <CategoryModal
                 setEntryChanged={setNoteChanged}

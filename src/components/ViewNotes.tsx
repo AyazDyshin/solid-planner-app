@@ -24,6 +24,8 @@ const ViewNotes = ({ otherWebId, setOtherWebId, notesArray, setNotesArray, noteT
             <div className="d-flex">
                 <Button onClick={() => {
                     setIsLoading(true);
+                    setViewerStatus(false);
+                    setNoteToView(null);
                     setOtherWebId(null);
                 }}>Go Back</Button>
             </div>

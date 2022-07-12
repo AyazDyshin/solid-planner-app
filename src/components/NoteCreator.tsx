@@ -57,13 +57,20 @@ interface Props {
     prefFileLocation: string;
     podType: string;
     publicTypeIndexUrl: string;
+    contactsFdrStatus: boolean;
+    setContactsFdrStatus: React.Dispatch<React.SetStateAction<boolean>>;
+    contactsArr: (string | null)[][];
+    setContactsArr: React.Dispatch<React.SetStateAction<(string | null)[][]>>;
+    contactsFetched: boolean;
+    setContactsFetched: React.Dispatch<React.SetStateAction<boolean>>;
 }
 //component of creation and saving a note the user's pod
 const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFolder, podType, publicTypeIndexUrl,
     setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, prefFileLocation,
     setCreatorStatus, creatorStatus, categoryArray, setCategoryArray, doNoteSave, setDoNoteSave, NoteInp,
     setNoteInp, accUpdObj, setAccUpdObj, agentsToUpd, setAgentsToUpd, noteUpdInProgress, setNoteUpdInProgress,
-    publicAccess, setPublicAccess, notesArray, setNotesArray
+    publicAccess, setPublicAccess, notesArray, setNotesArray, contactsFdrStatus, setContactsFdrStatus,
+    contactsArr, setContactsArr, contactsFetched, setContactsFetched
 }: Props) => {
 
     const { session, fetch } = useSession();
@@ -277,6 +284,12 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
                 setCategoryArray={setCategoryArray}
             />
             <AccessModal
+                contactsArr={contactsArr}
+                setContactsArr={setContactsArr}
+                contactsFetched={contactsFetched}
+                setContactsFetched={setContactsFetched}
+                contactsFdrStatus={contactsFdrStatus}
+                setContactsFdrStatus={setContactsFdrStatus}
                 storagePref={storagePref}
                 agentsToUpd={agentsToUpd}
                 setAgentsToUpd={setAgentsToUpd}

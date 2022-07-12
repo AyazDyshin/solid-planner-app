@@ -36,13 +36,20 @@ interface Props {
         [x: string]: AccessModes;
     }>>;
     storagePref: string;
+    contactsFdrStatus: boolean;
+    setContactsFdrStatus: React.Dispatch<React.SetStateAction<boolean>>;
     habitInp?: Habit;
     setHabitInp?: React.Dispatch<React.SetStateAction<Habit>>;
+    contactsArr: (string | null)[][];
+    setContactsArr: React.Dispatch<React.SetStateAction<(string | null)[][]>>;
+    contactsFetched: boolean;
+    setContactsFetched: React.Dispatch<React.SetStateAction<boolean>>;
 }
 //a popup window to prompt user to set access type
 const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, setNoteInp, contactsList, setContactsList, accUpdObj,
-    setAccUpdObj, publicAccess, setPublicAccess, habitInp, setHabitInp, storagePref,
-    agentsToUpd, setAgentsToUpd }: Props) => {
+    setAccUpdObj, publicAccess, setPublicAccess, habitInp, setHabitInp, storagePref, contactsFdrStatus, setContactsFdrStatus,
+    agentsToUpd, setAgentsToUpd, contactsArr, setContactsArr, contactsFetched, setContactsFetched
+}: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
     if (!webId) {
@@ -84,10 +91,26 @@ const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, setNoteIn
             if (inputToUse.shareList) shList = inputToUse.shareList;
             else shList = {};
             setSharedList(shList);
-            let contactsStatus = await checkContacts(webId, fetch, storagePref);
-            setContactsStat(contactsStatus);
-            if (contactsStatus) {
-                const namesAndIds = await fetchContacts(webId, fetch, storagePref);
+            let namesAndIds: (string | null)[][] = [];
+            let contactsStatus = false;
+            if (!contactsFetched) {
+                console.log("in cont fetch");
+                contactsStatus = await checkContacts(webId, fetch, storagePref);
+                setContactsFdrStatus(contactsStatus);
+                if (contactsStatus) {
+                    namesAndIds = await fetchContacts(webId, fetch, storagePref);
+                    console.log(namesAndIds);
+                    setContactsArr(namesAndIds);
+                }
+            }
+            // 
+            if (contactsFdrStatus || contactsStatus) {
+                console.log("ehrherhe????11")
+                console.log(namesAndIds);
+                if (namesAndIds.length === 0) {
+                    console.log("ehrherhe????")
+                    namesAndIds = contactsArr;
+                }
                 let contObj: { [x: string]: string | null; } = {};
 
                 namesAndIds.map((pair) => {
@@ -183,7 +206,7 @@ const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, setNoteIn
                             </div>
                             <Collapse in={contactsOpen}>
                                 <div>
-                                    {contactsStat && <div>
+                                    {contactsFdrStatus && <div>
                                         {
                                             Object.entries(contactsList).map(([key, value], index) => {
                                                 return (
@@ -218,7 +241,7 @@ const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, setNoteIn
                                         }
                                     </div>}
                                     {
-                                        !contactsStat && <NoContacts />
+                                        !contactsFdrStatus && <NoContacts />
                                     }
                                 </div>
                             </Collapse>

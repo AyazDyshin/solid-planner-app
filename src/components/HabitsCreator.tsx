@@ -62,12 +62,19 @@ interface Props {
   publicTypeIndexUrl: string;
   habitUpdInProgress: boolean;
   setHabitUpdInProgress: React.Dispatch<React.SetStateAction<boolean>>;
+  contactsFdrStatus: boolean;
+  setContactsFdrStatus: React.Dispatch<React.SetStateAction<boolean>>;
+  contactsArr: (string | null)[][];
+  setContactsArr: React.Dispatch<React.SetStateAction<(string | null)[][]>>;
+  contactsFetched: boolean;
+  setContactsFetched: React.Dispatch<React.SetStateAction<boolean>>;
 }
 const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus, setCreatorStatus,
   viewerStatus, setViewerStatus, habitToView, setHabitToView, habitsArray, setHabitsArray, newEntryCr, setNewEntryCr,
   accUpdObj, setAccUpdObj, publicAccess, setPublicAccess, agentsToUpd, setAgentsToUpd, categoryArray, setCategoryArray,
   habitDoSave, setHabitDoSave, currentView, setCurrentView, storagePref, defFolder, prefFileLocation, publicTypeIndexUrl, podType,
-  habitUpdInProgress, setHabitUpdInProgress
+  habitUpdInProgress, setHabitUpdInProgress, contactsFdrStatus, setContactsFdrStatus,
+  contactsArr, setContactsArr, contactsFetched, setContactsFetched
 }: Props) => {
   const { session, fetch } = useSession();
   const { webId } = session.info;
@@ -414,6 +421,12 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
         setCategoryModalState={setCategoryModalState}
       />
       <AccessModal
+        contactsArr={contactsArr}
+        setContactsArr={setContactsArr}
+        contactsFetched={contactsFetched}
+        setContactsFetched={setContactsFetched}
+        contactsFdrStatus={contactsFdrStatus}
+        setContactsFdrStatus={setContactsFdrStatus}
         storagePref={storagePref}
         agentsToUpd={agentsToUpd}
         setAgentsToUpd={setAgentsToUpd}

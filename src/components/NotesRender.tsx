@@ -24,6 +24,12 @@ interface Props {
     prefFileLocation: string;
     podType: string;
     publicTypeIndexUrl: string;
+    contactsFdrStatus: boolean;
+    setContactsFdrStatus: React.Dispatch<React.SetStateAction<boolean>>;
+    contactsArr: (string | null)[][];
+    setContactsArr: React.Dispatch<React.SetStateAction<(string | null)[][]>>;
+    contactsFetched: boolean;
+    setContactsFetched: React.Dispatch<React.SetStateAction<boolean>>;
 }
 // Component that is responsible for rendering content of notes and habits tab
 // splits the content in two halves, left half: "FolderPickerOrContent"
@@ -34,7 +40,9 @@ interface Props {
 // this is needed to render the respective creator component
 const NotesRender = ({ active, viewerStatus, setViewerStatus, creatorStatus, setCreatorStatus, isEdit, storagePref, defFolder,
     setIsEdit, notesArray, setNotesArray, isLoadingContents, setIsLoadingContents, notesFetched, setNotesFetched, podType,
-    prefFileLocation, publicTypeIndexUrl }: Props) => {
+    prefFileLocation, publicTypeIndexUrl, contactsFdrStatus, setContactsFdrStatus, contactsArr, setContactsArr,
+    contactsFetched, setContactsFetched
+}: Props) => {
     const [newEntryCr, setNewEntryCr] = useState<boolean>(false);
     const [noteToView, setNoteToView] = useState<Note | null>(null);
     const [categoryArray, setCategoryArray] = useState<string[]>([]);
@@ -77,6 +85,12 @@ const NotesRender = ({ active, viewerStatus, setViewerStatus, creatorStatus, set
                 <div className="col h-100 border border-5">
 
                     {(viewerStatus || creatorStatus) && <NoteCreator
+                        contactsArr={contactsArr}
+                        setContactsArr={setContactsArr}
+                        contactsFetched={contactsFetched}
+                        setContactsFetched={setContactsFetched}
+                        contactsFdrStatus={contactsFdrStatus}
+                        setContactsFdrStatus={setContactsFdrStatus}
                         noteUpdInProgress={noteUpdInProgress}
                         setNoteUpdInProgress={setNoteUpdInProgress}
                         publicTypeIndexUrl={publicTypeIndexUrl}

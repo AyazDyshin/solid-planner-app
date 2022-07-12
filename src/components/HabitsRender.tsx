@@ -14,10 +14,17 @@ interface Props {
     publicTypeIndexUrl: string;
     podType: string;
     defFolder: string | null;
+    contactsFdrStatus: boolean;
+    setContactsFdrStatus: React.Dispatch<React.SetStateAction<boolean>>;
+    contactsArr: (string | null)[][];
+    setContactsArr: React.Dispatch<React.SetStateAction<(string | null)[][]>>;
+    contactsFetched: boolean;
+    setContactsFetched: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsArray, storagePref, prefFileLocation,
-    publicTypeIndexUrl, podType, defFolder }: Props) => {
+    publicTypeIndexUrl, podType, defFolder, contactsFdrStatus, setContactsFdrStatus,
+    contactsArr, setContactsArr, contactsFetched, setContactsFetched }: Props) => {
     const [viewerStatus, setViewerStatus] = useState<boolean>(false);
     const [creatorStatus, setCreatorStatus] = useState<boolean>(false);
     const [arrOfChanges, setArrOfChanges] = useState<string[]>([]);
@@ -78,6 +85,12 @@ const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsA
                 </div>
                 <div className="col h-100 border border-5">
                     {(viewerStatus || creatorStatus) && <HabitsCreator
+                        contactsArr={contactsArr}
+                        setContactsArr={setContactsArr}
+                        contactsFetched={contactsFetched}
+                        setContactsFetched={setContactsFetched}
+                        contactsFdrStatus={contactsFdrStatus}
+                        setContactsFdrStatus={setContactsFdrStatus}
                         habitUpdInProgress={habitUpdInProgress}
                         setHabitUpdInProgress={setHabitUpdInProgress}
                         publicTypeIndexUrl={publicTypeIndexUrl}

@@ -43,6 +43,13 @@ const ContentToRender = ({ active, viewerStatus, setViewerStatus, habitsFetched,
         case "notes":
             return (
                 <NotesRender
+                    contactsArr={contactsArr}
+                    setContactsArr={setContactsArr}
+                    contactsFetched={contactsFetched}
+                    setContactsFetched={setContactsFetched}
+                    contactsFdrStatus={contactsFdrStatus}
+                    setContactsFdrStatus={setContactsFdrStatus}
+
                     publicTypeIndexUrl={publicTypeIndexUrl}
                     podType={podType}
                     prefFileLocation={prefFileLocation}
@@ -65,6 +72,12 @@ const ContentToRender = ({ active, viewerStatus, setViewerStatus, habitsFetched,
         case "habits":
             return (
                 <HabitsRender
+                    contactsArr={contactsArr}
+                    setContactsArr={setContactsArr}
+                    contactsFetched={contactsFetched}
+                    setContactsFetched={setContactsFetched}
+                    contactsFdrStatus={contactsFdrStatus}
+                    setContactsFdrStatus={setContactsFdrStatus}
                     defFolder={defFolder}
                     podType={podType}
                     publicTypeIndexUrl={publicTypeIndexUrl}

@@ -245,7 +245,12 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, stora
                           <Badge pill bg="secondary" className="me-1 cursor">shared</Badge>
                         </div>
                       </OverlayTrigger>}
-                      {note.title}
+                      {
+                        note.title && <div >{note.title}</div>
+                      }
+                      {
+                        note.title === null && <div style={{ "color": "grey" }}>  no title </div>
+                      }
                       {
                         note.id &&
                         <Button variant="outline-danger"

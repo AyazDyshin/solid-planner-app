@@ -94,21 +94,16 @@ const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, setNoteIn
             let namesAndIds: (string | null)[][] = [];
             let contactsStatus = false;
             if (!contactsFetched) {
-                console.log("in cont fetch");
                 contactsStatus = await checkContacts(webId, fetch, storagePref);
                 setContactsFdrStatus(contactsStatus);
                 if (contactsStatus) {
                     namesAndIds = await fetchContacts(webId, fetch, storagePref);
-                    console.log(namesAndIds);
                     setContactsArr(namesAndIds);
                 }
             }
-            // 
+
             if (contactsFdrStatus || contactsStatus) {
-                console.log("ehrherhe????11")
-                console.log(namesAndIds);
                 if (namesAndIds.length === 0) {
-                    console.log("ehrherhe????")
                     namesAndIds = contactsArr;
                 }
                 let contObj: { [x: string]: string | null; } = {};

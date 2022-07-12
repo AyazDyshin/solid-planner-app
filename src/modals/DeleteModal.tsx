@@ -1,7 +1,7 @@
 import { useSession } from '@inrupt/solid-ui-react';
 import React from 'react'
 import { Modal, Button, Spinner } from 'react-bootstrap';
-import { Note } from '../components/types';
+import { Habit, Note } from '../components/types';
 import { deleteEntry } from '../services/SolidPod';
 
 interface Props {
@@ -11,18 +11,22 @@ interface Props {
     entryType: string;
     storagePref: string;
     publicTypeIndexUrl: string;
-    noteUpdInProgress: boolean;
-    notesArray: Note[];
-    setNotesArray: React.Dispatch<React.SetStateAction<Note[]>>;
+    progressCheck: boolean;
     newEntryCr: boolean;
     setNewEntryCr: React.Dispatch<React.SetStateAction<boolean>>;
     setViewerStatus: React.Dispatch<React.SetStateAction<boolean>>;
     setCreatorStatus: React.Dispatch<React.SetStateAction<boolean>>;
     setUrlToDelete: React.Dispatch<React.SetStateAction<string | null>>;
+    notesArray?: Note[];
+    setNotesArray?: React.Dispatch<React.SetStateAction<Note[]>>;
+    habitsArray?: Habit[];
+    setHabitsArray?: React.Dispatch<React.SetStateAction<Habit[]>>;
 }
 
 const DeleteModal = ({ deleteModalState, setDeleteModalState, urlToDelete, setUrlToDelete, entryType, storagePref, setNewEntryCr,
-    publicTypeIndexUrl, noteUpdInProgress, setNotesArray, newEntryCr, setViewerStatus, setCreatorStatus, notesArray }: Props) => {
+    publicTypeIndexUrl, setNotesArray, newEntryCr, setViewerStatus, setCreatorStatus, notesArray, progressCheck,
+    habitsArray, setHabitsArray
+}: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
     if (webId === undefined) {
@@ -32,10 +36,15 @@ const DeleteModal = ({ deleteModalState, setDeleteModalState, urlToDelete, setUr
         setDeleteModalState(false);
     }
     const handleDelete = async () => {
-
         setDeleteModalState(false);
-        let updArr = notesArray.filter((note) => note.url !== urlToDelete);
-        setNotesArray(updArr);
+        if (notesArray && setNotesArray) {
+            let updArr = notesArray.filter((note) => note.url !== urlToDelete);
+            setNotesArray(updArr);
+        }
+        if (habitsArray && setHabitsArray) {
+            let updArr = habitsArray.filter((habit) => habit.url !== urlToDelete);
+            setHabitsArray(updArr);
+        }
         newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
         setViewerStatus(false);
         setCreatorStatus(false);
@@ -45,13 +54,13 @@ const DeleteModal = ({ deleteModalState, setDeleteModalState, urlToDelete, setUr
     }
     return (
         <Modal show={deleteModalState} onHide={handleClose}>
-            {noteUpdInProgress && <div className="h-100 d-flex justify-content-center align-items-center" style={{ minHeight: "200px" }}>
+            {progressCheck && <div className="h-100 d-flex justify-content-center align-items-center" style={{ minHeight: "200px" }}>
                 <Spinner animation="border" role="status">
                     <span className="visually-hidden">Loading...</span>
                 </Spinner>
             </div>}
             {
-                !noteUpdInProgress && <div>
+                !progressCheck && <div>
                     <Modal.Header closeButton>
                         <Modal.Title>Are you sure you want to delete this {entryType}?</Modal.Title>
                     </Modal.Header>

@@ -3,7 +3,7 @@ import { useSession } from "@inrupt/solid-ui-react";
 import { useEffect, useState } from "react";
 import { InputGroup, FormControl, Button, ButtonGroup, DropdownButton, Dropdown } from "react-bootstrap";
 import CategoryModal from "../modals/CategoryModal";
-import { deleteEntry, editNote, saveNote } from "../services/SolidPod";
+import { editNote, saveNote } from "../services/SolidPod";
 import { accessObject, Note } from "./types";
 import { BsThreeDots, BsShare } from "react-icons/bs";
 import { FiEdit } from "react-icons/fi";
@@ -96,25 +96,6 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
         }
     }, [viewerStatus, noteToView, creatorStatus]);
 
-    // useEffect(() => {
-    //     console.log("in creator");
-    //     console.log(performDelete);
-    //     console.log(noteUpdInProgress);
-    //     const deleteNote = async () => {
-    //         if (urlToDelete) {
-    //             await deleteEntry(webId, fetch, urlToDelete, "note", storagePref, publicTypeIndexUrl);
-    //             setPerformDelete(false);
-    //             setUrlToDelete(null);
-    //         }
-    //         else {
-    //             throw new Error("note your are trying to delete doesn't exist");
-    //         }
-    //     }
-    //     if (performDelete && !noteUpdInProgress) {
-    //         deleteNote();
-    //     }
-    // }, [noteUpdInProgress, performDelete])
-
     const handleSave = async () => {
         setIsEdit(false);
 
@@ -126,7 +107,6 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
                 ...NoteInp, url: `${defFolder}notes/${idToSave}.ttl`, id: idToSave,
                 access: { "private": { read: false, append: false, write: false } }
             }
-            // if (newNote.url === null) setNoteInp((prevState) => ({ ...prevState, url: `${defFolder}notes/${idToSave}.ttl` }));
 
             setNoteInp(newNote);
             setNotesArray((prevState) => ([...prevState, newNote]));
@@ -135,7 +115,6 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
             setNoteChanged(false);
             setNoteUpdInProgress(true);
             await saveNote(webId, fetch, newNote, storagePref, defFolder, prefFileLocation, podType);
-            //setTimeout(() => { setNoteUpdInProgress(false); }, 2000);
             setNoteUpdInProgress(false);
             console.log("finish upd");
         }
@@ -189,9 +168,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
                     setNoteUpdInProgress(false);
                 }
                 else {
-                    //setNoteUpdInProgress(true);
                     await editNote(webId, fetch, newNote, storagePref, publicTypeIndexUrl);
-                    // setNoteUpdInProgress(false);
                 }
             }
 
@@ -222,19 +199,13 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
     }
 
     const handleDelete = async () => {
-        // setIsEdit(false);
-        // setViewerStatus(false);
-        // setCreatorStatus(false);
-        // const updArr = notesArray.filter((note) => note.url !== NoteInp.url);
-        // setNotesArray(updArr);
-        // newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
+
         if (!NoteInp) {
             throw new Error("Error, note to view wasn't provided");
         }
         //handle
         setUrlToDelete(NoteInp.url!);
         setDeleteModalState(true);
-        // await deleteEntry(webId ?? "", fetch, NoteInp.url!, "note", storagePref, publicTypeIndexUrl);
     }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -289,7 +260,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
                 newEntryCr={newEntryCr}
                 setNewEntryCr={setNewEntryCr}
                 publicTypeIndexUrl={publicTypeIndexUrl}
-                noteUpdInProgress={noteUpdInProgress}
+                progressCheck={noteUpdInProgress}
                 notesArray={notesArray}
                 setNotesArray={setNotesArray}
                 setViewerStatus={setViewerStatus}

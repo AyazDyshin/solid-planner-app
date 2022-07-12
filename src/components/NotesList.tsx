@@ -1,5 +1,4 @@
 import 'bootstrap/dist/css/bootstrap.css';
-import { getInteger, getStringNoLocale, Thing } from "@inrupt/solid-client";
 import { useSession } from "@inrupt/solid-ui-react";
 import { RefAttributes, useEffect, useState } from "react";
 import "../styles.css";
@@ -283,7 +282,7 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, stora
               entryType={"note"}
               storagePref={storagePref}
               publicTypeIndexUrl={publicTypeIndexUrl}
-              noteUpdInProgress={noteUpdInProgress}
+              progressCheck={noteUpdInProgress}
             />
           </div>
         </div>

@@ -11,6 +11,7 @@ import { RiArrowDropDownLine, RiArrowGoBackFill } from 'react-icons/ri';
 import { VscTypeHierarchySuper } from 'react-icons/vsc';
 import { MdSaveAlt } from "react-icons/md";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import DeleteModal from '../modals/DeleteModal';
 
 interface Props {
   viewerStatus: boolean;
@@ -66,6 +67,7 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
   const [objOfStates, setObjOfStates] = useState<{ [x: number]: boolean | null; }>({});
   const [performDelete, setPerformDelete] = useState<boolean>(false);
   const [urlToDelete, setUrlToDelete] = useState<string | null>(null);
+  const [deleteModalState, setDeleteModalState] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchHabits = async (otherId?: string) => {
@@ -154,14 +156,8 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
 
   const handleDelete = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, url: string) => {
     e.stopPropagation();
-    let updArr = habitsArray.filter((habit) => habit.url !== url);
-    setHabitsArray(updArr);
-    newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
-    setViewerStatus(false);
-    setCreatorStatus(false);
-    setPerformDelete(true);
     setUrlToDelete(url);
-    // await deleteEntry(webId, fetch, url, "habit", storagePref, publicTypeIndexUrl);
+    setDeleteModalState(true);
   }
   if (!habitsFetched || isLoading) {
     return (
@@ -403,6 +399,22 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
               </div>
             }
           </div>
+          <DeleteModal
+            deleteModalState={deleteModalState}
+            setDeleteModalState={setDeleteModalState}
+            urlToDelete={urlToDelete}
+            setUrlToDelete={setUrlToDelete}
+            entryType={"habit"}
+            storagePref={storagePref}
+            newEntryCr={newEntryCr}
+            setNewEntryCr={setNewEntryCr}
+            publicTypeIndexUrl={publicTypeIndexUrl}
+            progressCheck={habitUpdInProgress}
+            habitsArray={habitsArray}
+            setHabitsArray={setHabitsArray}
+            setViewerStatus={setViewerStatus}
+            setCreatorStatus={setCreatorStatus}
+          />
         </div >
       )
     }

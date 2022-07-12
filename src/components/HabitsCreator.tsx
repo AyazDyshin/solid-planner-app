@@ -18,6 +18,7 @@ import CategoryModal from "../modals/CategoryModal";
 import SharedModal from "../modals/SharedModal";
 import { ColorResult, TwitterPicker } from "react-color";
 import CalendarModal from "../modals/CalendarModal";
+import DeleteModal from "../modals/DeleteModal";
 
 interface Props {
   habitInp: Habit;
@@ -84,6 +85,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
   const [calendarModalState, setCalendarModalState] = useState<boolean>(false);
   const [performDelete, setPerformDelete] = useState<boolean>(false);
   const [urlToDelete, setUrlToDelete] = useState<string | null>(null);
+  const [deleteModalState, setDeleteModalState] = useState<boolean>(false);
 
   useEffect(() => {
     if (habitChanged) {
@@ -248,20 +250,12 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
   };
 
   const handleDelete = async () => {
-    setIsEdit(false);
-    setViewerStatus(false);
-    setCreatorStatus(false);
-    let updArr = habitsArray.filter((habit) => habit.id !== habitInp.id);
-    setHabitsArray(updArr);
-    newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
     if (!habitInp.id) {
       throw new Error("error: provided habit to delete, doesn't have id");
 
     }
-    //handle
-    setPerformDelete(true);
     setUrlToDelete(habitInp.url!);
-    await deleteEntry(webId, fetch, habitInp.url!, "habit", storagePref, publicTypeIndexUrl);
+    setDeleteModalState(true);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -449,6 +443,23 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
         viewerStatus={viewerStatus}
         categoryArray={categoryArray}
         setCategoryArray={setCategoryArray}
+      />
+
+      <DeleteModal
+        deleteModalState={deleteModalState}
+        setDeleteModalState={setDeleteModalState}
+        urlToDelete={urlToDelete}
+        setUrlToDelete={setUrlToDelete}
+        entryType={"habit"}
+        storagePref={storagePref}
+        newEntryCr={newEntryCr}
+        setNewEntryCr={setNewEntryCr}
+        publicTypeIndexUrl={publicTypeIndexUrl}
+        progressCheck={habitUpdInProgress}
+        habitsArray={habitsArray}
+        setHabitsArray={setHabitsArray}
+        setViewerStatus={setViewerStatus}
+        setCreatorStatus={setCreatorStatus}
       />
     </div>
   );

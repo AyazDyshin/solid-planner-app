@@ -9,7 +9,6 @@ import { BiFolder } from 'react-icons/bi';
 import { GoPrimitiveDot, GoCheck, GoX } from 'react-icons/go';
 import { RiArrowDropDownLine, RiArrowGoBackFill } from 'react-icons/ri';
 import { VscTypeHierarchySuper } from 'react-icons/vsc';
-import { MdSaveAlt } from "react-icons/md";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import DeleteModal from '../modals/DeleteModal';
 

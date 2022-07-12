@@ -223,24 +223,27 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
               }}>all</Dropdown.Item>
 
             </DropdownButton>
-            <DropdownButton
-              className="mx-1 my-1"
-              variant="secondary"
-              title={<div><VscTypeHierarchySuper /> {currentAccess ? currentAccess : "access type"} <RiArrowDropDownLine /></div>}
-            >
-              {
-                accessArray.map((access, key) => {
-                  return <Dropdown.Item href="" key={Date.now() + key + Math.floor(Math.random() * 1000)}
-                    onClick={() => {
-                      setViewerStatus(false);
-                      setCreatorStatus(false);
-                      setCurrentAccess(access);
-                    }}><GoPrimitiveDot /> {access}</Dropdown.Item>
-                })
-              }
-              {currentAccess && (
-                <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentAccess(null)}><RiArrowGoBackFill /> reset</Dropdown.Item></>)}
-            </DropdownButton>
+            {
+              (podType !== "acp") &&
+              <DropdownButton
+                className="mx-1 my-1"
+                variant="secondary"
+                title={<div><VscTypeHierarchySuper /> {currentAccess ? currentAccess : "access type"} <RiArrowDropDownLine /></div>}
+              >
+                {
+                  accessArray.map((access, key) => {
+                    return <Dropdown.Item href="" key={Date.now() + key + Math.floor(Math.random() * 1000)}
+                      onClick={() => {
+                        setViewerStatus(false);
+                        setCreatorStatus(false);
+                        setCurrentAccess(access);
+                      }}><GoPrimitiveDot /> {access}</Dropdown.Item>
+                  })
+                }
+                {currentAccess && (
+                  <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentAccess(null)}><RiArrowGoBackFill /> reset</Dropdown.Item></>)}
+              </DropdownButton>
+            }
             {
               categoryArray.length !== 0 && <DropdownButton
                 className="mx-1 my-1"
@@ -264,7 +267,7 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
               </DropdownButton>
             }
             {
-              (currentCategory || currentAccess) &&
+              (currentCategory || currentAccess) && (podType !== "acp") &&
               <OverlayTrigger placement="left" overlay={
                 <Popover>
                   <Popover.Body className="py-1 px-1">
@@ -345,7 +348,7 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                         <div style={{ display: "inline-block" }}>
                           {!habit.category && <Badge pill bg="info" className="me-1">no category</Badge>}
                         </div>
-                        {habit.access && <OverlayTrigger placement="right" overlay={
+                        {habit.access && (podType !== "acp") && <OverlayTrigger placement="right" overlay={
                           <Popover>
                             <Popover.Body className="py-1 px-1">
                               {(habit.access[Object.keys(habit.access)[0]].read) ?
@@ -362,7 +365,7 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                           </div>
                         </OverlayTrigger>}
 
-                        {habit.shareList && <OverlayTrigger placement="right" overlay={
+                        {habit.shareList && (podType !== "acp") && <OverlayTrigger placement="right" overlay={
                           <Popover style={{ maxWidth: "400px" }}>
                             <Popover.Body className="py-1 px-1">
                               <div >

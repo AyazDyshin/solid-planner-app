@@ -126,24 +126,27 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, stora
       return (
         <div className="w-100 h-100">
           <div className="d-flex">
-            <DropdownButton
-              className="mx-1 my-1"
-              variant="secondary"
-              title={<div><VscTypeHierarchySuper /> {currentAccess ? currentAccess : "access type"} <RiArrowDropDownLine /></div>}
-            >
-              {
-                accessArray.map((access, index) => {
-                  return <Dropdown.Item href="" key={Date.now() + index + Math.floor(Math.random() * 1000)}
-                    onClick={() => {
-                      setViewerStatus(false);
-                      setCreatorStatus(false);
-                      setCurrentAccess(access);
-                    }}><GoPrimitiveDot /> {access}</Dropdown.Item>
-                })
-              }
-              {currentAccess && (
-                <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentAccess(null)}><RiArrowGoBackFill /> reset</Dropdown.Item></>)}
-            </DropdownButton>
+            {
+              (podType !== "acp") &&
+              <DropdownButton
+                className="mx-1 my-1"
+                variant="secondary"
+                title={<div><VscTypeHierarchySuper /> {currentAccess ? currentAccess : "access type"} <RiArrowDropDownLine /></div>}
+              >
+                {
+                  accessArray.map((access, index) => {
+                    return <Dropdown.Item href="" key={Date.now() + index + Math.floor(Math.random() * 1000)}
+                      onClick={() => {
+                        setViewerStatus(false);
+                        setCreatorStatus(false);
+                        setCurrentAccess(access);
+                      }}><GoPrimitiveDot /> {access}</Dropdown.Item>
+                  })
+                }
+                {currentAccess && (
+                  <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentAccess(null)}><RiArrowGoBackFill /> reset</Dropdown.Item></>)}
+              </DropdownButton>
+            }
             {
               categoryArray.length !== 0 && <DropdownButton
                 className="mx-1 my-1"
@@ -167,7 +170,7 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, stora
               </DropdownButton>
             }
             {
-              (currentCategory || currentAccess) &&
+              (currentCategory || currentAccess) && (podType !== "acp") &&
               <OverlayTrigger placement="left" overlay={
                 <Popover>
                   <Popover.Body className="py-1 px-1">
@@ -218,7 +221,7 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, stora
                       <div style={{ display: "inline-block" }}>
                         {!note.category && <Badge pill bg="info" className="me-1">no category</Badge>}
                       </div>
-                      {note.access && <OverlayTrigger placement="right" overlay={
+                      {note.access && (podType !== "acp") && <OverlayTrigger placement="right" overlay={
                         <Popover>
                           <Popover.Body className="py-1 px-1">
                             {(note.access[Object.keys(note.access)[0]].read) ?
@@ -235,7 +238,7 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, stora
                         </div>
                       </OverlayTrigger>}
 
-                      {note.shareList && <OverlayTrigger placement="right" overlay={
+                      {note.shareList && (podType !== "acp") && <OverlayTrigger placement="right" overlay={
                         <Popover style={{ maxWidth: "400px" }}>
                           <Popover.Body className="py-1 px-1">
                             <div >

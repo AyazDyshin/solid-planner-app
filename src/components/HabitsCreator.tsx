@@ -297,8 +297,8 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
             <Dropdown.Item onClick={() => (setCategoryModalState(true))}>
               <BiFolderPlus /> set category
             </Dropdown.Item>
-            {viewerStatus && <Dropdown.Item onClick={() => { setAccessModalState(true) }} ><BsShare /> share</Dropdown.Item>}
-            {viewerStatus && habitInp.shareList &&
+            {viewerStatus && (podType !== "acp") && <Dropdown.Item onClick={() => { setAccessModalState(true) }} ><BsShare /> share</Dropdown.Item>}
+            {viewerStatus && habitInp.shareList && (podType !== "acp") &&
               <Dropdown.Item onClick={() => (setSharedModalState(true))} >
                 <RiUserSharedLine /> shared list
               </Dropdown.Item>}

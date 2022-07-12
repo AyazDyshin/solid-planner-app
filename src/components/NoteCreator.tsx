@@ -241,8 +241,8 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
                         <Dropdown.Item onClick={() => (setCategoryModalState(true))}>
                             <BiFolderPlus /> set category
                         </Dropdown.Item>
-                        {viewerStatus && <Dropdown.Item onClick={() => (setAccessModalState(true))}><BsShare /> share</Dropdown.Item>}
-                        {viewerStatus && noteToView?.shareList &&
+                        {viewerStatus && (podType !== "acp") && <Dropdown.Item onClick={() => (setAccessModalState(true))}><BsShare /> share</Dropdown.Item>}
+                        {viewerStatus && noteToView?.shareList && (podType !== "acp") &&
                             <Dropdown.Item onClick={() => (setSharedModalState(true))}>
                                 <RiUserSharedLine /> shared list
                             </Dropdown.Item>}

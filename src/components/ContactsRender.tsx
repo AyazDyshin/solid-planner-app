@@ -50,7 +50,6 @@ const ContactsRender = ({ storagePref, publicTypeIndexUrl, prefFileLocation, pod
                 }
             }
             if (otherWebId) {
-                console.log("we are here other");
                 let notesArrUpd = await fetchAllEntries(otherWebId, fetch, "note", storagePref, prefFileLocation,
                     publicTypeIndexUrl, podType, true);
                 let transformedArr = await Promise.all(notesArrUpd.map(async (thing) => {

@@ -258,10 +258,29 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                       }}><GoPrimitiveDot /> {category}</Dropdown.Item>
                   })
                 }
-
+                <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentCategory("without category")}><GoPrimitiveDot /> without category</Dropdown.Item></>
                 {currentCategory && (
                   <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentCategory(null)}><RiArrowGoBackFill /> reset</Dropdown.Item></>)}
               </DropdownButton>
+            }
+            {
+              (currentCategory || currentAccess) &&
+              <OverlayTrigger placement="left" overlay={
+                <Popover>
+                  <Popover.Body className="py-1 px-1">
+                    Reset category and access filters
+                  </Popover.Body>
+                </Popover>}>
+                <Button
+                  variant="secondary"
+                  className="mx-1 my-1"
+                  onClick={() => {
+                    setCurrentCategory(null);
+                    setCurrentAccess(null);
+                  }
+
+                  }>Reset all</Button>
+              </OverlayTrigger>
             }
             <OverlayTrigger placement="left" overlay={
               <Popover>
@@ -320,7 +339,7 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                           </div>
                         }
                         <div style={{ display: "inline-block" }}>
-                          {habit.recurrence && <Badge style={{ "backgroundColor": 'red!important' }} className="me-1">{habit.recurrence}</Badge>}
+                          {habit.recurrence && <Badge pill style={{ "backgroundColor": 'red!important' }} className="me-1">{habit.recurrence}</Badge>}
                           {habit.category && <Badge pill bg="info" className="me-1">{habit.category}</Badge>}
                         </div>
                         <div style={{ display: "inline-block" }}>
@@ -373,8 +392,12 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                             <Badge pill bg="secondary" className="me-1 cursor">shared</Badge>
                           </div>
                         </OverlayTrigger>}
-                        {habit.title}
-
+                        {
+                          habit.title && <div>{habit.title}</div>
+                        }
+                        {
+                          habit.title === null && <div style={{ "color": "grey" }}>No title</div>
+                        }
                         {
                           habit.id &&
                           <Button variant="outline-danger"

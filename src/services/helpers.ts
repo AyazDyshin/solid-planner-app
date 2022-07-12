@@ -474,7 +474,14 @@ export const extractCategories = <T extends { category: string | null; }>(arrOfE
 }
 
 export const filterByCategory = <T extends { category: string | null; }>(arrOfEntries: T[], categoryFilter: string) => {
-    let ret = arrOfEntries.filter((entry) => entry.category === categoryFilter);
+    let ret: T[] = [];
+    if (categoryFilter === 'without category') {
+        console.log("we got here");
+        ret = arrOfEntries.filter((entry) => entry.category === null);
+    }
+   else  {
+        ret = arrOfEntries.filter((entry) => entry.category === categoryFilter);
+    }
     return ret;
 }
 

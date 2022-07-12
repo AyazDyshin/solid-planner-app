@@ -24,9 +24,7 @@ const NoteViewer = ({ noteToView, setNoteToView }: Props) => {
             <FormControl disabled={true} as="textarea" aria-label="textarea" style={{ 'resize': 'none', 'height': '91%' }}
                 name="content"
                 value={noteToView.content === null ? "" : noteToView.content}
-
             />
-
         </div>
     )
 }

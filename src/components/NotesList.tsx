@@ -3,7 +3,6 @@ import { useSession } from "@inrupt/solid-ui-react";
 import { RefAttributes, useEffect, useState } from "react";
 import "../styles.css";
 import { Dropdown, DropdownButton, Badge, OverlayTrigger, Popover, PopoverProps, Button, Spinner } from "react-bootstrap";
-import SaveModal from "./SaveModal";
 import { Note } from "./types";
 import { RiArrowDropDownLine, RiArrowGoBackFill } from "react-icons/ri";
 import { BsPlusLg } from "react-icons/bs";
@@ -162,10 +161,29 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, stora
                       }}><GoPrimitiveDot /> {category}</Dropdown.Item>
                   })
                 }
-
+                <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentCategory("without category")}><GoPrimitiveDot /> without category</Dropdown.Item></>
                 {currentCategory && (
                   <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentCategory(null)}><RiArrowGoBackFill /> reset</Dropdown.Item></>)}
               </DropdownButton>
+            }
+            {
+              (currentCategory || currentAccess) &&
+              <OverlayTrigger placement="left" overlay={
+                <Popover>
+                  <Popover.Body className="py-1 px-1">
+                    Reset category and access filters
+                  </Popover.Body>
+                </Popover>}>
+                <Button
+                  variant="secondary"
+                  className="mx-1 my-1"
+                  onClick={() => {
+                    setCurrentCategory(null);
+                    setCurrentAccess(null);
+                  }
+
+                  }>Reset all</Button>
+              </OverlayTrigger>
             }
             <OverlayTrigger placement="left" overlay={
               <Popover>
@@ -290,7 +308,7 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, stora
               progressCheck={noteUpdInProgress}
             />
           </div>
-        </div>
+        </div >
       )
     }
   }

@@ -14,17 +14,24 @@ interface Props {
     publicTypeIndexUrl: string;
     prefFileLocation: string;
     podType: string;
+    contactsArr: (string | null)[][];
+    setContactsArr: React.Dispatch<React.SetStateAction<(string | null)[][]>>;
+    contactsFetched: boolean;
+    setContactsFetched: React.Dispatch<React.SetStateAction<boolean>>;
+    contactsFdrStatus: boolean;
+    setContactsFdrStatus: React.Dispatch<React.SetStateAction<boolean>>;
 }
-const ContactsRender = ({ storagePref, publicTypeIndexUrl, prefFileLocation, podType }: Props) => {
+const ContactsRender = ({ storagePref, publicTypeIndexUrl, prefFileLocation, podType, contactsArr, setContactsArr,
+    contactsFetched, setContactsFetched, contactsFdrStatus, setContactsFdrStatus
+}: Props) => {
     const { session, fetch } = useSession();
-    const [contactsFdrStatus, setContactsFdrStatus] = useState<boolean>(false);
     const { webId } = session.info;
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [contactsArr, setContactsArr] = useState<(string | null)[][]>([]);
     const [otherWebId, setOtherWebId] = useState<string | null>(null);
     const [notesArray, setNotesArray] = useState<(Note | null)[]>([]);
     const [noteToView, setNoteToView] = useState<Note | null>(null);
     const [viewerStatus, setViewerStatus] = useState<boolean>(false);
+
     if (webId === undefined) {
         throw new Error(`Error, couldn't get user's WebId`);
     }
@@ -32,15 +39,18 @@ const ContactsRender = ({ storagePref, publicTypeIndexUrl, prefFileLocation, pod
     useEffect(() => {
         const initialize = async () => {
             setIsLoading(true);
-            let contactsStatus = await checkContacts(webId, fetch, storagePref);
-            setContactsFdrStatus(contactsStatus);
-            if (contactsStatus) {
-                const namesAndIds = await fetchContacts(webId, fetch, storagePref);
-                setContactsArr(namesAndIds);
-                const namesArr = namesAndIds.map((pair) => pair[0] ? pair[0] : pair[1]);
-
+            if (!contactsFetched) {
+                let contactsStatus = await checkContacts(webId, fetch, storagePref);
+                setContactsFdrStatus(contactsStatus);
+                if (contactsStatus) {
+                    const namesAndIds = await fetchContacts(webId, fetch, storagePref);
+                    setContactsArr(namesAndIds);
+                    const namesArr = namesAndIds.map((pair) => pair[0] ? pair[0] : pair[1]);
+                    setContactsFetched(true);
+                }
             }
             if (otherWebId) {
+                console.log("we are here other");
                 let notesArrUpd = await fetchAllEntries(otherWebId, fetch, "note", storagePref, prefFileLocation,
                     publicTypeIndexUrl, podType, true);
                 let transformedArr = await Promise.all(notesArrUpd.map(async (thing) => {

@@ -264,10 +264,16 @@ export const createDefFolder = async (webId: string, fetch: fetcher, storagePref
 
 export const fetchAllEntries = async (webId: string, fetch: fetcher, entry: string, storagePref: string, prefFileLocation: string,
   publicTypeIndexUrl: string, podType: string, other?: boolean) => {
+  console.log("this is webId");
+  console.log(webId);
   let arrayOfCategories: string[] = [];
   let urlsArr
   try {
-    urlsArr = await getAllUrlFromPublicIndex(webId, fetch, entry, storagePref, publicTypeIndexUrl);
+
+    urlsArr = await getAllUrlFromPublicIndex(webId, fetch, entry, storagePref, publicTypeIndexUrl, other ? other : undefined);
+
+    console.log("this is url arr");
+    console.log(urlsArr);
   }
   catch (error) {
     if (other) {
@@ -335,6 +341,8 @@ export const fetchAllEntries = async (webId: string, fetch: fetcher, entry: stri
   }));
   let retValue = updUrlsArr.flat();
   if (!retValue) return [];
+  console.log("this is what we ret");
+  console.log(retValue);
   return retValue;
 }
 

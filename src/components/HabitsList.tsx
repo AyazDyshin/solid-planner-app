@@ -269,7 +269,7 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                   Create a new habit
                 </Popover.Body>
               </Popover>}>
-              <a className="btn btn-secondary ms-1 my-1 d-flex align-items-center justify-content-center" onClick={handleCreate}><BsPlusLg /></a>
+              <a className="btn btn-secondary ms-auto my-1 d-flex align-items-center justify-content-center" onClick={handleCreate}><BsPlusLg /></a>
             </OverlayTrigger>
           </div>
           <div className="list-group w-100 h-80">

@@ -1,4 +1,5 @@
 import { Contact } from "rdf-namespaces/dist/vcard";
+import { useState } from "react";
 import ContactsRender from "./ContactsRender";
 import HabitsRender from "./HabitsRender";
 import NotesRender from "./NotesRender";
@@ -33,7 +34,11 @@ interface Props {
 const ContentToRender = ({ active, viewerStatus, setViewerStatus, habitsFetched, setHabitsFetched, habitsArray, setHabitsArray,
     creatorStatus, setCreatorStatus, isEdit, setIsEdit, notesArray, storagePref, defFolder, prefFileLocation, podType,
     setNotesArray, isLoadingContents, setIsLoadingContents, notesFetched, setNotesFetched, publicTypeIndexUrl }: Props) => {
-    
+
+    const [contactsFetched, setContactsFetched] = useState<boolean>(false);
+    const [contactsArr, setContactsArr] = useState<(string | null)[][]>([]);
+    const [contactsFdrStatus, setContactsFdrStatus] = useState<boolean>(false);
+
     switch (active) {
         case "notes":
             return (
@@ -74,6 +79,12 @@ const ContentToRender = ({ active, viewerStatus, setViewerStatus, habitsFetched,
         case "contacts":
             return (
                 <ContactsRender
+                    contactsFdrStatus={contactsFdrStatus}
+                    setContactsFdrStatus={setContactsFdrStatus}
+                    contactsArr={contactsArr}
+                    setContactsArr={setContactsArr}
+                    contactsFetched={contactsFetched}
+                    setContactsFetched={setContactsFetched}
                     podType={podType}
                     prefFileLocation={prefFileLocation}
                     publicTypeIndexUrl={publicTypeIndexUrl}

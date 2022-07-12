@@ -141,8 +141,22 @@ export const getAccessType = async (webId: string, fetch: fetcher, storagePref: 
 
 
 export const getAllUrlFromPublicIndex = async (webId: string, fetch: fetcher, type: string, storagePref: string,
-    publicTypeIndexUrl: string
+    publicTypeIndexUrl: string, other?: boolean
 ) => {
+    if (other) {
+        let newPublicTypeUrl: string = "";
+        try {
+            newPublicTypeUrl = await getPublicTypeIndexUrl(webId, fetch);
+        }
+        catch (error) {
+            let message = 'Unknown Error';
+            if (error instanceof Error) message = error.message;
+            throw new Error(`couldn't fetch other user's publicTypeIndex file this might be due to the fact that you don't have access to it, error: ${message}`);
+        }
+        publicTypeIndexUrl = newPublicTypeUrl;
+    }
+    console.log("this is pub type");
+    console.log(publicTypeIndexUrl);
     let typeToGet = (type === "note" ? schema.TextDigitalDocument : voc.Habit);
     let dataSet;
     try {

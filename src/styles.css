@@ -8,8 +8,39 @@
 }
 
 .dropdown-toggle::after {
-    display:none !important;
+    display: none !important;
 }
+
 .center {
     margin: 0 auto;
 }
+
+.modal-dialog,
+.modal-content {
+    /* 80% of window height */
+    height: 90vh;
+}
+
+.modal-body {
+    /* 100% = dialog height, 120px = header + footer */
+    height: 100%;
+    overflow-y: auto;
+}
+
+.adjust-me-based-on-size{
+    margin-left: 20%;
+    margin-right: 20%;
+  }
+  @media only screen and (min-width: 800) and (max-width: 1200) {
+    .adjust-me-based-on-size {
+  
+      margin-left: 10%;
+      margin-right: 10%;
+    }
+  }
+  @media only screen and (max-width: 600px) {
+    .adjust-me-based-on-size {
+      margin-left: 0;
+      margin-right: 0%;
+    }
+  }

@@ -220,7 +220,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
         setNoteChanged(true);
     };
     return (
-        <div>
+        <div >
             <InputGroup className="mb-2 mt-2">
                 <InputGroup.Text id="basic-addon1">Title:</InputGroup.Text>
                 <FormControl
@@ -252,7 +252,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
                     </DropdownButton>
                 </ButtonGroup>
             </InputGroup>
-            <FormControl {...(!isEdit && { disabled: true })} as="textarea" aria-label="textarea" style={{ 'resize': 'none', 'height': '80%' }}
+            <FormControl {...(!isEdit && { disabled: true })} as="textarea" aria-label="textarea" style={{ 'resize': 'none', 'height': '90%' }}
                 name="content"
                 value={NoteInp.content === null ? "" : NoteInp.content}
                 onChange={handleChange}

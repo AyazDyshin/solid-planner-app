@@ -36,12 +36,13 @@ interface Props {
   setNotesFetched: React.Dispatch<React.SetStateAction<boolean>>;
   podType: string;
   prefFileLocation: string;
+  setNoteModalState: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, storagePref,
   viewerStatus, setViewerStatus, setCreatorStatus, isEdit, setIsEdit, categoryArray, setCategoryArray, publicTypeIndexUrl,
   newEntryCr, setNewEntryCr, noteUpdInProgress, setNoteUpdInProgress, notesFetched, setNotesFetched, podType,
-  prefFileLocation
+  prefFileLocation, setNoteModalState
 }: Props) => {
 
   const { session, fetch } = useSession();
@@ -93,6 +94,7 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, stora
   const handleCreate = () => {
     setViewerStatus(false);
     setCreatorStatus(true);
+    setNoteModalState(true);
   }
 
   const handleDelete = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, url: string) => {
@@ -124,15 +126,17 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, stora
     }
     else {
       return (
-        <div className="w-100 h-100">
+        <div className="w-100 h-100" >
           <div className="d-flex">
             {
               (podType !== "acp") &&
               <DropdownButton
                 className="mx-1 my-1"
                 variant="secondary"
+                menuVariant="dark"
                 title={<div><VscTypeHierarchySuper /> {currentAccess ? currentAccess : "access type"} <RiArrowDropDownLine /></div>}
               >
+                
                 {
                   accessArray.map((access, index) => {
                     return <Dropdown.Item href="" key={Date.now() + index + Math.floor(Math.random() * 1000)}

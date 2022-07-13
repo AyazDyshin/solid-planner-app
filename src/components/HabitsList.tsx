@@ -342,7 +342,9 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                           </div>
                         }
                         <div style={{ display: "inline-block" }}>
-                          {habit.recurrence && <Badge pill style={{ "backgroundColor": 'red!important' }} className="me-1">{habit.recurrence}</Badge>}
+                          {habit.recurrence &&
+                            <Badge pill className="me-1">{habit.recurrence}</Badge>
+                          }
                           {habit.category && <Badge pill bg="info" className="me-1">{habit.category}</Badge>}
                         </div>
                         <div style={{ display: "inline-block" }}>

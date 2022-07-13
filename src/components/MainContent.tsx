@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Navbar from "./Navbar";
+import NavbarSolidApp from "./NavbarSolidApp";
 import ContentToRender from "./ContentToRender";
 import Test from "./Test";
 import { checkPermissions, isWacOrAcp } from "../services/access";
@@ -10,7 +10,6 @@ import { Habit, Note } from "./types";
 import { getDefaultFolder, getPrefLink, getPublicTypeIndexUrl, getStoragePref } from "../services/podGetters";
 import NoPermissions from "./NoPermissions";
 import TestCalendar from "./TestCalendar";
-import ColorPickerTest from "./ColorPickerTest";
 
 // This is the root component that first renders NavBar and then other content
 // Passes active and setActive hooks, which represent the currently clicked tab
@@ -82,7 +81,7 @@ const MainContent = () => {
           {/* <Test /> */}
           {/* <TestCalendar /> */}
           {/* <ColorPickerTest /> */}
-          <Navbar
+          <NavbarSolidApp
             creatorStatus={creatorStatus}
             setCreatorStatus={setCreatorStatus}
             viewerStatus={viewerStatus}

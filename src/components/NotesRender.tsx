@@ -4,6 +4,7 @@ import { accessObject, Note } from "./types";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import NoteCreator from "./NoteCreator";
 import NotesList from "./NotesList";
+import { Modal } from "react-bootstrap";
 
 interface Props {
     active: string;
@@ -53,79 +54,83 @@ const NotesRender = ({ active, viewerStatus, setViewerStatus, creatorStatus, set
     const [accUpdObj, setAccUpdObj] = useState<{ [x: string]: boolean; }>({});
     const [agentsToUpd, setAgentsToUpd] = useState<{ [x: string]: AccessModes; }>({});
     const [noteUpdInProgress, setNoteUpdInProgress] = useState<boolean>(false);
-
+    const [noteModalState, setNoteModalState] = useState<boolean>(false);
     return (
-        <div className="container-fluid pad">
-            <div className="row h-100">
-                <div className="col h-100 border border-5 border-end-0 d-flex justify-content-center align-items-center p-0">
-                    <NotesList
-                        noteUpdInProgress={noteUpdInProgress}
-                        setNoteUpdInProgress={setNoteUpdInProgress}
-                        podType={podType}
-                        prefFileLocation={prefFileLocation}
-                        publicTypeIndexUrl={publicTypeIndexUrl}
-                        storagePref={storagePref}
-                        notesFetched={notesFetched}
-                        setNotesFetched={setNotesFetched}
-                        notesArray={notesArray}
-                        setNotesArray={setNotesArray}
-                        setCreatorStatus={setCreatorStatus}
-                        newEntryCr={newEntryCr}
-                        setNewEntryCr={setNewEntryCr}
-                        noteToView={noteToView}
-                        setNoteToView={setNoteToView}
-                        viewerStatus={viewerStatus}
-                        setViewerStatus={setViewerStatus}
-                        isEdit={isEdit}
-                        setIsEdit={setIsEdit}
-                        categoryArray={categoryArray}
-                        setCategoryArray={setCategoryArray}
-                    />
-                </div>
-                <div className="col h-100 border border-5">
-
-                    {(viewerStatus || creatorStatus) && <NoteCreator
-                        contactsArr={contactsArr}
-                        setContactsArr={setContactsArr}
-                        contactsFetched={contactsFetched}
-                        setContactsFetched={setContactsFetched}
-                        contactsFdrStatus={contactsFdrStatus}
-                        setContactsFdrStatus={setContactsFdrStatus}
-                        noteUpdInProgress={noteUpdInProgress}
-                        setNoteUpdInProgress={setNoteUpdInProgress}
-                        publicTypeIndexUrl={publicTypeIndexUrl}
-                        podType={podType}
-                        prefFileLocation={prefFileLocation}
-                        defFolder={defFolder}
-                        storagePref={storagePref}
-                        notesArray={notesArray}
-                        setNotesArray={setNotesArray}
-                        agentsToUpd={agentsToUpd}
-                        setAgentsToUpd={setAgentsToUpd}
-                        accUpdObj={accUpdObj}
-                        setAccUpdObj={setAccUpdObj}
-                        publicAccess={publicAccess}
-                        setPublicAccess={setPublicAccess}
-                        newEntryCr={newEntryCr}
-                        setNewEntryCr={setNewEntryCr}
-                        noteToView={noteToView}
-                        setNoteToView={setNoteToView}
-                        viewerStatus={viewerStatus}
-                        setViewerStatus={setViewerStatus}
-                        isEdit={isEdit}
-                        setIsEdit={setIsEdit}
-                        creatorStatus={creatorStatus}
-                        setCreatorStatus={setCreatorStatus}
-                        categoryArray={categoryArray}
-                        setCategoryArray={setCategoryArray}
-                        doNoteSave={doNoteSave}
-                        setDoNoteSave={setDoNoteSave}
-                        NoteInp={NoteInp}
-                        setNoteInp={setNoteInp}
-                    />
-                    }
-                </div>
+        <div className="container-fluid pad h-100 w-100 d-flex justify-content-center" style={{ "backgroundColor": "#F8F8F8" }}>
+            <div id="setWidth" style={{ "backgroundColor": "#fff" }} className="h-100 w-100 px-2 adjust-me-based-on-size  d-flex justify-content-center align-items-center p-0">
+                <NotesList
+                    setNoteModalState={setNoteModalState}
+                    noteUpdInProgress={noteUpdInProgress}
+                    setNoteUpdInProgress={setNoteUpdInProgress}
+                    podType={podType}
+                    prefFileLocation={prefFileLocation}
+                    publicTypeIndexUrl={publicTypeIndexUrl}
+                    storagePref={storagePref}
+                    notesFetched={notesFetched}
+                    setNotesFetched={setNotesFetched}
+                    notesArray={notesArray}
+                    setNotesArray={setNotesArray}
+                    setCreatorStatus={setCreatorStatus}
+                    newEntryCr={newEntryCr}
+                    setNewEntryCr={setNewEntryCr}
+                    noteToView={noteToView}
+                    setNoteToView={setNoteToView}
+                    viewerStatus={viewerStatus}
+                    setViewerStatus={setViewerStatus}
+                    isEdit={isEdit}
+                    setIsEdit={setIsEdit}
+                    categoryArray={categoryArray}
+                    setCategoryArray={setCategoryArray}
+                />
             </div>
+            {(viewerStatus || creatorStatus) &&
+                <Modal show={noteModalState} onHide={() => { setNoteModalState(false) }}>
+                    <Modal.Header closeButton>
+                        {creatorStatus ? "create a note" : "edit a note"}
+                    </Modal.Header>
+                    <Modal.Body >
+                        <NoteCreator
+                            contactsArr={contactsArr}
+                            setContactsArr={setContactsArr}
+                            contactsFetched={contactsFetched}
+                            setContactsFetched={setContactsFetched}
+                            contactsFdrStatus={contactsFdrStatus}
+                            setContactsFdrStatus={setContactsFdrStatus}
+                            noteUpdInProgress={noteUpdInProgress}
+                            setNoteUpdInProgress={setNoteUpdInProgress}
+                            publicTypeIndexUrl={publicTypeIndexUrl}
+                            podType={podType}
+                            prefFileLocation={prefFileLocation}
+                            defFolder={defFolder}
+                            storagePref={storagePref}
+                            notesArray={notesArray}
+                            setNotesArray={setNotesArray}
+                            agentsToUpd={agentsToUpd}
+                            setAgentsToUpd={setAgentsToUpd}
+                            accUpdObj={accUpdObj}
+                            setAccUpdObj={setAccUpdObj}
+                            publicAccess={publicAccess}
+                            setPublicAccess={setPublicAccess}
+                            newEntryCr={newEntryCr}
+                            setNewEntryCr={setNewEntryCr}
+                            noteToView={noteToView}
+                            setNoteToView={setNoteToView}
+                            viewerStatus={viewerStatus}
+                            setViewerStatus={setViewerStatus}
+                            isEdit={isEdit}
+                            setIsEdit={setIsEdit}
+                            creatorStatus={creatorStatus}
+                            setCreatorStatus={setCreatorStatus}
+                            categoryArray={categoryArray}
+                            setCategoryArray={setCategoryArray}
+                            doNoteSave={doNoteSave}
+                            setDoNoteSave={setDoNoteSave}
+                            NoteInp={NoteInp}
+                            setNoteInp={setNoteInp}
+                        />
+                    </Modal.Body>
+                </Modal>
+            }
         </div>
     );
 }

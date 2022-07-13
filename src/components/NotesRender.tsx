@@ -84,11 +84,13 @@ const NotesRender = ({ active, viewerStatus, setViewerStatus, creatorStatus, set
                 />
             </div>
             {(viewerStatus || creatorStatus) &&
-                <Modal show={noteModalState} onHide={() => { setNoteModalState(false) }}>
+                <Modal id="viewerModal" show={noteModalState} style={{ "height": "90vh" }}
+                    size="lg"
+                    onHide={() => { setNoteModalState(false) }}>
                     <Modal.Header closeButton>
                         {creatorStatus ? "create a note" : "edit a note"}
                     </Modal.Header>
-                    <Modal.Body >
+                    <Modal.Body id="viewerModal">
                         <NoteCreator
                             contactsArr={contactsArr}
                             setContactsArr={setContactsArr}

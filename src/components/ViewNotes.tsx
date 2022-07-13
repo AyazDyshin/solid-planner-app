@@ -13,9 +13,10 @@ interface Props {
     setViewerStatus: React.Dispatch<React.SetStateAction<boolean>>;
     isLoading: boolean;
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+    setContactModalState: React.Dispatch<React.SetStateAction<boolean>>;
 }
 const ViewNotes = ({ otherWebId, setOtherWebId, notesArray, setNotesArray, noteToView, setNoteToView,
-    viewerStatus, setViewerStatus, isLoading, setIsLoading
+    viewerStatus, setViewerStatus, isLoading, setIsLoading, setContactModalState
 }: Props) => {
     const [activeNote, setActiveNote] = useState<number | null>(null);
 
@@ -41,6 +42,7 @@ const ViewNotes = ({ otherWebId, setOtherWebId, notesArray, setNotesArray, noteT
                                     setActiveNote(note.id);
                                     setNoteToView(note);
                                     setViewerStatus(true);
+                                    setContactModalState(true)
                                 }}
                             >
                                 {note.category && <Badge pill bg="primary" className="me-1">{note.category}</Badge>}

@@ -2,7 +2,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import { useSession } from "@inrupt/solid-ui-react";
 import { RefAttributes, useEffect, useState } from "react";
 import "../styles.css";
-import { Dropdown, DropdownButton, Badge, OverlayTrigger, Popover, PopoverProps, Button, Spinner } from "react-bootstrap";
+import { Dropdown, DropdownButton, Badge, OverlayTrigger, Popover, PopoverProps, Button, Spinner, ButtonGroup } from "react-bootstrap";
 import { Note } from "./types";
 import { RiArrowDropDownLine, RiArrowGoBackFill } from "react-icons/ri";
 import { BsPlusLg } from "react-icons/bs";
@@ -119,6 +119,7 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, stora
             <a className="btn btn-primary" onClick={() => {
               setCreatorStatus(true);
               setViewerStatus(false);
+              setNoteModalState(true);
             }}>create</a>
           </div>
         </div>
@@ -128,70 +129,72 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, stora
       return (
         <div className="w-100 h-100" >
           <div className="d-flex">
-            {
-              (podType !== "acp") &&
-              <DropdownButton
-                className="mx-1 my-1"
-                variant="secondary"
-                menuVariant="dark"
-                title={<div><VscTypeHierarchySuper /> {currentAccess ? currentAccess : "access type"} <RiArrowDropDownLine /></div>}
-              >
-                
-                {
-                  accessArray.map((access, index) => {
-                    return <Dropdown.Item href="" key={Date.now() + index + Math.floor(Math.random() * 1000)}
-                      onClick={() => {
-                        setViewerStatus(false);
-                        setCreatorStatus(false);
-                        setCurrentAccess(access);
-                      }}><GoPrimitiveDot /> {access}</Dropdown.Item>
-                  })
-                }
-                {currentAccess && (
-                  <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentAccess(null)}><RiArrowGoBackFill /> reset</Dropdown.Item></>)}
-              </DropdownButton>
-            }
-            {
-              categoryArray.length !== 0 && <DropdownButton
-                className="mx-1 my-1"
-                variant="secondary"
-                title={<div><BiFolder /> {currentCategory ? currentCategory : "Category"} <RiArrowDropDownLine /></div>}
-              >
-                {
-                  categoryArray.map((category, index) => {
-                    return <Dropdown.Item href="" key={Date.now() + index + Math.floor(Math.random() * 1000)}
-                      onClick={() => {
-                        setViewerStatus(false);
-                        setCreatorStatus(false);
-                        setCurrentCategory(category);
-
-                      }}><GoPrimitiveDot /> {category}</Dropdown.Item>
-                  })
-                }
-                <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentCategory("without category")}><GoPrimitiveDot /> without category</Dropdown.Item></>
-                {currentCategory && (
-                  <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentCategory(null)}><RiArrowGoBackFill /> reset</Dropdown.Item></>)}
-              </DropdownButton>
-            }
-            {
-              (currentCategory || currentAccess) && (podType !== "acp") &&
-              <OverlayTrigger placement="left" overlay={
-                <Popover>
-                  <Popover.Body className="py-1 px-1">
-                    Reset category and access filters
-                  </Popover.Body>
-                </Popover>}>
-                <Button
+            <ButtonGroup className="my-1">
+              {
+                (podType !== "acp") &&
+                <DropdownButton
+                  as={ButtonGroup}
                   variant="secondary"
-                  className="mx-1 my-1"
-                  onClick={() => {
-                    setCurrentCategory(null);
-                    setCurrentAccess(null);
-                  }
+                  menuVariant="dark"
+                  title={<div><VscTypeHierarchySuper /> {currentAccess ? currentAccess : "access type"} <RiArrowDropDownLine /></div>}
+                >
 
-                  }>Reset all</Button>
-              </OverlayTrigger>
-            }
+                  {
+                    accessArray.map((access, index) => {
+                      return <Dropdown.Item href="" key={Date.now() + index + Math.floor(Math.random() * 1000)}
+                        onClick={() => {
+                          setViewerStatus(false);
+                          setCreatorStatus(false);
+                          setCurrentAccess(access);
+                        }}><GoPrimitiveDot /> {access}</Dropdown.Item>
+                    })
+                  }
+                  {currentAccess && (
+                    <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentAccess(null)}><RiArrowGoBackFill /> reset</Dropdown.Item></>)}
+                </DropdownButton>
+              }
+              {
+                categoryArray.length !== 0 && <DropdownButton
+                  as={ButtonGroup}
+                  variant="secondary"
+                  menuVariant="dark"
+                  title={<div><BiFolder /> {currentCategory ? currentCategory : "Category"} <RiArrowDropDownLine /></div>}
+                >
+                  {
+                    categoryArray.map((category, index) => {
+                      return <Dropdown.Item href="" key={Date.now() + index + Math.floor(Math.random() * 1000)}
+                        onClick={() => {
+                          setViewerStatus(false);
+                          setCreatorStatus(false);
+                          setCurrentCategory(category);
+
+                        }}><GoPrimitiveDot /> {category}</Dropdown.Item>
+                    })
+                  }
+                  <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentCategory("without category")}><GoPrimitiveDot /> without category</Dropdown.Item></>
+                  {currentCategory && (
+                    <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentCategory(null)}><RiArrowGoBackFill /> reset</Dropdown.Item></>)}
+                </DropdownButton>
+              }
+              {
+                (currentCategory || currentAccess) && (podType !== "acp") &&
+                <OverlayTrigger placement="left" overlay={
+                  <Popover>
+                    <Popover.Body className="py-1 px-1">
+                      Reset category and access filters
+                    </Popover.Body>
+                  </Popover>}>
+                  <Button
+                    variant="secondary"
+                    onClick={() => {
+                      setCurrentCategory(null);
+                      setCurrentAccess(null);
+                    }
+
+                    }>Reset all</Button>
+                </OverlayTrigger>
+              }
+            </ButtonGroup>
             <OverlayTrigger placement="left" overlay={
               <Popover>
                 <Popover.Body className="py-1 px-1">
@@ -200,6 +203,7 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, stora
               </Popover>}>
               <a className="btn btn-secondary ms-auto my-1 d-flex align-items-center justify-content-center" onClick={handleCreate}><BsPlusLg /></a>
             </OverlayTrigger>
+
           </div>
           <div className="list-group w-100 h-80">
             {
@@ -217,6 +221,7 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, stora
                         setNoteToView(note);
                         setViewerStatus(true);
                         setCreatorStatus(false);
+                        setNoteModalState(true);
                       }}
                     >
                       <div style={{ display: "inline-block" }}>

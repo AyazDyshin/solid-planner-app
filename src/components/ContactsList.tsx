@@ -37,7 +37,7 @@ const ContactsList = ({ contactsArr, setContactsArr, otherWebId, setOtherWebId, 
                         <BsPlusLg /></Button>
                 </OverlayTrigger>
             </div>
-            <div className="list-group w-100 h-100">
+            <div className="list-group w-100 h-80">
                 {
                     contactsArr.map((contact, index) => {
                         return <a

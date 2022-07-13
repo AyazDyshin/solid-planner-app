@@ -1,7 +1,7 @@
 import { ThingPersisted } from "@inrupt/solid-client";
 import { useSession } from "@inrupt/solid-ui-react";
 import { useEffect, useState } from "react";
-import { Button, Spinner } from "react-bootstrap";
+import { Button, Modal, Spinner } from "react-bootstrap";
 import { checkContacts, fetchAllEntries, fetchContacts, thingToNote } from "../services/SolidPod";
 import ContactsList from "./ContactsList";
 import NoContacts from "./NoContacts";
@@ -31,6 +31,7 @@ const ContactsRender = ({ storagePref, publicTypeIndexUrl, prefFileLocation, pod
     const [notesArray, setNotesArray] = useState<(Note | null)[]>([]);
     const [noteToView, setNoteToView] = useState<Note | null>(null);
     const [viewerStatus, setViewerStatus] = useState<boolean>(false);
+    const [contactModalState, setContactModalState] = useState<boolean>(false);
 
     if (webId === undefined) {
         throw new Error(`Error, couldn't get user's WebId`);
@@ -63,73 +64,80 @@ const ContactsRender = ({ storagePref, publicTypeIndexUrl, prefFileLocation, pod
     }, [otherWebId]);
 
     return (
-        <div className="container-fluid pad">
-            <div className="row h-100">
-                <div className="col h-100 border border-5 border-end-0 d-flex justify-content-center align-items-center p-0">
-                    {
-                        isLoading && <Spinner animation="border" role="status">
-                            <span className="visually-hidden">Loading...</span>
-                        </Spinner>
-                    }
+        <div className="container-fluid pad h-100 w-100 d-flex justify-content-center" style={{ "backgroundColor": "#F8F8F8" }}>
+            <div id="setWidth" style={{ "backgroundColor": "#fff" }} className="h-100 w-100 px-2 adjust-me-based-on-size  d-flex justify-content-center align-items-center p-0">
+                {
+                    isLoading && <Spinner animation="border" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                    </Spinner>
+                }
 
-                    {
-                        !isLoading && contactsFdrStatus && !otherWebId &&
-                        <ContactsList
-                            isLoading={isLoading}
-                            setIsLoading={setIsLoading}
-                            contactsArr={contactsArr}
-                            setContactsArr={setContactsArr}
-                            otherWebId={otherWebId}
-                            setOtherWebId={setOtherWebId}
-                        />
-                    }
-                    {
-                        notesArray.length !== 0 && !isLoading && contactsFdrStatus && otherWebId &&
-                        <ViewNotes
-                            isLoading={isLoading}
-                            setIsLoading={setIsLoading}
-                            viewerStatus={viewerStatus}
-                            setViewerStatus={setViewerStatus}
-                            noteToView={noteToView}
-                            setNoteToView={setNoteToView}
-                            notesArray={notesArray}
-                            setNotesArray={setNotesArray}
-                            otherWebId={otherWebId}
-                            setOtherWebId={setOtherWebId}
-                        />
-                    }
-                    {
-                        notesArray.length === 0 && !isLoading && otherWebId && contactsFdrStatus &&
-                        <div>
-                            <div className="card text-center">
-                                <div className="card-body">
-                                    <h5 className="card-title">Oooops...</h5>
-                                    <p className="card-text">Seems like there is no content that you can view</p>
-                                    <Button onClick={() => {
-                                        setIsLoading(true);
-                                        setOtherWebId(null);
-                                    }}>Go Back</Button>
-                                </div>
+                {
+                    !isLoading && contactsFdrStatus && !otherWebId &&
+                    <ContactsList
+                        isLoading={isLoading}
+                        setIsLoading={setIsLoading}
+                        contactsArr={contactsArr}
+                        setContactsArr={setContactsArr}
+                        otherWebId={otherWebId}
+                        setOtherWebId={setOtherWebId}
+                    />
+                }
+                {
+                    notesArray.length !== 0 && !isLoading && contactsFdrStatus && otherWebId &&
+                    <ViewNotes
+                        setContactModalState={setContactModalState}
+                        isLoading={isLoading}
+                        setIsLoading={setIsLoading}
+                        viewerStatus={viewerStatus}
+                        setViewerStatus={setViewerStatus}
+                        noteToView={noteToView}
+                        setNoteToView={setNoteToView}
+                        notesArray={notesArray}
+                        setNotesArray={setNotesArray}
+                        otherWebId={otherWebId}
+                        setOtherWebId={setOtherWebId}
+                    />
+
+                }
+                {
+                    notesArray.length === 0 && !isLoading && otherWebId && contactsFdrStatus &&
+                    <div>
+                        <div className="card text-center">
+                            <div className="card-body">
+                                <h5 className="card-title">Oooops...</h5>
+                                <p className="card-text">Seems like there is no content that you can view</p>
+                                <Button onClick={() => {
+                                    setIsLoading(true);
+                                    setOtherWebId(null);
+                                }}>Go Back</Button>
                             </div>
                         </div>
+                    </div>
 
-                    }
-                    {
-                        !isLoading && !contactsFdrStatus && <NoContacts />
-                    }
+                }
+                {
+                    !isLoading && !contactsFdrStatus && <NoContacts />
+                }
 
-                </div>
-                <div className="col h-100 border border-5">
-                    {
-                        otherWebId && viewerStatus &&
+            </div>
+
+            {
+                otherWebId && viewerStatus &&
+                <Modal id="viewerModal" show={contactModalState} style={{ "height": "90vh" }}
+                    size="lg"
+                    onHide={() => { setContactModalState(false) }}>
+                    <Modal.Header closeButton>
+                        Note viewer
+                    </Modal.Header>
+                    <Modal.Body id="viewerModal">
                         <NoteViewer
                             noteToView={noteToView}
                             setNoteToView={setNoteToView}
                         />
-                    }
-                </div>
-            </div>
-
+                    </Modal.Body>
+                </Modal>
+            }
         </div>
     )
 }

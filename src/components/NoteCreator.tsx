@@ -220,7 +220,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
         setNoteChanged(true);
     };
     return (
-        <div >
+        <div style={{ "height": "70vh" }}>
             <InputGroup className="mb-2 mt-2">
                 <InputGroup.Text id="basic-addon1">Title:</InputGroup.Text>
                 <FormControl
@@ -234,6 +234,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
                     <Button variant="secondary" onClick={handleSave}><MdSaveAlt /> save</Button>
                     <DropdownButton className="dropNoIcon"
                         variant="outline-secondary"
+                        menuVariant="dark"
                         title={<BsThreeDots />}
                         id="input-group-dropdown-1"
                     >

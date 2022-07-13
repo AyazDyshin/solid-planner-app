@@ -51,6 +51,7 @@ const CategoryModal = ({ categoryModalState, setCategoryModalState, setNoteInp,
                         categoryArray.length !== 0 && <DropdownButton
                             variant="outline-secondary"
                             title="choose existing category"
+                            menuVariant="dark"
                         >
                             {
                                 categoryArray.map((category, index) => {

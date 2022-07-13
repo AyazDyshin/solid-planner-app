@@ -289,6 +289,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
         <ButtonGroup>
           <Button variant="secondary" onClick={handleSave}><MdSaveAlt /> save</Button>
           <DropdownButton className="dropNoIcon"
+            menuVariant="dark"
             variant="outline-secondary"
             title={<BsThreeDots />}
             id="input-group-dropdown-1"
@@ -315,6 +316,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
             <InputGroup.Text id="basic-addon1" style={{ 'width': '50%' }}>repeat</InputGroup.Text>
             <div className="d-grid">
               <DropdownButton
+                menuVariant="dark"
                 variant="outline-secondary"
                 title={habitInp.recurrence}
                 id="input-group-dropdown-1"

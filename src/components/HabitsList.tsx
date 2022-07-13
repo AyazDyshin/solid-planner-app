@@ -4,7 +4,7 @@ import { fetchAllEntries, thingToHabit, editHabit, deleteEntry } from '../servic
 import { BsPlusLg } from "react-icons/bs";
 import { Habit } from './types';
 import { extractCategories, filterByAccess, filterByCategory, getHabitsToday, setStreaks } from '../services/helpers';
-import { DropdownButton, Dropdown, OverlayTrigger, Popover, Badge, Spinner, Button } from 'react-bootstrap';
+import { DropdownButton, Dropdown, OverlayTrigger, Popover, Badge, Spinner, Button, ButtonGroup } from 'react-bootstrap';
 import { BiFolder } from 'react-icons/bi';
 import { GoPrimitiveDot, GoCheck, GoX } from 'react-icons/go';
 import { RiArrowDropDownLine, RiArrowGoBackFill } from 'react-icons/ri';
@@ -44,11 +44,14 @@ interface Props {
   defFolder: string | null;
   habitUpdInProgress: boolean;
   setHabitUpdInProgress: React.Dispatch<React.SetStateAction<boolean>>;
+  habitModalState: boolean;
+  setHabitModalState: React.Dispatch<React.SetStateAction<boolean>>;
 }
 const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorStatus, habitsFetched, setHabitsFetched,
   habitsArray, setHabitsArray, isEdit, setIsEdit, habitToView, setHabitToView, newEntryCr, setNewEntryCr, storagePref,
   habitsToday, setHabitsToday, categoryArray, setCategoryArray, habitInp, setHabitInp, habitDoSave, setHabitDoSave, currentView,
-  setCurrentView, prefFileLocation, publicTypeIndexUrl, podType, defFolder, habitUpdInProgress, setHabitUpdInProgress
+  setCurrentView, prefFileLocation, publicTypeIndexUrl, podType, defFolder, habitUpdInProgress, setHabitUpdInProgress,
+  habitModalState, setHabitModalState
 }: Props) => {
   const { session, fetch } = useSession();
   const { webId } = session.info;
@@ -146,6 +149,7 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
   const handleCreate = () => {
     setViewerStatus(false);
     setCreatorStatus(true);
+    setHabitModalState(true);
   };
   const handleSave = async (toSave: Habit) => {
     let updHabit = setStreaks(toSave);
@@ -176,6 +180,7 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
             <a className="btn btn-primary" onClick={() => {
               setCreatorStatus(true);
               setViewerStatus(false);
+              setHabitModalState(true);
             }}>create</a>
           </div>
         </div>
@@ -185,106 +190,111 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
       return (
         <div className="w-100 h-100">
           <div className="d-flex">
-            <DropdownButton
-              className="mx-1 my-1"
-              variant="secondary"
-              title={currentView}
-            >
-              <Dropdown.Item onClick={() => {
-                setViewerStatus(false);
-                setCreatorStatus(false);
-                setCurrentView('today');
-              }}>today</Dropdown.Item>
-              <Dropdown.Item onClick={() => {
-                setViewerStatus(false);
-                setCreatorStatus(false);
-                setCurrentView('all habits');
-              }}>all habits</Dropdown.Item>
-            </DropdownButton>
-            <DropdownButton
-              className="mx-1 my-1"
-              variant="secondary"
-              title={currentStatus}
-            >
-              <Dropdown.Item onClick={() => {
-                setViewerStatus(false);
-                setCreatorStatus(false);
-                setCurrentStatus('done');
-              }}>done</Dropdown.Item>
-              <Dropdown.Item onClick={() => {
-                setViewerStatus(false);
-                setCreatorStatus(false);
-                setCurrentStatus('undone');
-              }}>undone</Dropdown.Item>
-              <Dropdown.Item onClick={() => {
-                setViewerStatus(false);
-                setCreatorStatus(false);
-                setCurrentStatus('all');
-              }}>all</Dropdown.Item>
-
-            </DropdownButton>
-            {
-              (podType !== "acp") &&
+            <ButtonGroup className="my-1">
               <DropdownButton
-                className="mx-1 my-1"
+                as={ButtonGroup}
+                menuVariant="dark"
                 variant="secondary"
-                title={<div><VscTypeHierarchySuper /> {currentAccess ? currentAccess : "access type"} <RiArrowDropDownLine /></div>}
+                title={currentView}
               >
-                {
-                  accessArray.map((access, key) => {
-                    return <Dropdown.Item href="" key={Date.now() + key + Math.floor(Math.random() * 1000)}
-                      onClick={() => {
-                        setViewerStatus(false);
-                        setCreatorStatus(false);
-                        setCurrentAccess(access);
-                      }}><GoPrimitiveDot /> {access}</Dropdown.Item>
-                  })
-                }
-                {currentAccess && (
-                  <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentAccess(null)}><RiArrowGoBackFill /> reset</Dropdown.Item></>)}
+                <Dropdown.Item onClick={() => {
+                  setViewerStatus(false);
+                  setCreatorStatus(false);
+                  setCurrentView('today');
+                }}>today</Dropdown.Item>
+                <Dropdown.Item onClick={() => {
+                  setViewerStatus(false);
+                  setCreatorStatus(false);
+                  setCurrentView('all habits');
+                }}>all habits</Dropdown.Item>
               </DropdownButton>
-            }
-            {
-              categoryArray.length !== 0 && <DropdownButton
-                className="mx-1 my-1"
+              <DropdownButton
+                as={ButtonGroup}
+                menuVariant="dark"
                 variant="secondary"
-                title={<div><BiFolder /> {currentCategory ? currentCategory : "Category"} <RiArrowDropDownLine /></div>}
+                title={currentStatus}
               >
-                {
-                  categoryArray.map((category, key) => {
-                    return <Dropdown.Item key={Date.now() + key + Math.floor(Math.random() * 1000)}
-                      onClick={() => {
-                        setViewerStatus(false);
-                        setCreatorStatus(false);
-                        setCurrentCategory(category);
+                <Dropdown.Item onClick={() => {
+                  setViewerStatus(false);
+                  setCreatorStatus(false);
+                  setCurrentStatus('done');
+                }}>done</Dropdown.Item>
+                <Dropdown.Item onClick={() => {
+                  setViewerStatus(false);
+                  setCreatorStatus(false);
+                  setCurrentStatus('undone');
+                }}>undone</Dropdown.Item>
+                <Dropdown.Item onClick={() => {
+                  setViewerStatus(false);
+                  setCreatorStatus(false);
+                  setCurrentStatus('all');
+                }}>all</Dropdown.Item>
 
-                      }}><GoPrimitiveDot /> {category}</Dropdown.Item>
-                  })
-                }
-                <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentCategory("without category")}><GoPrimitiveDot /> without category</Dropdown.Item></>
-                {currentCategory && (
-                  <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentCategory(null)}><RiArrowGoBackFill /> reset</Dropdown.Item></>)}
               </DropdownButton>
-            }
-            {
-              (currentCategory || currentAccess) && (podType !== "acp") &&
-              <OverlayTrigger placement="left" overlay={
-                <Popover>
-                  <Popover.Body className="py-1 px-1">
-                    Reset category and access filters
-                  </Popover.Body>
-                </Popover>}>
-                <Button
+              {
+                (podType !== "acp") &&
+                <DropdownButton
+                  as={ButtonGroup}
+                  menuVariant="dark"
                   variant="secondary"
-                  className="mx-1 my-1"
-                  onClick={() => {
-                    setCurrentCategory(null);
-                    setCurrentAccess(null);
+                  title={<div><VscTypeHierarchySuper /> {currentAccess ? currentAccess : "access type"} <RiArrowDropDownLine /></div>}
+                >
+                  {
+                    accessArray.map((access, key) => {
+                      return <Dropdown.Item href="" key={Date.now() + key + Math.floor(Math.random() * 1000)}
+                        onClick={() => {
+                          setViewerStatus(false);
+                          setCreatorStatus(false);
+                          setCurrentAccess(access);
+                        }}><GoPrimitiveDot /> {access}</Dropdown.Item>
+                    })
                   }
+                  {currentAccess && (
+                    <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentAccess(null)}><RiArrowGoBackFill /> reset</Dropdown.Item></>)}
+                </DropdownButton>
+              }
+              {
+                categoryArray.length !== 0 && <DropdownButton
+                  as={ButtonGroup}
+                  variant="secondary"
+                  menuVariant="dark"
+                  title={<div><BiFolder /> {currentCategory ? currentCategory : "Category"} <RiArrowDropDownLine /></div>}
+                >
+                  {
+                    categoryArray.map((category, key) => {
+                      return <Dropdown.Item key={Date.now() + key + Math.floor(Math.random() * 1000)}
+                        onClick={() => {
+                          setViewerStatus(false);
+                          setCreatorStatus(false);
+                          setCurrentCategory(category);
 
-                  }>Reset all</Button>
-              </OverlayTrigger>
-            }
+                        }}><GoPrimitiveDot /> {category}</Dropdown.Item>
+                    })
+                  }
+                  <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentCategory("without category")}><GoPrimitiveDot /> without category</Dropdown.Item></>
+                  {currentCategory && (
+                    <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentCategory(null)}><RiArrowGoBackFill /> reset</Dropdown.Item></>)}
+                </DropdownButton>
+              }
+              {
+                (currentCategory || currentAccess) && (podType !== "acp") &&
+                <OverlayTrigger placement="right" overlay={
+                  <Popover>
+                    <Popover.Body className="py-1 px-1">
+                      Reset category and access filters
+                    </Popover.Body>
+                  </Popover>}>
+                  <Button
+                    variant="secondary"
+                    onClick={() => {
+                      setCurrentCategory(null);
+                      setCurrentAccess(null);
+                    }
+
+                    }>Reset all</Button>
+                </OverlayTrigger>
+              }
+            </ButtonGroup>
             <OverlayTrigger placement="left" overlay={
               <Popover>
                 <Popover.Body className="py-1 px-1">
@@ -295,9 +305,6 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
             </OverlayTrigger>
           </div>
           <div className="list-group w-100 h-80">
-
-
-
             {
               habitsToShow.length !== 0 && <div className="list-group" style={{ maxHeight: '80%', overflow: 'auto' }}>
                 {
@@ -315,6 +322,7 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                           setHabitToView(habit);
                           setViewerStatus(true);
                           setCreatorStatus(false);
+                          setHabitModalState(true);
                         }}
                       >
                         {
@@ -333,7 +341,6 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                                 setHabitsToShow(tempArr);
                                 console.log(tempArr);
                                 let toSave = tempArr[key];
-                                console.log(toSave);
                                 setObjOfStates((prevState) => ({ ...prevState, [key]: !objOfStates[key] }));
                                 handleSave(toSave);
 

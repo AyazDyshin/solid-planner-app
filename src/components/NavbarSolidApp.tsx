@@ -6,6 +6,7 @@ import { CgNotes } from "react-icons/cg";
 import { FiLogOut } from "react-icons/fi";
 import { RiContactsLine } from "react-icons/ri";
 import { TbListCheck } from "react-icons/tb";
+import { useState } from "react";
 interface Props {
     links: string[];
     active: string;
@@ -27,6 +28,8 @@ const NavbarSolidApp = ({ links, active, setActive, viewerStatus, setViewerStatu
     if (webId === undefined) {
         throw new Error(`Error, couldn't get user's WebId`);
     }
+    const [expanded, setExpanded] = useState(false);
+
     const onError = (error: Error) => {
         console.log(error);
     }
@@ -44,11 +47,11 @@ const NavbarSolidApp = ({ links, active, setActive, viewerStatus, setViewerStatu
     }
 
     return (
-        <Navbar bg="primary" variant="dark" expand="lg" fixed="top">
+        <Navbar bg="primary" variant="dark" expand="lg" fixed="top" expanded={expanded}>
             <Container>
                 <Navbar.Brand href="#home">Solid Planner App</Navbar.Brand>
-                <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                <Navbar.Collapse id="basic-navbar-nav">
+                <Navbar.Toggle aria-controls="basic-navbar-nav" onClick={() => setExpanded(!expanded)} />
+                <Navbar.Collapse>
                     <Nav className="d-flex justify-content-around w-100">
                         {links.map((link, index) => (
                             <Nav.Link
@@ -57,6 +60,7 @@ const NavbarSolidApp = ({ links, active, setActive, viewerStatus, setViewerStatu
                                 onClick={(e) => {
                                     e.preventDefault();
                                     setActive(link);
+                                    setExpanded(false)
                                     setViewerStatus(false);
                                     setCreatorStatus(false);
                                     setIsEdit(false);

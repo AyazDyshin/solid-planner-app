@@ -1,5 +1,6 @@
 import { AccessModes } from '@inrupt/solid-client/dist/acp/policy';
 import React, { useState } from 'react'
+import { Modal } from 'react-bootstrap';
 import HabitsCreator from './HabitsCreator'
 import HabitsList from './HabitsList'
 import { accessObject, Habit } from './types';
@@ -44,90 +45,99 @@ const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsA
     });
     const [currentView, setCurrentView] = useState<string>("today");
     const [habitUpdInProgress, setHabitUpdInProgress] = useState<boolean>(false);
+    const [habitModalState, setHabitModalState] = useState<boolean>(false);
 
     return (
-        <div className="container-fluid pad">
-            <div className="row h-100">
-                <div className="col h-100 border border-5 border-end-0 d-flex justify-content-center align-items-center p-0">
-                    <HabitsList
-                        habitUpdInProgress={habitUpdInProgress}
-                        setHabitUpdInProgress={setHabitUpdInProgress}
-                        defFolder={defFolder}
-                        podType={podType}
-                        publicTypeIndexUrl={publicTypeIndexUrl}
-                        prefFileLocation={prefFileLocation}
-                        currentView={currentView}
-                        setCurrentView={setCurrentView}
-                        habitDoSave={habitDoSave}
-                        setHabitDoSave={setHabitDoSave}
-                        habitInp={habitInp}
-                        setHabitInp={setHabitInp}
-                        categoryArray={categoryArray}
-                        setCategoryArray={setCategoryArray}
-                        habitsToday={habitsToday}
-                        setHabitsToday={setHabitsToday}
-                        newEntryCr={newEntryCr}
-                        setNewEntryCr={setNewEntryCr}
-                        habitToView={habitToView}
-                        setHabitToView={setHabitToView}
-                        habitsFetched={habitsFetched}
-                        setHabitsFetched={setHabitsFetched}
-                        habitsArray={habitsArray}
-                        setHabitsArray={setHabitsArray}
-                        viewerStatus={viewerStatus}
-                        setViewerStatus={setViewerStatus}
-                        creatorStatus={creatorStatus}
-                        setCreatorStatus={setCreatorStatus}
-                        isEdit={isEdit}
-                        setIsEdit={setIsEdit}
-                        storagePref={storagePref}
-                    />
-                </div>
-                <div className="col h-100 border border-5">
-                    {(viewerStatus || creatorStatus) && <HabitsCreator
-                        contactsArr={contactsArr}
-                        setContactsArr={setContactsArr}
-                        contactsFetched={contactsFetched}
-                        setContactsFetched={setContactsFetched}
-                        contactsFdrStatus={contactsFdrStatus}
-                        setContactsFdrStatus={setContactsFdrStatus}
-                        habitUpdInProgress={habitUpdInProgress}
-                        setHabitUpdInProgress={setHabitUpdInProgress}
-                        publicTypeIndexUrl={publicTypeIndexUrl}
-                        podType={podType}
-                        prefFileLocation={prefFileLocation}
-                        defFolder={defFolder}
-                        storagePref={storagePref}
-                        currentView={currentView}
-                        setCurrentView={setCurrentView}
-                        habitDoSave={habitDoSave}
-                        setHabitDoSave={setHabitDoSave}
-                        categoryArray={categoryArray}
-                        setCategoryArray={setCategoryArray}
-                        agentsToUpd={agentsToUpd}
-                        setAgentsToUpd={setAgentsToUpd}
-                        publicAccess={publicAccess}
-                        setPublicAccess={setPublicAccess}
-                        accUpdObj={accUpdObj}
-                        setAccUpdObj={setAccUpdObj}
-                        newEntryCr={newEntryCr}
-                        setNewEntryCr={setNewEntryCr}
-                        habitsArray={habitsArray}
-                        setHabitsArray={setHabitsArray}
-                        habitToView={habitToView}
-                        setHabitToView={setHabitToView}
-                        creatorStatus={creatorStatus}
-                        setCreatorStatus={setCreatorStatus}
-                        habitInp={habitInp}
-                        setHabitInp={setHabitInp}
-                        viewerStatus={viewerStatus}
-                        setViewerStatus={setViewerStatus}
-                        isEdit={isEdit}
-                        setIsEdit={setIsEdit}
-                    />
-                    }
-                </div>
+        <div className="container-fluid pad h-100 w-100 d-flex justify-content-center" style={{ "backgroundColor": "#F8F8F8" }}>
+            <div id="setWidth" style={{ "backgroundColor": "#fff" }} className="h-100 w-100 px-2 adjust-me-based-on-size  d-flex justify-content-center align-items-center p-0">
+                <HabitsList
+                    habitModalState={habitModalState}
+                    setHabitModalState={setHabitModalState}
+                    habitUpdInProgress={habitUpdInProgress}
+                    setHabitUpdInProgress={setHabitUpdInProgress}
+                    defFolder={defFolder}
+                    podType={podType}
+                    publicTypeIndexUrl={publicTypeIndexUrl}
+                    prefFileLocation={prefFileLocation}
+                    currentView={currentView}
+                    setCurrentView={setCurrentView}
+                    habitDoSave={habitDoSave}
+                    setHabitDoSave={setHabitDoSave}
+                    habitInp={habitInp}
+                    setHabitInp={setHabitInp}
+                    categoryArray={categoryArray}
+                    setCategoryArray={setCategoryArray}
+                    habitsToday={habitsToday}
+                    setHabitsToday={setHabitsToday}
+                    newEntryCr={newEntryCr}
+                    setNewEntryCr={setNewEntryCr}
+                    habitToView={habitToView}
+                    setHabitToView={setHabitToView}
+                    habitsFetched={habitsFetched}
+                    setHabitsFetched={setHabitsFetched}
+                    habitsArray={habitsArray}
+                    setHabitsArray={setHabitsArray}
+                    viewerStatus={viewerStatus}
+                    setViewerStatus={setViewerStatus}
+                    creatorStatus={creatorStatus}
+                    setCreatorStatus={setCreatorStatus}
+                    isEdit={isEdit}
+                    setIsEdit={setIsEdit}
+                    storagePref={storagePref}
+                />
             </div>
+                {(viewerStatus || creatorStatus) &&
+                    <Modal id="viewerModal" show={habitModalState} style={{ "height": "90vh" }}
+                        size="lg"
+                        onHide={() => { setHabitModalState(false) }}>
+                        <Modal.Header closeButton>
+                            {creatorStatus ? "create a note" : "edit a note"}
+                        </Modal.Header>
+                        <Modal.Body id="viewerModal">
+                            <HabitsCreator
+                                contactsArr={contactsArr}
+                                setContactsArr={setContactsArr}
+                                contactsFetched={contactsFetched}
+                                setContactsFetched={setContactsFetched}
+                                contactsFdrStatus={contactsFdrStatus}
+                                setContactsFdrStatus={setContactsFdrStatus}
+                                habitUpdInProgress={habitUpdInProgress}
+                                setHabitUpdInProgress={setHabitUpdInProgress}
+                                publicTypeIndexUrl={publicTypeIndexUrl}
+                                podType={podType}
+                                prefFileLocation={prefFileLocation}
+                                defFolder={defFolder}
+                                storagePref={storagePref}
+                                currentView={currentView}
+                                setCurrentView={setCurrentView}
+                                habitDoSave={habitDoSave}
+                                setHabitDoSave={setHabitDoSave}
+                                categoryArray={categoryArray}
+                                setCategoryArray={setCategoryArray}
+                                agentsToUpd={agentsToUpd}
+                                setAgentsToUpd={setAgentsToUpd}
+                                publicAccess={publicAccess}
+                                setPublicAccess={setPublicAccess}
+                                accUpdObj={accUpdObj}
+                                setAccUpdObj={setAccUpdObj}
+                                newEntryCr={newEntryCr}
+                                setNewEntryCr={setNewEntryCr}
+                                habitsArray={habitsArray}
+                                setHabitsArray={setHabitsArray}
+                                habitToView={habitToView}
+                                setHabitToView={setHabitToView}
+                                creatorStatus={creatorStatus}
+                                setCreatorStatus={setCreatorStatus}
+                                habitInp={habitInp}
+                                setHabitInp={setHabitInp}
+                                viewerStatus={viewerStatus}
+                                setViewerStatus={setViewerStatus}
+                                isEdit={isEdit}
+                                setIsEdit={setIsEdit}
+                            />
+                        </Modal.Body>
+                    </Modal>
+                }
         </div>
     )
 }

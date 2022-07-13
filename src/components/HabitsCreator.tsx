@@ -312,7 +312,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
       <div className="d-flex">
         <div className="d-flex-column w-50">
           <InputGroup className="w-100">
-            <InputGroup.Text id="basic-addon1" style={{ 'width': '50%' }}>repeat</InputGroup.Text>
+            <InputGroup.Text id="basic-addon1" style={{ 'width': '60%' }}>repeat</InputGroup.Text>
             <div className="d-grid">
               <DropdownButton
                 menuVariant="dark"
@@ -352,12 +352,12 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
           </InputGroup>
           {viewerStatus && <InputGroup className="w-100">
             <InputGroup.Text  {...(!isEdit && { disabled: true })}
-              className="text-center" id="basic-addon1" style={{ 'width': '50%' }}>Date Created:</InputGroup.Text>
-            <InputGroup.Text style={{ 'width': '50%' }}>
+              className="text-center" id="basic-addon1" style={{ 'width': '60%' }}>Date Created:</InputGroup.Text>
+            <InputGroup.Text style={{ 'width': '40%' }}>
               {habitInp.startDate ? constructDate(habitInp.startDate) : constructDate(new Date())}</InputGroup.Text>
           </InputGroup>}
           {viewerStatus && (currentView === 'today') && (habitInp.stat !== null) && <InputGroup className="w-100">
-            <InputGroup.Text className="text-center" id="basic-addon1" style={{ 'width': '50%' }}>Status:</InputGroup.Text>
+            <InputGroup.Text className="text-center" id="basic-addon1" style={{ 'width': '60%' }}>Status:</InputGroup.Text>
             <div className="form-check form-switch d-flex justify-content-center align-items-center">
               <input className="form-check-input"  {...(!isEdit && { disabled: true })} type="checkbox" style={{ "transform": "scale(1.6)", "marginLeft": "-0.5em" }}
                 onChange={() => {
@@ -369,19 +369,19 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
             </div>
           </InputGroup>}
           {viewerStatus && <InputGroup className="w-100">
-            <InputGroup.Text className="text-center" id="basic-addon1" style={{ 'width': '50%' }}>Current streak:</InputGroup.Text>
-            <InputGroup.Text className="text-center" id="basic-addon1" style={{ 'width': '50%' }}>
+            <InputGroup.Text className="text-center" id="basic-addon1" style={{ 'width': '60%' }}>Current streak:</InputGroup.Text>
+            <InputGroup.Text className="text-center" id="basic-addon1" style={{ 'width': '40%' }}>
               {habitInp.currentStreak ? habitInp.currentStreak : "0"}
             </InputGroup.Text>
           </InputGroup>}
           {viewerStatus && <InputGroup className="w-100">
-            <InputGroup.Text className="text-center" id="basic-addon1" style={{ 'width': '50%' }}>Best streak:</InputGroup.Text>
-            <InputGroup.Text className="text-center" id="basic-addon1" style={{ 'width': '50%' }}>
+            <InputGroup.Text className="text-center" id="basic-addon1" style={{ 'width': '60%' }}>Best streak:</InputGroup.Text>
+            <InputGroup.Text className="text-center" id="basic-addon1" style={{ 'width': '40%' }}>
               {habitInp.bestStreak ? habitInp.bestStreak : "0"}
             </InputGroup.Text>
           </InputGroup>}
           <InputGroup className="w-100">
-            <InputGroup.Text className="text-center" id="basic-addon1" style={{ 'width': '50%' }}>Color:</InputGroup.Text>
+            <InputGroup.Text className="text-center" id="basic-addon1" style={{ 'width': '60%' }}>Color:</InputGroup.Text>
 
 
             <Button onClick={() => setShowColorPicker(true)} style={{ "backgroundColor": habitInp.color, 'width': '25%' }}>
@@ -396,7 +396,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
           onChange={handleChange}
         />
       </div>
-      <div className="d-flex justify-content-center ">
+      <div className="d-flex justify-content-center my-1">
         <Button onClick={() => setCalendarModalState(true)}> View in a calendar</Button>
       </div>
       <Modal show={showColorPicker} onHide={() => { setShowColorPicker(false) }}>

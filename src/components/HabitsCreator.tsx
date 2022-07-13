@@ -352,12 +352,12 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
           </InputGroup>
           {viewerStatus && <InputGroup className="w-100">
             <InputGroup.Text  {...(!isEdit && { disabled: true })}
-              className="text-center" id="basic-addon1" style={{ 'width': '60%' }}>Date Created:</InputGroup.Text>
-            <InputGroup.Text style={{ 'width': '40%' }}>
+              className="text-center adjust-3" id="basic-addon1">Date Created:</InputGroup.Text>
+            <InputGroup.Text className="adjust-3">
               {habitInp.startDate ? constructDate(habitInp.startDate) : constructDate(new Date())}</InputGroup.Text>
           </InputGroup>}
           {viewerStatus && (currentView === 'today') && (habitInp.stat !== null) && <InputGroup className="w-100">
-            <InputGroup.Text className="text-center" id="basic-addon1" style={{ 'width': '60%' }}>Status:</InputGroup.Text>
+            <InputGroup.Text className="text-center adjust-3" id="basic-addon1">Status:</InputGroup.Text>
             <div className="form-check form-switch d-flex justify-content-center align-items-center">
               <input className="form-check-input"  {...(!isEdit && { disabled: true })} type="checkbox" style={{ "transform": "scale(1.6)", "marginLeft": "-0.5em" }}
                 onChange={() => {
@@ -369,14 +369,14 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
             </div>
           </InputGroup>}
           {viewerStatus && <InputGroup className="w-100">
-            <InputGroup.Text className="text-center" id="basic-addon1" style={{ 'width': '60%' }}>Current streak:</InputGroup.Text>
-            <InputGroup.Text className="text-center" id="basic-addon1" style={{ 'width': '40%' }}>
+            <InputGroup.Text className="text-center adjust-3" id="basic-addon1">Current streak:</InputGroup.Text>
+            <InputGroup.Text className="text-center adjust-3" id="basic-addon1">
               {habitInp.currentStreak ? habitInp.currentStreak : "0"}
             </InputGroup.Text>
           </InputGroup>}
           {viewerStatus && <InputGroup className="w-100">
-            <InputGroup.Text className="text-center" id="basic-addon1" style={{ 'width': '60%' }}>Best streak:</InputGroup.Text>
-            <InputGroup.Text className="text-center" id="basic-addon1" style={{ 'width': '40%' }}>
+            <InputGroup.Text className="text-center adjust-3" id="basic-addon1">Best streak:</InputGroup.Text>
+            <InputGroup.Text className="text-center adjust-3" id="basic-addon1">
               {habitInp.bestStreak ? habitInp.bestStreak : "0"}
             </InputGroup.Text>
           </InputGroup>}

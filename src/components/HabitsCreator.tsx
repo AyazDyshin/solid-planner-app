@@ -1,5 +1,5 @@
 import "../styles.css";
-import { Button, ButtonGroup, Dropdown, DropdownButton, FormControl, InputGroup, OverlayTrigger, Popover, Tooltip } from 'react-bootstrap';
+import { Button, ButtonGroup, Dropdown, DropdownButton, FormControl, InputGroup, Modal, OverlayTrigger, Popover, Tooltip } from 'react-bootstrap';
 import { accessObject, Habit } from './types';
 import { BsThreeDots, BsShare } from "react-icons/bs";
 import { FiEdit } from "react-icons/fi";
@@ -162,7 +162,6 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
   }
   const popover = (
     <Popover.Body>
-      <TwitterPicker triangle="hide" onChangeComplete={getColor} />
     </Popover.Body>
   );
   const handleSave = async () => {
@@ -384,10 +383,9 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
           <InputGroup className="w-100">
             <InputGroup.Text className="text-center" id="basic-addon1" style={{ 'width': '50%' }}>Color:</InputGroup.Text>
 
-            <OverlayTrigger placement="right" overlay={popover} show={showColorPicker}>
-              <Button onClick={() => setShowColorPicker(!showColorPicker)} style={{ "backgroundColor": habitInp.color, 'width': '25%' }}>
-              </Button>
-            </OverlayTrigger>
+
+            <Button onClick={() => setShowColorPicker(true)} style={{ "backgroundColor": habitInp.color, 'width': '25%' }}>
+            </Button>
           </InputGroup>
         </div>
         <FormControl {...(!isEdit && { disabled: true })} as="textarea" aria-label="textarea"
@@ -401,6 +399,12 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
       <div className="d-flex justify-content-center ">
         <Button onClick={() => setCalendarModalState(true)}> View in a calendar</Button>
       </div>
+      <Modal show={showColorPicker} onHide={() => { setShowColorPicker(false) }}>
+        <Modal.Header closeButton>
+          <Modal.Title>Pick a color</Modal.Title>
+        </Modal.Header>
+        <TwitterPicker triangle="hide" onChangeComplete={getColor} width="100%" />
+      </Modal>
       <CalendarModal
         calendarModalState={calendarModalState}
         setCalendarModalState={setCalendarModalState}

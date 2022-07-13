@@ -13,8 +13,8 @@ const LogInPage = () => {
   const [issuer, setIssuer] = useState<string>("https://");
   const [providerModalState, setProviderModalState] = useState<boolean>(false);
   return (
-    <div className="container">
-      <Form className="container w-50 px-5 pt-5 pb-4 border border-3 mt-5 rounded border-secondary shadow-lg">
+    <div className="adjust-2">
+      <Form className="container px-5 pt-5 pb-4 border border-3 mt-5 rounded border-secondary">
         <h3 className="display-3 text-center mb-5">Solid Planner App</h3>
         <InputGroup>
           <DropdownButton

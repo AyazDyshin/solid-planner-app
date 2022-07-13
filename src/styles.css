@@ -1,41 +1,63 @@
 .pad {
-    padding-top: 56px;
-    height: 100%;
+  padding-top: 56px;
+  height: 100%;
 }
 
 .cursor {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .dropdown-toggle::after {
-    display: none !important;
+  display: none !important;
 }
 
 .center {
-    margin: 0 auto;
+  margin: 0 auto;
 }
 
 
 .modal-body {
-    /* 100% = dialog height, 120px = header + footer */
-    height: 100%;
-    overflow-y: scroll;
+  /* 100% = dialog height, 120px = header + footer */
+  height: 100%;
+  overflow-y: scroll;
 }
 
-.adjust-me-based-on-size{
-    margin-left: 20%;
-    margin-right: 20%;
+.adjust-me-based-on-size {
+  margin-left: 20%;
+  margin-right: 20%;
+}
+
+@media only screen and (min-width: 800) and (max-width: 1200) {
+  .adjust-me-based-on-size {
+
+    margin-left: 10%;
+    margin-right: 10%;
   }
-  @media only screen and (min-width: 800) and (max-width: 1200) {
-    .adjust-me-based-on-size {
-  
-      margin-left: 10%;
-      margin-right: 10%;
-    }
+}
+
+@media only screen and (max-width: 600px) {
+  .adjust-me-based-on-size {
+    margin-left: 0%;
+    margin-right: 0%;
   }
-  @media only screen and (max-width: 600px) {
-    .adjust-me-based-on-size {
-      margin-left: 0;
-      margin-right: 0%;
-    }
+}
+
+.adjust-2 {
+  margin-left: 25%;
+  margin-right: 25%;
+}
+
+@media only screen and (min-width: 800) and (max-width: 1200) {
+  .adjust-2 {
+
+    margin-left: 10%;
+    margin-right: 10%;
   }
+}
+
+@media only screen and (max-width: 600px) {
+  .adjust-2 {
+    margin-left: 0%;
+    margin-right: 0%;
+  }
+}

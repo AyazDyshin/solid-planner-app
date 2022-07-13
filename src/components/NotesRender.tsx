@@ -57,7 +57,7 @@ const NotesRender = ({ active, viewerStatus, setViewerStatus, creatorStatus, set
     const [noteModalState, setNoteModalState] = useState<boolean>(false);
     return (
         <div className="container-fluid pad h-100 w-100 d-flex justify-content-center" style={{ "backgroundColor": "#F8F8F8" }}>
-            <div id="setWidth" style={{ "backgroundColor": "#fff" }} className="h-100 w-100 px-2 adjust-me-based-on-size  d-flex justify-content-center align-items-center p-0">
+        <div id="setWidth" style={{ "backgroundColor": "#fff" }} className="h-100 w-100  adjust-me-based-on-size  d-flex justify-content-center align-items-center p-0">
                 <NotesList
                     setNoteModalState={setNoteModalState}
                     noteUpdInProgress={noteUpdInProgress}

@@ -1,16 +1,18 @@
 import { useSession } from '@inrupt/solid-ui-react';
 import { useEffect, useState } from 'react';
 import { fetchAllEntries, thingToHabit, editHabit, deleteEntry } from '../services/SolidPod';
-import { BsPlusLg } from "react-icons/bs";
+import { BsCircle } from "react-icons/bs";
 import { Habit } from './types';
 import { extractCategories, filterByAccess, filterByCategory, getHabitsToday, setStreaks } from '../services/helpers';
-import { DropdownButton, Dropdown, OverlayTrigger, Popover, Badge, Spinner, Button, ButtonGroup } from 'react-bootstrap';
+import { DropdownButton, Dropdown, OverlayTrigger, Popover, Badge, Spinner, Button, ButtonGroup, Container, Nav, Navbar, NavDropdown } from 'react-bootstrap';
 import { BiFolder } from 'react-icons/bi';
 import { GoPrimitiveDot, GoCheck, GoX } from 'react-icons/go';
 import { RiArrowDropDownLine, RiArrowGoBackFill } from 'react-icons/ri';
 import { VscTypeHierarchySuper } from 'react-icons/vsc';
 import { RiDeleteBin6Line } from "react-icons/ri";
 import DeleteModal from '../modals/DeleteModal';
+import { MdCreate } from 'react-icons/md';
+import { FiClock } from 'react-icons/fi';
 
 interface Props {
   viewerStatus: boolean;
@@ -190,119 +192,125 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
       return (
         <div className="w-100 h-100">
           <div className="d-flex">
-            <ButtonGroup className="my-1">
-              <DropdownButton
-                as={ButtonGroup}
-                menuVariant="dark"
-                variant="secondary"
-                title={currentView}
-              >
-                <Dropdown.Item onClick={() => {
-                  setViewerStatus(false);
-                  setCreatorStatus(false);
-                  setCurrentView('today');
-                }}>today</Dropdown.Item>
-                <Dropdown.Item onClick={() => {
-                  setViewerStatus(false);
-                  setCreatorStatus(false);
-                  setCurrentView('all habits');
-                }}>all habits</Dropdown.Item>
-              </DropdownButton>
-              <DropdownButton
-                as={ButtonGroup}
-                menuVariant="dark"
-                variant="secondary"
-                title={currentStatus}
-              >
-                <Dropdown.Item onClick={() => {
-                  setViewerStatus(false);
-                  setCreatorStatus(false);
-                  setCurrentStatus('done');
-                }}>done</Dropdown.Item>
-                <Dropdown.Item onClick={() => {
-                  setViewerStatus(false);
-                  setCreatorStatus(false);
-                  setCurrentStatus('undone');
-                }}>undone</Dropdown.Item>
-                <Dropdown.Item onClick={() => {
-                  setViewerStatus(false);
-                  setCreatorStatus(false);
-                  setCurrentStatus('all');
-                }}>all</Dropdown.Item>
+            <Navbar expand="lg" bg="warning" variant="light" className="w-100">
+              <Container>
+                <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                <Navbar.Collapse id="basic-navbar-nav">
+                  <Nav className="me-auto">
+                    <NavDropdown
+                      menuVariant="dark"
+                      title={<div><FiClock /> {currentView} <RiArrowDropDownLine /></div>}
+                    >
+                      <NavDropdown.Item onClick={() => {
+                        setViewerStatus(false);
+                        setCreatorStatus(false);
+                        setCurrentView('today');
+                      }}><GoPrimitiveDot /> today</NavDropdown.Item>
+                      <NavDropdown.Item onClick={() => {
+                        setViewerStatus(false);
+                        setCreatorStatus(false);
+                        setCurrentView('all habits');
+                      }}><GoPrimitiveDot /> all habits</NavDropdown.Item>
+                    </NavDropdown>
+                    <NavDropdown
+                      as={ButtonGroup}
+                      menuVariant="dark"
+                      variant="secondary"
+                      title={<div><BsCircle /> {currentStatus} <RiArrowDropDownLine /></div>}
+                    >
+                      <NavDropdown.Item onClick={() => {
+                        setViewerStatus(false);
+                        setCreatorStatus(false);
+                        setCurrentStatus('done');
+                      }}><GoPrimitiveDot /> done</NavDropdown.Item>
+                      <NavDropdown.Item onClick={() => {
+                        setViewerStatus(false);
+                        setCreatorStatus(false);
+                        setCurrentStatus('undone');
+                      }}><GoPrimitiveDot /> undone</NavDropdown.Item>
+                      <NavDropdown.Item onClick={() => {
+                        setViewerStatus(false);
+                        setCreatorStatus(false);
+                        setCurrentStatus('all');
+                      }}><GoPrimitiveDot /> all</NavDropdown.Item>
 
-              </DropdownButton>
-              {
-                (podType !== "acp") &&
-                <DropdownButton
-                  as={ButtonGroup}
-                  menuVariant="dark"
-                  variant="secondary"
-                  title={<div><VscTypeHierarchySuper /> {currentAccess ? currentAccess : "access type"} <RiArrowDropDownLine /></div>}
-                >
-                  {
-                    accessArray.map((access, key) => {
-                      return <Dropdown.Item href="" key={Date.now() + key + Math.floor(Math.random() * 1000)}
-                        onClick={() => {
-                          setViewerStatus(false);
-                          setCreatorStatus(false);
-                          setCurrentAccess(access);
-                        }}><GoPrimitiveDot /> {access}</Dropdown.Item>
-                    })
-                  }
-                  {currentAccess && (
-                    <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentAccess(null)}><RiArrowGoBackFill /> reset</Dropdown.Item></>)}
-                </DropdownButton>
-              }
-              {
-                categoryArray.length !== 0 && <DropdownButton
-                  as={ButtonGroup}
-                  variant="secondary"
-                  menuVariant="dark"
-                  title={<div><BiFolder /> {currentCategory ? currentCategory : "Category"} <RiArrowDropDownLine /></div>}
-                >
-                  {
-                    categoryArray.map((category, key) => {
-                      return <Dropdown.Item key={Date.now() + key + Math.floor(Math.random() * 1000)}
-                        onClick={() => {
-                          setViewerStatus(false);
-                          setCreatorStatus(false);
-                          setCurrentCategory(category);
-
-                        }}><GoPrimitiveDot /> {category}</Dropdown.Item>
-                    })
-                  }
-                  <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentCategory("without category")}><GoPrimitiveDot /> without category</Dropdown.Item></>
-                  {currentCategory && (
-                    <><Dropdown.Divider /><Dropdown.Item onClick={() => setCurrentCategory(null)}><RiArrowGoBackFill /> reset</Dropdown.Item></>)}
-                </DropdownButton>
-              }
-              {
-                (currentCategory || currentAccess) && (podType !== "acp") &&
-                <OverlayTrigger placement="right" overlay={
-                  <Popover>
-                    <Popover.Body className="py-1 px-1">
-                      Reset category and access filters
-                    </Popover.Body>
-                  </Popover>}>
-                  <Button
-                    variant="secondary"
-                    onClick={() => {
-                      setCurrentCategory(null);
-                      setCurrentAccess(null);
+                    </NavDropdown>
+                    {
+                      (podType !== "acp") &&
+                      <NavDropdown
+                        menuVariant="dark"
+                        title={<div><VscTypeHierarchySuper /> {currentAccess ? currentAccess : "access type"} <RiArrowDropDownLine /></div>}
+                      >
+                        {
+                          accessArray.map((access, key) => {
+                            return <NavDropdown.Item href="" key={Date.now() + key + Math.floor(Math.random() * 1000)}
+                              onClick={() => {
+                                setViewerStatus(false);
+                                setCreatorStatus(false);
+                                setCurrentAccess(access);
+                              }}><GoPrimitiveDot /> {access}</NavDropdown.Item>
+                          })
+                        }
+                        {currentAccess && (
+                          <><NavDropdown.Divider /><NavDropdown.Item onClick={() => setCurrentAccess(null)}><RiArrowGoBackFill /> reset</NavDropdown.Item></>)}
+                      </NavDropdown>
                     }
+                    {
+                      categoryArray.length !== 0 && <NavDropdown
+                        as={ButtonGroup}
+                        variant="secondary"
+                        menuVariant="dark"
+                        title={<div><BiFolder /> {currentCategory ? currentCategory : "Category"} <RiArrowDropDownLine /></div>}
+                      >
+                        {
+                          categoryArray.map((category, key) => {
+                            return <NavDropdown.Item key={Date.now() + key + Math.floor(Math.random() * 1000)}
+                              onClick={() => {
+                                setViewerStatus(false);
+                                setCreatorStatus(false);
+                                setCurrentCategory(category);
 
-                    }>Reset all</Button>
-                </OverlayTrigger>
-              }
-            </ButtonGroup>
-            <OverlayTrigger placement="left" overlay={
-              <Popover>
-                <Popover.Body className="py-1 px-1">
-                  Create a new habit
-                </Popover.Body>
-              </Popover>}>
-              <a className="btn btn-secondary ms-auto my-1 d-flex align-items-center justify-content-center" onClick={handleCreate}><BsPlusLg /></a>
-            </OverlayTrigger>
+                              }}><GoPrimitiveDot /> {category}</NavDropdown.Item>
+                          })
+                        }
+                        <><NavDropdown.Divider /><NavDropdown.Item onClick={() => setCurrentCategory("without category")}><GoPrimitiveDot /> without category</NavDropdown.Item></>
+                        {currentCategory && (
+                          <><NavDropdown.Divider /><NavDropdown.Item onClick={() => setCurrentCategory(null)}><RiArrowGoBackFill /> reset</NavDropdown.Item></>)}
+                      </NavDropdown>
+                    }
+                    {
+                      (currentCategory || currentAccess) && (podType !== "acp") &&
+                      <OverlayTrigger placement="right" overlay={
+                        <Popover>
+                          <Popover.Body className="py-1 px-1">
+                            Reset category and access filters
+                          </Popover.Body>
+                        </Popover>}>
+                        <Nav.Link
+                          className="me-auto"
+                          onClick={() => {
+                            setCurrentCategory(null);
+                            setCurrentAccess(null);
+                          }
+
+                          }><RiArrowGoBackFill /> Reset all</Nav.Link>
+                      </OverlayTrigger>
+                    }
+                    <OverlayTrigger placement="right" overlay={
+                      <Popover>
+                        <Popover.Body className="py-1 px-1">
+                          Create a new habit
+                        </Popover.Body>
+                      </Popover>}>
+                      <Nav.Link className="me-auto" onClick={handleCreate}><MdCreate /> Create</Nav.Link>
+                    </OverlayTrigger>
+                  </Nav>
+                </Navbar.Collapse>
+              </Container>
+            </Navbar>
+
+
+
           </div>
           <div className="list-group w-100 h-80">
             {

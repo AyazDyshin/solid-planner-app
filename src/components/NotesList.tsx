@@ -2,7 +2,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import { useSession } from "@inrupt/solid-ui-react";
 import { RefAttributes, useEffect, useState } from "react";
 import "../styles.css";
-import { Dropdown, DropdownButton, Badge, OverlayTrigger, Popover, PopoverProps, Button, Spinner, ButtonGroup, Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
+import { Dropdown, DropdownButton, Badge, OverlayTrigger, Popover, PopoverProps, Button, Spinner, ButtonGroup, Container, Nav, Navbar, NavDropdown, Form } from "react-bootstrap";
 import { Note } from "./types";
 import { RiArrowDropDownLine, RiArrowGoBackFill } from "react-icons/ri";
 import { BsPlusLg } from "react-icons/bs";
@@ -37,13 +37,15 @@ interface Props {
   setNotesFetched: React.Dispatch<React.SetStateAction<boolean>>;
   podType: string;
   prefFileLocation: string;
-  setNoteModalState: React.Dispatch<React.SetStateAction<boolean>>
+  setNoteModalState: React.Dispatch<React.SetStateAction<boolean>>;
+  refetchNotes: boolean;
+  setRefetchNotes: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, storagePref,
   viewerStatus, setViewerStatus, setCreatorStatus, isEdit, setIsEdit, categoryArray, setCategoryArray, publicTypeIndexUrl,
   newEntryCr, setNewEntryCr, noteUpdInProgress, setNoteUpdInProgress, notesFetched, setNotesFetched, podType,
-  prefFileLocation, setNoteModalState
+  prefFileLocation, setNoteModalState, refetchNotes, setRefetchNotes
 }: Props) => {
 
   const { session, fetch } = useSession();
@@ -66,6 +68,7 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, stora
     const fetchNotes = async () => {
       let filteredNotes: Note[]
       if (!notesFetched) {
+        console.log("we got in noootes fetch");
         let noteArr = await fetchAllEntries(webId, fetch, "note", storagePref, prefFileLocation, publicTypeIndexUrl,
           podType);
         let transformedArr = await Promise.all(noteArr.map(async (thing) => {
@@ -90,7 +93,7 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, stora
       setIsLoading(false);
     }
     fetchNotes();
-  }, [newEntryCr, currentCategory, currentAccess]);
+  }, [newEntryCr, currentCategory, currentAccess, refetchNotes, notesFetched]);
 
   const handleCreate = () => {
     setViewerStatus(false);
@@ -288,7 +291,7 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, stora
                         note.title && <div >{note.title}</div>
                       }
                       {
-                        note.title === null && <div style={{ "color": "grey" }}>  no title </div>
+                        ((note.title === null) || (note.title === '')) && <div style={{ "color": "grey" }}>  no title </div>
                       }
                       {
                         note.id &&

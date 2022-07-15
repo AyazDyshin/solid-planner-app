@@ -691,6 +691,8 @@ export const checkContacts = async (webId: string, fetch: fetcher, storage: stri
     return true;
   }
   catch (error) {
+    console.log("this is error");
+    console.log(error);
     return false;
   }
 }

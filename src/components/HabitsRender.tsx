@@ -21,10 +21,12 @@ interface Props {
     setContactsArr: React.Dispatch<React.SetStateAction<(string | null)[][]>>;
     contactsFetched: boolean;
     setContactsFetched: React.Dispatch<React.SetStateAction<boolean>>;
+    refetchHabits: boolean;
+    setRefetchHabits: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsArray, storagePref, prefFileLocation,
-    publicTypeIndexUrl, podType, defFolder, contactsFdrStatus, setContactsFdrStatus,
+    publicTypeIndexUrl, podType, defFolder, contactsFdrStatus, setContactsFdrStatus, refetchHabits, setRefetchHabits,
     contactsArr, setContactsArr, contactsFetched, setContactsFetched }: Props) => {
     const [viewerStatus, setViewerStatus] = useState<boolean>(false);
     const [creatorStatus, setCreatorStatus] = useState<boolean>(false);
@@ -51,6 +53,8 @@ const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsA
         <div className="container-fluid pad h-100 w-100 d-flex justify-content-center" style={{ "backgroundColor": "#F8F8F8" }}>
             <div id="setWidth" style={{ "backgroundColor": "#fff" }} className="h-100 w-100  adjust-me-based-on-size  d-flex justify-content-center align-items-center p-0">
                 <HabitsList
+                    refetchHabits={refetchHabits}
+                    setRefetchHabits={setRefetchHabits}
                     habitModalState={habitModalState}
                     setHabitModalState={setHabitModalState}
                     habitUpdInProgress={habitUpdInProgress}
@@ -86,58 +90,58 @@ const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsA
                     storagePref={storagePref}
                 />
             </div>
-                {(viewerStatus || creatorStatus) &&
-                    <Modal id="viewerModal" show={habitModalState} style={{ "height": "90vh" }}
-                        size="lg"
-                        onHide={() => { setHabitModalState(false) }}>
-                        <Modal.Header closeButton>
-                            {creatorStatus ? "create a habit" : "edit a habit"}
-                        </Modal.Header>
-                        <Modal.Body id="viewerModal">
-                            <HabitsCreator
-                                contactsArr={contactsArr}
-                                setContactsArr={setContactsArr}
-                                contactsFetched={contactsFetched}
-                                setContactsFetched={setContactsFetched}
-                                contactsFdrStatus={contactsFdrStatus}
-                                setContactsFdrStatus={setContactsFdrStatus}
-                                habitUpdInProgress={habitUpdInProgress}
-                                setHabitUpdInProgress={setHabitUpdInProgress}
-                                publicTypeIndexUrl={publicTypeIndexUrl}
-                                podType={podType}
-                                prefFileLocation={prefFileLocation}
-                                defFolder={defFolder}
-                                storagePref={storagePref}
-                                currentView={currentView}
-                                setCurrentView={setCurrentView}
-                                habitDoSave={habitDoSave}
-                                setHabitDoSave={setHabitDoSave}
-                                categoryArray={categoryArray}
-                                setCategoryArray={setCategoryArray}
-                                agentsToUpd={agentsToUpd}
-                                setAgentsToUpd={setAgentsToUpd}
-                                publicAccess={publicAccess}
-                                setPublicAccess={setPublicAccess}
-                                accUpdObj={accUpdObj}
-                                setAccUpdObj={setAccUpdObj}
-                                newEntryCr={newEntryCr}
-                                setNewEntryCr={setNewEntryCr}
-                                habitsArray={habitsArray}
-                                setHabitsArray={setHabitsArray}
-                                habitToView={habitToView}
-                                setHabitToView={setHabitToView}
-                                creatorStatus={creatorStatus}
-                                setCreatorStatus={setCreatorStatus}
-                                habitInp={habitInp}
-                                setHabitInp={setHabitInp}
-                                viewerStatus={viewerStatus}
-                                setViewerStatus={setViewerStatus}
-                                isEdit={isEdit}
-                                setIsEdit={setIsEdit}
-                            />
-                        </Modal.Body>
-                    </Modal>
-                }
+            {(viewerStatus || creatorStatus) &&
+                <Modal id="viewerModal" show={habitModalState} style={{ "height": "90vh" }}
+                    size="lg"
+                    onHide={() => { setHabitModalState(false) }}>
+                    <Modal.Header closeButton>
+                        {creatorStatus ? "create a habit" : "edit a habit"}
+                    </Modal.Header>
+                    <Modal.Body id="viewerModal">
+                        <HabitsCreator
+                            contactsArr={contactsArr}
+                            setContactsArr={setContactsArr}
+                            contactsFetched={contactsFetched}
+                            setContactsFetched={setContactsFetched}
+                            contactsFdrStatus={contactsFdrStatus}
+                            setContactsFdrStatus={setContactsFdrStatus}
+                            habitUpdInProgress={habitUpdInProgress}
+                            setHabitUpdInProgress={setHabitUpdInProgress}
+                            publicTypeIndexUrl={publicTypeIndexUrl}
+                            podType={podType}
+                            prefFileLocation={prefFileLocation}
+                            defFolder={defFolder}
+                            storagePref={storagePref}
+                            currentView={currentView}
+                            setCurrentView={setCurrentView}
+                            habitDoSave={habitDoSave}
+                            setHabitDoSave={setHabitDoSave}
+                            categoryArray={categoryArray}
+                            setCategoryArray={setCategoryArray}
+                            agentsToUpd={agentsToUpd}
+                            setAgentsToUpd={setAgentsToUpd}
+                            publicAccess={publicAccess}
+                            setPublicAccess={setPublicAccess}
+                            accUpdObj={accUpdObj}
+                            setAccUpdObj={setAccUpdObj}
+                            newEntryCr={newEntryCr}
+                            setNewEntryCr={setNewEntryCr}
+                            habitsArray={habitsArray}
+                            setHabitsArray={setHabitsArray}
+                            habitToView={habitToView}
+                            setHabitToView={setHabitToView}
+                            creatorStatus={creatorStatus}
+                            setCreatorStatus={setCreatorStatus}
+                            habitInp={habitInp}
+                            setHabitInp={setHabitInp}
+                            viewerStatus={viewerStatus}
+                            setViewerStatus={setViewerStatus}
+                            isEdit={isEdit}
+                            setIsEdit={setIsEdit}
+                        />
+                    </Modal.Body>
+                </Modal>
+            }
         </div>
     )
 }

@@ -20,9 +20,11 @@ interface Props {
     setContactsFetched: React.Dispatch<React.SetStateAction<boolean>>;
     contactsFdrStatus: boolean;
     setContactsFdrStatus: React.Dispatch<React.SetStateAction<boolean>>;
+    refetchContacts: boolean;
+    setRefetchContacts: React.Dispatch<React.SetStateAction<boolean>>;
 }
 const ContactsRender = ({ storagePref, publicTypeIndexUrl, prefFileLocation, podType, contactsArr, setContactsArr,
-    contactsFetched, setContactsFetched, contactsFdrStatus, setContactsFdrStatus
+    contactsFetched, setContactsFetched, contactsFdrStatus, setContactsFdrStatus, refetchContacts, setRefetchContacts
 }: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
@@ -40,15 +42,21 @@ const ContactsRender = ({ storagePref, publicTypeIndexUrl, prefFileLocation, pod
     useEffect(() => {
         const initialize = async () => {
             setIsLoading(true);
+            console.log("we are heer1 ");
             if (!contactsFetched) {
+                console.log("we are heer2");
                 let contactsStatus = await checkContacts(webId, fetch, storagePref);
+                // console.log("this is contactsStatus");
+                // console.log(contactsStatus);
                 setContactsFdrStatus(contactsStatus);
                 if (contactsStatus) {
                     const namesAndIds = await fetchContacts(webId, fetch, storagePref);
+                    console.log("this is names");
+                    console.log(namesAndIds);
                     setContactsArr(namesAndIds);
                     const namesArr = namesAndIds.map((pair) => pair[0] ? pair[0] : pair[1]);
-                    setContactsFetched(true);
                 }
+                setContactsFetched(true);
             }
             if (otherWebId) {
                 let notesArrUpd = await fetchAllEntries(otherWebId, fetch, "note", storagePref, prefFileLocation,
@@ -58,10 +66,12 @@ const ContactsRender = ({ storagePref, publicTypeIndexUrl, prefFileLocation, pod
                 }));
                 setNotesArray(transformedArr.filter((item) => item !== null));
             }
+            console.log("we are done");
             setIsLoading(false);
         };
         initialize();
-    }, [otherWebId]);
+
+    }, [otherWebId, contactsFetched]);
 
     return (
         <div className="container-fluid pad h-100 w-100 d-flex justify-content-center" style={{ "backgroundColor": "#F8F8F8" }}>
@@ -73,7 +83,7 @@ const ContactsRender = ({ storagePref, publicTypeIndexUrl, prefFileLocation, pod
                 }
 
                 {
-                    !isLoading && contactsFdrStatus && !otherWebId &&
+                    !isLoading && contactsFdrStatus && !otherWebId && contactsArr.length !== 0 &&
                     <ContactsList
                         isLoading={isLoading}
                         setIsLoading={setIsLoading}
@@ -117,7 +127,7 @@ const ContactsRender = ({ storagePref, publicTypeIndexUrl, prefFileLocation, pod
 
                 }
                 {
-                    !isLoading && !contactsFdrStatus && <NoContacts />
+                    !isLoading && ((!contactsFdrStatus) || (contactsFdrStatus && contactsArr.length === 0)) && <NoContacts />
                 }
 
             </div>

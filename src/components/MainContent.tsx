@@ -9,8 +9,9 @@ import { recordDefaultFolder } from "../services/SolidPod";
 import { Habit, Note } from "./types";
 import { getDefaultFolder, getPrefLink, getPublicTypeIndexUrl, getStoragePref } from "../services/podGetters";
 import NoPermissions from "./NoPermissions";
-import TestCalendar from "./TestCalendar";
-
+import {
+  WebsocketNotification,
+} from "@inrupt/solid-client-notifications";
 // This is the root component that first renders NavBar and then other content
 // Passes active and setActive hooks, which represent the currently clicked tab
 const MainContent = () => {
@@ -37,14 +38,21 @@ const MainContent = () => {
   const [publicTypeIndexUrl, setPublicTypeIndexUrl] = useState<string>("");
   const [podType, setPodType] = useState<string>("");
   const [defFolder, setDefFolder] = useState<string | null>(null);
+  const [contactsFetched, setContactsFetched] = useState<boolean>(false);
+  const [contactsFdrStatus, setContactsFdrStatus] = useState<boolean>(false);
+
+  const [refetchNotes, setRefetchNotes] = useState<boolean>(false);
+  const [refetchContacts, setRefetchContacts] = useState<boolean>(false);
+  const [refetchHabits, setRefetchHabits] = useState<boolean>(false);
+
   useEffect(() => {
     let check = async () => {
       setIsLoading(true);
 
-      let updStoragePref = await getStoragePref(webId, fetch);
+      let updStoragePref: string = await getStoragePref(webId, fetch);
       setStoragePref(updStoragePref);
 
-      let updPrefFileLocation = await getPrefLink(webId, fetch);
+      let updPrefFileLocation: string = await getPrefLink(webId, fetch);
       setPrefFileLocation(updPrefFileLocation);
 
       let updPublicTypeIndexUrl = await getPublicTypeIndexUrl(webId, fetch);
@@ -61,6 +69,58 @@ const MainContent = () => {
       setDefFolder(defFolderUpd);
       let result = await checkPermissions(webId, fetch, updStoragePref, updPodType);
       setPermissionStatus(result);
+
+      const wssUrl = new URL(updStoragePref);
+      wssUrl.protocol = 'wss';
+      const inboxUrl = `${updStoragePref}inbox/`;
+      const contactsUrl = `${updStoragePref}contacts/`;
+      if (updPodType == 'acp') {
+        const websocket3 = new WebsocketNotification(
+          updPublicTypeIndexUrl,
+          { fetch: fetch }
+        );
+        websocket3.on("message", () => {
+          setNotesFetched(false);
+          setHabitsFetched(false);
+          setRefetchNotes(!refetchNotes);
+          setRefetchHabits(!refetchHabits);
+        });
+        websocket3.connect();
+
+        const websocket4 = new WebsocketNotification(
+          `${contactsUrl}people.ttl`,
+          { fetch: fetch }
+        );
+        websocket4.on("message", () => {
+          setContactsFdrStatus(false);
+          setContactsFetched(false);
+        });
+        websocket4.connect();
+      }
+      if (updPodType === 'wac') {
+        var socket = new WebSocket(wssUrl, ['solid-0.1']);
+        socket.onopen = function () {
+          this.send(`sub ${updPublicTypeIndexUrl}`);
+          this.send(`sub ${contactsUrl}`);
+        };
+
+        socket.onmessage = function (msg) {
+          if (msg.data && msg.data.slice(0, 3) === 'pub') {
+            if (msg.data === `pub ${updPublicTypeIndexUrl}`) {
+              setNotesFetched(false);
+              setHabitsFetched(false);
+              setRefetchNotes(!refetchNotes);
+              setRefetchHabits(!refetchHabits);
+            }
+            if (`pub ${contactsUrl}`) {
+              setContactsFetched(false);
+              setContactsFdrStatus(false);
+              setRefetchContacts(!refetchContacts);
+            }
+
+          }
+        };
+      }
       setIsLoading(false);
     }
     check();
@@ -78,9 +138,7 @@ const MainContent = () => {
     if (permissionStatus) {
       return (
         <div>
-          {/* <Test /> */}
-          {/* <TestCalendar /> */}
-          {/* <ColorPickerTest /> */}
+          <Test />
           <NavbarSolidApp
             creatorStatus={creatorStatus}
             setCreatorStatus={setCreatorStatus}
@@ -93,6 +151,16 @@ const MainContent = () => {
             setIsEdit={setIsEdit}
           />
           <ContentToRender
+            refetchContacts={refetchContacts}
+            setRefetchContacts={setRefetchContacts}
+            refetchHabits={refetchHabits}
+            setRefetchHabits={setRefetchHabits}
+            refetchNotes={refetchNotes}
+            setRefetchNotes={setRefetchNotes}
+            contactsFetched={contactsFetched}
+            setContactsFetched={setContactsFetched}
+            contactsFdrStatus={contactsFdrStatus}
+            setContactsFdrStatus={setContactsFdrStatus}
             publicTypeIndexUrl={publicTypeIndexUrl}
             podType={podType}
             prefFileLocation={prefFileLocation}

@@ -48,12 +48,14 @@ interface Props {
   setHabitUpdInProgress: React.Dispatch<React.SetStateAction<boolean>>;
   habitModalState: boolean;
   setHabitModalState: React.Dispatch<React.SetStateAction<boolean>>;
+  refetchHabits: boolean;
+  setRefetchHabits: React.Dispatch<React.SetStateAction<boolean>>;
 }
 const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorStatus, habitsFetched, setHabitsFetched,
   habitsArray, setHabitsArray, isEdit, setIsEdit, habitToView, setHabitToView, newEntryCr, setNewEntryCr, storagePref,
   habitsToday, setHabitsToday, categoryArray, setCategoryArray, habitInp, setHabitInp, habitDoSave, setHabitDoSave, currentView,
   setCurrentView, prefFileLocation, publicTypeIndexUrl, podType, defFolder, habitUpdInProgress, setHabitUpdInProgress,
-  habitModalState, setHabitModalState
+  habitModalState, setHabitModalState, refetchHabits, setRefetchHabits
 }: Props) => {
   const { session, fetch } = useSession();
   const { webId } = session.info;
@@ -130,7 +132,7 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
 
     fetchHabits();
 
-  }, [newEntryCr, currentCategory, currentAccess, currentView, currentStatus]);
+  }, [newEntryCr, currentCategory, currentAccess, currentView, currentStatus, refetchHabits]);
 
   useEffect(() => {
     const deleteNote = async () => {

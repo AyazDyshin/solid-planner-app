@@ -31,6 +31,8 @@ interface Props {
     setContactsArr: React.Dispatch<React.SetStateAction<(string | null)[][]>>;
     contactsFetched: boolean;
     setContactsFetched: React.Dispatch<React.SetStateAction<boolean>>;
+    refetchNotes: boolean;
+    setRefetchNotes: React.Dispatch<React.SetStateAction<boolean>>;
 }
 // Component that is responsible for rendering content of notes and habits tab
 // splits the content in two halves, left half: "FolderPickerOrContent"
@@ -42,7 +44,7 @@ interface Props {
 const NotesRender = ({ active, viewerStatus, setViewerStatus, creatorStatus, setCreatorStatus, isEdit, storagePref, defFolder,
     setIsEdit, notesArray, setNotesArray, isLoadingContents, setIsLoadingContents, notesFetched, setNotesFetched, podType,
     prefFileLocation, publicTypeIndexUrl, contactsFdrStatus, setContactsFdrStatus, contactsArr, setContactsArr,
-    contactsFetched, setContactsFetched
+    contactsFetched, setContactsFetched, refetchNotes, setRefetchNotes
 }: Props) => {
     const [newEntryCr, setNewEntryCr] = useState<boolean>(false);
     const [noteToView, setNoteToView] = useState<Note | null>(null);
@@ -57,8 +59,10 @@ const NotesRender = ({ active, viewerStatus, setViewerStatus, creatorStatus, set
     const [noteModalState, setNoteModalState] = useState<boolean>(false);
     return (
         <div className="container-fluid pad h-100 w-100 d-flex justify-content-center" style={{ "backgroundColor": "#F8F8F8" }}>
-        <div id="setWidth" style={{ "backgroundColor": "#fff" }} className="h-100 w-100  adjust-me-based-on-size  d-flex justify-content-center align-items-center p-0">
+            <div id="setWidth" style={{ "backgroundColor": "#fff" }} className="h-100 w-100  adjust-me-based-on-size  d-flex justify-content-center align-items-center p-0">
                 <NotesList
+                    refetchNotes={refetchNotes}
+                    setRefetchNotes={setRefetchNotes}
                     setNoteModalState={setNoteModalState}
                     noteUpdInProgress={noteUpdInProgress}
                     setNoteUpdInProgress={setNoteUpdInProgress}

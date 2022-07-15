@@ -61,9 +61,6 @@ const NavbarSolidApp = ({ links, active, setActive, viewerStatus, setViewerStatu
                                     e.preventDefault();
                                     setActive(link);
                                     setExpanded(false)
-                                    setViewerStatus(false);
-                                    setCreatorStatus(false);
-                                    setIsEdit(false);
                                 }}
                             >{getIcon(link)} {link}</Nav.Link>
                         ))}
@@ -74,26 +71,6 @@ const NavbarSolidApp = ({ links, active, setActive, viewerStatus, setViewerStatu
                 </Navbar.Collapse>
             </Container>
         </Navbar>
-        // <nav className="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
-        //     <div className="container-fluid">
-        //         <div className="navbar-nav d-flex justify-content-around w-100">
-        //             {links.map((link, index) => (
-        //                 <a
-        //                     key={Date.now() + index}
-        //                     className={`nav-link ${active === link ? 'active' : ''} cursor`}
-        //                     onClick={(e) => {
-        //                         e.preventDefault();
-        //                         setActive(link);
-        //                         setViewerStatus(false);
-        //                         setCreatorStatus(false);
-        //                         setIsEdit(false);
-        //                     }}
-        //                 >{getIcon(link)} {link}</a>
-        //             ))}
-        //            
-        //         </div>
-        //     </div>
-        // </nav>
     )
 }
 

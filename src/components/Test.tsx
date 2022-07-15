@@ -14,7 +14,7 @@ import { first } from 'lodash';
 import { schema, space, vcard } from 'rdf-namespaces';
 import { pim } from '@inrupt/solid-client/dist/constants';
 import {
-  saveCheckIn, thingToNote
+  thingToNote
 } from '../services/SolidPod';
 import { access } from "@inrupt/solid-client";
 import { object, updated } from 'rdf-namespaces/dist/as';
@@ -47,7 +47,6 @@ const Test = () => {
     prevDate.setDate(10);
     let today = new Date();
     let b = differenceInCalendarDays(today, prevDate);
-    console.log(b);
 
     // let habToTest: Habit = {
     //   id: null, title: "biba", content: null, startDate: null, lastCheckInDate: null, recurrence: "daily", bestStreak: null,
@@ -107,7 +106,7 @@ const Test = () => {
   }
 
 
-  gets();
+  //gets();
 
 
   return (

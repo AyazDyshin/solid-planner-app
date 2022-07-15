@@ -23,13 +23,13 @@ const LogInPage = () => {
             id="input-group-dropdown-1">
             <Dropdown.Item onClick={() => {
               setIssuer("https://inrupt.net")
-            }}>inrupt.net</Dropdown.Item>
+            }}>Inrupt.net</Dropdown.Item>
             <Dropdown.Item onClick={() => {
               setIssuer("https://broker.pod.inrupt.com")
             }}>Broker Pod Inrupt</Dropdown.Item>
             <Dropdown.Item onClick={() => {
               setIssuer("https://dev.inrupt.net")
-            }}>dev.inrupt.net</Dropdown.Item>
+            }}>Dev.inrupt.net</Dropdown.Item>
             <Dropdown.Item onClick={() => {
               setIssuer("https://solidcommunity.net")
             }}>SolidCommunity.net</Dropdown.Item>
@@ -50,7 +50,7 @@ const LogInPage = () => {
             <Button className="w-100">Log in</Button></LoginButton>
         </div>
         <div className="d-flex justify-content-center mt-3">
-          <a href="https://solidproject.org/" target="_blank" className="link-primary mx-2">What is Solid? <AiOutlineLink /></a>
+          <a href="https://solidproject.org/" target="_blank" className="link-primary mx-2" rel="noreferrer">What is Solid? <AiOutlineLink /></a>
           <a onClick={() => { setProviderModalState(true) }} className="link-primary mx-2 cursor">Which provider to pick?</a>
         </div>
       </Form>

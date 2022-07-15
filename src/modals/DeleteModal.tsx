@@ -38,11 +38,11 @@ const DeleteModal = ({ deleteModalState, setDeleteModalState, urlToDelete, setUr
     const handleDelete = async () => {
         setDeleteModalState(false);
         if (notesArray && setNotesArray) {
-            let updArr = notesArray.filter((note) => note.url !== urlToDelete);
+            const updArr = notesArray.filter((note) => note.url !== urlToDelete);
             setNotesArray(updArr);
         }
         if (habitsArray && setHabitsArray) {
-            let updArr = habitsArray.filter((habit) => habit.url !== urlToDelete);
+            const updArr = habitsArray.filter((habit) => habit.url !== urlToDelete);
             setHabitsArray(updArr);
         }
         newEntryCr ? setNewEntryCr(false) : setNewEntryCr(true);
@@ -50,7 +50,10 @@ const DeleteModal = ({ deleteModalState, setDeleteModalState, urlToDelete, setUr
         setCreatorStatus(false);
         setUrlToDelete(null);
         //handle?
-        await deleteEntry(webId, fetch, urlToDelete!, entryType, storagePref, publicTypeIndexUrl);
+        if (!urlToDelete) {
+            throw new Error("item you are trying to delete doesn't have a url");
+        }
+        await deleteEntry(webId, fetch, urlToDelete, entryType, storagePref, publicTypeIndexUrl);
     }
     return (
         <Modal show={deleteModalState} onHide={handleClose}>
@@ -66,7 +69,7 @@ const DeleteModal = ({ deleteModalState, setDeleteModalState, urlToDelete, setUr
                     </Modal.Header>
                     <Modal.Footer>
                         <Button variant="secondary" onClick={handleClose}>
-                            Go Back
+                            Go back
                         </Button>
                         <Button variant="danger" onClick={handleDelete}>
                             Delete

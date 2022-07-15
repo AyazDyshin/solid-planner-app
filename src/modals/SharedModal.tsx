@@ -1,41 +1,28 @@
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import { useSession } from "@inrupt/solid-ui-react";
-import { useEffect, useState } from "react";
-import { Modal, Button, Form, FormControl, InputGroup, DropdownButton, Dropdown, Spinner } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Modal, Button, Spinner } from "react-bootstrap";
 import { accessObject, Note, Habit } from "../components/types";
-import { getPubAccess, getSharedList } from "../services/access";
 import AccessElement from "./AccessElement";
 
 interface Props {
     sharedModalState: boolean;
     setSharedModalState: React.Dispatch<React.SetStateAction<boolean>>;
-    setNoteInp?: React.Dispatch<React.SetStateAction<Note>>;
     NoteInp?: Note;
-    setHabitInp?: React.Dispatch<React.SetStateAction<Habit>>;
     habitInp?: Habit;
-    viewerStatus: boolean;
-    categoryArray: string[];
-    setCategoryArray: React.Dispatch<React.SetStateAction<string[]>>;
     publicAccess: accessObject;
     setPublicAccess: React.Dispatch<React.SetStateAction<accessObject>>;
-    accUpdObj: {
-        [x: string]: boolean;
-    };
     setAccUpdObj: React.Dispatch<React.SetStateAction<{
         [x: string]: boolean;
     }>>;
-    agentsToUpd: {
-        [x: string]: AccessModes;
-    };
     setAgentsToUpd: React.Dispatch<React.SetStateAction<{
         [x: string]: AccessModes;
     }>>;
 }
 //a popup window to prompt user to pick a folder
-const SharedModal = ({ sharedModalState, setSharedModalState, setNoteInp,
-    NoteInp, viewerStatus, categoryArray, setCategoryArray, publicAccess,
-    accUpdObj, setAccUpdObj, agentsToUpd, setAgentsToUpd, setPublicAccess, habitInp, setHabitInp }: Props) => {
-    const { session, fetch } = useSession();
+const SharedModal = ({ sharedModalState, setSharedModalState, NoteInp, publicAccess, setAccUpdObj, setAgentsToUpd, setPublicAccess,
+    habitInp }: Props) => {
+    const { session } = useSession();
     const { webId } = session.info;
     if (!webId) {
         throw new Error(`Error, couldn't get user's WebId`);
@@ -46,7 +33,7 @@ const SharedModal = ({ sharedModalState, setSharedModalState, setNoteInp,
     useEffect(() => {
         const fetchAccess = async () => {
             setIsLoading(true);
-            let inputToUse = NoteInp ? NoteInp : habitInp;
+            const inputToUse = NoteInp ? NoteInp : habitInp;
 
             if (!inputToUse) {
                 throw new Error("Error, entry to set access for wasn't provided");
@@ -54,8 +41,8 @@ const SharedModal = ({ sharedModalState, setSharedModalState, setNoteInp,
             if (!inputToUse.access) {
                 throw new Error("Error, entry to set access for wasn't provided");
             }
-            let key = Object.keys(inputToUse.access)[0];
-            let pubAccess = inputToUse.access[key];
+            const key = Object.keys(inputToUse.access)[0];
+            const pubAccess = inputToUse.access[key];
             setPublicAccess({ read: pubAccess.read, append: pubAccess.append, write: pubAccess.write });
             if (inputToUse.shareList) setSharedList(inputToUse.shareList);
             else setSharedList({});
@@ -134,8 +121,8 @@ const SharedModal = ({ sharedModalState, setSharedModalState, setNoteInp,
                         <Button variant="secondary" onClick={() => {
                             setAccUpdObj({});
                             setSharedModalState(false);
-                        }}>Go Back</Button>
-                        <Button variant="primary" onClick={() => setSharedModalState(false)}>save</Button>
+                        }}>Go back</Button>
+                        <Button variant="primary" onClick={() => setSharedModalState(false)}>Save</Button>
                     </Modal.Footer>
                 </div>
             }

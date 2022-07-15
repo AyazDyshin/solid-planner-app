@@ -1,28 +1,22 @@
+import React from 'react';
 import { LogoutButton, useSession } from "@inrupt/solid-ui-react";
-import { Button, Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
+import { Container, Nav, Navbar } from "react-bootstrap";
 import "../styles.css";
-import { Note } from "./types";
 import { CgNotes } from "react-icons/cg";
 import { FiLogOut } from "react-icons/fi";
 import { RiContactsLine } from "react-icons/ri";
 import { TbListCheck } from "react-icons/tb";
 import { useState } from "react";
+import { capitalizeFirstLetter } from '../services/helpers';
 interface Props {
     links: string[];
     active: string;
     setActive: React.Dispatch<React.SetStateAction<string>>;
-    viewerStatus: boolean;
-    setViewerStatus: React.Dispatch<React.SetStateAction<boolean>>;
-    creatorStatus: boolean;
-    setCreatorStatus: React.Dispatch<React.SetStateAction<boolean>>;
-    isEdit: boolean;
-    setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
 }
 // this component renders NavBar, it iterates over "links" array and creates corresponding links
 // clicking on the links sets "active" to the links value
 // logout functionality is implemented using "LogoutButton" component from @inrupt/solid-ui-react
-const NavbarSolidApp = ({ links, active, setActive, viewerStatus, setViewerStatus,
-    creatorStatus, setCreatorStatus, isEdit, setIsEdit }: Props) => {
+const NavbarSolidApp = ({ links, active, setActive }: Props) => {
     const { session } = useSession();
     const { webId } = session.info;
     if (webId === undefined) {
@@ -31,7 +25,9 @@ const NavbarSolidApp = ({ links, active, setActive, viewerStatus, setViewerStatu
     const [expanded, setExpanded] = useState(false);
 
     const onError = (error: Error) => {
-        console.log(error);
+        let message = 'Unknown Error';
+        if (error instanceof Error) message = error.message;
+        throw new Error(`Error when trying to logout, error: ${message}`);
     }
     const getIcon = (link: string) => {
         switch (link) {
@@ -62,10 +58,10 @@ const NavbarSolidApp = ({ links, active, setActive, viewerStatus, setViewerStatu
                                     setActive(link);
                                     setExpanded(false)
                                 }}
-                            >{getIcon(link)} {link}</Nav.Link>
+                            >{getIcon(link)} {capitalizeFirstLetter(link)}</Nav.Link>
                         ))}
                         <LogoutButton onError={onError} >
-                            <Button variant="secondary"><FiLogOut /> Log Out</Button>
+                            <Nav.Link><FiLogOut /> Log out</Nav.Link>
                         </LogoutButton>
                     </Nav>
                 </Navbar.Collapse>

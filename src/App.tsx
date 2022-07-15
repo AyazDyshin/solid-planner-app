@@ -1,17 +1,13 @@
 import "regenerator-runtime/runtime";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import LogInPage from "./components/LogInPage";
 import MainContent from "./components/MainContent";
 import { useSession } from "@inrupt/solid-ui-react";
 import { Spinner } from "react-bootstrap";
 import ErrorBoundary from "./components/ErrorBoundary";
 const App: React.FC = () => {
-  const { session, sessionRequestInProgress} = useSession();
-  const [refresh, setRefresh] = useState<boolean>(false);
+  const { session, sessionRequestInProgress } = useSession();
   const render = () => {
-    useEffect(() => {
-
-    }, [refresh])
     // Checks if data loading is in progress
     if (sessionRequestInProgress) {
       return (

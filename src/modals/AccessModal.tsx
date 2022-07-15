@@ -1,9 +1,8 @@
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import { useSession } from "@inrupt/solid-ui-react";
-import { useState, useEffect, SetStateAction } from "react";
-import { Modal, Button, Form, FormControl, InputGroup, DropdownButton, Dropdown, Collapse, Spinner } from "react-bootstrap";
+import React, { useState, useEffect } from "react";
+import { Modal, Button, FormControl, InputGroup, Collapse, Spinner } from "react-bootstrap";
 import { Habit, Note } from "../components/types";
-import { getPubAccess, getSharedList, setPubAccess, shareWith } from "../services/access";
 import { checkContacts, fetchContacts } from "../services/SolidPod";
 import "../styles.css";
 import AccessElement from "./AccessElement";
@@ -13,7 +12,6 @@ import NoContacts from "../components/NoContacts";
 interface Props {
     accessModalState: boolean;
     setAccessModalState: React.Dispatch<React.SetStateAction<boolean>>;
-    setNoteInp?: React.Dispatch<React.SetStateAction<Note>>;
     NoteInp?: Note;
     publicAccess: accessObject;
     setPublicAccess: React.Dispatch<React.SetStateAction<accessObject>>;
@@ -23,15 +21,10 @@ interface Props {
     setContactsList: React.Dispatch<React.SetStateAction<{
         [x: string]: AccessModes;
     }>>;
-    accUpdObj: {
-        [x: string]: boolean;
-    };
     setAccUpdObj: React.Dispatch<React.SetStateAction<{
         [x: string]: boolean;
     }>>;
-    agentsToUpd: {
-        [x: string]: AccessModes;
-    };
+
     setAgentsToUpd: React.Dispatch<React.SetStateAction<{
         [x: string]: AccessModes;
     }>>;
@@ -39,27 +32,22 @@ interface Props {
     contactsFdrStatus: boolean;
     setContactsFdrStatus: React.Dispatch<React.SetStateAction<boolean>>;
     habitInp?: Habit;
-    setHabitInp?: React.Dispatch<React.SetStateAction<Habit>>;
     contactsArr: (string | null)[][];
     setContactsArr: React.Dispatch<React.SetStateAction<(string | null)[][]>>;
     contactsFetched: boolean;
-    setContactsFetched: React.Dispatch<React.SetStateAction<boolean>>;
 }
 //a popup window to prompt user to set access type
-const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, setNoteInp, contactsList, setContactsList, accUpdObj,
-    setAccUpdObj, publicAccess, setPublicAccess, habitInp, setHabitInp, storagePref, contactsFdrStatus, setContactsFdrStatus,
-    agentsToUpd, setAgentsToUpd, contactsArr, setContactsArr, contactsFetched, setContactsFetched
+const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, contactsList, setContactsList,
+    setAccUpdObj, publicAccess, setPublicAccess, habitInp, storagePref, contactsFdrStatus, setContactsFdrStatus,
+    setAgentsToUpd, contactsArr, setContactsArr, contactsFetched
 }: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
     if (!webId) {
         throw new Error(`Error, couldn't get user's WebId`);
     }
-    const [sharedOpen, setSharedOpen] = useState<boolean>(false);
-    const [sharingOpen, setSharingOpen] = useState<boolean>(false);
     const [contactsOpen, setContactsOpen] = useState<boolean>(false);
     const [webIdOpen, setWebIdOpen] = useState<boolean>(false);
-    const [contactsStat, setContactsStat] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [currentWebId, setCurrentWebId] = useState<string>("");
     const [webIdReady, setWebIdReady] = useState<boolean>(false);
@@ -72,20 +60,18 @@ const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, setNoteIn
         const fetchAccess = async () => {
 
             setIsLoading(true);
-            setSharedOpen(false);
-            setSharingOpen(false);
             setContactsOpen(false);
             setWebIdOpen(false);
             //handle
-            let inputToUse = NoteInp ? NoteInp : habitInp;
+            const inputToUse = NoteInp ? NoteInp : habitInp;
             if (!inputToUse) {
                 throw new Error("Error, entry to set access for wasn't provided");
             }
             if (!inputToUse.access) {
                 throw new Error("Error, entry to set access for wasn't provided");
             }
-            let key = Object.keys(inputToUse.access)[0];
-            let pubAccess = inputToUse.access[key];
+            const key = Object.keys(inputToUse.access)[0];
+            const pubAccess = inputToUse.access[key];
             setPublicAccess({ read: pubAccess.read, append: pubAccess.append, write: pubAccess.write });
             let shList: Record<string, AccessModes>;
             if (inputToUse.shareList) shList = inputToUse.shareList;
@@ -106,17 +92,17 @@ const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, setNoteIn
                 if (namesAndIds.length === 0) {
                     namesAndIds = contactsArr;
                 }
-                let contObj: { [x: string]: string | null; } = {};
+                const contObj: { [x: string]: string | null; } = {};
 
                 namesAndIds.map((pair) => {
                     if (pair[0]) contObj[pair[0]] = pair[1];
                 });
 
                 setFullContacts(contObj);
-                let testObj: { [x: string]: AccessModes; } = {};
-                const namesArr = namesAndIds.filter((pair) => pair !== [null, null])
+                const testObj: { [x: string]: AccessModes; } = {};
+                namesAndIds.filter((pair) => pair !== [null, null])
                     .map((pair) => {
-                        let contName = pair[0] ? pair[0] : pair[1];
+                        const contName = pair[0] ? pair[0] : pair[1];
                         let acc;
                         if (pair[1] && shList[pair[1]]) {
                             acc = shList[pair[1]];
@@ -208,22 +194,21 @@ const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, setNoteIn
                                                     <AccessElement
                                                         key={Date.now() + index + Math.floor(Math.random() * 1000)}
                                                         title={key}
-                                                        //handle
                                                         readOnChange={() => {
-                                                            let wId = (fullContacts[key]) ? fullContacts[key] : key;
-                                                            setAgentsToUpd(prevState => ({ ...prevState, [wId!]: { read: !value.read, append: value.append, write: value.write } }));
+                                                            const wId = (fullContacts[key]) ? fullContacts[key] : key;
+                                                            setAgentsToUpd(prevState => ({ ...prevState, [wId ? wId : ""]: { read: !value.read, append: value.append, write: value.write } }));
                                                             setContactsList(prevState => ({ ...prevState, [key]: { read: !value.read, append: value.append, write: value.write } }));
                                                             setAccUpdObj(prevState => ({ ...prevState, "agent": true }));
                                                         }}
                                                         appendOnChange={() => {
-                                                            let wId = (fullContacts[key]) ? fullContacts[key] : key;
-                                                            setAgentsToUpd(prevState => ({ ...prevState, [wId!]: { read: value.read, append: !value.append, write: value.write } }));
+                                                            const wId = (fullContacts[key]) ? fullContacts[key] : key;
+                                                            setAgentsToUpd(prevState => ({ ...prevState, [wId ? wId : ""]: { read: value.read, append: !value.append, write: value.write } }));
                                                             setContactsList(prevState => ({ ...prevState, [key]: { read: value.read, append: !value.append, write: value.write } }));
                                                             setAccUpdObj(prevState => ({ ...prevState, "agent": true }));
                                                         }}
                                                         writeOnChange={() => {
-                                                            let wId = (fullContacts[key]) ? fullContacts[key] : key;
-                                                            setAgentsToUpd(prevState => ({ ...prevState, [wId!]: { read: value.read, append: value.append, write: !value.write } }));
+                                                            const wId = (fullContacts[key]) ? fullContacts[key] : key;
+                                                            setAgentsToUpd(prevState => ({ ...prevState, [wId ? wId : ""]: { read: value.read, append: value.append, write: !value.write } }));
                                                             setContactsList(prevState => ({ ...prevState, [key]: { read: value.read, append: value.append, write: !value.write } }));
                                                             setAccUpdObj(prevState => ({ ...prevState, "agent": true }));
                                                         }}
@@ -287,10 +272,10 @@ const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, setNoteIn
                             onClick={() => {
                                 setAccUpdObj({});
                                 setAccessModalState(false);
-                            }}>Go Back</Button>
+                            }}>Go back</Button>
                         <Button variant="primary" onClick={() => {
                             setAccessModalState(false);
-                        }}>set</Button>
+                        }}>Set</Button>
                     </Modal.Footer>
                 </div>
             }

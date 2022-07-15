@@ -7,7 +7,7 @@ import { getAcr } from "./helperAccess";
 
 //not used
 export const initializePolicies = async (webId: string, fetch: fetcher, url: string, access: accessObject, agent: string, storagePref: string) => {
-    let policiesUrl = `${storagePref}policies/`;
+    const policiesUrl = `${storagePref}policies/`;
     let myRulesAndPoliciesSolidDataset = await getSolidDataset(
         policiesUrl,
         { fetch: fetch }
@@ -84,7 +84,7 @@ export const initializePolicies = async (webId: string, fetch: fetcher, url: str
     myRulesAndPoliciesSolidDataset = acp_ess_1.setRule(myRulesAndPoliciesSolidDataset, appendRule);
     myRulesAndPoliciesSolidDataset = acp_ess_1.setRule(myRulesAndPoliciesSolidDataset, writeRule);
 
-    const savedSolidDataset = await saveSolidDatasetAt(
+    await saveSolidDatasetAt(
         policiesUrl,
         myRulesAndPoliciesSolidDataset,
         { fetch: fetch }      // fetch from the authenticated session
@@ -94,7 +94,7 @@ export const initializePolicies = async (webId: string, fetch: fetcher, url: str
 //not used
 export const setAccessForResource = async (webId: string, fetch: fetcher, url: string, access: accessObject,
     agent: string, storagePref: string) => {
-    let policiesUrl = `${storagePref}policies/`;
+    const policiesUrl = `${storagePref}policies/`;
     await initializePolicies(webId, fetch, url, access, agent, storagePref);
 
     const resourceWithAcr = await acp_ess_1.getSolidDatasetWithAcr(
@@ -102,39 +102,32 @@ export const setAccessForResource = async (webId: string, fetch: fetcher, url: s
         { fetch: fetch }            // fetch from the authenticated session
     );
 
-    let updResource = resourceWithAcr as WithAccessibleAcr;
-    let changedResourceWithAcr = acp_ess_1.addPolicyUrl(
+    const updResource = resourceWithAcr as WithAccessibleAcr;
+    acp_ess_1.addPolicyUrl(
         updResource,
         `${policiesUrl}#defaultAccessControlAgentReadPolicy${url}`
     );
 
-    changedResourceWithAcr = acp_ess_1.addPolicyUrl(
+    acp_ess_1.addPolicyUrl(
         updResource,
         `${policiesUrl}#defaultAccessControlAgentAppendPolicy${url}`
     );
 
-    changedResourceWithAcr = acp_ess_1.addPolicyUrl(
+    acp_ess_1.addPolicyUrl(
         updResource,
         `${policiesUrl}#defaultAccessControlWriteReadPolicy${url}`
     );
-
-
-    // let updatedResourceWithAcr = await acp_ess_1.saveAcrFor(
-    //     changedResourceWithAcr,
-    //     { fetch: fetch }
-    // );
-    //  updatedResourceWithAcr = await saveSolidDatasetAt(url, updatedResourceWithAcr, { fetch: fetch });
 }
 
 // not used
 export const addPoliciesToResource = async (webId: string, fetch: fetcher, url: string, storagePref: string) => {
-    let policiesUrl = `${storagePref}policies/`;
+    const policiesUrl = `${storagePref}policies/`;
     const resourceWithAcr = await acp_ess_1.getSolidDatasetWithAcr(
         url,
         { fetch: fetch }            // fetch from the authenticated session
     );
 
-    let updResource = resourceWithAcr as WithAccessibleAcr;
+    const updResource = resourceWithAcr as WithAccessibleAcr;
 
     let changedResourceWithAcr = acp_ess_1.addPolicyUrl(
         updResource,
@@ -152,11 +145,11 @@ export const addPoliciesToResource = async (webId: string, fetch: fetcher, url: 
 
 //not used
 export const updateMainAcr = async (resource: WithAccessibleAcr, allPolicies: any[], fetch: fetcher) => {
-    let acr = getAcr(resource);
-    let allThings = getThingAll(acr);
-    let mainAcr = allThings.find((thing) => getUrl(thing, RDF.type) === ACP.AccessControl);
+    const acr = getAcr(resource);
+    const allThings = getThingAll(acr);
+    const mainAcr = allThings.find((thing) => getUrl(thing, RDF.type) === ACP.AccessControl);
 
-    let allPoliciesUpd = allPolicies.filter((policy) => policy !== null);
+    const allPoliciesUpd = allPolicies.filter((policy) => policy !== null);
     let changedResourceWithAcr = resource;
     allPoliciesUpd.map((policy) => {
         //handle

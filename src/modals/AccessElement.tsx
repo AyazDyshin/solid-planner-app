@@ -1,4 +1,4 @@
-import { accessObject } from "../components/types";
+import React from 'react'
 
 interface Props {
     title: string;
@@ -19,7 +19,7 @@ const AccessElement = ({ title, readOnChange, appendOnChange, writeOnChange, rea
 
                 <div className="form-check form-switch">
                     <label className="form-check-label"
-                        htmlFor="flexSwitchCheckDefault1">read</label>
+                        htmlFor="flexSwitchCheckDefault1">Read</label>
                     <input className="form-check-input" type="checkbox"
                         onChange={readOnChange}
                         checked={readStatus}
@@ -27,7 +27,7 @@ const AccessElement = ({ title, readOnChange, appendOnChange, writeOnChange, rea
                 </div>
                 <div className="form-check form-switch">
                     <label className="form-check-label"
-                        htmlFor="flexSwitchCheckDefault1">append</label>
+                        htmlFor="flexSwitchCheckDefault1">Append</label>
                     <input className="form-check-input" type="checkbox"
                         onChange={appendOnChange}
                         checked={appendStatus}
@@ -35,7 +35,7 @@ const AccessElement = ({ title, readOnChange, appendOnChange, writeOnChange, rea
                 </div>
                 <div className="form-check form-switch">
                     <label className="form-check-label"
-                        htmlFor="flexSwitchCheckDefault2">write</label>
+                        htmlFor="flexSwitchCheckDefault2">Write</label>
                     <input className="form-check-input" type="checkbox"
                         onChange={writeOnChange}
                         checked={writeStatus}

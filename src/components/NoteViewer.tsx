@@ -3,10 +3,9 @@ import { FormControl, InputGroup } from 'react-bootstrap';
 import { Note } from './types';
 interface Props {
     noteToView: Note | null;
-    setNoteToView: React.Dispatch<React.SetStateAction<Note | null>>;
 }
 
-const NoteViewer = ({ noteToView, setNoteToView }: Props) => {
+const NoteViewer = ({ noteToView }: Props) => {
     if (!noteToView) {
         throw new Error("Error, note to view wasn't provided");
     }

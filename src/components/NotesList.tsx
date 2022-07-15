@@ -1,29 +1,26 @@
 import 'bootstrap/dist/css/bootstrap.css';
+import React from 'react';
 import { useSession } from "@inrupt/solid-ui-react";
-import { RefAttributes, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "../styles.css";
-import { Dropdown, DropdownButton, Badge, OverlayTrigger, Popover, PopoverProps, Button, Spinner, ButtonGroup, Container, Nav, Navbar, NavDropdown, Form } from "react-bootstrap";
+import { Badge, OverlayTrigger, Popover, Button, Spinner, ButtonGroup, Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
 import { Note } from "./types";
 import { RiArrowDropDownLine, RiArrowGoBackFill } from "react-icons/ri";
-import { BsPlusLg } from "react-icons/bs";
 import { BiFolder } from "react-icons/bi";
 import { VscTypeHierarchySuper } from "react-icons/vsc";
 import { GoPrimitiveDot, GoCheck, GoX } from "react-icons/go";
 import { RiDeleteBin6Line } from "react-icons/ri";
-import { deleteEntry, fetchAllEntries, thingToNote } from '../services/SolidPod';
+import { fetchAllEntries, thingToNote } from '../services/SolidPod';
 import DeleteModal from '../modals/DeleteModal';
-import { extractCategories, filterByAccess, filterByCategory } from '../services/helpers';
+import { capitalizeFirstLetter, extractCategories, filterByAccess, filterByCategory } from '../services/helpers';
 import { MdCreate } from 'react-icons/md';
 
 interface Props {
   notesArray: Note[];
   setNotesArray: React.Dispatch<React.SetStateAction<Note[]>>;
-  noteToView: Note | null;
   setNoteToView: React.Dispatch<React.SetStateAction<Note | null>>;
-  viewerStatus: boolean;
   setViewerStatus: React.Dispatch<React.SetStateAction<boolean>>;
   setCreatorStatus: React.Dispatch<React.SetStateAction<boolean>>;
-  isEdit: boolean;
   setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
   categoryArray: string[];
   setCategoryArray: React.Dispatch<React.SetStateAction<string[]>>;
@@ -32,20 +29,18 @@ interface Props {
   storagePref: string;
   publicTypeIndexUrl: string;
   noteUpdInProgress: boolean;
-  setNoteUpdInProgress: React.Dispatch<React.SetStateAction<boolean>>;
   notesFetched: boolean;
   setNotesFetched: React.Dispatch<React.SetStateAction<boolean>>;
   podType: string;
   prefFileLocation: string;
   setNoteModalState: React.Dispatch<React.SetStateAction<boolean>>;
   refetchNotes: boolean;
-  setRefetchNotes: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, storagePref,
-  viewerStatus, setViewerStatus, setCreatorStatus, isEdit, setIsEdit, categoryArray, setCategoryArray, publicTypeIndexUrl,
-  newEntryCr, setNewEntryCr, noteUpdInProgress, setNoteUpdInProgress, notesFetched, setNotesFetched, podType,
-  prefFileLocation, setNoteModalState, refetchNotes, setRefetchNotes
+const NotesList = ({ notesArray, setNotesArray, setNoteToView, storagePref,
+  setViewerStatus, setCreatorStatus, setIsEdit, categoryArray, setCategoryArray, publicTypeIndexUrl,
+  newEntryCr, setNewEntryCr, noteUpdInProgress, notesFetched, setNotesFetched, podType,
+  prefFileLocation, setNoteModalState, refetchNotes
 }: Props) => {
 
   const { session, fetch } = useSession();
@@ -68,14 +63,13 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, stora
     const fetchNotes = async () => {
       let filteredNotes: Note[]
       if (!notesFetched) {
-        console.log("we got in noootes fetch");
-        let noteArr = await fetchAllEntries(webId, fetch, "note", storagePref, prefFileLocation, publicTypeIndexUrl,
+        const noteArr = await fetchAllEntries(webId, fetch, "note", storagePref, prefFileLocation, publicTypeIndexUrl,
           podType);
         let transformedArr = await Promise.all(noteArr.map(async (thing) => {
           return await thingToNote(thing, webId, fetch, storagePref, prefFileLocation, podType);
         }));
         transformedArr = transformedArr.filter((item) => item !== null) as Note[];
-        let updType = transformedArr as Note[];
+        const updType = transformedArr as Note[];
         setNotesArray(updType);
         setNotesFetched(true);
         filteredNotes = updType;
@@ -83,7 +77,7 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, stora
       else {
         filteredNotes = notesArray;
       }
-      let extr = extractCategories(filteredNotes);
+      const extr = extractCategories(filteredNotes);
       setCategoryArray(extr);
       if (currentCategory || currentAccess) {
         if (currentCategory) filteredNotes = filterByCategory(filteredNotes, currentCategory);
@@ -118,8 +112,8 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, stora
       return (
         <div className="card text-center">
           <div className="card-body">
-            <h5 className="card-title">You don't have any notes yet!</h5>
-            <p className="card-text">Let's fix this</p>
+            <h5 className="card-title">You don&apos;t have any notes yet!</h5>
+            <p className="card-text">Let&apos;s fix this</p>
             <a className="btn btn-primary" onClick={() => {
               setCreatorStatus(true);
               setViewerStatus(false);
@@ -144,7 +138,7 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, stora
                         as={ButtonGroup}
                         variant="secondary"
                         menuVariant="dark"
-                        title={<div><VscTypeHierarchySuper /> {currentAccess ? currentAccess : "access type"} <RiArrowDropDownLine /></div>}
+                        title={<div><VscTypeHierarchySuper /> {capitalizeFirstLetter(currentAccess ? currentAccess : "access type")} <RiArrowDropDownLine /></div>}
                       >
 
                         {
@@ -154,11 +148,11 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, stora
                                 setViewerStatus(false);
                                 setCreatorStatus(false);
                                 setCurrentAccess(access);
-                              }}><GoPrimitiveDot /> {access}</NavDropdown.Item>
+                              }}><GoPrimitiveDot /> {capitalizeFirstLetter(access)}</NavDropdown.Item>
                           })
                         }
                         {currentAccess && (
-                          <><NavDropdown.Divider /><NavDropdown.Item onClick={() => setCurrentAccess(null)}><RiArrowGoBackFill /> reset</NavDropdown.Item></>)}
+                          <><NavDropdown.Divider /><NavDropdown.Item onClick={() => setCurrentAccess(null)}><RiArrowGoBackFill /> Reset</NavDropdown.Item></>)}
                       </NavDropdown>
                     }
                     {
@@ -179,9 +173,9 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, stora
                               }}><GoPrimitiveDot /> {category}</NavDropdown.Item>
                           })
                         }
-                        <><NavDropdown.Divider /><NavDropdown.Item onClick={() => setCurrentCategory("without category")}><GoPrimitiveDot /> without category</NavDropdown.Item></>
+                        <><NavDropdown.Divider /><NavDropdown.Item onClick={() => setCurrentCategory("without category")}><GoPrimitiveDot /> Without category</NavDropdown.Item></>
                         {currentCategory && (
-                          <><NavDropdown.Divider /><NavDropdown.Item onClick={() => setCurrentCategory(null)}><RiArrowGoBackFill /> reset</NavDropdown.Item></>)}
+                          <><NavDropdown.Divider /><NavDropdown.Item onClick={() => setCurrentCategory(null)}><RiArrowGoBackFill /> Reset</NavDropdown.Item></>)}
                       </NavDropdown>
                     }
                     {
@@ -240,17 +234,17 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, stora
                         {note.category && <Badge pill bg="info" className="me-1">{note.category}</Badge>}
                       </div>
                       <div style={{ display: "inline-block" }}>
-                        {!note.category && <Badge pill bg="info" className="me-1">no category</Badge>}
+                        {!note.category && <Badge pill bg="info" className="me-1">No category</Badge>}
                       </div>
                       {note.access && (podType !== "acp") && <OverlayTrigger placement="right" overlay={
                         <Popover>
                           <Popover.Body className="py-1 px-1">
                             {(note.access[Object.keys(note.access)[0]].read) ?
-                              (<div>read: <GoCheck /></div>) : (<div>read: <GoX /></div>)}
+                              (<div>read: <GoCheck /></div>) : (<div>Read: <GoX /></div>)}
                             {(note.access[Object.keys(note.access)[0]].append) ?
-                              (<div>append: <GoCheck /></div>) : (<div>append: <GoX /></div>)}
+                              (<div>append: <GoCheck /></div>) : (<div>Append: <GoX /></div>)}
                             {(note.access[Object.keys(note.access)[0]].write) ?
-                              (<div>write: <GoCheck /></div>) : (<div>write: <GoX /></div>)}
+                              (<div>write: <GoCheck /></div>) : (<div>Write: <GoX /></div>)}
                           </Popover.Body>
                         </Popover>
                       }>
@@ -264,41 +258,41 @@ const NotesList = ({ notesArray, setNotesArray, noteToView, setNoteToView, stora
                           <Popover.Body className="py-1 px-1">
                             <div >
                               {
-                                //handle
-                                Object.keys(note!.shareList!).map((key, index) => {
+                                note && note.shareList && Object.keys(note.shareList).map((key, index) => {
                                   return <div key={Date.now() + index + Math.floor(Math.random() * 1000)}>
                                     <div> {key} :</div>
                                     <div className="d-flex justify-content-between">
-                                      {(note!.shareList![key].read) ?
+                                      {note && note.shareList && (note.shareList[key].read) ?
                                         (<div style={{ display: "inline" }}>read: <GoCheck /></div>) : (<div style={{ display: "inline" }}>read: <GoX /></div>)}
-                                      {(note!.shareList![key].append) ?
+                                      {note && note.shareList && (note.shareList[key].append) ?
                                         (<div style={{ display: "inline" }}>append: <GoCheck /></div>) : (<div style={{ display: "inline" }}>append: <GoX /></div>)}
-                                      {(note!.shareList![key].write) ?
+                                      {note && note.shareList && (note.shareList[key].write) ?
                                         (<div style={{ display: "inline" }}>write: <GoCheck /></div>) : (<div style={{ display: "inline" }}>write: <GoX /></div>)}
                                     </div>
                                   </div>
                                 })
+
                               }
                             </div>
                           </Popover.Body>
                         </Popover>
                       }>
                         <div style={{ display: "inline-block" }}>
-                          <Badge pill bg="secondary" className="me-1 cursor">shared</Badge>
+                          <Badge pill bg="secondary" className="me-1 cursor">Shared</Badge>
                         </div>
                       </OverlayTrigger>}
                       {
                         note.title && <div >{note.title}</div>
                       }
                       {
-                        ((note.title === null) || (note.title === '')) && <div style={{ "color": "grey" }}>  no title </div>
+                        ((note.title === null) || (note.title === '')) && <div style={{ "color": "grey" }}>No title</div>
                       }
                       {
                         note.id &&
                         <Button variant="outline-danger"
                           className="ms-auto me-2 px-1 py-1"
                           style={{ color: "red" }}
-                          onClick={(e) => { handleDelete(e, note.url!) }}
+                          onClick={(e) => { handleDelete(e, note.url) }}
                         ><RiDeleteBin6Line /></Button>
                       }
                     </a>

@@ -1,6 +1,6 @@
 import * as React from "react";
 import 'bootstrap/dist/css/bootstrap.css';
-import { Alert, Button, Modal, Card } from "react-bootstrap";
+import { Button, Card } from "react-bootstrap";
 interface Props {
     children: JSX.Element;
 }
@@ -21,7 +21,6 @@ const ErrorBoundary = ({ children }: Props) => {
         return () => {
             window.removeEventListener("unhandledrejection", promiseRejectionHandler);
         };
-        /* eslint-disable react-hooks/exhaustive-deps */
     }, []);
 
     return error ? (

@@ -1,10 +1,10 @@
 import { useSession } from '@inrupt/solid-ui-react';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { fetchAllEntries, thingToHabit, editHabit, deleteEntry } from '../services/SolidPod';
 import { BsCircle } from "react-icons/bs";
 import { Habit } from './types';
-import { extractCategories, filterByAccess, filterByCategory, getHabitsToday, setStreaks } from '../services/helpers';
-import { DropdownButton, Dropdown, OverlayTrigger, Popover, Badge, Spinner, Button, ButtonGroup, Container, Nav, Navbar, NavDropdown } from 'react-bootstrap';
+import { capitalizeFirstLetter, extractCategories, filterByAccess, filterByCategory, setStreaks } from '../services/helpers';
+import { OverlayTrigger, Popover, Badge, Spinner, Button, ButtonGroup, Container, Nav, Navbar, NavDropdown } from 'react-bootstrap';
 import { BiFolder } from 'react-icons/bi';
 import { GoPrimitiveDot, GoCheck, GoX } from 'react-icons/go';
 import { RiArrowDropDownLine, RiArrowGoBackFill } from 'react-icons/ri';
@@ -15,28 +15,18 @@ import { MdCreate } from 'react-icons/md';
 import { FiClock } from 'react-icons/fi';
 
 interface Props {
-  viewerStatus: boolean;
   setViewerStatus: React.Dispatch<React.SetStateAction<boolean>>;
-  creatorStatus: boolean;
   setCreatorStatus: React.Dispatch<React.SetStateAction<boolean>>;
   habitsFetched: boolean;
   setHabitsFetched: React.Dispatch<React.SetStateAction<boolean>>;
   habitsArray: Habit[];
   setHabitsArray: React.Dispatch<React.SetStateAction<Habit[]>>;
-  isEdit: boolean;
   setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
-  habitToView: Habit | null;
   setHabitToView: React.Dispatch<React.SetStateAction<Habit | null>>;
   newEntryCr: boolean;
   setNewEntryCr: React.Dispatch<React.SetStateAction<boolean>>;
-  habitsToday: Habit[];
-  setHabitsToday: React.Dispatch<React.SetStateAction<Habit[]>>;
   categoryArray: string[];
   setCategoryArray: React.Dispatch<React.SetStateAction<string[]>>;
-  habitInp: Habit;
-  setHabitInp: React.Dispatch<React.SetStateAction<Habit>>;
-  habitDoSave: boolean;
-  setHabitDoSave: React.Dispatch<React.SetStateAction<boolean>>;
   currentView: string;
   setCurrentView: React.Dispatch<React.SetStateAction<string>>;
   storagePref: string;
@@ -45,17 +35,14 @@ interface Props {
   podType: string;
   defFolder: string | null;
   habitUpdInProgress: boolean;
-  setHabitUpdInProgress: React.Dispatch<React.SetStateAction<boolean>>;
-  habitModalState: boolean;
   setHabitModalState: React.Dispatch<React.SetStateAction<boolean>>;
   refetchHabits: boolean;
-  setRefetchHabits: React.Dispatch<React.SetStateAction<boolean>>;
 }
-const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorStatus, habitsFetched, setHabitsFetched,
-  habitsArray, setHabitsArray, isEdit, setIsEdit, habitToView, setHabitToView, newEntryCr, setNewEntryCr, storagePref,
-  habitsToday, setHabitsToday, categoryArray, setCategoryArray, habitInp, setHabitInp, habitDoSave, setHabitDoSave, currentView,
-  setCurrentView, prefFileLocation, publicTypeIndexUrl, podType, defFolder, habitUpdInProgress, setHabitUpdInProgress,
-  habitModalState, setHabitModalState, refetchHabits, setRefetchHabits
+const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabitsFetched,
+  habitsArray, setHabitsArray, setIsEdit, setHabitToView, newEntryCr, setNewEntryCr, storagePref,
+  categoryArray, setCategoryArray, currentView,
+  setCurrentView, prefFileLocation, publicTypeIndexUrl, podType, defFolder, habitUpdInProgress,
+  setHabitModalState, refetchHabits
 }: Props) => {
   const { session, fetch } = useSession();
   const { webId } = session.info;
@@ -69,19 +56,18 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
   const [activeHabit, setActiveHabit] = useState<number | null>(null);
   const accessArray = ["public", "private", "shared"];
   const [currentStatus, setCurrentStatus] = useState<string | null>("undone");
-  const [habitsToSave, setHabitsToSave] = useState<Habit[]>([]);
   const [objOfStates, setObjOfStates] = useState<{ [x: number]: boolean | null; }>({});
   const [performDelete, setPerformDelete] = useState<boolean>(false);
   const [urlToDelete, setUrlToDelete] = useState<string | null>(null);
   const [deleteModalState, setDeleteModalState] = useState<boolean>(false);
 
   useEffect(() => {
-    const fetchHabits = async (otherId?: string) => {
+    const fetchHabits = async () => {
       let filteredHabits: Habit[] = [];
       if (!habitsFetched) {
-        let habitArr = await fetchAllEntries(webId, fetch, "habit", storagePref, prefFileLocation, publicTypeIndexUrl, podType);
+        const habitArr = await fetchAllEntries(webId, fetch, "habit", storagePref, prefFileLocation, publicTypeIndexUrl, podType);
         for (let i = 0; i < habitArr.length; i++) {
-          let item = await thingToHabit(habitArr[i], webId, fetch, storagePref, prefFileLocation, podType);
+          const item = await thingToHabit(habitArr[i], webId, fetch, storagePref, prefFileLocation, podType);
           if (item) {
             filteredHabits.push(item);
           }
@@ -92,19 +78,17 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
       else {
         filteredHabits = habitsArray;
       }
-      let extr = extractCategories(filteredHabits);
+      const extr = extractCategories(filteredHabits);
       setCategoryArray(extr);
 
 
       if (currentCategory || currentAccess || currentView || currentStatus) {
-        let temp = filteredHabits;
+        const temp = filteredHabits;
         if (currentCategory) filteredHabits = filterByCategory(filteredHabits, currentCategory);
         if (currentAccess) filteredHabits = filterByAccess(filteredHabits, currentAccess);
 
 
         if (currentView === 'today') {
-
-          let bib = getHabitsToday(filteredHabits);
           filteredHabits.forEach((habit) => {
             temp.map((habit2) => {
               if (habit.id === habit2.id) {
@@ -156,14 +140,19 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
     setHabitModalState(true);
   };
   const handleSave = async (toSave: Habit) => {
-    let updHabit = setStreaks(toSave);
+    const updHabit = setStreaks(toSave);
     setNewEntryCr(!newEntryCr);
     await editHabit(webId, fetch, updHabit, storagePref, defFolder, prefFileLocation, publicTypeIndexUrl, podType);
   };
 
-  const handleDelete = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, url: string) => {
+  const handleDelete = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, url: string | null) => {
     e.stopPropagation();
-    setUrlToDelete(url);
+    if (url) {
+      setUrlToDelete(url);
+    }
+    else {
+      throw new Error("habit that you want to delete doesn't have a url attached to it");
+    }
     setDeleteModalState(true);
   }
   if (!habitsFetched || isLoading) {
@@ -179,8 +168,8 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
       return (
         <div className="card text-center">
           <div className="card-body">
-            <h5 className="card-title">You don't have any habits yet!</h5>
-            <p className="card-text">Let's fix this</p>
+            <h5 className="card-title">You don&apos;t have any habits yet!</h5>
+            <p className="card-text">Let&apos;s fix this</p>
             <a className="btn btn-primary" onClick={() => {
               setCreatorStatus(true);
               setViewerStatus(false);
@@ -201,47 +190,47 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                   <Nav className="me-auto">
                     <NavDropdown
                       menuVariant="dark"
-                      title={<div><FiClock /> {currentView} <RiArrowDropDownLine /></div>}
+                      title={<div><FiClock /> {capitalizeFirstLetter(currentView)} <RiArrowDropDownLine /></div>}
                     >
                       <NavDropdown.Item onClick={() => {
                         setViewerStatus(false);
                         setCreatorStatus(false);
                         setCurrentView('today');
-                      }}><GoPrimitiveDot /> today</NavDropdown.Item>
+                      }}><GoPrimitiveDot /> Today</NavDropdown.Item>
                       <NavDropdown.Item onClick={() => {
                         setViewerStatus(false);
                         setCreatorStatus(false);
                         setCurrentView('all habits');
-                      }}><GoPrimitiveDot /> all habits</NavDropdown.Item>
+                      }}><GoPrimitiveDot /> All habits</NavDropdown.Item>
                     </NavDropdown>
                     <NavDropdown
                       as={ButtonGroup}
                       menuVariant="dark"
                       variant="secondary"
-                      title={<div><BsCircle /> {currentStatus} <RiArrowDropDownLine /></div>}
+                      title={<div><BsCircle /> {capitalizeFirstLetter(currentStatus)} <RiArrowDropDownLine /></div>}
                     >
                       <NavDropdown.Item onClick={() => {
                         setViewerStatus(false);
                         setCreatorStatus(false);
                         setCurrentStatus('done');
-                      }}><GoPrimitiveDot /> done</NavDropdown.Item>
+                      }}><GoPrimitiveDot /> Done</NavDropdown.Item>
                       <NavDropdown.Item onClick={() => {
                         setViewerStatus(false);
                         setCreatorStatus(false);
                         setCurrentStatus('undone');
-                      }}><GoPrimitiveDot /> undone</NavDropdown.Item>
+                      }}><GoPrimitiveDot /> Undone</NavDropdown.Item>
                       <NavDropdown.Item onClick={() => {
                         setViewerStatus(false);
                         setCreatorStatus(false);
                         setCurrentStatus('all');
-                      }}><GoPrimitiveDot /> all</NavDropdown.Item>
+                      }}><GoPrimitiveDot /> All</NavDropdown.Item>
 
                     </NavDropdown>
                     {
                       (podType !== "acp") &&
                       <NavDropdown
                         menuVariant="dark"
-                        title={<div><VscTypeHierarchySuper /> {currentAccess ? currentAccess : "access type"} <RiArrowDropDownLine /></div>}
+                        title={<div><VscTypeHierarchySuper /> {capitalizeFirstLetter(currentAccess ? currentAccess : "access type")} <RiArrowDropDownLine /></div>}
                       >
                         {
                           accessArray.map((access, key) => {
@@ -250,7 +239,7 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                                 setViewerStatus(false);
                                 setCreatorStatus(false);
                                 setCurrentAccess(access);
-                              }}><GoPrimitiveDot /> {access}</NavDropdown.Item>
+                              }}><GoPrimitiveDot /> {capitalizeFirstLetter(access)}</NavDropdown.Item>
                           })
                         }
                         {currentAccess && (
@@ -275,7 +264,7 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                               }}><GoPrimitiveDot /> {category}</NavDropdown.Item>
                           })
                         }
-                        <><NavDropdown.Divider /><NavDropdown.Item onClick={() => setCurrentCategory("without category")}><GoPrimitiveDot /> without category</NavDropdown.Item></>
+                        <><NavDropdown.Divider /><NavDropdown.Item onClick={() => setCurrentCategory("without category")}><GoPrimitiveDot /> Without category</NavDropdown.Item></>
                         {currentCategory && (
                           <><NavDropdown.Divider /><NavDropdown.Item onClick={() => setCurrentCategory(null)}><RiArrowGoBackFill /> reset</NavDropdown.Item></>)}
                       </NavDropdown>
@@ -346,16 +335,18 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                                 e.stopPropagation();
                               }}
                               onChange={() => {
-                                let tempArr = habitsToShow;
+                                const tempArr = habitsToShow;
                                 tempArr[key].stat = !habit.stat;
                                 setHabitsToShow(tempArr);
-                                console.log(tempArr);
-                                let toSave = tempArr[key];
+                                const toSave = tempArr[key];
                                 setObjOfStates((prevState) => ({ ...prevState, [key]: !objOfStates[key] }));
                                 handleSave(toSave);
 
                               }}
-                              type="checkbox" checked={objOfStates[key]!} style={{ "transform": "scale(1.7)" }} />
+                              type="checkbox" checked={
+                                (objOfStates[key]) ? true : false
+                              }
+                              style={{ "transform": "scale(1.7)" }} />
                           </div>
                         }
                         <div style={{ display: "inline-block" }}>
@@ -425,7 +416,7 @@ const HabitsList = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorSt
                           <Button variant="outline-danger"
                             className="px-1 py-1 ms-auto"
                             style={{ color: "red" }}
-                            onClick={(e) => { handleDelete(e, habit.url!) }}
+                            onClick={(e) => { handleDelete(e, habit.url) }}
                           ><RiDeleteBin6Line /></Button>
                         }
                       </a>

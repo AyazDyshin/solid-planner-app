@@ -1,3 +1,4 @@
+import React from 'react';
 import { useEffect, useState } from "react";
 import NavbarSolidApp from "./NavbarSolidApp";
 import ContentToRender from "./ContentToRender";
@@ -28,7 +29,6 @@ const MainContent = () => {
   const [creatorStatus, setCreatorStatus] = useState<boolean>(false);
   const [isEdit, setIsEdit] = useState(false);
   const [notesArray, setNotesArray] = useState<Note[]>([]);
-  const [isLoadingContents, setIsLoadingContents] = useState<boolean>(true);
   const [notesFetched, setNotesFetched] = useState<boolean>(false);
   const [habitsFetched, setHabitsFetched] = useState<boolean>(false);
   const [habitsArray, setHabitsArray] = useState<Habit[]>([]);
@@ -46,19 +46,19 @@ const MainContent = () => {
   const [refetchHabits, setRefetchHabits] = useState<boolean>(false);
 
   useEffect(() => {
-    let check = async () => {
+    const check = async () => {
       setIsLoading(true);
 
-      let updStoragePref: string = await getStoragePref(webId, fetch);
+      const updStoragePref: string = await getStoragePref(webId, fetch);
       setStoragePref(updStoragePref);
 
-      let updPrefFileLocation: string = await getPrefLink(webId, fetch);
+      const updPrefFileLocation: string = await getPrefLink(webId, fetch);
       setPrefFileLocation(updPrefFileLocation);
 
-      let updPublicTypeIndexUrl = await getPublicTypeIndexUrl(webId, fetch);
+      const updPublicTypeIndexUrl = await getPublicTypeIndexUrl(webId, fetch);
       setPublicTypeIndexUrl(updPublicTypeIndexUrl);
 
-      let updPodType = await isWacOrAcp(updStoragePref, fetch);
+      const updPodType = await isWacOrAcp(updStoragePref, fetch);
       setPodType(updPodType);
 
       let defFolderUpd = await getDefaultFolder(webId, fetch, updPrefFileLocation);
@@ -67,12 +67,12 @@ const MainContent = () => {
       }
       defFolderUpd = await getDefaultFolder(webId, fetch, updPrefFileLocation);
       setDefFolder(defFolderUpd);
-      let result = await checkPermissions(webId, fetch, updStoragePref, updPodType);
+      const result = await checkPermissions(webId, fetch, updStoragePref, updPodType);
       setPermissionStatus(result);
 
       const wssUrl = new URL(updStoragePref);
       wssUrl.protocol = 'wss';
-      const inboxUrl = `${updStoragePref}inbox/`;
+      //const inboxUrl = `${updStoragePref}inbox/`;
       const contactsUrl = `${updStoragePref}contacts/`;
       if (updPodType == 'acp') {
         const websocket3 = new WebsocketNotification(
@@ -98,7 +98,7 @@ const MainContent = () => {
         websocket4.connect();
       }
       if (updPodType === 'wac') {
-        var socket = new WebSocket(wssUrl, ['solid-0.1']);
+        const socket = new WebSocket(wssUrl, ['solid-0.1']);
         socket.onopen = function () {
           this.send(`sub ${updPublicTypeIndexUrl}`);
           this.send(`sub ${contactsUrl}`);
@@ -112,7 +112,7 @@ const MainContent = () => {
               setRefetchNotes(!refetchNotes);
               setRefetchHabits(!refetchHabits);
             }
-            if (`pub ${contactsUrl}`) {
+            if (msg.data === `pub ${contactsUrl}`) {
               setContactsFetched(false);
               setContactsFdrStatus(false);
               setRefetchContacts(!refetchContacts);
@@ -140,23 +140,13 @@ const MainContent = () => {
         <div>
           <Test />
           <NavbarSolidApp
-            creatorStatus={creatorStatus}
-            setCreatorStatus={setCreatorStatus}
-            viewerStatus={viewerStatus}
-            setViewerStatus={setViewerStatus}
             links={links}
             active={active}
             setActive={setActive}
-            isEdit={isEdit}
-            setIsEdit={setIsEdit}
           />
           <ContentToRender
-            refetchContacts={refetchContacts}
-            setRefetchContacts={setRefetchContacts}
             refetchHabits={refetchHabits}
-            setRefetchHabits={setRefetchHabits}
             refetchNotes={refetchNotes}
-            setRefetchNotes={setRefetchNotes}
             contactsFetched={contactsFetched}
             setContactsFetched={setContactsFetched}
             contactsFdrStatus={contactsFdrStatus}
@@ -172,8 +162,6 @@ const MainContent = () => {
             setHabitsArray={setHabitsArray}
             notesFetched={notesFetched}
             setNotesFetched={setNotesFetched}
-            isLoadingContents={isLoadingContents}
-            setIsLoadingContents={setIsLoadingContents}
             notesArray={notesArray}
             setNotesArray={setNotesArray}
             creatorStatus={creatorStatus}

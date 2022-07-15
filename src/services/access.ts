@@ -32,9 +32,7 @@ export const initializeAcl = async (url: string, fetch: fetcher) => {
             );
         }
         if (!hasFallbackAcl(myDatasetWithAcl)) {
-            // throwError(new Error(
-            //     `The current user does not have permission to see who currently has access to this resource, url: ${url}`
-            // ));
+
             throw new Error(
                 `The current user does not have permission to see who currently has access to this resource, url: ${url}`
             );
@@ -61,34 +59,31 @@ export const determineAccess = async (webId: string, url: string, fetch: fetcher
 // ie give read permission to general public or not.
 export const setPubAccess = async (webId: string, accessObj: accessObject, url: string, fetch: fetcher,
     storagePref: string, prefFileLocation: string, podType: string) => {
-    let type = await getAccessType(webId, fetch, storagePref, prefFileLocation, podType);
+    const type = await getAccessType(webId, fetch, storagePref, prefFileLocation, podType);
     if (type === "wac") {
         try {
-            let upd = await universalAccess.setPublicAccess(url, {
+            const upd = await universalAccess.setPublicAccess(url, {
                 read: accessObj.read,
                 append: accessObj.append,
                 write: accessObj.write
             }, { fetch: fetch });
             if (!upd) {
-                //  throwError(new Error(`You don't have permissions to changes the access type of this resource, url: ${url}`));
                 throw new Error(`You don't have permissions to changes the access type of this resource, url: ${url}`);
-            };
+            }
         }
         catch {
             try {
                 await initializeAcl(url, fetch);
-                let upd = await universalAccess.setPublicAccess(url, {
+                const upd = await universalAccess.setPublicAccess(url, {
                     read: accessObj.read,
                     append: accessObj.append,
                     write: accessObj.write
                 }, { fetch: fetch });
                 if (!upd) {
-                    //  throwError(new Error(`You don't have permissions to changes the access type of this resource, url: ${url}`));
                     throw new Error(`You don't have permissions to changes the access type of this resource, url: ${url}`);
-                };
+                }
             }
             catch {
-                // throwError(new Error(`You don't have permissions to change the access type of this resource, url: ${url}`));
                 throw new Error(`You don't have permissions to change the access type of this resource, url: ${url}`);
             }
         }
@@ -102,18 +97,17 @@ export const setPubAccess = async (webId: string, accessObj: accessObject, url: 
 export const shareWith = async (webId: string, url: string, fetch: fetcher, accessObj: accessObject,
     shareWith: string, storagePref: string, prefFileLocation: string, podType: string) => {
 
-    let type = await getAccessType(webId, fetch, storagePref, prefFileLocation, podType);
+    const type = await getAccessType(webId, fetch, storagePref, prefFileLocation, podType);
 
     if (type === "wac") {
         try {
 
-            let upd = await universalAccess.setAgentAccess(url, shareWith, {
+            const upd = await universalAccess.setAgentAccess(url, shareWith, {
                 read: accessObj.read,
                 append: accessObj.append,
                 write: accessObj.write
             }, { fetch: fetch });
             if (!upd) {
-                //throwError(new Error(`The current user does not have permission to change access rights to this resource, url: ${url}`));
                 throw new Error(`The current user does not have permission to change access rights to this resource, url: ${url}`);
             }
         }
@@ -121,19 +115,17 @@ export const shareWith = async (webId: string, url: string, fetch: fetcher, acce
             try {
                 await initializeAcl(url, fetch);
 
-                let upd = await universalAccess.setAgentAccess(url, shareWith, {
+                const upd = await universalAccess.setAgentAccess(url, shareWith, {
                     read: accessObj.read,
                     append: accessObj.append,
                     write: accessObj.write
                 }, { fetch: fetch });
                 if (!upd) {
-                    //   throwError(new Error(`The current user does not have permission to change access rights to this resource, url: ${url}`));
                     throw new Error(`The current user does not have permission to change access rights to this resource, url: ${url}`);
                 }
             }
 
             catch {
-                //  throwError(new Error(`The current user does not have permission to change access rights to this resource, url: ${url}`));
                 throw new Error(`The current user does not have permission to change access rights to this resource, url: ${url}`);
             }
         }
@@ -151,11 +143,10 @@ export const getSharedList = async (webId: string, url: string, fetch: fetcher, 
         try {
             const allAgents = await universalAccess.getAgentAccessAll(url, { fetch: fetch });
             if (!allAgents) {
-                //  throwError(new Error(`The current user does not have permission to see who currently has access to this resource, url: ${url}`));
                 throw new Error(`The current user does not have permission to see who currently has access to this resource, url: ${url}`);
             }
-            let accObj: Record<string, AccessModes> = {};
-            for (let obj in allAgents) {
+            const accObj: Record<string, AccessModes> = {};
+            for (const obj in allAgents) {
                 if (!(obj === webId || obj.substring(0, 8) !== 'https://')) {
                     accObj[obj] = allAgents[obj];
                 }
@@ -167,11 +158,10 @@ export const getSharedList = async (webId: string, url: string, fetch: fetcher, 
                 await initializeAcl(url, fetch);
                 const allAgents = await universalAccess.getAgentAccessAll(url, { fetch: fetch });
                 if (!allAgents) {
-                    //  throwError(new Error(`The current user does not have permission to see who currently has access to this resource, url: ${url}`));
                     throw new Error(`The current user does not have permission to see who currently has access to this resource, url: ${url}`);
                 }
-                let accObj: Record<string, AccessModes> = {};
-                for (let obj in allAgents) {
+                const accObj: Record<string, AccessModes> = {};
+                for (const obj in allAgents) {
                     if (!(obj === webId || obj.substring(0, 8) !== 'https://')) {
                         accObj[obj] = allAgents[obj];
                     }
@@ -179,7 +169,6 @@ export const getSharedList = async (webId: string, url: string, fetch: fetcher, 
                 return accObj;
             }
             catch {
-                // throwError(new Error(`The current user does not have permission to see who currently has access to this resource, url: ${url}`));
                 throw new Error(`The current user does not have permission to see who currently has access to this resource, url: ${url}`);
             }
         }
@@ -196,9 +185,8 @@ export const getPubAccess = async (webId: string, url: string, fetch: fetcher, s
     podType: string) => {
     if (podType === "wac") {
         try {
-            let pubAcc = await universalAccess.getPublicAccess(url, { fetch: fetch });
+            const pubAcc = await universalAccess.getPublicAccess(url, { fetch: fetch });
             if (!pubAcc) {
-                // throwError(new Error(`The current user does not have permission to see who currently has access to this resource, url: ${url}`));
                 throw new Error(`The current user does not have permission to see who currently has access to this resource, url: ${url}`);
             }
             return pubAcc;
@@ -206,21 +194,19 @@ export const getPubAccess = async (webId: string, url: string, fetch: fetcher, s
         catch {
             try {
                 await initializeAcl(url, fetch);
-                let pubAcc = await universalAccess.getPublicAccess(url, { fetch: fetch });
+                const pubAcc = await universalAccess.getPublicAccess(url, { fetch: fetch });
                 if (!pubAcc) {
-                    //  throwError(new Error(`The current user does not have permission to see who currently has access to this resource, url: ${url}`));
                     throw new Error(`The current user does not have permission to see who currently has access to this resource, url: ${url}`);
                 }
                 return pubAcc;
             }
             catch (error) {
-                // throwError(new Error(`The current user does not have permission to see who currently has access to this resource, url: ${url}`));
                 throw new Error(`The current user does not have permission to see who currently has access to this resource, url: ${url}`);
             }
         }
     }
     else {
-        let retOfCall = await getAcpAccess(webId, url, fetch, "public");
+        const retOfCall = await getAcpAccess(webId, url, fetch, "public");
         if (!retOfCall[ACP.PublicAgent]) return { read: false, append: false, write: false }
         return retOfCall[ACP.PublicAgent];
     }
@@ -237,7 +223,6 @@ export const isWacOrAcp = async (url: string, fetch: fetcher) => {
             dataSetWithAcr = await acp_ess_2.getSolidDatasetWithAcr(url, { fetch: fetch });
         }
         catch {
-            // throwError(new Error(`Couldn't fetch a dataSet from user's POD, this might be due to server error, or due to not having permission`));
             throw new Error(`Couldn't fetch a dataSet from user's POD, this might be due to server error, or due to not having permission`);
 
         }
@@ -255,7 +240,7 @@ export const checkPermissions = async (webId: string, fetch: fetcher, storage: s
         else {
             await createContainerAt(`${storage}planerAppTester1/`, { fetch: fetch });
             await initializeAcl(`${storage}planerAppTester1/`, fetch);
-            let upd = await universalAccess.setPublicAccess(`${storage}planerAppTester1/`, {
+            const upd = await universalAccess.setPublicAccess(`${storage}planerAppTester1/`, {
                 read: true,
                 append: true,
                 write: true,

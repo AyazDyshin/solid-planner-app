@@ -21,7 +21,6 @@ interface Props {
     newEntryCr: boolean;
     setNewEntryCr: React.Dispatch<React.SetStateAction<boolean>>;
     noteToView: Note | null;
-    setNoteToView: React.Dispatch<React.SetStateAction<Note | null>>;
     viewerStatus: boolean;
     setViewerStatus: React.Dispatch<React.SetStateAction<boolean>>;
     isEdit: boolean;
@@ -29,9 +28,6 @@ interface Props {
     setCreatorStatus: React.Dispatch<React.SetStateAction<boolean>>;
     creatorStatus: boolean;
     categoryArray: string[];
-    setCategoryArray: React.Dispatch<React.SetStateAction<string[]>>;
-    doNoteSave: boolean;
-    setDoNoteSave: React.Dispatch<React.SetStateAction<boolean>>;
     NoteInp: Note;
     setNoteInp: React.Dispatch<React.SetStateAction<Note>>;
     publicAccess: accessObject;
@@ -62,15 +58,14 @@ interface Props {
     contactsArr: (string | null)[][];
     setContactsArr: React.Dispatch<React.SetStateAction<(string | null)[][]>>;
     contactsFetched: boolean;
-    setContactsFetched: React.Dispatch<React.SetStateAction<boolean>>;
 }
 //component of creation and saving a note the user's pod
 const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFolder, podType, publicTypeIndexUrl,
-    setNoteToView, viewerStatus, setViewerStatus, isEdit, setIsEdit, prefFileLocation,
-    setCreatorStatus, creatorStatus, categoryArray, setCategoryArray, doNoteSave, setDoNoteSave, NoteInp,
+    viewerStatus, setViewerStatus, isEdit, setIsEdit, prefFileLocation,
+    setCreatorStatus, creatorStatus, categoryArray, NoteInp,
     setNoteInp, accUpdObj, setAccUpdObj, agentsToUpd, setAgentsToUpd, noteUpdInProgress, setNoteUpdInProgress,
     publicAccess, setPublicAccess, notesArray, setNotesArray, contactsFdrStatus, setContactsFdrStatus,
-    contactsArr, setContactsArr, contactsFetched, setContactsFetched
+    contactsArr, setContactsArr, contactsFetched
 }: Props) => {
 
     const { session, fetch } = useSession();
@@ -83,7 +78,6 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
     const [sharedModalState, setSharedModalState] = useState<boolean>(false);
     const [contactsList, setContactsList] = useState<{ [x: string]: AccessModes; }>({});
     const [noteChanged, setNoteChanged] = useState<boolean>(false);
-    const [performDelete, setPerformDelete] = useState<boolean>(false);
     const [urlToDelete, setUrlToDelete] = useState<string | null>(null);
     const [deleteModalState, setDeleteModalState] = useState<boolean>(false);
 
@@ -109,8 +103,8 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
         if (creatorStatus) {
             setViewerStatus(false);
             setCreatorStatus(false);
-            let idToSave = Date.now() + Math.floor(Math.random() * 1000);
-            let newNote = {
+            const idToSave = Date.now() + Math.floor(Math.random() * 1000);
+            const newNote = {
                 ...NoteInp, url: `${defFolder}notes/${idToSave}.ttl`, id: idToSave,
                 access: { "private": { read: false, append: false, write: false } }
             }
@@ -123,7 +117,6 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
             setNoteUpdInProgress(true);
             await saveNote(webId, fetch, newNote, storagePref, defFolder, prefFileLocation, podType);
             setNoteUpdInProgress(false);
-            console.log("finish upd");
         }
         else if (viewerStatus && (noteChanged || Object.keys(accUpdObj).length !== 0)) {
             setViewerStatus(false);
@@ -147,11 +140,12 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
                     else {
                         updShareList = agentsToUpd;
                     }
-                    let b = Object.keys(updShareList);
                     Object.keys(updShareList).map((key) => {
                         //handle
-                        if (!updShareList![key].read && !updShareList![key].append && !updShareList![key].write) {
-                            delete updShareList![key];
+                        if (updShareList) {
+                            if (!updShareList[key].read && !updShareList[key].append && !updShareList[key].write) {
+                                delete updShareList[key];
+                            }
                         }
                     });
                     if (Object.keys(updShareList).length === 0) updShareList = undefined;
@@ -160,12 +154,12 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
                 }
                 setAccUpdObj({});
             }
-            let index = notesArray.findIndex(item => item.id === noteToUpd.id);
-            let updArr = notesArray;
+            const index = notesArray.findIndex(item => item.id === noteToUpd.id);
+            const updArr = notesArray;
             updArr[index] = noteToUpd;
             setNotesArray(updArr);
             setNewEntryCr(!newEntryCr);
-            let newNote = NoteInp;
+            const newNote = NoteInp;
             setNoteInp({ id: null, title: "", content: "", category: "", url: "", access: null });
             if (noteChanged) {
                 setNoteChanged(false);
@@ -194,7 +188,10 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
                     if (!NoteInp) {
                         throw new Error("Error, note to view wasn't provided");
                     }
-                    await shareWith(webId, NoteInp!.url, fetch, agentsToUpd[item], item, storagePref, prefFileLocation, podType);
+                    if (!NoteInp.url) {
+                        throw new Error("Error, note you are trying to share doesn't have a url");
+                    }
+                    await shareWith(webId, NoteInp.url, fetch, agentsToUpd[item], item, storagePref, prefFileLocation, podType);
 
                 }
             }
@@ -211,7 +208,10 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
             throw new Error("Error, note to view wasn't provided");
         }
         //handle
-        setUrlToDelete(NoteInp.url!);
+        if (!NoteInp.url) {
+            throw new Error("Error, note that you want to delete doesn't have a url");
+        }
+        setUrlToDelete(NoteInp.url);
         setDeleteModalState(true);
     }
 
@@ -231,25 +231,25 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
                     onChange={handleChange} />
 
                 <ButtonGroup>
-                    <Button variant="secondary" onClick={handleSave}><MdSaveAlt /> save</Button>
+                    <Button variant="secondary" onClick={handleSave}><MdSaveAlt /> Save</Button>
                     <DropdownButton className="dropNoIcon"
                         variant="outline-secondary"
                         menuVariant="dark"
                         title={<BsThreeDots />}
                         id="input-group-dropdown-1"
                     >
-                        {viewerStatus && <Dropdown.Item onClick={handleEdit}><FiEdit /> edit</Dropdown.Item>}
+                        {viewerStatus && <Dropdown.Item onClick={handleEdit}><FiEdit /> Edit</Dropdown.Item>}
                         <Dropdown.Item onClick={() => (setCategoryModalState(true))}>
-                            <BiFolderPlus /> set category
+                            <BiFolderPlus /> Set category
                         </Dropdown.Item>
-                        {viewerStatus && (podType !== "acp") && <Dropdown.Item onClick={() => (setAccessModalState(true))}><BsShare /> share</Dropdown.Item>}
+                        {viewerStatus && (podType !== "acp") && <Dropdown.Item onClick={() => (setAccessModalState(true))}><BsShare /> Share</Dropdown.Item>}
                         {viewerStatus && noteToView?.shareList && (podType !== "acp") &&
                             <Dropdown.Item onClick={() => (setSharedModalState(true))}>
-                                <RiUserSharedLine /> shared list
+                                <RiUserSharedLine /> Shared list
                             </Dropdown.Item>}
                         {viewerStatus && <Dropdown.Item onClick={handleDelete}
                             style={{ color: "red" }}
-                        ><RiDeleteBin6Line /> delete</Dropdown.Item>}
+                        ><RiDeleteBin6Line /> Delete</Dropdown.Item>}
                     </DropdownButton>
                 </ButtonGroup>
             </InputGroup>
@@ -282,19 +282,15 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
                 noteInp={NoteInp}
                 viewerStatus={viewerStatus}
                 categoryArray={categoryArray}
-                setCategoryArray={setCategoryArray}
             />
             <AccessModal
                 contactsArr={contactsArr}
                 setContactsArr={setContactsArr}
                 contactsFetched={contactsFetched}
-                setContactsFetched={setContactsFetched}
                 contactsFdrStatus={contactsFdrStatus}
                 setContactsFdrStatus={setContactsFdrStatus}
                 storagePref={storagePref}
-                agentsToUpd={agentsToUpd}
                 setAgentsToUpd={setAgentsToUpd}
-                accUpdObj={accUpdObj}
                 setAccUpdObj={setAccUpdObj}
                 publicAccess={publicAccess}
                 setPublicAccess={setPublicAccess}
@@ -302,23 +298,16 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
                 setContactsList={setContactsList}
                 accessModalState={accessModalState}
                 setAccessModalState={setAccessModalState}
-                setNoteInp={setNoteInp}
                 NoteInp={NoteInp}
             />
             <SharedModal
-                agentsToUpd={agentsToUpd}
                 setAgentsToUpd={setAgentsToUpd}
-                accUpdObj={accUpdObj}
                 setAccUpdObj={setAccUpdObj}
                 publicAccess={publicAccess}
                 setPublicAccess={setPublicAccess}
                 sharedModalState={sharedModalState}
                 setSharedModalState={setSharedModalState}
-                setNoteInp={setNoteInp}
                 NoteInp={NoteInp}
-                viewerStatus={viewerStatus}
-                categoryArray={categoryArray}
-                setCategoryArray={setCategoryArray}
             />
         </div>
     )

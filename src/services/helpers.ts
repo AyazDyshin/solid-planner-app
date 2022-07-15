@@ -1,10 +1,9 @@
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
-import { Habit, returnCheckIn } from "../components/types";
+import { Habit } from "../components/types";
 import {
     isSameDay, isSameWeek, isSameMonth, isSameYear, differenceInCalendarDays, getDay, format,
-    differenceInCalendarWeeks, differenceInCalendarMonths, differenceInCalendarYears, differenceInWeeks, differenceInMonths
+    differenceInCalendarWeeks, differenceInCalendarMonths, differenceInCalendarYears
 } from 'date-fns';
-import React from "react";
 
 //function that extracts main part from the user's webId
 export const modifyWebId = (webId: string): string => {
@@ -14,8 +13,15 @@ export const modifyWebId = (webId: string): string => {
 }
 
 export const getIdPart = (url: string) => {
-    let arr = url.split("/");
+    const arr = url.split("/");
     return arr[arr.length - 1];
+}
+
+export function capitalizeFirstLetter(string: string | null) {
+    if (string === null){
+        return 'Null';
+    }
+    return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 export const getNumberFromDay = (day: string) => {
@@ -38,8 +44,7 @@ export const getNumberFromDay = (day: string) => {
 }
 const setStreaksDefaultCases = (habit: Habit): Habit => {
     let functionToUse;
-    let today = new Date();
-    let toReturn: returnCheckIn = 0;
+    const today = new Date();
     switch (habit.recurrence) {
         case "daily": {
             functionToUse = differenceInCalendarDays;
@@ -84,7 +89,9 @@ const setStreaksDefaultCases = (habit: Habit): Habit => {
             if (!isSameDay(today, habit.lastCheckInDate)) {
                 habit.prevLastCheckIn = habit.lastCheckInDate;
                 habit.lastCheckInDate = today;
-                habit.currentStreak = habit.currentStreak! + 1;
+                if (habit.currentStreak) {
+                    habit.currentStreak = habit.currentStreak + 1;
+                }
                 habit.prevBestStreak = habit.bestStreak;
                 habit = habitUpdBest(habit);
                 if (!habit.checkInList) habit.checkInList = [today];
@@ -98,8 +105,8 @@ const setStreaksDefaultCases = (habit: Habit): Habit => {
     }
 }
 
-export const setStreaks = (habit: Habit): Habit => {
-    let today = new Date();
+export const setStreaks = (habit: Habit) => {
+    const today = new Date();
     if (habit.stat) {
         if (!habit.currentStreak || habit.currentStreak === 0) { // case for when habit is checked, but doesn't have current streak
             habit.currentStreak = 1;
@@ -152,6 +159,7 @@ export const setStreaks = (habit: Habit): Habit => {
                         else if (!habit.custom) {
                             habit.custom = null;
                             habit.recurrence = "daily";
+                            return habit;
                         }
                         else {
                             if (checkWeekDay(habit)) {
@@ -205,10 +213,10 @@ export const setStreaks = (habit: Habit): Habit => {
 }
 
 const checkWeekDay = (habit: Habit) => {
-    let today = new Date();
+    const today = new Date();
     if (habit.custom && !(typeof habit.custom === 'number')) {
-        let todayWeek = getDay(today);
-        let updArr = habit.custom.map((weekDay) => {
+        const todayWeek = getDay(today);
+        const updArr = habit.custom.map((weekDay) => {
             if (weekDay === todayWeek) return true;
         });
         if (updArr) {
@@ -245,9 +253,9 @@ export const checkArrayOverlap = (arr1: number[], arr2: number[]) => {
 }
 
 export const getHabitsToday = (allHab: Habit[]) => {
-    let allHabits = allHab;
-    let today = new Date();
-    let habitsToday = allHabits.filter((habit) => {
+    const allHabits = allHab;
+    const today = new Date();
+    const habitsToday = allHabits.filter((habit) => {
         let toCheckDate = habit.lastCheckInDate ? habit.lastCheckInDate : habit.startDate;
         if (!toCheckDate) {
             habit.startDate = new Date();
@@ -297,16 +305,16 @@ export const getHabitsToday = (allHab: Habit[]) => {
                     }
                 }
                 else if (habit.custom && typeof habit.custom !== 'number') {
-                    let updCustom: number[] = habit.custom;
-                    let todayWeek = getDay(today);
+                    const updCustom: number[] = habit.custom;
+                    const todayWeek = getDay(today);
                     if (!isSameDay(today, toCheckDate)) {
                         if (differenceInCalendarDays(today, toCheckDate) > 7) {
                             habit = habitUpdBest(habit);
                             habit.currentStreak = 0;
                         }
                         else {
-                            let arrOfDaysBetween = [];
-                            let lastCheckInWeekDay = getDay(toCheckDate);
+                            const arrOfDaysBetween = [];
+                            const lastCheckInWeekDay = getDay(toCheckDate);
                             if (lastCheckInWeekDay - todayWeek > 0) {
                                 for (let i = lastCheckInWeekDay + 1; i < todayWeek; i++) {
                                     arrOfDaysBetween.push(i);
@@ -326,7 +334,7 @@ export const getHabitsToday = (allHab: Habit[]) => {
                             }
                         }
                     }
-                    let updArr = updCustom.filter((weekDay) => {
+                    const updArr = updCustom.filter((weekDay) => {
                         if (weekDay === todayWeek) return true;
                     });
                     if (updArr) {
@@ -416,8 +424,8 @@ export const getHabitsToday = (allHab: Habit[]) => {
                     }
                     else {
                         if (!isSameDay(toCheckDate, today)) {
-                            let todayWeek = getDay(today);
-                            let updArr = habit.custom?.filter((weekDay) => {
+                            const todayWeek = getDay(today);
+                            const updArr = habit.custom?.filter((weekDay) => {
                                 if (weekDay === todayWeek) {
                                     return true;
                                 }
@@ -430,8 +438,8 @@ export const getHabitsToday = (allHab: Habit[]) => {
                             }
                         }
                         else {
-                            let todayWeek = getDay(today);
-                            let updArr = habit.custom?.filter((weekDay) => {
+                            const todayWeek = getDay(today);
+                            const updArr = habit.custom?.filter((weekDay) => {
                                 if (weekDay === todayWeek) {
                                     return true;
                                 }
@@ -452,9 +460,9 @@ export const getHabitsToday = (allHab: Habit[]) => {
 
 export const constructDate = (date: Date | null) => {
     if (!date) return "no date"
-    let day = date.getDate();
-    let month = date.getMonth() + 1;
-    let year = date.getFullYear();
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
     return (`${day}.${month}.${year}`);
 }
 //  adds '/' to Url's end if it is missing
@@ -464,10 +472,10 @@ export const updUrlForFolder = (url: string) => {
 }
 
 export const extractCategories = <T extends { category: string | null; }>(arrOfEntries: T[]) => {
-    let arrayOfCategories: string[] = [];
+    const arrayOfCategories: string[] = [];
 
-    let categoryArr = arrOfEntries.map((entry) => {
-        let categoryOfCurrEntry = entry.category;
+    arrOfEntries.map((entry) => {
+        const categoryOfCurrEntry = entry.category;
         if (categoryOfCurrEntry && !arrayOfCategories.includes(categoryOfCurrEntry)) arrayOfCategories.push(categoryOfCurrEntry);
     });
     return arrayOfCategories;
@@ -476,10 +484,9 @@ export const extractCategories = <T extends { category: string | null; }>(arrOfE
 export const filterByCategory = <T extends { category: string | null; }>(arrOfEntries: T[], categoryFilter: string) => {
     let ret: T[] = [];
     if (categoryFilter === 'without category') {
-        console.log("we got here");
         ret = arrOfEntries.filter((entry) => entry.category === null);
     }
-   else  {
+    else {
         ret = arrOfEntries.filter((entry) => entry.category === categoryFilter);
     }
     return ret;
@@ -509,9 +516,9 @@ export const filterByAccess = <T extends { category: string | null; access: Reco
 
 export const checkInsToObj = (habit: Habit): { title: string; date: string; backgroundColor: string; }[] => {
     if (habit.checkInList) {
-        let arrToRet: { title: string; date: string; backgroundColor: string; }[] = [];
+        const arrToRet: { title: string; date: string; backgroundColor: string; }[] = [];
         habit.checkInList.forEach((checkIn) => {
-            let dateVal = format(checkIn, "yyyy-MM-dd");
+            const dateVal = format(checkIn, "yyyy-MM-dd");
             arrToRet.push({ title: `${habit.title}`, date: dateVal, backgroundColor: habit.color });
         });
         return arrToRet;

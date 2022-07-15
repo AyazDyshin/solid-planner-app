@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "../styles.css";
+import React from 'react';
 import { accessObject, Note } from "./types";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import NoteCreator from "./NoteCreator";
@@ -7,7 +8,6 @@ import NotesList from "./NotesList";
 import { Modal } from "react-bootstrap";
 
 interface Props {
-    active: string;
     viewerStatus: boolean;
     setViewerStatus: React.Dispatch<React.SetStateAction<boolean>>;
     creatorStatus: boolean;
@@ -16,8 +16,6 @@ interface Props {
     setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
     notesArray: Note[];
     setNotesArray: React.Dispatch<React.SetStateAction<Note[]>>;
-    isLoadingContents: boolean;
-    setIsLoadingContents: React.Dispatch<React.SetStateAction<boolean>>;
     notesFetched: boolean;
     setNotesFetched: React.Dispatch<React.SetStateAction<boolean>>;
     storagePref: string;
@@ -30,9 +28,7 @@ interface Props {
     contactsArr: (string | null)[][];
     setContactsArr: React.Dispatch<React.SetStateAction<(string | null)[][]>>;
     contactsFetched: boolean;
-    setContactsFetched: React.Dispatch<React.SetStateAction<boolean>>;
     refetchNotes: boolean;
-    setRefetchNotes: React.Dispatch<React.SetStateAction<boolean>>;
 }
 // Component that is responsible for rendering content of notes and habits tab
 // splits the content in two halves, left half: "FolderPickerOrContent"
@@ -41,17 +37,15 @@ interface Props {
 // this is needed to update the left side view, ie list of entries existing in the user's pod
 // "creatorStatus" and "setCreatorStatus" are hooks to monitor if create button was pressed,
 // this is needed to render the respective creator component
-const NotesRender = ({ active, viewerStatus, setViewerStatus, creatorStatus, setCreatorStatus, isEdit, storagePref, defFolder,
-    setIsEdit, notesArray, setNotesArray, isLoadingContents, setIsLoadingContents, notesFetched, setNotesFetched, podType,
+const NotesRender = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorStatus, isEdit, storagePref, defFolder,
+    setIsEdit, notesArray, setNotesArray, notesFetched, setNotesFetched, podType,
     prefFileLocation, publicTypeIndexUrl, contactsFdrStatus, setContactsFdrStatus, contactsArr, setContactsArr,
-    contactsFetched, setContactsFetched, refetchNotes, setRefetchNotes
+    contactsFetched, refetchNotes
 }: Props) => {
     const [newEntryCr, setNewEntryCr] = useState<boolean>(false);
     const [noteToView, setNoteToView] = useState<Note | null>(null);
     const [categoryArray, setCategoryArray] = useState<string[]>([]);
-    const [doNoteSave, setDoNoteSave] = useState<boolean>(false);
     const [NoteInp, setNoteInp] = useState<Note>({ id: null, title: "", content: "", category: "", url: "", access: null });
-    const [arrOfChanges, setArrOfChanges] = useState<string[]>([]);
     const [publicAccess, setPublicAccess] = useState<accessObject>({ read: false, append: false, write: false });
     const [accUpdObj, setAccUpdObj] = useState<{ [x: string]: boolean; }>({});
     const [agentsToUpd, setAgentsToUpd] = useState<{ [x: string]: AccessModes; }>({});
@@ -62,10 +56,8 @@ const NotesRender = ({ active, viewerStatus, setViewerStatus, creatorStatus, set
             <div id="setWidth" style={{ "backgroundColor": "#fff" }} className="h-100 w-100  adjust-me-based-on-size  d-flex justify-content-center align-items-center p-0">
                 <NotesList
                     refetchNotes={refetchNotes}
-                    setRefetchNotes={setRefetchNotes}
                     setNoteModalState={setNoteModalState}
                     noteUpdInProgress={noteUpdInProgress}
-                    setNoteUpdInProgress={setNoteUpdInProgress}
                     podType={podType}
                     prefFileLocation={prefFileLocation}
                     publicTypeIndexUrl={publicTypeIndexUrl}
@@ -77,11 +69,8 @@ const NotesRender = ({ active, viewerStatus, setViewerStatus, creatorStatus, set
                     setCreatorStatus={setCreatorStatus}
                     newEntryCr={newEntryCr}
                     setNewEntryCr={setNewEntryCr}
-                    noteToView={noteToView}
                     setNoteToView={setNoteToView}
-                    viewerStatus={viewerStatus}
                     setViewerStatus={setViewerStatus}
-                    isEdit={isEdit}
                     setIsEdit={setIsEdit}
                     categoryArray={categoryArray}
                     setCategoryArray={setCategoryArray}
@@ -92,14 +81,13 @@ const NotesRender = ({ active, viewerStatus, setViewerStatus, creatorStatus, set
                     size="lg"
                     onHide={() => { setNoteModalState(false) }}>
                     <Modal.Header closeButton>
-                        {creatorStatus ? "create a note" : "edit a note"}
+                        {creatorStatus ? "Create a note" : "Edit a note"}
                     </Modal.Header>
                     <Modal.Body id="viewerModal">
                         <NoteCreator
                             contactsArr={contactsArr}
                             setContactsArr={setContactsArr}
                             contactsFetched={contactsFetched}
-                            setContactsFetched={setContactsFetched}
                             contactsFdrStatus={contactsFdrStatus}
                             setContactsFdrStatus={setContactsFdrStatus}
                             noteUpdInProgress={noteUpdInProgress}
@@ -120,7 +108,6 @@ const NotesRender = ({ active, viewerStatus, setViewerStatus, creatorStatus, set
                             newEntryCr={newEntryCr}
                             setNewEntryCr={setNewEntryCr}
                             noteToView={noteToView}
-                            setNoteToView={setNoteToView}
                             viewerStatus={viewerStatus}
                             setViewerStatus={setViewerStatus}
                             isEdit={isEdit}
@@ -128,9 +115,6 @@ const NotesRender = ({ active, viewerStatus, setViewerStatus, creatorStatus, set
                             creatorStatus={creatorStatus}
                             setCreatorStatus={setCreatorStatus}
                             categoryArray={categoryArray}
-                            setCategoryArray={setCategoryArray}
-                            doNoteSave={doNoteSave}
-                            setDoNoteSave={setDoNoteSave}
                             NoteInp={NoteInp}
                             setNoteInp={setNoteInp}
                         />

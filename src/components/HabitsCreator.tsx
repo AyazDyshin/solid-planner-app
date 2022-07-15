@@ -1,17 +1,17 @@
 import "../styles.css";
-import { Button, ButtonGroup, Dropdown, DropdownButton, FormControl, InputGroup, Modal, OverlayTrigger, Popover, Tooltip } from 'react-bootstrap';
+import { Button, ButtonGroup, Dropdown, DropdownButton, FormControl, InputGroup, Modal } from 'react-bootstrap';
 import { accessObject, Habit } from './types';
 import { BsThreeDots, BsShare } from "react-icons/bs";
 import { FiEdit } from "react-icons/fi";
 import { RiDeleteBin6Line, RiUserSharedLine } from "react-icons/ri";
 import { BiFolderPlus } from "react-icons/bi";
 import { MdSaveAlt } from "react-icons/md";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import { setPubAccess, shareWith } from "../services/access";
 import { saveHabit, deleteEntry, editHabit } from "../services/SolidPod";
 import { useSession } from "@inrupt/solid-ui-react";
-import { constructDate, setStreaks } from "../services/helpers";
+import { capitalizeFirstLetter, constructDate, setStreaks } from "../services/helpers";
 import AccessModal from "../modals/AccessModal";
 import CustomHabitModal from "../modals/CustomHabitModal";
 import CategoryModal from "../modals/CategoryModal";
@@ -30,7 +30,6 @@ interface Props {
   creatorStatus: boolean;
   setCreatorStatus: React.Dispatch<React.SetStateAction<boolean>>;
   habitToView: Habit | null;
-  setHabitToView: React.Dispatch<React.SetStateAction<Habit | null>>;
   habitsArray: Habit[];
   setHabitsArray: React.Dispatch<React.SetStateAction<Habit[]>>;
   newEntryCr: boolean;
@@ -50,11 +49,7 @@ interface Props {
     [x: string]: AccessModes;
   }>>;
   categoryArray: string[];
-  setCategoryArray: React.Dispatch<React.SetStateAction<string[]>>;
-  habitDoSave: boolean;
-  setHabitDoSave: React.Dispatch<React.SetStateAction<boolean>>;
   currentView: string;
-  setCurrentView: React.Dispatch<React.SetStateAction<string>>;
   storagePref: string;
   defFolder: string | null;
   prefFileLocation: string;
@@ -67,14 +62,13 @@ interface Props {
   contactsArr: (string | null)[][];
   setContactsArr: React.Dispatch<React.SetStateAction<(string | null)[][]>>;
   contactsFetched: boolean;
-  setContactsFetched: React.Dispatch<React.SetStateAction<boolean>>;
 }
 const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus, setCreatorStatus,
-  viewerStatus, setViewerStatus, habitToView, setHabitToView, habitsArray, setHabitsArray, newEntryCr, setNewEntryCr,
-  accUpdObj, setAccUpdObj, publicAccess, setPublicAccess, agentsToUpd, setAgentsToUpd, categoryArray, setCategoryArray,
-  habitDoSave, setHabitDoSave, currentView, setCurrentView, storagePref, defFolder, prefFileLocation, publicTypeIndexUrl, podType,
+  viewerStatus, setViewerStatus, habitToView, habitsArray, setHabitsArray, newEntryCr, setNewEntryCr,
+  accUpdObj, setAccUpdObj, publicAccess, setPublicAccess, agentsToUpd, setAgentsToUpd, categoryArray,
+  currentView, storagePref, defFolder, prefFileLocation, publicTypeIndexUrl, podType,
   habitUpdInProgress, setHabitUpdInProgress, contactsFdrStatus, setContactsFdrStatus,
-  contactsArr, setContactsArr, contactsFetched, setContactsFetched
+  contactsArr, setContactsArr, contactsFetched
 }: Props) => {
   const { session, fetch } = useSession();
   const { webId } = session.info;
@@ -87,7 +81,6 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
   const [accessModalState, setAccessModalState] = useState<boolean>(false);
   const [contactsList, setContactsList] = useState<{ [x: string]: AccessModes; }>({});
   const [sharedModalState, setSharedModalState] = useState<boolean>(false);
-  const [testCol, setTestCol] = useState<string>("red");
   const [showColorPicker, setShowColorPicker] = useState<boolean>(false);
   const [calendarModalState, setCalendarModalState] = useState<boolean>(false);
   const [performDelete, setPerformDelete] = useState<boolean>(false);
@@ -113,7 +106,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
       });
       setIsEdit(true);
     }
-  }, [viewerStatus, habitToView, creatorStatus, habitDoSave]);
+  }, [viewerStatus, habitToView, creatorStatus]);
 
   useEffect(() => {
     const deleteNote = async () => {
@@ -134,9 +127,9 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
   const saveHabitFromCreator = async () => {
     setViewerStatus(false);
     setCreatorStatus(false);
-    let date = new Date();
-    let idToSave = Date.now() + Math.floor(Math.random() * 1000);
-    let newHabit = {
+    const date = new Date();
+    const idToSave = Date.now() + Math.floor(Math.random() * 1000);
+    const newHabit = {
       ...habitInp, id: idToSave, startDate: date, url: `${defFolder}habits/${idToSave}.ttl`,
       access: { "private": { read: false, append: false, write: false } }
     }
@@ -156,14 +149,10 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
   }
   const getColor = (color: ColorResult) => {
     setShowColorPicker(!showColorPicker);
-    let toSet: string = color.hex;
     setHabitInp(prevState => ({ ...prevState, ["color"]: color.hex }));
     setHabitChanged(true);
   }
-  const popover = (
-    <Popover.Body>
-    </Popover.Body>
-  );
+
   const handleSave = async () => {
     setIsEdit(false);
     if (creatorStatus) {
@@ -192,24 +181,27 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
           else {
             updShareList = agentsToUpd;
           }
-          let b = Object.keys(updShareList);
+
           Object.keys(updShareList).map((key) => {
-            if (!updShareList![key].read && !updShareList![key].append && !updShareList![key].write) {
-              delete updShareList![key];
+            if (updShareList) {
+              if (!updShareList[key].read && !updShareList[key].append && !updShareList[key].write) {
+                delete updShareList[key];
+              }
             }
           });
           if (Object.keys(updShareList).length === 0) updShareList = undefined;
           habitToUpd = { ...habitToUpd, shareList: updShareList }
+
         }
         setAccUpdObj({});
       }
-      let index = habitsArray.findIndex(item => item.id === habitToUpd.id);
-      let updArr = habitsArray;
+      const index = habitsArray.findIndex(item => item.id === habitToUpd.id);
+      const updArr = habitsArray;
       habitToUpd = setStreaks(habitToUpd);
       updArr[index] = habitToUpd;
       setHabitsArray(updArr);
       setNewEntryCr(!newEntryCr);
-      let newHabit = habitInp;
+      const newHabit = habitInp;
       setHabitInp({
         id: null, title: null, content: null, startDate: null, lastCheckInDate: null, recurrence: "daily", bestStreak: null,
         currentStreak: null, stat: false, category: null, url: null, access: null, prevBestStreak: null, prevLastCheckIn: null,
@@ -247,7 +239,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
           throw new Error("error: provided habit to set access for, doesn't have url");
 
         }
-        for (let item in agentsToUpd) {
+        for (const item in agentsToUpd) {
           await shareWith(webId, habitInp.url, fetch, agentsToUpd[item], item, storagePref, prefFileLocation, podType);
 
         }
@@ -260,7 +252,12 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
       throw new Error("error: provided habit to delete, doesn't have id");
 
     }
-    setUrlToDelete(habitInp.url!);
+    if (habitInp.url) {
+      setUrlToDelete(habitInp.url);
+    }
+    else {
+      throw new Error("error, habit you are trying to delete doesn't have url");
+    }
     setDeleteModalState(true);
   };
 
@@ -275,7 +272,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
   };
 
   return (
-    <div>
+    <div style={{ "height": "40vh" }}>
       <InputGroup className="mb-2 mt-2">
         <InputGroup.Text id="basic-addon1">Title:</InputGroup.Text>
         <FormControl
@@ -286,7 +283,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
           onChange={handleChange} />
 
         <ButtonGroup>
-          <Button variant="secondary" onClick={handleSave}><MdSaveAlt /> save</Button>
+          <Button variant="secondary" onClick={handleSave}><MdSaveAlt /> Save</Button>
           <DropdownButton className="dropNoIcon"
             menuVariant="dark"
             variant="outline-secondary"
@@ -295,16 +292,16 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
           >
             {viewerStatus && <Dropdown.Item onClick={handleEdit}><FiEdit /> edit</Dropdown.Item>}
             <Dropdown.Item onClick={() => (setCategoryModalState(true))}>
-              <BiFolderPlus /> set category
+              <BiFolderPlus /> Set category
             </Dropdown.Item>
-            {viewerStatus && (podType !== "acp") && <Dropdown.Item onClick={() => { setAccessModalState(true) }} ><BsShare /> share</Dropdown.Item>}
+            {viewerStatus && (podType !== "acp") && <Dropdown.Item onClick={() => { setAccessModalState(true) }} ><BsShare /> Share</Dropdown.Item>}
             {viewerStatus && habitInp.shareList && (podType !== "acp") &&
               <Dropdown.Item onClick={() => (setSharedModalState(true))} >
-                <RiUserSharedLine /> shared list
+                <RiUserSharedLine /> Shared list
               </Dropdown.Item>}
             {viewerStatus && <Dropdown.Item onClick={handleDelete}
               style={{ color: "red" }}
-            ><RiDeleteBin6Line /> delete</Dropdown.Item>}
+            ><RiDeleteBin6Line /> Delete</Dropdown.Item>}
           </DropdownButton>
         </ButtonGroup>
       </InputGroup>
@@ -312,12 +309,12 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
       <div className="d-flex">
         <div className="d-flex-column w-50">
           <InputGroup className="w-100">
-            <InputGroup.Text id="basic-addon1" style={{ 'width': '60%' }}>repeat</InputGroup.Text>
+            <InputGroup.Text id="basic-addon1" style={{ 'width': '60%' }}>Repeat:</InputGroup.Text>
             <div className="d-grid">
               <DropdownButton
                 menuVariant="dark"
                 variant="outline-secondary"
-                title={habitInp.recurrence}
+                title={capitalizeFirstLetter(habitInp.recurrence)}
                 id="input-group-dropdown-1"
                 className="w-100"
                 {...(!isEdit && { disabled: true })}
@@ -326,27 +323,27 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
                   setHabitInp(prevState => ({ ...prevState, recurrence: 'daily' }));
                   setHabitInp(prevState => ({ ...prevState, custom: null }));
                   setHabitChanged(true);
-                }}>daily</Dropdown.Item>
+                }}>Daily</Dropdown.Item>
                 <Dropdown.Item onClick={() => {
                   setHabitInp(prevState => ({ ...prevState, recurrence: 'weekly' }));
                   setHabitInp(prevState => ({ ...prevState, custom: null }));
                   setHabitChanged(true);
-                }}>weekly</Dropdown.Item>
+                }}>Weekly</Dropdown.Item>
                 <Dropdown.Item onClick={() => {
                   setHabitInp(prevState => ({ ...prevState, recurrence: 'monthly' }));
                   setHabitInp(prevState => ({ ...prevState, custom: null }));
                   setHabitChanged(true);
-                }}>monthly</Dropdown.Item>
+                }}>Monthly</Dropdown.Item>
                 <Dropdown.Item onClick={() => {
                   setHabitInp(prevState => ({ ...prevState, recurrence: 'yearly' }));
                   setHabitInp(prevState => ({ ...prevState, custom: null }));
                   setHabitChanged(true);
-                }}>yearly</Dropdown.Item>
+                }}>Yearly</Dropdown.Item>
                 <Dropdown.Item onClick={() => {
                   setHabitInp(prevState => ({ ...prevState, recurrence: 'custom' }))
                   setCustomHabitModalState(true);
                   setHabitChanged(true);
-                }}>custom</Dropdown.Item>
+                }}>Custom</Dropdown.Item>
               </DropdownButton>
             </div>
           </InputGroup>
@@ -419,7 +416,6 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
       <CategoryModal
         setEntryChanged={setHabitChanged}
         categoryArray={categoryArray}
-        setCategoryArray={setCategoryArray}
         habitInp={habitInp}
         setHabitInp={setHabitInp}
         viewerStatus={viewerStatus}
@@ -430,13 +426,10 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
         contactsArr={contactsArr}
         setContactsArr={setContactsArr}
         contactsFetched={contactsFetched}
-        setContactsFetched={setContactsFetched}
         contactsFdrStatus={contactsFdrStatus}
         setContactsFdrStatus={setContactsFdrStatus}
         storagePref={storagePref}
-        agentsToUpd={agentsToUpd}
         setAgentsToUpd={setAgentsToUpd}
-        accUpdObj={accUpdObj}
         contactsList={contactsList}
         setContactsList={setContactsList}
         setAccUpdObj={setAccUpdObj}
@@ -444,24 +437,17 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
         setPublicAccess={setPublicAccess}
         accessModalState={accessModalState}
         setAccessModalState={setAccessModalState}
-        setHabitInp={setHabitInp}
         habitInp={habitInp}
       />
 
       <SharedModal
-        agentsToUpd={agentsToUpd}
         setAgentsToUpd={setAgentsToUpd}
-        accUpdObj={accUpdObj}
         setAccUpdObj={setAccUpdObj}
         publicAccess={publicAccess}
         setPublicAccess={setPublicAccess}
         sharedModalState={sharedModalState}
         setSharedModalState={setSharedModalState}
-        setHabitInp={setHabitInp}
         habitInp={habitInp}
-        viewerStatus={viewerStatus}
-        categoryArray={categoryArray}
-        setCategoryArray={setCategoryArray}
       />
 
       <DeleteModal

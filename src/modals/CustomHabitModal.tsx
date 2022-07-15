@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Modal, Button, Form, FormControl, InputGroup, DropdownButton, Dropdown, Collapse } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Modal, Button, Form, InputGroup, Collapse } from "react-bootstrap";
 import { Habit } from "../components/types";
 import { getNumberFromDay } from "../services/helpers";
 
@@ -74,10 +74,10 @@ const CustomHabitModal = ({ customHabitModalState, setCustomHabitModalState, hab
             setHabitInp(prevState => ({ ...prevState, custom: parseInt(numberOfDays) }));
         }
         else if (toApply === "week") {
-            let newCustom: number[] = [];
+            const newCustom: number[] = [];
             daysArr.forEach((day) => {
                 if (objOfDays[day]) {
-                    let num = getNumberFromDay(day);
+                    const num = getNumberFromDay(day);
                     if (num !== undefined) newCustom.push(num);
                 }
             });

@@ -1,23 +1,15 @@
-import { useState } from "react";
-import React from 'react';
-import { Button, Collapse, Dropdown, DropdownButton, Modal, OverlayTrigger, Popover } from "react-bootstrap";
-import { BsPlusLg } from "react-icons/bs";
-import NoContacts from "./NoContacts";
-import { GoPrimitiveDot } from "react-icons/go";
-import { RiArrowDropDownLine, RiArrowGoBackFill } from "react-icons/ri";
-import { VscTypeHierarchySuper } from "react-icons/vsc";
+import React, { useState } from 'react'
+import { Button, Collapse, Modal, OverlayTrigger, Popover } from 'react-bootstrap'
+import { BsPlusLg } from 'react-icons/bs'
 
 interface Props {
     contactsArr: (string | null)[][],
-    setContactsArr: React.Dispatch<React.SetStateAction<(string | null)[][]>>;
-    otherWebId: string | null;
     setOtherWebId: React.Dispatch<React.SetStateAction<string | null>>;
-    isLoading: boolean;
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const ContactsList = ({ contactsArr, setContactsArr, otherWebId, setOtherWebId, isLoading, setIsLoading }: Props) => {
-    const contactsNames = contactsArr.map((item) => item[0]);
+const ContactsList = ({ contactsArr, setOtherWebId, setIsLoading }: Props) => {
+    contactsArr.map((item) => item[0]);
     const [activeContact, setActiveContact] = useState<string | null>(null);
     const [open, setOpen] = useState(false);
     const [showModal, setShowModal] = useState<boolean>(false);
@@ -73,9 +65,9 @@ const ContactsList = ({ contactsArr, setContactsArr, otherWebId, setOtherWebId, 
                             <Collapse in={open}>
                                 <div className="card text-center">
                                     <ol className="list-group list-group-numbered">
-                                        <li className="list-group-item">Go to <a href="https://podbrowser.inrupt.com/login" target="_blank" className="link-primary">Inrupt's POD browser</a></li>
+                                        <li className="list-group-item">Go to <a href="https://podbrowser.inrupt.com/login" target="_blank" className="link-primary" rel="noreferrer">Inrupt&apos;s POD browser</a></li>
                                         <li className="list-group-item">Authorize with your POD provider</li>
-                                        <li className="list-group-item">Go to "Contacts" tab</li>
+                                        <li className="list-group-item">Go to &quot;Contacts&quot; tab</li>
                                         <li className="list-group-item">Add at least one webId</li>
                                         <li className="list-group-item">After that the contacts that you add there would be shown in this tab</li>
                                     </ol>

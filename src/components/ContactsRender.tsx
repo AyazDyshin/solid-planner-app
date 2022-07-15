@@ -1,14 +1,13 @@
-import { ThingPersisted } from "@inrupt/solid-client";
 import { useSession } from "@inrupt/solid-ui-react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Modal, Spinner } from "react-bootstrap";
 import { checkContacts, fetchAllEntries, fetchContacts, thingToNote } from "../services/SolidPod";
 import ContactsList from "./ContactsList";
 import NoContacts from "./NoContacts";
-import NotesList from "./NotesList";
 import NoteViewer from "./NoteViewer";
 import { Note } from "./types";
 import ViewNotes from "./ViewNotes";
+
 interface Props {
     storagePref: string;
     publicTypeIndexUrl: string;
@@ -20,11 +19,10 @@ interface Props {
     setContactsFetched: React.Dispatch<React.SetStateAction<boolean>>;
     contactsFdrStatus: boolean;
     setContactsFdrStatus: React.Dispatch<React.SetStateAction<boolean>>;
-    refetchContacts: boolean;
-    setRefetchContacts: React.Dispatch<React.SetStateAction<boolean>>;
 }
+
 const ContactsRender = ({ storagePref, publicTypeIndexUrl, prefFileLocation, podType, contactsArr, setContactsArr,
-    contactsFetched, setContactsFetched, contactsFdrStatus, setContactsFdrStatus, refetchContacts, setRefetchContacts
+    contactsFetched, setContactsFetched, contactsFdrStatus, setContactsFdrStatus
 }: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
@@ -42,31 +40,25 @@ const ContactsRender = ({ storagePref, publicTypeIndexUrl, prefFileLocation, pod
     useEffect(() => {
         const initialize = async () => {
             setIsLoading(true);
-            console.log("we are heer1 ");
             if (!contactsFetched) {
-                console.log("we are heer2");
-                let contactsStatus = await checkContacts(webId, fetch, storagePref);
-                // console.log("this is contactsStatus");
-                // console.log(contactsStatus);
+                const contactsStatus = await checkContacts(webId, fetch, storagePref);
                 setContactsFdrStatus(contactsStatus);
                 if (contactsStatus) {
                     const namesAndIds = await fetchContacts(webId, fetch, storagePref);
-                    console.log("this is names");
-                    console.log(namesAndIds);
                     setContactsArr(namesAndIds);
-                    const namesArr = namesAndIds.map((pair) => pair[0] ? pair[0] : pair[1]);
+                    //here
+                    namesAndIds.map((pair) => pair[0] ? pair[0] : pair[1]);
                 }
                 setContactsFetched(true);
             }
             if (otherWebId) {
-                let notesArrUpd = await fetchAllEntries(otherWebId, fetch, "note", storagePref, prefFileLocation,
+                const notesArrUpd = await fetchAllEntries(otherWebId, fetch, "note", storagePref, prefFileLocation,
                     publicTypeIndexUrl, podType, true);
-                let transformedArr = await Promise.all(notesArrUpd.map(async (thing) => {
+                const transformedArr = await Promise.all(notesArrUpd.map(async (thing) => {
                     return await thingToNote(thing, otherWebId, fetch, storagePref, prefFileLocation, podType);
                 }));
                 setNotesArray(transformedArr.filter((item) => item !== null));
             }
-            console.log("we are done");
             setIsLoading(false);
         };
         initialize();
@@ -85,11 +77,8 @@ const ContactsRender = ({ storagePref, publicTypeIndexUrl, prefFileLocation, pod
                 {
                     !isLoading && contactsFdrStatus && !otherWebId && contactsArr.length !== 0 &&
                     <ContactsList
-                        isLoading={isLoading}
                         setIsLoading={setIsLoading}
                         contactsArr={contactsArr}
-                        setContactsArr={setContactsArr}
-                        otherWebId={otherWebId}
                         setOtherWebId={setOtherWebId}
                     />
                 }
@@ -97,18 +86,12 @@ const ContactsRender = ({ storagePref, publicTypeIndexUrl, prefFileLocation, pod
                     notesArray.length !== 0 && !isLoading && contactsFdrStatus && otherWebId &&
                     <ViewNotes
                         setContactModalState={setContactModalState}
-                        isLoading={isLoading}
                         setIsLoading={setIsLoading}
-                        viewerStatus={viewerStatus}
                         setViewerStatus={setViewerStatus}
-                        noteToView={noteToView}
                         setNoteToView={setNoteToView}
                         notesArray={notesArray}
-                        setNotesArray={setNotesArray}
-                        otherWebId={otherWebId}
                         setOtherWebId={setOtherWebId}
                     />
-
                 }
                 {
                     notesArray.length === 0 && !isLoading && otherWebId && contactsFdrStatus &&
@@ -143,7 +126,6 @@ const ContactsRender = ({ storagePref, publicTypeIndexUrl, prefFileLocation, pod
                     <Modal.Body id="viewerModal">
                         <NoteViewer
                             noteToView={noteToView}
-                            setNoteToView={setNoteToView}
                         />
                     </Modal.Body>
                 </Modal>

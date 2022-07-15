@@ -1,22 +1,15 @@
-import { ThingPersisted } from "@inrupt/solid-client";
 import React, { useState } from "react";
 import { Badge, Button } from "react-bootstrap";
 import { Note } from "./types";
 interface Props {
-    otherWebId: string | null;
     setOtherWebId: React.Dispatch<React.SetStateAction<string | null>>;
     notesArray: (Note | null)[];
-    setNotesArray: React.Dispatch<React.SetStateAction<(Note | null)[]>>;
-    noteToView: Note | null;
     setNoteToView: React.Dispatch<React.SetStateAction<Note | null>>;
-    viewerStatus: boolean;
     setViewerStatus: React.Dispatch<React.SetStateAction<boolean>>;
-    isLoading: boolean;
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
     setContactModalState: React.Dispatch<React.SetStateAction<boolean>>;
 }
-const ViewNotes = ({ otherWebId, setOtherWebId, notesArray, setNotesArray, noteToView, setNoteToView,
-    viewerStatus, setViewerStatus, isLoading, setIsLoading, setContactModalState
+const ViewNotes = ({ setOtherWebId, notesArray, setNoteToView, setViewerStatus, setIsLoading, setContactModalState
 }: Props) => {
     const [activeNote, setActiveNote] = useState<number | null>(null);
 

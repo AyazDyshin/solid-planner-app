@@ -1,5 +1,4 @@
-import { useSession } from "@inrupt/solid-ui-react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Modal, Button, FormControl, InputGroup, DropdownButton, Dropdown } from "react-bootstrap";
 import { Note, Habit } from "../components/types";
 
@@ -13,13 +12,10 @@ interface Props {
     setHabitInp?: React.Dispatch<React.SetStateAction<Habit>>;
     viewerStatus: boolean;
     categoryArray: string[];
-    setCategoryArray: React.Dispatch<React.SetStateAction<string[]>>;
 }
 //a popup window to prompt user to pick a folder
 const CategoryModal = ({ categoryModalState, setCategoryModalState, setNoteInp,
-    noteInp, viewerStatus, categoryArray, setCategoryArray, habitInp, setHabitInp, setEntryChanged }: Props) => {
-    const { session } = useSession();
-    const { webId } = session.info;
+    noteInp, viewerStatus, categoryArray, habitInp, setHabitInp, setEntryChanged }: Props) => {
     const [input, setInput] = useState<string>("");
 
     const handleSave = () => {
@@ -65,7 +61,7 @@ const CategoryModal = ({ categoryModalState, setCategoryModalState, setNoteInp,
                 </div>
                 <InputGroup>
                     <InputGroup.Text>
-                        Or enter new:
+                        New:
                     </InputGroup.Text>
                     <FormControl aria-describedby="basic-addon3" value={input} onChange={e => setInput(e.target.value)} />
                 </InputGroup>

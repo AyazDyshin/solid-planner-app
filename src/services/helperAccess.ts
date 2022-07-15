@@ -5,8 +5,8 @@ import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import { ACL, ACP } from "@inrupt/vocab-solid";
 import { accessObject, fetcher } from "../components/types";
 
-//const throwError = useAsyncError();
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function hasAccessibleAcr(resource: { internal_acp: any; }) {
     return (typeof resource.internal_acp === "object" &&
         resource.internal_acp !== null &&
@@ -18,9 +18,6 @@ export function getAcr(
     resource: { internal_acp: { acr: AccessControlResource; }; }
 ): AccessControlResource {
     if (!hasAccessibleAcr(resource)) {
-        // throwError(new Error(
-        //     ` The current user does not have permission to see who currently has access to this resource, or the user's POD Server does not support Access Control Resources`
-        // ));
         throw new Error(` The current user does not have permission to see who currently has access to this resource, or the user's POD Server does not support Access Control Resources`);
     }
     return resource.internal_acp.acr;
@@ -37,22 +34,19 @@ export const changeAccessAcp = async (url: string, access: accessObject, agent: 
     catch (error) {
         let message = 'Unknown Error';
         if (error instanceof Error) message = error.message;
-       // throwError(new Error(`Error when fetching dataset url:${url} error: ${message}`));
         throw new Error(`Error when fetching dataset url:${url} error: ${message}`);
     }
     if (!hasAccessibleAcr(resourceWithAcr)) {
-       // throwError(new Error(`The current user does not have permission to see who currently has access to this resource url: ${url}`));
         throw new Error(`The current user does not have permission to see who currently has access to this resource url: ${url}`);
     }
 
-    let res = agent === ACP.PublicAgent ? await universalAccess.setPublicAccess(url, access, { fetch: fetch }) : await universalAccess.setAgentAccess(url, agent, access, { fetch: fetch });
+    const res = agent === ACP.PublicAgent ? await universalAccess.setPublicAccess(url, access, { fetch: fetch }) : await universalAccess.setAgentAccess(url, agent, access, { fetch: fetch });
 
     if (!res) {
-      //  throwError(new Error(`The current user does not have permission to change access rights to this resource url: ${url}`));
         throw new Error(`The current user does not have permission to change access rights to this resource url: ${url}`);
     }
     let updResource = resourceWithAcr as WithAccessibleAcr;
-    let [[readMatcher, appendMatcher, writeMatcher], [readPolicy, appendPolicy, writePolicy]] = await getAcpMatchersAndPolices(url, fetch);
+    let [[readMatcher, appendMatcher, writeMatcher]] = await getAcpMatchersAndPolices(url, fetch);
     if (!access.read) {
         if (readMatcher) {
             readMatcher = acp_ess_2.removeAgent(readMatcher, agent);
@@ -60,7 +54,7 @@ export const changeAccessAcp = async (url: string, access: accessObject, agent: 
                 updResource,
                 readMatcher
             );
-            const updatedResourceWithAcr = await acp_ess_2.saveAcrFor(
+            await acp_ess_2.saveAcrFor(
                 updResource,
                 { fetch: fetch }
             );
@@ -73,7 +67,7 @@ export const changeAccessAcp = async (url: string, access: accessObject, agent: 
                 updResource,
                 appendMatcher
             );
-            const updatedResourceWithAcr = await acp_ess_2.saveAcrFor(
+            await acp_ess_2.saveAcrFor(
                 updResource,
                 { fetch: fetch }
             );
@@ -86,7 +80,7 @@ export const changeAccessAcp = async (url: string, access: accessObject, agent: 
                 updResource,
                 writeMatcher
             );
-            const updatedResourceWithAcr = await acp_ess_2.saveAcrFor(
+            await acp_ess_2.saveAcrFor(
                 updResource,
                 { fetch: fetch }
             );
@@ -106,11 +100,9 @@ export const getAcpMatchersAndPolices = async (url: string, fetch: fetcher) => {
     catch (error) {
         let message = 'Unknown Error';
         if (error instanceof Error) message = error.message;
-      //  throwError(new Error(`Error when fetching dataset url:${url} error: ${message}`));
         throw new Error(`Error when fetching dataset url:${url} error: ${message}`);
     }
     if (!hasAccessibleAcr(resourceWithAcr)) {
-       // throwError(new Error(`The current user does not have permission to see who currently has access to this resource url: ${url}`));
         throw new Error(`The current user does not have permission to see who currently has access to this resource url: ${url}`);
     }
     const updResource = resourceWithAcr as WithAccessibleAcr;
@@ -139,14 +131,14 @@ export const getAcpMatchersAndPolices = async (url: string, fetch: fetcher) => {
 
 //used
 export const getAcpAccess = async (webId: string, url: string, fetch: fetcher, acc: string) => {
-    let [[readMatcher, appendMatcher, writeMatcher], rest] = await getAcpMatchersAndPolices(url, fetch);
-    let accObj: Record<string, AccessModes> = {};
+    const [[readMatcher, appendMatcher, writeMatcher]] = await getAcpMatchersAndPolices(url, fetch);
+    const accObj: Record<string, AccessModes> = {};
 
 
     if (readMatcher) {
-        let arrayOfReadAgents = getUrlAll(readMatcher, ACP.agent);
+        const arrayOfReadAgents = getUrlAll(readMatcher, ACP.agent);
         arrayOfReadAgents.map((agentUrl) => {
-            let condition = acc === "public" ? (agentUrl === ACP.PublicAgent) : (agentUrl !== ACP.PublicAgent);
+            const condition = acc === "public" ? (agentUrl === ACP.PublicAgent) : (agentUrl !== ACP.PublicAgent);
             if (condition) {
                 if (!accObj[agentUrl]) accObj[agentUrl] = { read: true, append: false, write: false }
                 accObj[agentUrl].read = true;
@@ -155,9 +147,9 @@ export const getAcpAccess = async (webId: string, url: string, fetch: fetcher, a
     }
 
     if (appendMatcher) {
-        let arrayOfAppendAgents = getUrlAll(appendMatcher, ACP.agent);
+        const arrayOfAppendAgents = getUrlAll(appendMatcher, ACP.agent);
         arrayOfAppendAgents.map((agentUrl) => {
-            let condition = acc === "public" ? (agentUrl === ACP.PublicAgent) : (agentUrl !== ACP.PublicAgent);
+            const condition = acc === "public" ? (agentUrl === ACP.PublicAgent) : (agentUrl !== ACP.PublicAgent);
             if (condition) {
                 if (!accObj[agentUrl]) accObj[agentUrl] = { read: false, append: true, write: false }
                 accObj[agentUrl].append = true;
@@ -166,9 +158,9 @@ export const getAcpAccess = async (webId: string, url: string, fetch: fetcher, a
     }
 
     if (writeMatcher) {
-        let arrayOfWriteAgents = getUrlAll(writeMatcher, ACP.agent);
+        const arrayOfWriteAgents = getUrlAll(writeMatcher, ACP.agent);
         arrayOfWriteAgents.map((agentUrl) => {
-            let condition = acc === "public" ? (agentUrl === ACP.PublicAgent) : (agentUrl !== ACP.PublicAgent);
+            const condition = acc === "public" ? (agentUrl === ACP.PublicAgent) : (agentUrl !== ACP.PublicAgent);
             if (condition) {
                 if (!accObj[agentUrl]) accObj[agentUrl] = { read: false, append: false, write: true }
                 accObj[agentUrl].write = true;

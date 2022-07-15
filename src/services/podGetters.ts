@@ -1,7 +1,7 @@
 import { getSolidDataset, getThing, getUrl, getStringNoLocale, getThingAll } from "@inrupt/solid-client";
 import { space, solid, schema } from "rdf-namespaces";
 import { fetcher, voc } from "../components/types";
-import { createEntriesInTypeIndex, recordAccessType, repairDefaultFolder } from "./SolidPod";
+import { createEntriesInTypeIndex, recordAccessType } from "./SolidPod";
 export const getPrefLink = async (webId: string, fetch: fetcher) => {
     let dataSet;
     try {
@@ -37,7 +37,7 @@ export const getStoragePref = async (webId: string, fetch: fetcher) => {
     catch (error) {
         throw new Error("error occurred when trying to fetch user's webId");
     }
-    let aThing = getThing(dataSet, webId);
+    const aThing = getThing(dataSet, webId);
     if (aThing) {
         const firstData = getUrl(aThing, space.storage);
         if (firstData) {
@@ -61,7 +61,7 @@ export const getPublicTypeIndexUrl = async (webId: string, fetch: fetcher) => {
     catch (error) {
         throw new Error("error occurred when trying to fetch user's webId");
     }
-    let aThing = getThing(dataSet, webId);
+    const aThing = getThing(dataSet, webId);
     if (aThing) {
         const firstData = getUrl(aThing, solid.publicTypeIndex);
         if (firstData) {
@@ -88,11 +88,11 @@ export const getDefaultFolder = async (webId: string, fetch: fetcher, prefFileLo
         if (error instanceof Error) message = error.message;
         throw new Error(`couldn't fetch preference file, this might be due to the fact that it doesn't exist, error: ${message}`);
     }
-    let aThing = await getThing(dataSet, prefFileLocation);
+    const aThing = await getThing(dataSet, prefFileLocation);
     if (!aThing) {
         throw new Error("preference file is empty");
     }
-    let defFolderUrl = await getUrl(aThing, voc.defaultFolder);
+    const defFolderUrl = await getUrl(aThing, voc.defaultFolder);
     return defFolderUrl;
 }
 
@@ -110,7 +110,7 @@ export const getAccessType = async (webId: string, fetch: fetcher, storagePref: 
         if (error instanceof Error) message = error.message;
         throw new Error(`couldn't fetch preference file, this might be due to the fact that it doesn't exist, error: ${message}`);
     }
-    let aThing = await getThing(dataSet, prefFileLocation);
+    const aThing = await getThing(dataSet, prefFileLocation);
     if (aThing === null) {
         throw new Error("preference file is empty");
     }
@@ -127,7 +127,7 @@ export const getAccessType = async (webId: string, fetch: fetcher, storagePref: 
             if (error instanceof Error) message = error.message;
             throw new Error(`couldn't fetch preference file, this might be due to the fact that it doesn't exist, error: ${message}`);
         }
-        let aThing = await getThing(dataSet, prefFileLocation);
+        const aThing = await getThing(dataSet, prefFileLocation);
         if (aThing === null) {
             throw new Error("preference file is empty");
         }
@@ -144,7 +144,7 @@ export const getAllUrlFromPublicIndex = async (webId: string, fetch: fetcher, ty
     publicTypeIndexUrl: string, other?: boolean
 ) => {
     if (other) {
-        let newPublicTypeUrl: string = "";
+        let newPublicTypeUrl = "";
         try {
             newPublicTypeUrl = await getPublicTypeIndexUrl(webId, fetch);
         }
@@ -155,9 +155,7 @@ export const getAllUrlFromPublicIndex = async (webId: string, fetch: fetcher, ty
         }
         publicTypeIndexUrl = newPublicTypeUrl;
     }
-    console.log("this is pub type");
-    console.log(publicTypeIndexUrl);
-    let typeToGet = (type === "note" ? schema.TextDigitalDocument : voc.Habit);
+    const typeToGet = (type === "note" ? schema.TextDigitalDocument : voc.Habit);
     let dataSet;
     try {
         dataSet = await getSolidDataset(publicTypeIndexUrl, { fetch: fetch });
@@ -167,7 +165,7 @@ export const getAllUrlFromPublicIndex = async (webId: string, fetch: fetcher, ty
         if (error instanceof Error) message = error.message;
         throw new Error(`Error when fetching dataset url: ${publicTypeIndexUrl} error: ${message}`);
     }
-    let allThing = getThingAll(dataSet);
+    const allThing = getThingAll(dataSet);
     let updThings = allThing.filter((thing) => getUrl(thing, solid.forClass) === typeToGet)
         .map((thing) => getUrl(thing, solid.instance)).filter((url) => url) as string[];
     if (updThings === []) {
@@ -185,7 +183,7 @@ export const getAllUrlFromPublicIndex = async (webId: string, fetch: fetcher, ty
             if (error instanceof Error) message = error.message;
             throw new Error(`Error when fetching dataset url: ${publicTypeIndexUrl} error: ${message}`);
         }
-        let allThing = getThingAll(dataSet);
+        const allThing = getThingAll(dataSet);
         updThings = allThing.filter((thing) => getUrl(thing, solid.forClass) === typeToGet)
             .map((thing) => getUrl(thing, solid.instance)).filter((url) => url) as string[];
         if (updThings === []) {

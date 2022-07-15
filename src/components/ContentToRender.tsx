@@ -1,5 +1,4 @@
-import { Contact } from "rdf-namespaces/dist/vcard";
-import { useState } from "react";
+import React, { useState } from "react";
 import ContactsRender from "./ContactsRender";
 import HabitsRender from "./HabitsRender";
 import NotesRender from "./NotesRender";
@@ -15,8 +14,6 @@ interface Props {
     setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
     notesArray: Note[];
     setNotesArray: React.Dispatch<React.SetStateAction<Note[]>>;
-    isLoadingContents: boolean;
-    setIsLoadingContents: React.Dispatch<React.SetStateAction<boolean>>;
     notesFetched: boolean;
     setNotesFetched: React.Dispatch<React.SetStateAction<boolean>>;
     habitsFetched: boolean;
@@ -33,19 +30,15 @@ interface Props {
     contactsFdrStatus: boolean;
     setContactsFdrStatus: React.Dispatch<React.SetStateAction<boolean>>;
     refetchNotes: boolean;
-    setRefetchNotes: React.Dispatch<React.SetStateAction<boolean>>;
     refetchHabits: boolean;
-    setRefetchHabits: React.Dispatch<React.SetStateAction<boolean>>;
-    refetchContacts: boolean;
-    setRefetchContacts: React.Dispatch<React.SetStateAction<boolean>>;
 }
 // this component decides what to render based on "active" property ie clicked tab
 // while seems redundant at the moment will be useful once other tabs will be implemented
 const ContentToRender = ({ active, viewerStatus, setViewerStatus, habitsFetched, setHabitsFetched, habitsArray, setHabitsArray,
     creatorStatus, setCreatorStatus, isEdit, setIsEdit, notesArray, storagePref, defFolder, prefFileLocation, podType,
-    setNotesArray, isLoadingContents, setIsLoadingContents, notesFetched, setNotesFetched, publicTypeIndexUrl,
-    contactsFetched, setContactsFetched, contactsFdrStatus, setContactsFdrStatus, refetchContacts, setRefetchContacts,
-    refetchNotes, setRefetchNotes, refetchHabits, setRefetchHabits
+    setNotesArray, notesFetched, setNotesFetched, publicTypeIndexUrl,
+    contactsFetched, setContactsFetched, contactsFdrStatus, setContactsFdrStatus,
+    refetchNotes, refetchHabits
 }: Props) => {
 
     const [contactsArr, setContactsArr] = useState<(string | null)[][]>([]);
@@ -55,11 +48,9 @@ const ContentToRender = ({ active, viewerStatus, setViewerStatus, habitsFetched,
             return (
                 <NotesRender
                     refetchNotes={refetchNotes}
-                    setRefetchNotes={setRefetchNotes}
                     contactsArr={contactsArr}
                     setContactsArr={setContactsArr}
                     contactsFetched={contactsFetched}
-                    setContactsFetched={setContactsFetched}
                     contactsFdrStatus={contactsFdrStatus}
                     setContactsFdrStatus={setContactsFdrStatus}
                     publicTypeIndexUrl={publicTypeIndexUrl}
@@ -69,15 +60,12 @@ const ContentToRender = ({ active, viewerStatus, setViewerStatus, habitsFetched,
                     storagePref={storagePref}
                     notesFetched={notesFetched}
                     setNotesFetched={setNotesFetched}
-                    isLoadingContents={isLoadingContents}
-                    setIsLoadingContents={setIsLoadingContents}
                     notesArray={notesArray}
                     setNotesArray={setNotesArray}
                     creatorStatus={creatorStatus}
                     setCreatorStatus={setCreatorStatus}
                     viewerStatus={viewerStatus}
                     setViewerStatus={setViewerStatus}
-                    active={active}
                     isEdit={isEdit}
                     setIsEdit={setIsEdit}
                 />);
@@ -85,11 +73,9 @@ const ContentToRender = ({ active, viewerStatus, setViewerStatus, habitsFetched,
             return (
                 <HabitsRender
                     refetchHabits={refetchHabits}
-                    setRefetchHabits={setRefetchHabits}
                     contactsArr={contactsArr}
                     setContactsArr={setContactsArr}
                     contactsFetched={contactsFetched}
-                    setContactsFetched={setContactsFetched}
                     contactsFdrStatus={contactsFdrStatus}
                     setContactsFdrStatus={setContactsFdrStatus}
                     defFolder={defFolder}
@@ -106,8 +92,6 @@ const ContentToRender = ({ active, viewerStatus, setViewerStatus, habitsFetched,
         case "contacts":
             return (
                 <ContactsRender
-                    refetchContacts={refetchContacts}
-                    setRefetchContacts={setRefetchContacts}
                     contactsFdrStatus={contactsFdrStatus}
                     setContactsFdrStatus={setContactsFdrStatus}
                     contactsArr={contactsArr}

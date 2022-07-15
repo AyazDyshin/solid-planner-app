@@ -20,26 +20,21 @@ interface Props {
     contactsArr: (string | null)[][];
     setContactsArr: React.Dispatch<React.SetStateAction<(string | null)[][]>>;
     contactsFetched: boolean;
-    setContactsFetched: React.Dispatch<React.SetStateAction<boolean>>;
     refetchHabits: boolean;
-    setRefetchHabits: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsArray, storagePref, prefFileLocation,
-    publicTypeIndexUrl, podType, defFolder, contactsFdrStatus, setContactsFdrStatus, refetchHabits, setRefetchHabits,
-    contactsArr, setContactsArr, contactsFetched, setContactsFetched }: Props) => {
+    publicTypeIndexUrl, podType, defFolder, contactsFdrStatus, setContactsFdrStatus, refetchHabits, 
+    contactsArr, setContactsArr, contactsFetched }: Props) => {
     const [viewerStatus, setViewerStatus] = useState<boolean>(false);
     const [creatorStatus, setCreatorStatus] = useState<boolean>(false);
-    const [arrOfChanges, setArrOfChanges] = useState<string[]>([]);
     const [newEntryCr, setNewEntryCr] = useState<boolean>(false);
     const [isEdit, setIsEdit] = useState<boolean>(false);
     const [habitToView, setHabitToView] = useState<Habit | null>(null);
     const [accUpdObj, setAccUpdObj] = useState<{ [x: string]: boolean; }>({});
     const [publicAccess, setPublicAccess] = useState<accessObject>({ read: false, append: false, write: false });
     const [agentsToUpd, setAgentsToUpd] = useState<{ [x: string]: AccessModes; }>({});
-    const [habitsToday, setHabitsToday] = useState<Habit[]>([]);
     const [categoryArray, setCategoryArray] = useState<string[]>([]);
-    const [habitDoSave, setHabitDoSave] = useState<boolean>(false);
     const [habitInp, setHabitInp] = useState<Habit>({
         id: null, title: "", content: "", startDate: null, lastCheckInDate: null, recurrence: "daily", bestStreak: null,
         currentStreak: null, stat: null, category: "", url: "", access: null, prevBestStreak: null, prevLastCheckIn: null,
@@ -54,38 +49,25 @@ const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsA
             <div id="setWidth" style={{ "backgroundColor": "#fff" }} className="h-100 w-100  adjust-me-based-on-size  d-flex justify-content-center align-items-center p-0">
                 <HabitsList
                     refetchHabits={refetchHabits}
-                    setRefetchHabits={setRefetchHabits}
-                    habitModalState={habitModalState}
                     setHabitModalState={setHabitModalState}
                     habitUpdInProgress={habitUpdInProgress}
-                    setHabitUpdInProgress={setHabitUpdInProgress}
                     defFolder={defFolder}
                     podType={podType}
                     publicTypeIndexUrl={publicTypeIndexUrl}
                     prefFileLocation={prefFileLocation}
                     currentView={currentView}
                     setCurrentView={setCurrentView}
-                    habitDoSave={habitDoSave}
-                    setHabitDoSave={setHabitDoSave}
-                    habitInp={habitInp}
-                    setHabitInp={setHabitInp}
                     categoryArray={categoryArray}
                     setCategoryArray={setCategoryArray}
-                    habitsToday={habitsToday}
-                    setHabitsToday={setHabitsToday}
                     newEntryCr={newEntryCr}
                     setNewEntryCr={setNewEntryCr}
-                    habitToView={habitToView}
                     setHabitToView={setHabitToView}
                     habitsFetched={habitsFetched}
                     setHabitsFetched={setHabitsFetched}
                     habitsArray={habitsArray}
                     setHabitsArray={setHabitsArray}
-                    viewerStatus={viewerStatus}
                     setViewerStatus={setViewerStatus}
-                    creatorStatus={creatorStatus}
                     setCreatorStatus={setCreatorStatus}
-                    isEdit={isEdit}
                     setIsEdit={setIsEdit}
                     storagePref={storagePref}
                 />
@@ -95,14 +77,13 @@ const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsA
                     size="lg"
                     onHide={() => { setHabitModalState(false) }}>
                     <Modal.Header closeButton>
-                        {creatorStatus ? "create a habit" : "edit a habit"}
+                        {creatorStatus ? "Create a habit" : "Edit a habit"}
                     </Modal.Header>
                     <Modal.Body id="viewerModal">
                         <HabitsCreator
                             contactsArr={contactsArr}
                             setContactsArr={setContactsArr}
                             contactsFetched={contactsFetched}
-                            setContactsFetched={setContactsFetched}
                             contactsFdrStatus={contactsFdrStatus}
                             setContactsFdrStatus={setContactsFdrStatus}
                             habitUpdInProgress={habitUpdInProgress}
@@ -113,11 +94,7 @@ const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsA
                             defFolder={defFolder}
                             storagePref={storagePref}
                             currentView={currentView}
-                            setCurrentView={setCurrentView}
-                            habitDoSave={habitDoSave}
-                            setHabitDoSave={setHabitDoSave}
                             categoryArray={categoryArray}
-                            setCategoryArray={setCategoryArray}
                             agentsToUpd={agentsToUpd}
                             setAgentsToUpd={setAgentsToUpd}
                             publicAccess={publicAccess}
@@ -129,7 +106,6 @@ const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsA
                             habitsArray={habitsArray}
                             setHabitsArray={setHabitsArray}
                             habitToView={habitToView}
-                            setHabitToView={setHabitToView}
                             creatorStatus={creatorStatus}
                             setCreatorStatus={setCreatorStatus}
                             habitInp={habitInp}

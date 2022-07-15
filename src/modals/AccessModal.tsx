@@ -58,11 +58,9 @@ const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, contactsL
 
     useEffect(() => {
         const fetchAccess = async () => {
-
             setIsLoading(true);
             setContactsOpen(false);
             setWebIdOpen(false);
-            //handle
             const inputToUse = NoteInp ? NoteInp : habitInp;
             if (!inputToUse) {
                 throw new Error("Error, entry to set access for wasn't provided");
@@ -93,11 +91,9 @@ const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, contactsL
                     namesAndIds = contactsArr;
                 }
                 const contObj: { [x: string]: string | null; } = {};
-
                 namesAndIds.map((pair) => {
                     if (pair[0]) contObj[pair[0]] = pair[1];
                 });
-
                 setFullContacts(contObj);
                 const testObj: { [x: string]: AccessModes; } = {};
                 namesAndIds.filter((pair) => pair !== [null, null])
@@ -119,14 +115,9 @@ const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, contactsL
             setIsLoading(false);
         }
         if (accessModalState) fetchAccess();
-
     }, [accessModalState]);
 
-
-
-
     return (
-
         <Modal show={accessModalState} >
             {isLoading && <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "200px" }}>
                 <div >
@@ -162,7 +153,6 @@ const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, contactsL
                             appendStatus={publicAccess.append}
                             writeStatus={publicAccess.write}
                         />
-
                         <div>
                             <div className="d-flex justify-content-center"><h5>Set Access:</h5></div>
                             <div className="d-flex justify-content-around my-3">
@@ -196,20 +186,44 @@ const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, contactsL
                                                         title={key}
                                                         readOnChange={() => {
                                                             const wId = (fullContacts[key]) ? fullContacts[key] : key;
-                                                            setAgentsToUpd(prevState => ({ ...prevState, [wId ? wId : ""]: { read: !value.read, append: value.append, write: value.write } }));
-                                                            setContactsList(prevState => ({ ...prevState, [key]: { read: !value.read, append: value.append, write: value.write } }));
+                                                            setAgentsToUpd(prevState => (
+                                                                {
+                                                                    ...prevState, [wId ? wId : ""]:
+                                                                        { read: !value.read, append: value.append, write: value.write }
+                                                                }));
+                                                            setContactsList(prevState => (
+                                                                {
+                                                                    ...prevState, [key]:
+                                                                        { read: !value.read, append: value.append, write: value.write }
+                                                                }));
                                                             setAccUpdObj(prevState => ({ ...prevState, "agent": true }));
                                                         }}
                                                         appendOnChange={() => {
                                                             const wId = (fullContacts[key]) ? fullContacts[key] : key;
-                                                            setAgentsToUpd(prevState => ({ ...prevState, [wId ? wId : ""]: { read: value.read, append: !value.append, write: value.write } }));
-                                                            setContactsList(prevState => ({ ...prevState, [key]: { read: value.read, append: !value.append, write: value.write } }));
+                                                            setAgentsToUpd(prevState =>
+                                                            ({
+                                                                ...prevState, [wId ? wId : ""]:
+                                                                    { read: value.read, append: !value.append, write: value.write }
+                                                            }));
+                                                            setContactsList(prevState =>
+                                                            ({
+                                                                ...prevState, [key]:
+                                                                    { read: value.read, append: !value.append, write: value.write }
+                                                            }));
                                                             setAccUpdObj(prevState => ({ ...prevState, "agent": true }));
                                                         }}
                                                         writeOnChange={() => {
                                                             const wId = (fullContacts[key]) ? fullContacts[key] : key;
-                                                            setAgentsToUpd(prevState => ({ ...prevState, [wId ? wId : ""]: { read: value.read, append: value.append, write: !value.write } }));
-                                                            setContactsList(prevState => ({ ...prevState, [key]: { read: value.read, append: value.append, write: !value.write } }));
+                                                            setAgentsToUpd(prevState => (
+                                                                {
+                                                                    ...prevState, [wId ? wId : ""]:
+                                                                        { read: value.read, append: value.append, write: !value.write }
+                                                                }));
+                                                            setContactsList(prevState => (
+                                                                {
+                                                                    ...prevState, [key]:
+                                                                        { read: value.read, append: value.append, write: !value.write }
+                                                                }));
                                                             setAccUpdObj(prevState => ({ ...prevState, "agent": true }));
                                                         }}
                                                         readStatus={contactsList[key].read}
@@ -264,7 +278,6 @@ const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, contactsL
                                     }
                                 </div>
                             </Collapse>
-
                         </div>
                     </Modal.Body>
                     <Modal.Footer>

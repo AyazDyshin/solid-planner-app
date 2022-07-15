@@ -63,6 +63,7 @@ interface Props {
   setContactsArr: React.Dispatch<React.SetStateAction<(string | null)[][]>>;
   contactsFetched: boolean;
 }
+
 const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus, setCreatorStatus,
   viewerStatus, setViewerStatus, habitToView, habitsArray, setHabitsArray, newEntryCr, setNewEntryCr,
   accUpdObj, setAccUpdObj, publicAccess, setPublicAccess, agentsToUpd, setAgentsToUpd, categoryArray,
@@ -133,7 +134,6 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
       ...habitInp, id: idToSave, startDate: date, url: `${defFolder}habits/${idToSave}.ttl`,
       access: { "private": { read: false, append: false, write: false } }
     }
-
     setHabitInp(newHabit);
     setHabitsArray((prevState) => ([...prevState, newHabit]));
     setNewEntryCr(!newEntryCr);
@@ -158,7 +158,6 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
     if (creatorStatus) {
       await saveHabitFromCreator();
     }
-
     else if (viewerStatus && (Object.keys(accUpdObj).length !== 0 || habitChanged)) {
       setViewerStatus(false);
       let habitToUpd = habitInp;
@@ -181,7 +180,6 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
           else {
             updShareList = agentsToUpd;
           }
-
           Object.keys(updShareList).map((key) => {
             if (updShareList) {
               if (!updShareList[key].read && !updShareList[key].append && !updShareList[key].write) {
@@ -191,7 +189,6 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
           });
           if (Object.keys(updShareList).length === 0) updShareList = undefined;
           habitToUpd = { ...habitToUpd, shareList: updShareList }
-
         }
         setAccUpdObj({});
       }
@@ -218,7 +215,6 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
           await editHabit(webId, fetch, newHabit, storagePref, defFolder, prefFileLocation, publicTypeIndexUrl, podType);
         }
       }
-
     }
     if (Object.keys(accUpdObj).length !== 0) {
       if (accUpdObj["public"]) {
@@ -268,7 +264,6 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
 
   const handleEdit = () => {
     isEdit ? setIsEdit(false) : setIsEdit(true);
-
   };
 
   return (
@@ -281,7 +276,6 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
           value={habitInp.title === null ? "" : habitInp.title}
           {...(!isEdit && { disabled: true })}
           onChange={handleChange} />
-
         <ButtonGroup>
           <Button variant="secondary" onClick={handleSave}><MdSaveAlt /> Save</Button>
           <DropdownButton className="dropNoIcon"
@@ -294,7 +288,8 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
             <Dropdown.Item onClick={() => (setCategoryModalState(true))}>
               <BiFolderPlus /> Set category
             </Dropdown.Item>
-            {viewerStatus && (podType !== "acp") && <Dropdown.Item onClick={() => { setAccessModalState(true) }} ><BsShare /> Share</Dropdown.Item>}
+            {viewerStatus && (podType !== "acp") &&
+              <Dropdown.Item onClick={() => { setAccessModalState(true) }} ><BsShare /> Share</Dropdown.Item>}
             {viewerStatus && habitInp.shareList && (podType !== "acp") &&
               <Dropdown.Item onClick={() => (setSharedModalState(true))} >
                 <RiUserSharedLine /> Shared list
@@ -305,7 +300,6 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
           </DropdownButton>
         </ButtonGroup>
       </InputGroup>
-
       <div className="d-flex">
         <div className="d-flex-column w-50">
           <InputGroup className="w-100">
@@ -356,7 +350,8 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
           {viewerStatus && (currentView === 'today') && (habitInp.stat !== null) && <InputGroup className="w-100">
             <InputGroup.Text className="text-center adjust-3" id="basic-addon1">Status:</InputGroup.Text>
             <div className="form-check form-switch d-flex justify-content-center align-items-center">
-              <input className="form-check-input"  {...(!isEdit && { disabled: true })} type="checkbox" style={{ "transform": "scale(1.6)", "marginLeft": "-0.5em" }}
+              <input className="form-check-input"  {...(!isEdit && { disabled: true })} type="checkbox"
+                style={{ "transform": "scale(1.6)", "marginLeft": "-0.5em" }}
                 onChange={() => {
                   setHabitInp((prevState) => ({ ...prevState, stat: !habitInp.stat }));
                   setHabitChanged(true);
@@ -379,8 +374,6 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
           </InputGroup>}
           <InputGroup className="w-100">
             <InputGroup.Text className="text-center" id="basic-addon1" style={{ 'width': '60%' }}>Color:</InputGroup.Text>
-
-
             <Button onClick={() => setShowColorPicker(true)} style={{ "backgroundColor": habitInp.color, 'width': '25%' }}>
             </Button>
           </InputGroup>
@@ -439,7 +432,6 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
         setAccessModalState={setAccessModalState}
         habitInp={habitInp}
       />
-
       <SharedModal
         setAgentsToUpd={setAgentsToUpd}
         setAccUpdObj={setAccUpdObj}
@@ -449,7 +441,6 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
         setSharedModalState={setSharedModalState}
         habitInp={habitInp}
       />
-
       <DeleteModal
         deleteModalState={deleteModalState}
         setDeleteModalState={setDeleteModalState}
@@ -470,4 +461,4 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
   );
 }
 
-export default HabitsCreator
+export default HabitsCreator;

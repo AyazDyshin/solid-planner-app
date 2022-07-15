@@ -3,7 +3,8 @@ import React from 'react';
 import { useSession } from "@inrupt/solid-ui-react";
 import { useEffect, useState } from "react";
 import "../styles.css";
-import { Badge, OverlayTrigger, Popover, Button, Spinner, ButtonGroup, Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
+import { Badge, OverlayTrigger, Popover, Button, Spinner, ButtonGroup, Container, Nav, Navbar, NavDropdown }
+  from "react-bootstrap";
 import { Note } from "./types";
 import { RiArrowDropDownLine, RiArrowGoBackFill } from "react-icons/ri";
 import { BiFolder } from "react-icons/bi";
@@ -42,13 +43,11 @@ const NotesList = ({ notesArray, setNotesArray, setNoteToView, storagePref,
   newEntryCr, setNewEntryCr, noteUpdInProgress, notesFetched, setNotesFetched, podType,
   prefFileLocation, setNoteModalState, refetchNotes
 }: Props) => {
-
   const { session, fetch } = useSession();
   const { webId } = session.info;
   if (webId === undefined) {
     throw new Error(`Error, couldn't get user's WebId`);
   }
-
   const [currentCategory, setCurrentCategory] = useState<string | null>(null);
   const [currentAccess, setCurrentAccess] = useState<string | null>(null);
   const [notesToShow, setNotesToShow] = useState<Note[]>([]);
@@ -138,9 +137,9 @@ const NotesList = ({ notesArray, setNotesArray, setNoteToView, storagePref,
                         as={ButtonGroup}
                         variant="secondary"
                         menuVariant="dark"
-                        title={<div><VscTypeHierarchySuper /> {capitalizeFirstLetter(currentAccess ? currentAccess : "access type")} <RiArrowDropDownLine /></div>}
+                        title={<div><VscTypeHierarchySuper />
+                          {capitalizeFirstLetter(currentAccess ? currentAccess : "access type")} <RiArrowDropDownLine /></div>}
                       >
-
                         {
                           accessArray.map((access, index) => {
                             return <NavDropdown.Item href="" key={Date.now() + index + Math.floor(Math.random() * 1000)}
@@ -152,7 +151,10 @@ const NotesList = ({ notesArray, setNotesArray, setNoteToView, storagePref,
                           })
                         }
                         {currentAccess && (
-                          <><NavDropdown.Divider /><NavDropdown.Item onClick={() => setCurrentAccess(null)}><RiArrowGoBackFill /> Reset</NavDropdown.Item></>)}
+                          <><NavDropdown.Divider />
+                            <NavDropdown.Item onClick={() => setCurrentAccess(null)}>
+                              <RiArrowGoBackFill /> Reset</NavDropdown.Item>
+                          </>)}
                       </NavDropdown>
                     }
                     {
@@ -173,9 +175,12 @@ const NotesList = ({ notesArray, setNotesArray, setNoteToView, storagePref,
                               }}><GoPrimitiveDot /> {category}</NavDropdown.Item>
                           })
                         }
-                        <><NavDropdown.Divider /><NavDropdown.Item onClick={() => setCurrentCategory("without category")}><GoPrimitiveDot /> Without category</NavDropdown.Item></>
+                        <><NavDropdown.Divider /><NavDropdown.Item
+                          onClick={() => setCurrentCategory("without category")}>
+                          <GoPrimitiveDot /> Without category</NavDropdown.Item></>
                         {currentCategory && (
-                          <><NavDropdown.Divider /><NavDropdown.Item onClick={() => setCurrentCategory(null)}><RiArrowGoBackFill /> Reset</NavDropdown.Item></>)}
+                          <><NavDropdown.Divider /><NavDropdown.Item
+                            onClick={() => setCurrentCategory(null)}><RiArrowGoBackFill /> Reset</NavDropdown.Item></>)}
                       </NavDropdown>
                     }
                     {
@@ -192,7 +197,6 @@ const NotesList = ({ notesArray, setNotesArray, setNoteToView, storagePref,
                             setCurrentCategory(null);
                             setCurrentAccess(null);
                           }
-
                           }><RiArrowGoBackFill /> Reset all</Nav.Link>
                       </OverlayTrigger>
                     }
@@ -208,8 +212,6 @@ const NotesList = ({ notesArray, setNotesArray, setNoteToView, storagePref,
                 </Navbar.Collapse>
               </Container>
             </Navbar>
-
-
           </div>
           <div className="list-group w-100 h-80">
             {
@@ -263,15 +265,20 @@ const NotesList = ({ notesArray, setNotesArray, setNoteToView, storagePref,
                                     <div> {key} :</div>
                                     <div className="d-flex justify-content-between">
                                       {note && note.shareList && (note.shareList[key].read) ?
-                                        (<div style={{ display: "inline" }}>read: <GoCheck /></div>) : (<div style={{ display: "inline" }}>read: <GoX /></div>)}
+                                        (<div style={{ display: "inline" }}>
+                                          read: <GoCheck /></div>) : (<div style={{ display: "inline" }}>read: <GoX />
+                                          </div>)}
                                       {note && note.shareList && (note.shareList[key].append) ?
-                                        (<div style={{ display: "inline" }}>append: <GoCheck /></div>) : (<div style={{ display: "inline" }}>append: <GoX /></div>)}
+                                        (<div style={{ display: "inline" }}>
+                                          append: <GoCheck /></div>) : (<div style={{ display: "inline" }}>append: <GoX />
+                                          </div>)}
                                       {note && note.shareList && (note.shareList[key].write) ?
-                                        (<div style={{ display: "inline" }}>write: <GoCheck /></div>) : (<div style={{ display: "inline" }}>write: <GoX /></div>)}
+                                        (<div style={{ display: "inline" }}>
+                                          write: <GoCheck /></div>) : (<div style={{ display: "inline" }}>write: <GoX />
+                                          </div>)}
                                     </div>
                                   </div>
                                 })
-
                               }
                             </div>
                           </Popover.Body>
@@ -326,7 +333,7 @@ const NotesList = ({ notesArray, setNotesArray, setNoteToView, storagePref,
               progressCheck={noteUpdInProgress}
             />
           </div>
-        </div >
+        </div>
       )
     }
   }

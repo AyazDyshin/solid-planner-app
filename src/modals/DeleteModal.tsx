@@ -32,9 +32,11 @@ const DeleteModal = ({ deleteModalState, setDeleteModalState, urlToDelete, setUr
     if (webId === undefined) {
         throw new Error(`Error, couldn't get user's WebId`);
     }
+
     const handleClose = () => {
         setDeleteModalState(false);
     }
+
     const handleDelete = async () => {
         setDeleteModalState(false);
         if (notesArray && setNotesArray) {
@@ -49,12 +51,12 @@ const DeleteModal = ({ deleteModalState, setDeleteModalState, urlToDelete, setUr
         setViewerStatus(false);
         setCreatorStatus(false);
         setUrlToDelete(null);
-        //handle?
         if (!urlToDelete) {
             throw new Error("item you are trying to delete doesn't have a url");
         }
         await deleteEntry(webId, fetch, urlToDelete, entryType, storagePref, publicTypeIndexUrl);
     }
+    
     return (
         <Modal show={deleteModalState} onHide={handleClose}>
             {progressCheck && <div className="h-100 d-flex justify-content-center align-items-center" style={{ minHeight: "200px" }}>

@@ -46,7 +46,6 @@ const ContactsRender = ({ storagePref, publicTypeIndexUrl, prefFileLocation, pod
                 if (contactsStatus) {
                     const namesAndIds = await fetchContacts(webId, fetch, storagePref);
                     setContactsArr(namesAndIds);
-                    //here
                     namesAndIds.map((pair) => pair[0] ? pair[0] : pair[1]);
                 }
                 setContactsFetched(true);
@@ -62,18 +61,17 @@ const ContactsRender = ({ storagePref, publicTypeIndexUrl, prefFileLocation, pod
             setIsLoading(false);
         };
         initialize();
-
     }, [otherWebId, contactsFetched]);
 
     return (
         <div className="container-fluid pad h-100 w-100 d-flex justify-content-center" style={{ "backgroundColor": "#F8F8F8" }}>
-            <div id="setWidth" style={{ "backgroundColor": "#fff" }} className="h-100 w-100 px-2 adjust-me-based-on-size  d-flex justify-content-center align-items-center p-0">
+            <div id="setWidth" style={{ "backgroundColor": "#fff" }}
+                className="h-100 w-100 px-2 adjust-me-based-on-size  d-flex justify-content-center align-items-center p-0">
                 {
                     isLoading && <Spinner animation="border" role="status">
                         <span className="visually-hidden">Loading...</span>
                     </Spinner>
                 }
-
                 {
                     !isLoading && contactsFdrStatus && !otherWebId && contactsArr.length !== 0 &&
                     <ContactsList
@@ -112,9 +110,7 @@ const ContactsRender = ({ storagePref, publicTypeIndexUrl, prefFileLocation, pod
                 {
                     !isLoading && ((!contactsFdrStatus) || (contactsFdrStatus && contactsArr.length === 0)) && <NoContacts />
                 }
-
             </div>
-
             {
                 otherWebId && viewerStatus &&
                 <Modal id="viewerModal" show={contactModalState} style={{ "height": "90vh" }}
@@ -133,6 +129,5 @@ const ContactsRender = ({ storagePref, publicTypeIndexUrl, prefFileLocation, pod
         </div>
     )
 }
-
 
 export default ContactsRender;

@@ -12,6 +12,7 @@ import "../styles.css";
 const LogInPage = () => {
   const [issuer, setIssuer] = useState<string>("https://");
   const [providerModalState, setProviderModalState] = useState<boolean>(false);
+
   return (
     <div className="adjust-2">
       <Form className="container px-5 pt-5 pb-4 border border-3 mt-5 rounded border-secondary">
@@ -50,7 +51,8 @@ const LogInPage = () => {
             <Button className="w-100">Log in</Button></LoginButton>
         </div>
         <div className="d-flex justify-content-center mt-3">
-          <a href="https://solidproject.org/" target="_blank" className="link-primary mx-2" rel="noreferrer">What is Solid? <AiOutlineLink /></a>
+          <a href="https://solidproject.org/" target="_blank"
+            className="link-primary mx-2" rel="noreferrer">What is Solid? <AiOutlineLink /></a>
           <a onClick={() => { setProviderModalState(true) }} className="link-primary mx-2 cursor">Which provider to pick?</a>
         </div>
       </Form>
@@ -62,5 +64,5 @@ const LogInPage = () => {
   )
 }
 
-export default LogInPage;
+export default LogInPage
 

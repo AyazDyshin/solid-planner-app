@@ -40,7 +40,6 @@ const ContentToRender = ({ active, viewerStatus, setViewerStatus, habitsFetched,
     contactsFetched, setContactsFetched, contactsFdrStatus, setContactsFdrStatus,
     refetchNotes, refetchHabits
 }: Props) => {
-
     const [contactsArr, setContactsArr] = useState<(string | null)[][]>([]);
 
     switch (active) {

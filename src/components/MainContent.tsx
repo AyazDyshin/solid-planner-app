@@ -40,7 +40,6 @@ const MainContent = () => {
   const [defFolder, setDefFolder] = useState<string | null>(null);
   const [contactsFetched, setContactsFetched] = useState<boolean>(false);
   const [contactsFdrStatus, setContactsFdrStatus] = useState<boolean>(false);
-
   const [refetchNotes, setRefetchNotes] = useState<boolean>(false);
   const [refetchContacts, setRefetchContacts] = useState<boolean>(false);
   const [refetchHabits, setRefetchHabits] = useState<boolean>(false);
@@ -48,19 +47,14 @@ const MainContent = () => {
   useEffect(() => {
     const check = async () => {
       setIsLoading(true);
-
       const updStoragePref: string = await getStoragePref(webId, fetch);
       setStoragePref(updStoragePref);
-
       const updPrefFileLocation: string = await getPrefLink(webId, fetch);
       setPrefFileLocation(updPrefFileLocation);
-
       const updPublicTypeIndexUrl = await getPublicTypeIndexUrl(webId, fetch);
       setPublicTypeIndexUrl(updPublicTypeIndexUrl);
-
       const updPodType = await isWacOrAcp(updStoragePref, fetch);
       setPodType(updPodType);
-
       let defFolderUpd = await getDefaultFolder(webId, fetch, updPrefFileLocation);
       if (!defFolderUpd) {
         await recordDefaultFolder(webId, fetch, updStoragePref, updPrefFileLocation, updPublicTypeIndexUrl, updPodType);
@@ -69,7 +63,6 @@ const MainContent = () => {
       setDefFolder(defFolderUpd);
       const result = await checkPermissions(webId, fetch, updStoragePref, updPodType);
       setPermissionStatus(result);
-
       const wssUrl = new URL(updStoragePref);
       wssUrl.protocol = 'wss';
       //const inboxUrl = `${updStoragePref}inbox/`;
@@ -103,7 +96,6 @@ const MainContent = () => {
           this.send(`sub ${updPublicTypeIndexUrl}`);
           this.send(`sub ${contactsUrl}`);
         };
-
         socket.onmessage = function (msg) {
           if (msg.data && msg.data.slice(0, 3) === 'pub') {
             if (msg.data === `pub ${updPublicTypeIndexUrl}`) {
@@ -117,7 +109,6 @@ const MainContent = () => {
               setContactsFdrStatus(false);
               setRefetchContacts(!refetchContacts);
             }
-
           }
         };
       }
@@ -125,6 +116,7 @@ const MainContent = () => {
     }
     check();
   }, [refresh]);
+
   if (isLoading) {
     return (
       <div className="h-100 d-flex justify-content-center align-items-center">
@@ -184,7 +176,6 @@ const MainContent = () => {
       )
     }
   }
-
 };
 
 export default MainContent;

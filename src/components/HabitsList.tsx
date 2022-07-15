@@ -4,7 +4,8 @@ import { fetchAllEntries, thingToHabit, editHabit, deleteEntry } from '../servic
 import { BsCircle } from "react-icons/bs";
 import { Habit } from './types';
 import { capitalizeFirstLetter, extractCategories, filterByAccess, filterByCategory, setStreaks } from '../services/helpers';
-import { OverlayTrigger, Popover, Badge, Spinner, Button, ButtonGroup, Container, Nav, Navbar, NavDropdown } from 'react-bootstrap';
+import { OverlayTrigger, Popover, Badge, Spinner, Button, ButtonGroup, Container, Nav, Navbar, NavDropdown }
+  from 'react-bootstrap';
 import { BiFolder } from 'react-icons/bi';
 import { GoPrimitiveDot, GoCheck, GoX } from 'react-icons/go';
 import { RiArrowDropDownLine, RiArrowGoBackFill } from 'react-icons/ri';
@@ -38,11 +39,9 @@ interface Props {
   setHabitModalState: React.Dispatch<React.SetStateAction<boolean>>;
   refetchHabits: boolean;
 }
-const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabitsFetched,
-  habitsArray, setHabitsArray, setIsEdit, setHabitToView, newEntryCr, setNewEntryCr, storagePref,
-  categoryArray, setCategoryArray, currentView,
-  setCurrentView, prefFileLocation, publicTypeIndexUrl, podType, defFolder, habitUpdInProgress,
-  setHabitModalState, refetchHabits
+const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabitsFetched, habitsArray, setHabitsArray,
+  setIsEdit, setHabitToView, newEntryCr, setNewEntryCr, storagePref, categoryArray, setCategoryArray, currentView,
+  setCurrentView, prefFileLocation, publicTypeIndexUrl, podType, defFolder, habitUpdInProgress, setHabitModalState, refetchHabits
 }: Props) => {
   const { session, fetch } = useSession();
   const { webId } = session.info;
@@ -80,14 +79,10 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
       }
       const extr = extractCategories(filteredHabits);
       setCategoryArray(extr);
-
-
       if (currentCategory || currentAccess || currentView || currentStatus) {
         const temp = filteredHabits;
         if (currentCategory) filteredHabits = filterByCategory(filteredHabits, currentCategory);
         if (currentAccess) filteredHabits = filterByAccess(filteredHabits, currentAccess);
-
-
         if (currentView === 'today') {
           filteredHabits.forEach((habit) => {
             temp.map((habit2) => {
@@ -111,11 +106,8 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
         setObjOfStates((prevState) => ({ ...prevState, [key]: habit.stat }));
       });
       setIsLoading(false);
-
     }
-
     fetchHabits();
-
   }, [newEntryCr, currentCategory, currentAccess, currentView, currentStatus, refetchHabits]);
 
   useEffect(() => {
@@ -139,6 +131,7 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
     setCreatorStatus(true);
     setHabitModalState(true);
   };
+
   const handleSave = async (toSave: Habit) => {
     const updHabit = setStreaks(toSave);
     setNewEntryCr(!newEntryCr);
@@ -164,7 +157,6 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
   }
   else {
     if ((habitsToShow.length === 0) && !(currentAccess || currentCategory || currentView)) {
-
       return (
         <div className="card text-center">
           <div className="card-body">
@@ -224,13 +216,14 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
                         setCreatorStatus(false);
                         setCurrentStatus('all');
                       }}><GoPrimitiveDot /> All</NavDropdown.Item>
-
                     </NavDropdown>
                     {
                       (podType !== "acp") &&
                       <NavDropdown
                         menuVariant="dark"
-                        title={<div><VscTypeHierarchySuper /> {capitalizeFirstLetter(currentAccess ? currentAccess : "access type")} <RiArrowDropDownLine /></div>}
+                        title={<div><VscTypeHierarchySuper />
+                          {capitalizeFirstLetter(currentAccess ? currentAccess : "access type")}
+                          <RiArrowDropDownLine /></div>}
                       >
                         {
                           accessArray.map((access, key) => {
@@ -243,7 +236,8 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
                           })
                         }
                         {currentAccess && (
-                          <><NavDropdown.Divider /><NavDropdown.Item onClick={() => setCurrentAccess(null)}><RiArrowGoBackFill /> reset</NavDropdown.Item></>)}
+                          <><NavDropdown.Divider /><NavDropdown.Item
+                            onClick={() => setCurrentAccess(null)}><RiArrowGoBackFill /> reset</NavDropdown.Item></>)}
                       </NavDropdown>
                     }
                     {
@@ -264,9 +258,12 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
                               }}><GoPrimitiveDot /> {category}</NavDropdown.Item>
                           })
                         }
-                        <><NavDropdown.Divider /><NavDropdown.Item onClick={() => setCurrentCategory("without category")}><GoPrimitiveDot /> Without category</NavDropdown.Item></>
+                        <><NavDropdown.Divider /><NavDropdown.Item
+                          onClick={() => setCurrentCategory("without category")}
+                        ><GoPrimitiveDot /> Without category</NavDropdown.Item></>
                         {currentCategory && (
-                          <><NavDropdown.Divider /><NavDropdown.Item onClick={() => setCurrentCategory(null)}><RiArrowGoBackFill /> reset</NavDropdown.Item></>)}
+                          <><NavDropdown.Divider /><NavDropdown.Item
+                            onClick={() => setCurrentCategory(null)}><RiArrowGoBackFill /> reset</NavDropdown.Item></>)}
                       </NavDropdown>
                     }
                     {
@@ -283,7 +280,6 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
                             setCurrentCategory(null);
                             setCurrentAccess(null);
                           }
-
                           }><RiArrowGoBackFill /> Reset all</Nav.Link>
                       </OverlayTrigger>
                     }
@@ -299,15 +295,11 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
                 </Navbar.Collapse>
               </Container>
             </Navbar>
-
-
-
           </div>
           <div className="list-group w-100 h-80">
             {
               habitsToShow.length !== 0 && <div className="list-group" style={{ maxHeight: '80%', overflow: 'auto' }}>
                 {
-
                   habitsToShow.map((habit, key) => {
                     return (
                       <a
@@ -341,7 +333,6 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
                                 const toSave = tempArr[key];
                                 setObjOfStates((prevState) => ({ ...prevState, [key]: !objOfStates[key] }));
                                 handleSave(toSave);
-
                               }}
                               type="checkbox" checked={
                                 (objOfStates[key]) ? true : false
@@ -374,7 +365,6 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
                             <Badge pill bg="secondary" className="me-1 cursor">{Object.keys(habit.access)[0]}</Badge>
                           </div>
                         </OverlayTrigger>}
-
                         {habit.shareList && (podType !== "acp") && <OverlayTrigger placement="right" overlay={
                           <Popover style={{ maxWidth: "400px" }}>
                             <Popover.Body className="py-1 px-1">
@@ -387,11 +377,16 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
                                         habit.shareList &&
                                         <div className="d-flex justify-content-between">
                                           {(habit.shareList[key].read) ?
-                                            (<div style={{ display: "inline" }}>read: <GoCheck /></div>) : (<div style={{ display: "inline" }}>read: <GoX /></div>)}
+                                            (<div style={{ display: "inline" }}>
+                                              read: <GoCheck /></div>) :
+                                            (<div style={{ display: "inline" }}>read: <GoX /></div>)}
                                           {(habit.shareList[key].append) ?
-                                            (<div style={{ display: "inline" }}>append: <GoCheck /></div>) : (<div style={{ display: "inline" }}>append: <GoX /></div>)}
+                                            (<div style={{ display: "inline" }}>
+                                              append: <GoCheck /></div>) :
+                                            (<div style={{ display: "inline" }}>append: <GoX /></div>)}
                                           {(habit.shareList[key].write) ?
-                                            (<div style={{ display: "inline" }}>write: <GoCheck /></div>) : (<div style={{ display: "inline" }}>write: <GoX /></div>)}
+                                            (<div style={{ display: "inline" }}>write: <GoCheck /></div>) :
+                                            (<div style={{ display: "inline" }}>write: <GoX /></div>)}
                                         </div>
                                       }
                                     </div>

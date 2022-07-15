@@ -99,7 +99,6 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
 
     const handleSave = async () => {
         setIsEdit(false);
-
         if (creatorStatus) {
             setViewerStatus(false);
             setCreatorStatus(false);
@@ -108,7 +107,6 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
                 ...NoteInp, url: `${defFolder}notes/${idToSave}.ttl`, id: idToSave,
                 access: { "private": { read: false, append: false, write: false } }
             }
-
             setNoteInp(newNote);
             setNotesArray((prevState) => ([...prevState, newNote]));
             setNewEntryCr(!newEntryCr);
@@ -141,7 +139,6 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
                         updShareList = agentsToUpd;
                     }
                     Object.keys(updShareList).map((key) => {
-                        //handle
                         if (updShareList) {
                             if (!updShareList[key].read && !updShareList[key].append && !updShareList[key].write) {
                                 delete updShareList[key];
@@ -172,9 +169,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
                     await editNote(webId, fetch, newNote, storagePref, publicTypeIndexUrl);
                 }
             }
-
         }
-
         if (Object.keys(accUpdObj).length !== 0) {
             if (accUpdObj["public"]) {
                 if (!NoteInp) {
@@ -192,7 +187,6 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
                         throw new Error("Error, note you are trying to share doesn't have a url");
                     }
                     await shareWith(webId, NoteInp.url, fetch, agentsToUpd[item], item, storagePref, prefFileLocation, podType);
-
                 }
             }
         }
@@ -203,11 +197,9 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
     }
 
     const handleDelete = async () => {
-
         if (!NoteInp) {
             throw new Error("Error, note to view wasn't provided");
         }
-        //handle
         if (!NoteInp.url) {
             throw new Error("Error, note that you want to delete doesn't have a url");
         }
@@ -218,7 +210,8 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setNoteInp(prevState => ({ ...prevState, [e.target.name]: e.target.value }));
         setNoteChanged(true);
-    };
+    }
+
     return (
         <div style={{ "height": "70vh" }}>
             <InputGroup className="mb-2 mt-2">
@@ -242,7 +235,8 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
                         <Dropdown.Item onClick={() => (setCategoryModalState(true))}>
                             <BiFolderPlus /> Set category
                         </Dropdown.Item>
-                        {viewerStatus && (podType !== "acp") && <Dropdown.Item onClick={() => (setAccessModalState(true))}><BsShare /> Share</Dropdown.Item>}
+                        {viewerStatus && (podType !== "acp") && <Dropdown.Item onClick={() => (setAccessModalState(true))}>
+                            <BsShare /> Share</Dropdown.Item>}
                         {viewerStatus && noteToView?.shareList && (podType !== "acp") &&
                             <Dropdown.Item onClick={() => (setSharedModalState(true))}>
                                 <RiUserSharedLine /> Shared list
@@ -253,7 +247,8 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
                     </DropdownButton>
                 </ButtonGroup>
             </InputGroup>
-            <FormControl {...(!isEdit && { disabled: true })} as="textarea" aria-label="textarea" style={{ 'resize': 'none', 'height': '90%' }}
+            <FormControl {...(!isEdit && { disabled: true })} as="textarea" aria-label="textarea"
+                style={{ 'resize': 'none', 'height': '90%' }}
                 name="content"
                 value={NoteInp.content === null ? "" : NoteInp.content}
                 onChange={handleChange}

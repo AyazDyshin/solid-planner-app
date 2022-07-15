@@ -24,7 +24,7 @@ interface Props {
 }
 
 const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsArray, storagePref, prefFileLocation,
-    publicTypeIndexUrl, podType, defFolder, contactsFdrStatus, setContactsFdrStatus, refetchHabits, 
+    publicTypeIndexUrl, podType, defFolder, contactsFdrStatus, setContactsFdrStatus, refetchHabits,
     contactsArr, setContactsArr, contactsFetched }: Props) => {
     const [viewerStatus, setViewerStatus] = useState<boolean>(false);
     const [creatorStatus, setCreatorStatus] = useState<boolean>(false);
@@ -46,7 +46,8 @@ const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsA
 
     return (
         <div className="container-fluid pad h-100 w-100 d-flex justify-content-center" style={{ "backgroundColor": "#F8F8F8" }}>
-            <div id="setWidth" style={{ "backgroundColor": "#fff" }} className="h-100 w-100  adjust-me-based-on-size  d-flex justify-content-center align-items-center p-0">
+            <div id="setWidth" style={{ "backgroundColor": "#fff" }}
+                className="h-100 w-100  adjust-me-based-on-size  d-flex justify-content-center align-items-center p-0">
                 <HabitsList
                     refetchHabits={refetchHabits}
                     setHabitModalState={setHabitModalState}

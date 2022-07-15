@@ -1,9 +1,11 @@
 import * as React from "react";
 import 'bootstrap/dist/css/bootstrap.css';
 import { Button, Card } from "react-bootstrap";
+
 interface Props {
     children: JSX.Element;
 }
+
 const ErrorBoundary = ({ children }: Props) => {
     const [error, setError] = React.useState("");
 

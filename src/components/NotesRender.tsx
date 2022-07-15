@@ -51,9 +51,11 @@ const NotesRender = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorS
     const [agentsToUpd, setAgentsToUpd] = useState<{ [x: string]: AccessModes; }>({});
     const [noteUpdInProgress, setNoteUpdInProgress] = useState<boolean>(false);
     const [noteModalState, setNoteModalState] = useState<boolean>(false);
+
     return (
         <div className="container-fluid pad h-100 w-100 d-flex justify-content-center" style={{ "backgroundColor": "#F8F8F8" }}>
-            <div id="setWidth" style={{ "backgroundColor": "#fff" }} className="h-100 w-100  adjust-me-based-on-size  d-flex justify-content-center align-items-center p-0">
+            <div id="setWidth" style={{ "backgroundColor": "#fff" }}
+                className="h-100 w-100  adjust-me-based-on-size  d-flex justify-content-center align-items-center p-0">
                 <NotesList
                     refetchNotes={refetchNotes}
                     setNoteModalState={setNoteModalState}

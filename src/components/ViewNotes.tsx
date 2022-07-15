@@ -9,6 +9,7 @@ interface Props {
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
     setContactModalState: React.Dispatch<React.SetStateAction<boolean>>;
 }
+
 const ViewNotes = ({ setOtherWebId, notesArray, setNoteToView, setViewerStatus, setIsLoading, setContactModalState
 }: Props) => {
     const [activeNote, setActiveNote] = useState<number | null>(null);
@@ -29,7 +30,8 @@ const ViewNotes = ({ setOtherWebId, notesArray, setNoteToView, setViewerStatus, 
                         if (note) {
                             return <a
                                 key={`${note.id}${Date.now() + index + Math.floor(Math.random() * 1000)}`}
-                                className={`list-group-item px-1 list-group-item-action ${activeNote === note.id ? 'active' : ''}`}
+                                className={`list-group-item px-1 list-group-item-action 
+                                ${activeNote === note.id ? 'active' : ''}`}
                                 onClick={(e) => {
                                     e.preventDefault();
                                     setActiveNote(note.id);

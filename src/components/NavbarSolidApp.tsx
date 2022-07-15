@@ -29,6 +29,7 @@ const NavbarSolidApp = ({ links, active, setActive }: Props) => {
         if (error instanceof Error) message = error.message;
         throw new Error(`Error when trying to logout, error: ${message}`);
     }
+
     const getIcon = (link: string) => {
         switch (link) {
             case "notes":

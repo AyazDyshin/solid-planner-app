@@ -1,6 +1,7 @@
 import React from 'react'
 import { FormControl, InputGroup } from 'react-bootstrap';
 import { Note } from './types';
+
 interface Props {
     noteToView: Note | null;
 }

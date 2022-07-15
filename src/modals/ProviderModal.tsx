@@ -6,7 +6,9 @@ interface Props {
     providerModalState: boolean;
     setProviderModalState: React.Dispatch<React.SetStateAction<boolean>>;
 }
+
 const ProviderModal = ({ providerModalState, setProviderModalState }: Props) => {
+
     return (
         <Modal show={providerModalState}>
             <Modal.Header closeButton onClick={() => { setProviderModalState(false) }}>

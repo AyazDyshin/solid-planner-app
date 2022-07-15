@@ -11,7 +11,6 @@ interface Props {
 }
 
 const CustomHabitModal = ({ customHabitModalState, setCustomHabitModalState, habitInp, setHabitInp }: Props) => {
-
     const [weekOpen, setWeekOpen] = useState<boolean>(false);
     const [dayOpen, setDayOpen] = useState<boolean>(false);
     const [objOfDays, setObjOfDays] = useState<{ [x: string]: boolean }>({
@@ -123,7 +122,6 @@ const CustomHabitModal = ({ customHabitModalState, setCustomHabitModalState, hab
                         By number of days:
                     </Button>
                 </div>
-
                 <Collapse in={dayOpen}>
                     <InputGroup>
                         <InputGroup.Text>every</InputGroup.Text>
@@ -131,10 +129,7 @@ const CustomHabitModal = ({ customHabitModalState, setCustomHabitModalState, hab
                         <InputGroup.Text>days</InputGroup.Text>
                     </InputGroup>
                 </Collapse>
-
-
                 <Collapse in={weekOpen}>
-
                     <div>
                         {
                             daysArr.map((key, index) => {

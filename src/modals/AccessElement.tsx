@@ -8,15 +8,13 @@ interface Props {
     readStatus: boolean;
     appendStatus: boolean;
     writeStatus: boolean;
-
 }
-const AccessElement = ({ title, readOnChange, appendOnChange, writeOnChange, readStatus, appendStatus,
-    writeStatus }: Props) => {
+
+const AccessElement = ({ title, readOnChange, appendOnChange, writeOnChange, readStatus, appendStatus, writeStatus }: Props) => {
     return (
         <div className="my-2" key={Date.now() + Math.floor(Math.random() * 1000)}>
             <div className="text-center">{title}</div>
             <div className="d-flex justify-content-around">
-
                 <div className="form-check form-switch">
                     <label className="form-check-label"
                         htmlFor="flexSwitchCheckDefault1">Read</label>

@@ -8,12 +8,14 @@ interface Props {
     refresh: boolean;
     setRefresh: React.Dispatch<React.SetStateAction<boolean>>;
 }
+
 const NoPermissions = ({ refresh, setRefresh }: Props) => {
     const { session } = useSession();
     const { webId } = session.info;
     if (webId === undefined) {
         throw new Error(`Error, couldn't get user's WebId`);
     }
+
     return (
         <div className="d-flex justify-content-center align-items-center w-100 h-100">
             <Card style={{ width: '40%' }} className="text-center">
@@ -22,12 +24,19 @@ const NoPermissions = ({ refresh, setRefresh }: Props) => {
                     <Card.Text>
                         Here is how to fix that:
                         <ol className="list-group list-group-numbered">
-                            <li className="list-group-item">Go to <a href={webId} target="_blank" className="link-primary" rel="noreferrer">Your POD&apos;s browser <AiOutlineLink /></a></li>
-                            <li className="list-group-item">Display your preferences. <a href="https://github.com/SolidOS/userguide/blob/main/README.md#preferences"
-                                target="_blank" className="link-primary" rel="noreferrer">how? <AiOutlineLink /></a></li>
-                            <li className="list-group-item">Go to <strong>&quot;Manage your trusted applications&quot;</strong> section.</li>
-                            <li className="list-group-item">locate this application&apos;s URL (https://ayazdyshin.github.io)</li>
-                            <li className="list-group-item">Enable : <strong>Read</strong>, <strong>Write</strong>, <strong>Append</strong>, <strong>Control</strong>.</li>
+                            <li className="list-group-item">Go to
+                                <a href={webId} target="_blank" className="link-primary" rel="noreferrer">
+                                    Your POD&apos;s browser <AiOutlineLink /></a></li>
+                            <li className="list-group-item">Display your preferences.
+                                <a href="https://github.com/SolidOS/userguide/blob/main/README.md#preferences"
+                                    target="_blank" className="link-primary" rel="noreferrer">how? <AiOutlineLink /></a></li>
+                            <li className="list-group-item">
+                                Go to <strong>&quot;Manage your trusted applications&quot;</strong> section.</li>
+                            <li className="list-group-item">
+                                locate this application&apos;s URL (https://ayazdyshin.github.io)</li>
+                            <li className="list-group-item">
+                                Enable : <strong>Read</strong>,
+                                <strong>Write</strong>, <strong>Append</strong>, <strong>Control</strong>.</li>
                             <li className="list-group-item">Save changes.</li>
                         </ol>
                     </Card.Text>

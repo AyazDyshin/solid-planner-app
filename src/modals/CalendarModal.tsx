@@ -10,10 +10,12 @@ interface Props {
     setCalendarModalState: React.Dispatch<React.SetStateAction<boolean>>;
     habitInp: Habit;
 }
+
 const CalendarModal = ({ calendarModalState, setCalendarModalState, habitInp }: Props) => {
     const handleClose = () => {
         setCalendarModalState(false);
     }
+
     return (
         <Modal show={calendarModalState} onHide={handleClose}>
             <FullCalendar

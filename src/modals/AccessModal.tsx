@@ -78,10 +78,10 @@ const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, contactsL
             let namesAndIds: (string | null)[][] = [];
             let contactsStatus = false;
             if (!contactsFetched) {
-                contactsStatus = await checkContacts(webId, fetch, storagePref);
+                contactsStatus = await checkContacts(fetch, storagePref);
                 setContactsFdrStatus(contactsStatus);
                 if (contactsStatus) {
-                    namesAndIds = await fetchContacts(webId, fetch, storagePref);
+                    namesAndIds = await fetchContacts(fetch, storagePref);
                     setContactsArr(namesAndIds);
                 }
             }

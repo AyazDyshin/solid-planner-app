@@ -2,19 +2,70 @@ import {
   createThing, getSolidDataset, getThing, getThingAll, getUrl,
   addUrl, setThing, saveSolidDatasetAt, createContainerAt, Thing, getInteger,
   getStringNoLocale, removeThing, getContainedResourceUrlAll, deleteSolidDataset,
-  setStringNoLocale, addStringNoLocale, isContainer, addInteger,
-  buildThing, setDate, getDate, getBoolean, addBoolean, setInteger, setBoolean, addDate, getDateAll, SolidDataset, WithServerResourceInfo
+  setStringNoLocale, addStringNoLocale, isContainer, addInteger, buildThing, setDate, getDate, getBoolean,
+  addBoolean, setInteger, setBoolean, addDate, getDateAll, SolidDataset, WithServerResourceInfo, ThingPersisted, getIri,
+  getStringNoLocaleAll,
+  createSolidDataset,
+  saveSolidDatasetInContainer
 } from '@inrupt/solid-client';
 import { DCTERMS, RDF } from '@inrupt/vocab-common-rdf';
 import { solid, schema, foaf, vcard } from 'rdf-namespaces';
-import { Note, fetcher, Habit, voc, otherV } from '../components/types';
+import { Note, fetcher, Habit, voc, otherV, accessObject, appNotification } from '../components/types';
 import { determineAccess, initializeAcl, setPubAccess } from './access';
 import { updUrlForFolder } from './helpers';
-import { getAllUrlFromPublicIndex } from './podGetters';
+import { getAllUrlFromPublicIndex, getInboxUrl } from './podGetters';
 
-//function that transforms var of type Thing to var of Type Note
+export const thingToNotification = (toChange: Thing) => {
+  const updStatus = getBoolean(toChange, solid.read);
+  const updSender = getIri(toChange, schema.sender);
+  const updAccess = getStringNoLocaleAll(toChange, "http://purl.org/dc/terms/accessRights");
+  let updEntryType = getIri(toChange, solid.forClass);
+  const updId = getInteger(toChange, schema.identifier);
+  const updUrl = getIri(toChange, schema.url);
+
+  if (updStatus || updStatus === null || !updSender || !updEntryType || !updId || updAccess.length === 0 || !updUrl) {
+    return null;
+  }
+  if (!updAccess.includes("read") && !updAccess.includes("append") && !updAccess.includes("write")) return null;
+
+
+  else {
+    if (updEntryType === schema.TextDigitalDocument) updEntryType = 'note'
+    else updEntryType = 'habit'
+    const accObj: accessObject = { read: false, append: false, write: false };
+    if (updAccess.includes("read")) {
+      accObj.read = true;
+    }
+    if (updAccess.includes("append")) {
+      accObj.append = true;
+    }
+    if (updAccess.includes("write")) {
+      accObj.write = true;
+    }
+
+    const notification: appNotification = {
+      id: updId,
+      url: updUrl,
+      status: updStatus,
+      sender: updSender,
+      entryType: updEntryType,
+      access: accObj
+    }
+    return notification;
+  }
+}
+/**
+ * returns a note from a given thing
+ * @param   {Thing | null} toChange thing to transform
+ * @param   {string} webId webId of the user
+ * @param   {fetcher} fetch fetch function
+ * @param   {string} storagePref url of user's preferred storage location
+ * @param   {string} prefFileLocation url of user's preference file location
+ * @param   {string} podType denotes what access control mechanism user's POD uses, can be wac or acp
+ * @return  {Promise<Note | null>} Note generated from a given thing
+ */
 export const thingToNote = async (toChange: Thing | null, webId: string, fetch: fetcher, storagePref: string,
-  prefFileLocation: string, podType: string) => {
+  prefFileLocation: string, podType: string): Promise<Note | null> => {
   if (!toChange) {
     return null;
   }
@@ -42,9 +93,18 @@ export const thingToNote = async (toChange: Thing | null, webId: string, fetch: 
   return note;
 }
 
-
+/**
+ * returns a habit from a given thing
+ * @param   {Thing | null} toChange thing to transform
+ * @param   {string} webId webId of the user
+ * @param   {fetcher} fetch fetch function
+ * @param   {string} storagePref url of user's preferred storage location
+ * @param   {string} prefFileLocation url of user's preference file location
+ * @param   {string} podType denotes what access control mechanism user's POD uses, can be wac or acp
+ * @return  {Promise<Habit | null>} habit generated from a given thing
+ */
 export const thingToHabit = async (toChange: Thing | null, webId: string, fetch: fetcher, storagePref: string,
-  prefFileLocation: string, podType: string) => {
+  prefFileLocation: string, podType: string): Promise<Habit | null> => {
   if (!toChange) {
     return null;
   }
@@ -62,7 +122,6 @@ export const thingToHabit = async (toChange: Thing | null, webId: string, fetch:
   const updCustom = getStringNoLocale(toChange, voc.custom);
   const updCheckInList = getDateAll(toChange, voc.checkInDate);
   let newCustomValue: number[] | number | null = null;
-
   const getColor = getStringNoLocale(toChange, schema.color);
   const updColor = getColor ? getColor : "#3e619b";
   if (updCustom) {
@@ -74,7 +133,6 @@ export const thingToHabit = async (toChange: Thing | null, webId: string, fetch:
       newCustomValue = customArr.map((value) => parseInt(value));
     }
   }
-
   let getAcc;
   try {
     getAcc = await determineAccess(webId, toChange.url, fetch, storagePref, prefFileLocation, podType);
@@ -105,7 +163,14 @@ export const thingToHabit = async (toChange: Thing | null, webId: string, fetch:
   return habit;
 }
 
-export const repairDefaultFolder = async (webId: string, fetch: fetcher, storagePref: string, prefFileLocation: string) => {
+/**
+ * creates folders used by the application, in case if they are missing
+ * @param   {fetcher} fetch fetch function
+ * @param   {string} storagePref url of user's preferred storage location
+ * @param   {string} prefFileLocation url of user's preference file location
+ * @return  {Promise<void>} 
+ */
+export const repairDefaultFolder = async (fetch: fetcher, storagePref: string, prefFileLocation: string): Promise<void> => {
   const defaultFolderPath = `${storagePref}SolidPlannerApp`;
   let dataSet;
   try {
@@ -127,20 +192,39 @@ export const repairDefaultFolder = async (webId: string, fetch: fetcher, storage
   await saveSolidDatasetAt(prefFileLocation, dataSet, { fetch: fetch });
 }
 
+/**
+* wrapper function that calls @see repairDefaultFolder @see createDefFolder @see createEntriesInTypeIndex would create folders to 
+* store notes and habit as records in the user's public type index file for habits and notes
+* @param   {string} webId webId of the user
+* @param   {fetcher} fetch fetch function
+* @param   {string} storagePref url of user's preferred storage location
+* @param   {string} prefFileLocation url of user's preference file location
+* @param   {string} publicTypeIndexUrl url of user's public type index file
+* @param   {string} podType denotes what access control mechanisms user's POD uses, can be wac or acp
+* @return  {Promise<void>} 
+*/
 export const recordDefaultFolder = async (webId: string, fetch: fetcher, storagePref: string, prefFileLocation: string,
-  publicTypeIndexUrl: string, podType: string) => {
-  await repairDefaultFolder(webId, fetch, storagePref, prefFileLocation);
+  publicTypeIndexUrl: string, podType: string): Promise<void> => {
+  await repairDefaultFolder(fetch, storagePref, prefFileLocation);
   await createDefFolder(webId, fetch, storagePref, prefFileLocation, podType);
-  await createEntriesInTypeIndex(webId, fetch, "note", storagePref, publicTypeIndexUrl);
-  await createEntriesInTypeIndex(webId, fetch, "habit", storagePref, publicTypeIndexUrl);
+  await createEntriesInTypeIndex(fetch, "note", storagePref, publicTypeIndexUrl);
+  await createEntriesInTypeIndex(fetch, "habit", storagePref, publicTypeIndexUrl);
 }
 
-export const createEntriesInTypeIndex = async (webId: string, fetch: fetcher, entryType: string, storagePref: string,
+/**
+* creates entries in user's public type index file, for voc.Habit or schema.TextDigitalDocument
+* @param   {fetcher} fetch fetch function
+* @param   {string} entry type of entry to create a record for: note or habit
+* @param   {string} storagePref url of user's preferred storage location
+* @param   {string} publicTypeIndexUrl url of user's public type index file
+* @return  {Promise<void>} 
+*/
+export const createEntriesInTypeIndex = async (fetch: fetcher, entry: string, storagePref: string,
   publicTypeIndexUrl: string
-) => {
+): Promise<void> => {
   const defaultFolderPath = `${storagePref}SolidPlannerApp`;
   let url = "";
-  if (entryType === 'note') {
+  if (entry === 'note') {
     url = `${defaultFolderPath}/notes/`;
   }
   else {
@@ -158,16 +242,21 @@ export const createEntriesInTypeIndex = async (webId: string, fetch: fetcher, en
     throw new Error(`error when fetching public type index file, it either doesn't exist, or has different location from the one specified in the webId, error: ${message}`);
   }
   const aThing = buildThing(createThing())
-    .addIri(solid.forClass, entryType === "note" ? schema.TextDigitalDocument : voc.Habit)
+    .addIri(solid.forClass, entry === "note" ? schema.TextDigitalDocument : voc.Habit)
     .addIri(solid.instance, url)
     .build();
   dataSet = setThing(dataSet, aThing);
   await saveSolidDatasetAt(publicTypeIndexUrl, dataSet, { fetch: fetch });
 }
 
-
-export const recordAccessType = async (webId: string, fetch: fetcher, storagePref: string, prefFileLocation: string,
-  podType: string) => {
+/**
+* adds a record to user's preference file to denote what access control mechanism user's POD uses, can be wac or acp
+* @param   {fetcher} fetch fetch function
+* @param   {string} prefFileLocation url of user's preference file location
+* @param   {string} podType denotes what access control mechanism user's POD uses, can be wac or acp
+* @return  {Promise<void>} 
+*/
+export const recordAccessType = async (fetch: fetcher, prefFileLocation: string, podType: string): Promise<void> => {
   let dataSet;
   try {
     dataSet = await getSolidDataset(prefFileLocation, {
@@ -180,7 +269,6 @@ export const recordAccessType = async (webId: string, fetch: fetcher, storagePre
     throw new Error(`error when fetching preference file, it either doesn't exist, or has different location from the one specified in the webId, error: ${message}`);
   }
   let aThing = getThing(dataSet, prefFileLocation);
-
   if (!aThing) {
     throw new Error("preference file does not exist");
   }
@@ -189,9 +277,17 @@ export const recordAccessType = async (webId: string, fetch: fetcher, storagePre
   await saveSolidDatasetAt(prefFileLocation, dataSet, { fetch: fetch });
 }
 
+/**
+* creates the following containers in the user's POD: SolidPlannerApp/, SolidPlannerApp/Notes/, SolidPlannerApp/Habits/
+* @param   {string} webId webId of the user
+* @param   {fetcher} fetch fetch function
+* @param   {string} storagePref url of user's preferred storage location
+* @param   {string} prefFileLocation url of user's preference file location
+* @param   {string} podType denotes what access control mechanism user's POD uses, can be wac or acp
+* @return  {Promise<void>} 
+*/
 export const createDefFolder = async (webId: string, fetch: fetcher, storagePref: string, prefFileLocation: string,
-  podType: string) => {
-
+  podType: string): Promise<void> => {
   const defFolderUrl = `${storagePref}SolidPlannerApp`;
   try {
     await getSolidDataset(`${updUrlForFolder(defFolderUrl)}`, { fetch: fetch });
@@ -208,7 +304,7 @@ export const createDefFolder = async (webId: string, fetch: fetcher, storagePref
       throw new Error(`error when trying to create a folder for notes, error: ${message}`);
     }
   }
-  await recordAccessType(webId, fetch, storagePref, prefFileLocation, podType);
+  await recordAccessType(fetch, prefFileLocation, podType);
   await setPubAccess(webId, { read: true, append: false, write: false }, `${updUrlForFolder(defFolderUrl)}`, fetch,
     storagePref, prefFileLocation, podType);
   try {
@@ -228,7 +324,6 @@ export const createDefFolder = async (webId: string, fetch: fetcher, storagePref
       throw new Error(`error when trying to create a folder for notes, error: ${message}`);
     }
   }
-
   if (podType === "wac") {
     await initializeAcl(`${updUrlForFolder(defFolderUrl)}notes/`, fetch);
   }
@@ -251,7 +346,6 @@ export const createDefFolder = async (webId: string, fetch: fetcher, storagePref
       throw new Error(`error when trying to create a folder for habits in specified folder, error: ${message}`);
     }
   }
-
   if (podType === "wac") {
     await initializeAcl(`${updUrlForFolder(defFolderUrl)}habits/`, fetch);
   }
@@ -259,19 +353,24 @@ export const createDefFolder = async (webId: string, fetch: fetcher, storagePref
     storagePref, prefFileLocation, podType);
 }
 
-
+/**
+* fetches all things of specified entry type of a user or other webId 
+* @param   {string} webId webId of the user
+* @param   {fetcher} fetch fetch function
+* @param   {string} entry entry type to fetch
+* @param   {string} storagePref url of user's preferred storage location
+* @param   {string} prefFileLocation url of user's preference file location
+* @param   {string} publicTypeIndexUrl url of user's public type index file
+* @param   {string} podType denotes what access control mechanisms user's POD uses, can be wac or acp
+* @param   {boolean} [other] indicates if a fetch is perform not on the user's webId
+* @return  {Promise<(ThingPersisted | null)[] | never[]>} an array of things of specified entry type or nulls, or empty array
+*/
 export const fetchAllEntries = async (webId: string, fetch: fetcher, entry: string, storagePref: string, prefFileLocation: string,
-  publicTypeIndexUrl: string, podType: string, other?: boolean) => {
-  console.log("this is webId");
-  console.log(webId);
+  publicTypeIndexUrl: string, podType: string, other?: boolean): Promise<(ThingPersisted | null)[] | never[]> => {
   const arrayOfCategories: string[] = [];
   let urlsArr
   try {
-
     urlsArr = await getAllUrlFromPublicIndex(webId, fetch, entry, storagePref, publicTypeIndexUrl, other ? other : undefined);
-
-    console.log("this is url arr");
-    console.log(urlsArr);
   }
   catch (error) {
     if (other) {
@@ -339,20 +438,27 @@ export const fetchAllEntries = async (webId: string, fetch: fetcher, entry: stri
   }));
   const retValue = updUrlsArr.flat();
   if (!retValue) return [];
-  console.log("this is what we ret");
-  console.log(retValue);
   return retValue;
 }
 
+/**
+* checks if a dataSet with given url exists on the user's POD, if it doesn't, creates it
+* @param   {string} webId webId of the user
+* @param   {fetcher} fetch fetch function
+* @param   {string} storagePref url of user's preferred storage location
+* @param   {string} prefFileLocation url of user's preference file location
+* @param   {string} podType denotes what access control mechanism user's POD uses, can be wac or acp
+* @param   {string} folderUrl url of the dataSet to check
+* @return  {Promise<SolidDataset>} dataSet with a given url if it exists
+*/
 export const checkFolderExistence = async (webId: string, fetch: fetcher, storagePref: string,
-  prefFileLocation: string, podType: string, folderUrl: string) => {
+  prefFileLocation: string, podType: string, folderUrl: string): Promise<SolidDataset> => {
   let dataSet;
   try {
     dataSet = await getSolidDataset(folderUrl, {
       fetch: fetch
     });
   }
-
   catch (error) {
     try {
       await createDefFolder(webId, fetch, storagePref, prefFileLocation, podType);
@@ -369,8 +475,19 @@ export const checkFolderExistence = async (webId: string, fetch: fetcher, storag
   return dataSet;
 }
 
+/**
+* saves given note on the user's POD
+* @param   {string} webId webId of the user
+* @param   {fetcher} fetch fetch function
+* @param   {Note} note note to save
+* @param   {string} storagePref url of user's preferred storage location
+* @param   {string | null} defFolder url of user's folder to store data for this application
+* @param   {string} prefFileLocation url of user's preference file location
+* @param   {string} podType denotes what access control mechanism user's POD uses, can be wac or acp
+* @return  {Promise<void>}
+*/
 export const saveNote = async (webId: string, fetch: fetcher, note: Note, storagePref: string,
-  defFolder: string | null, prefFileLocation: string, podType: string) => {
+  defFolder: string | null, prefFileLocation: string, podType: string): Promise<void> => {
   const notesFolder = `${defFolder}notes/`;
   let dataSet = await checkFolderExistence(webId, fetch, storagePref, prefFileLocation, podType, notesFolder);
   const id = note.id === null ? Date.now() + Math.floor(Math.random() * 1000) : note.id;
@@ -393,8 +510,19 @@ export const saveNote = async (webId: string, fetch: fetcher, note: Note, storag
     prefFileLocation, podType);
 }
 
+/**
+* saves given habit on the user's POD
+* @param   {string} webId webId of the user
+* @param   {fetcher} fetch fetch function
+* @param   {Habit} habit habit to save
+* @param   {string} storagePref url of user's preferred storage location
+* @param   {string | null} defFolder url of user's folder to store data for this application
+* @param   {string} prefFileLocation url of user's preference file location
+* @param   {string} podType denotes what access control mechanism user's POD uses, can be wac or acp
+* @return  {Promise<void>}
+*/
 export const saveHabit = async (webId: string, fetch: fetcher, habit: Habit, storagePref: string,
-  defFolder: string | null, prefFileLocation: string, podType: string) => {
+  defFolder: string | null, prefFileLocation: string, podType: string): Promise<void> => {
   const habitsFolder = `${defFolder}habits/`;
   let dataSet = await checkFolderExistence(webId, fetch, storagePref, prefFileLocation, podType, habitsFolder);
   const id = habit.id === null ? Date.now() + Math.floor(Math.random() * 1000) : habit.id;
@@ -439,10 +567,15 @@ export const saveHabit = async (webId: string, fetch: fetcher, habit: Habit, sto
     await initializeAcl(habitUrl, fetch);
   }
   await setPubAccess(webId, { read: false, append: false, write: false }, habitUrl, fetch, storagePref, prefFileLocation, podType);
-  return habitUrl;
 }
 
-export const setHabitThing = (habitToSave: Habit, newThing: Thing) => {
+/**
+* adds data of a given habit to a given thing
+* @param   {Habit} habitToSave habit to get data from
+* @param   {Thing} newThing a thing to update
+* @return  {ThingPersisted} a thing with updated data from a given habit
+*/
+export const setHabitThing = (habitToSave: Habit, newThing: Thing): ThingPersisted => {
   if (habitToSave.title) {
     newThing = setStringNoLocale(newThing, DCTERMS.title, habitToSave.title);
   }
@@ -484,10 +617,22 @@ export const setHabitThing = (habitToSave: Habit, newThing: Thing) => {
   return newThing;
 }
 
-export const editHabit = async (webId: string, fetch: fetcher, habitToSave: Habit, storagePref: string,
+/**
+* updates a given habit on the user's POD
+* @param   {string} webId webId of the user
+* @param   {fetcher} fetch fetch function
+* @param   {Habit} habitToEdit habit to edit
+* @param   {string} storagePref url of user's preferred storage location
+* @param   {string | null} defFolder url of user's folder to store data for this application
+* @param   {string} prefFileLocation url of user's preference file location
+* @param   {string} publicTypeIndexUrl url of user's public type index file
+* @param   {string} podType denotes what access control mechanism user's POD uses, can be wac or acp
+* @return  {Promise<void>}
+*/
+export const editHabit = async (webId: string, fetch: fetcher, habitToEdit: Habit, storagePref: string,
   defFolder: string | null, prefFileLocation: string, publicTypeIndexUrl: string, podType: string) => {
-  if (!habitToSave.id) {
-    await saveHabit(webId, fetch, habitToSave, storagePref, defFolder, prefFileLocation, podType);
+  if (!habitToEdit.id) {
+    await saveHabit(webId, fetch, habitToEdit, storagePref, defFolder, prefFileLocation, podType);
     return;
   }
   const urlsArr = await getAllUrlFromPublicIndex(webId, fetch, "habit", storagePref, publicTypeIndexUrl);
@@ -503,23 +648,23 @@ export const editHabit = async (webId: string, fetch: fetcher, habitToSave: Habi
     }
     if (isContainer(data)) {
       const allNotes = getContainedResourceUrlAll(data);
-      if (habitToSave.url && allNotes.includes(habitToSave.url)) {
+      if (habitToEdit.url && allNotes.includes(habitToEdit.url)) {
         let newDs
         try {
-          newDs = await getSolidDataset(habitToSave.url, { fetch: fetch });
+          newDs = await getSolidDataset(habitToEdit.url, { fetch: fetch });
         }
         catch (error) {
           let message = 'Unknown Error';
           if (error instanceof Error) message = error.message;
-          throw new Error(`Error when fetching dataset url: ${habitToSave.url} error: ${message}`);
+          throw new Error(`Error when fetching dataset url: ${habitToEdit.url} error: ${message}`);
         }
-        let newThing = getThing(newDs, habitToSave.url);
+        let newThing = getThing(newDs, habitToEdit.url);
         if (newThing) {
           const thingId = getInteger(newThing, schema.identifier);
-          if (thingId === habitToSave.id) {
-            newThing = setHabitThing(habitToSave, newThing);
+          if (thingId === habitToEdit.id) {
+            newThing = setHabitThing(habitToEdit, newThing);
             const updDataSet = setThing(newDs, newThing);
-            await saveSolidDatasetAt(habitToSave.url, updDataSet,
+            await saveSolidDatasetAt(habitToEdit.url, updDataSet,
               { fetch: fetch });
           }
         }
@@ -530,8 +675,8 @@ export const editHabit = async (webId: string, fetch: fetcher, habitToSave: Habi
       if (newThingArr) {
         newThingArr.forEach(async (newThing) => {
           const thingId = getInteger(newThing, schema.identifier);
-          if (thingId === habitToSave.id) {
-            newThing = setHabitThing(habitToSave, newThing);
+          if (thingId === habitToEdit.id) {
+            newThing = setHabitThing(habitToEdit, newThing);
             const updDataSet = setThing(data, newThing);
             await saveSolidDatasetAt(url, updDataSet, { fetch: fetch });
           }
@@ -541,8 +686,17 @@ export const editHabit = async (webId: string, fetch: fetcher, habitToSave: Habi
   }));
 };
 
-export const editNote = async (webId: string, fetch: fetcher, note: Note, storagePref: string,
-  publicTypeIndexUrl: string) => {
+/**
+* updates a given note on the user's POD
+* @param   {string} webId webId of the user
+* @param   {fetcher} fetch fetch function
+* @param   {Note} noteToEdit note to edit
+* @param   {string} storagePref url of user's preferred storage location
+* @param   {string} publicTypeIndexUrl url of user's public type index file
+* @return  {Promise<void>}
+*/
+export const editNote = async (webId: string, fetch: fetcher, noteToEdit: Note, storagePref: string,
+  publicTypeIndexUrl: string): Promise<void> => {
   const urlsArr = await getAllUrlFromPublicIndex(webId, fetch, "note", storagePref, publicTypeIndexUrl);
   await Promise.all(urlsArr.map(async (url) => {
     let data: SolidDataset & WithServerResourceInfo;
@@ -556,39 +710,39 @@ export const editNote = async (webId: string, fetch: fetcher, note: Note, storag
     }
     if (isContainer(data)) {
       const allNotes = getContainedResourceUrlAll(data);
-      if (allNotes.includes(note.url)) {
+      if (allNotes.includes(noteToEdit.url)) {
         let newDs;
         try {
-          newDs = await getSolidDataset(note.url, { fetch: fetch });
+          newDs = await getSolidDataset(noteToEdit.url, { fetch: fetch });
         }
         catch (error) {
           let message = 'Unknown Error';
           if (error instanceof Error) message = error.message;
-          throw new Error(`Error when fetching dataset url: ${note.url} error: ${message}`);
+          throw new Error(`Error when fetching dataset url: ${noteToEdit.url} error: ${message}`);
         }
-        let newThing = getThing(newDs, note.url);
+        let newThing = getThing(newDs, noteToEdit.url);
         if (newThing) {
           const thingId = getInteger(newThing, schema.identifier);
-          if (thingId === note.id) {
-            if (note.title) {
-              newThing = setStringNoLocale(newThing, DCTERMS.title, note.title);
+          if (thingId === noteToEdit.id) {
+            if (noteToEdit.title) {
+              newThing = setStringNoLocale(newThing, DCTERMS.title, noteToEdit.title);
             }
-            if (note.content) {
-              newThing = setStringNoLocale(newThing, schema.text, note.content);
+            if (noteToEdit.content) {
+              newThing = setStringNoLocale(newThing, schema.text, noteToEdit.content);
 
             }
-            if (note.category) {
-              newThing = setStringNoLocale(newThing, otherV.category, note.category);
+            if (noteToEdit.category) {
+              newThing = setStringNoLocale(newThing, otherV.category, noteToEdit.category);
 
             }
             const updDataSet = setThing(newDs, newThing);
-            await saveSolidDatasetAt(note.url, updDataSet,
+            await saveSolidDatasetAt(noteToEdit.url, updDataSet,
               { fetch: fetch });
           }
         }
       }
       else {
-        throw new Error(`Error when trying to edit note, url: ${note.url} doesn't exist in POD`);
+        throw new Error(`Error when trying to edit note, url: ${noteToEdit.url} doesn't exist in POD`);
       }
     }
     else {
@@ -596,19 +750,18 @@ export const editNote = async (webId: string, fetch: fetcher, note: Note, storag
       if (newThingArr) {
         newThingArr.forEach(async (newThing) => {
           const thingId = getInteger(newThing, schema.identifier);
-          if (thingId === note.id) {
-            if (note.title) {
-              newThing = setStringNoLocale(newThing, DCTERMS.title, note.title);
+          if (thingId === noteToEdit.id) {
+            if (noteToEdit.title) {
+              newThing = setStringNoLocale(newThing, DCTERMS.title, noteToEdit.title);
             }
-            if (note.content) {
-              newThing = setStringNoLocale(newThing, schema.text, note.content);
+            if (noteToEdit.content) {
+              newThing = setStringNoLocale(newThing, schema.text, noteToEdit.content);
 
             }
-            if (note.category) {
-              newThing = setStringNoLocale(newThing, otherV.category, note.category);
+            if (noteToEdit.category) {
+              newThing = setStringNoLocale(newThing, otherV.category, noteToEdit.category);
 
             }
-
             const updDataSet = setThing(data, newThing);
             await saveSolidDatasetAt(url, updDataSet, { fetch: fetch });
           }
@@ -618,10 +771,19 @@ export const editNote = async (webId: string, fetch: fetcher, note: Note, storag
   }));
 }
 
-export const deleteEntry = async (webId: string, fetch: fetcher, urlToDelete: string, type: string, storagePref: string,
-  publicTypeIndexUrl: string) => {
-  console.log(`deleteting : ${urlToDelete}`);
-  const urlsArr = await getAllUrlFromPublicIndex(webId, fetch, type, storagePref, publicTypeIndexUrl);
+/**
+* deletes an entry of a given type at a given url from the user's POD
+* @param   {string} webId webId of the user
+* @param   {fetcher} fetch fetch function
+* @param   {string} urlToDelete url of entry to delete
+* @param   {string} entry type of an entry to delete, can be note or habit
+* @param   {string} storagePref url of user's preferred storage location
+* @param   {string} publicTypeIndexUrl url of user's public type index file
+* @return  {Promise<void>}
+*/
+export const deleteEntry = async (webId: string, fetch: fetcher, urlToDelete: string, entry: string, storagePref: string,
+  publicTypeIndexUrl: string): Promise<void> => {
+  const urlsArr = await getAllUrlFromPublicIndex(webId, fetch, entry, storagePref, publicTypeIndexUrl);
   await Promise.all(urlsArr.map(async (url) => {
     const data = await getSolidDataset(url, { fetch: fetch });
     if (isContainer(data)) {
@@ -648,25 +810,34 @@ export const deleteEntry = async (webId: string, fetch: fetcher, urlToDelete: st
   }));
 }
 
-
-export const checkContacts = async (webId: string, fetch: fetcher, storage: string) => {
+/**
+* checks if user's POD has contacts/ container that contains contacts that can be fetched
+* @param   {fetcher} fetch fetch function
+* @param   {string} storagePref url of user's preferred storage location
+* @return  {Promise<boolean>}  true if user has contacts in contacts/ container that can be fetched and false otherwise
+*/
+export const checkContacts = async (fetch: fetcher, storagePref: string): Promise<boolean> => {
   try {
-    await getSolidDataset(`${storage}contacts/`, { fetch: fetch });
-    const contactsUrl = `${storage}contacts/Person/`;
+    await getSolidDataset(`${storagePref}contacts/`, { fetch: fetch });
+    const contactsUrl = `${storagePref}contacts/Person/`;
     await getSolidDataset(contactsUrl, { fetch: fetch });
     return true;
   }
   catch (error) {
-    console.log("this is error");
-    console.log(error);
     return false;
   }
 }
 
-export const fetchContacts = async (webId: string, fetch: fetcher, storage: string) => {
+/**
+* fetches all user's contacts
+* @param   {fetcher} fetch fetch function
+* @param   {string} storagePref url of user's preferred storage location
+* @return  {Promise<(string | null)[][]>}an array of arrays, each representing a contact, contains contact's name in the 0 index and contact's webId in the 1 index
+*/
+export const fetchContacts = async (fetch: fetcher, storagePref: string): Promise<(string | null)[][]> => {
   let newDs
   try {
-    newDs = await getSolidDataset(`${storage}contacts/people.ttl`, { fetch: fetch });
+    newDs = await getSolidDataset(`${storagePref}contacts/people.ttl`, { fetch: fetch });
   }
   catch (error) {
     let message = 'Unknown Error';
@@ -704,4 +875,62 @@ export const fetchContacts = async (webId: string, fetch: fetcher, storage: stri
   finalArr = finalArr as ((string | null)[])[]
   const ret: ((string | null)[])[] = finalArr as ((string | null)[])[];
   return ret;
+}
+
+export const createEntryInInbox = async (webId: string, otherWebId: string, fetch: fetcher, entry: string,
+  accessObj: accessObject, url: string) => {
+  const otherInboxUrl = await getInboxUrl(otherWebId, fetch);
+  let dataSet = createSolidDataset();
+  const id = Date.now() + Math.floor(Math.random() * 1000);
+  let aThing = buildThing(createThing())
+    .addBoolean(solid.read, false)
+    .addIri(schema.sender, webId)
+    .addIri(RDF.type, solid.Notification)
+    .addIri(solid.forClass, entry === "note" ? schema.TextDigitalDocument : voc.Habit)
+    .addInteger(schema.identifier, id)
+    .addIri(schema.url, url)
+    .build();
+  if (accessObj.read) {
+    aThing = addStringNoLocale(aThing, "http://purl.org/dc/terms/accessRights", "read");
+  }
+  if (accessObj.append) {
+    aThing = addStringNoLocale(aThing, "http://purl.org/dc/terms/accessRights", "append");
+  }
+  if (accessObj.write) {
+    aThing = addStringNoLocale(aThing, "http://purl.org/dc/terms/accessRights", "write");
+  }
+  dataSet = setThing(dataSet, aThing);
+  await saveSolidDatasetInContainer(otherInboxUrl, dataSet, { fetch: fetch });
+}
+
+export const getThingsFromInbox = async (webId: string, fetch: fetcher, update?: boolean) => {
+  const inboxUrl = await getInboxUrl(webId, fetch);
+  let dataSet;
+  try {
+    dataSet = await getSolidDataset(inboxUrl, {
+      fetch: fetch
+    });
+  }
+  catch (error) {
+    let message = 'Unknown Error';
+    if (error instanceof Error) message = error.message;
+    throw new Error(`error when fetching inbox file, it either doesn't exist, or has different location from the one specified in the webId, error: ${message}`);
+  }
+  const allUrl = getContainedResourceUrlAll(dataSet);
+  const arrOfThings = await Promise.all(allUrl.map(async (url) => {
+    let ds = await getSolidDataset(url, { fetch: fetch });
+    const allThings = getThingAll(ds);
+    if (update) {
+      await Promise.all(allThings.map(async (thing) => {
+        if ((getBoolean(thing, solid.read) === false) && (getIri(thing, RDF.type) === solid.Notification)) {
+          thing = setBoolean(thing, solid.read, true);
+          ds = setThing(ds, thing);
+          await saveSolidDatasetAt(url, ds, { fetch: fetch });
+        }
+      }));
+    }
+    return allThings;
+  }));
+  const updArr = arrOfThings.flat();
+  return updArr.filter((thing) => (getBoolean(thing, solid.read) === false) && (getIri(thing, RDF.type) === solid.Notification));
 }

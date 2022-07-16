@@ -186,7 +186,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
                     if (!NoteInp.url) {
                         throw new Error("Error, note you are trying to share doesn't have a url");
                     }
-                    await shareWith(webId, NoteInp.url, fetch, agentsToUpd[item], item, storagePref, prefFileLocation, podType);
+                    await shareWith(webId, NoteInp.url, fetch, agentsToUpd[item], item, storagePref, prefFileLocation, podType, "note");
                 }
             }
         }
@@ -309,4 +309,3 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
 }
 
 export default NoteCreator;
-

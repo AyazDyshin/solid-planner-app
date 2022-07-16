@@ -50,6 +50,30 @@ export const getStoragePref = async (webId: string, fetch: fetcher) => {
     }
 }
 
+export const getInboxUrl = async (webId: string, fetch: fetcher) => {
+    let dataSet;
+    try {
+        dataSet = await getSolidDataset(webId, {
+            fetch: fetch
+        });
+    }
+    catch (error) {
+        throw new Error("error occurred when trying to fetch user's webId");
+    }
+    const aThing = getThing(dataSet, webId);
+    console.log(aThing);
+    if (aThing) {
+        const firstData = getUrl(aThing, "http://www.w3.org/ns/ldp#inbox");
+        console.log(firstData);
+        if (firstData) {
+            return firstData;
+        }
+        throw new Error("error, for some reason you webId profile does not contain info about your inbox location");
+    }
+    else {
+        throw new Error("error, user's profile/card#me doesn't exist");
+    }
+}
 
 export const getPublicTypeIndexUrl = async (webId: string, fetch: fetcher) => {
     let dataSet;
@@ -116,7 +140,7 @@ export const getAccessType = async (webId: string, fetch: fetcher, storagePref: 
     }
     let type = await getStringNoLocale(aThing, voc.accessType);
     if (type === null) {
-        await recordAccessType(webId, fetch, storagePref, prefFileLocation, podType);
+        await recordAccessType(fetch, prefFileLocation, podType);
         try {
             dataSet = await getSolidDataset(prefFileLocation, {
                 fetch: fetch
@@ -140,7 +164,7 @@ export const getAccessType = async (webId: string, fetch: fetcher, storagePref: 
 }
 
 
-export const getAllUrlFromPublicIndex = async (webId: string, fetch: fetcher, type: string, storagePref: string,
+export const getAllUrlFromPublicIndex = async (webId: string, fetch: fetcher, entry: string, storagePref: string,
     publicTypeIndexUrl: string, other?: boolean
 ) => {
     if (other) {
@@ -155,7 +179,7 @@ export const getAllUrlFromPublicIndex = async (webId: string, fetch: fetcher, ty
         }
         publicTypeIndexUrl = newPublicTypeUrl;
     }
-    const typeToGet = (type === "note" ? schema.TextDigitalDocument : voc.Habit);
+    const typeToGet = (entry === "note" ? schema.TextDigitalDocument : voc.Habit);
     let dataSet;
     try {
         dataSet = await getSolidDataset(publicTypeIndexUrl, { fetch: fetch });
@@ -169,11 +193,11 @@ export const getAllUrlFromPublicIndex = async (webId: string, fetch: fetcher, ty
     let updThings = allThing.filter((thing) => getUrl(thing, solid.forClass) === typeToGet)
         .map((thing) => getUrl(thing, solid.instance)).filter((url) => url) as string[];
     if (updThings === []) {
-        if (type === 'note') {
-            await createEntriesInTypeIndex(webId, fetch, "note", storagePref, publicTypeIndexUrl);
+        if (entry === 'note') {
+            await createEntriesInTypeIndex(fetch, "note", storagePref, publicTypeIndexUrl);
         }
         else {
-            await createEntriesInTypeIndex(webId, fetch, "habit", storagePref, publicTypeIndexUrl);
+            await createEntriesInTypeIndex(fetch, "habit", storagePref, publicTypeIndexUrl);
         }
         try {
             dataSet = await getSolidDataset(publicTypeIndexUrl, { fetch: fetch });

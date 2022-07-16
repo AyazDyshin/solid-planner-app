@@ -43,7 +43,7 @@ const MainContent = () => {
   const [refetchNotes, setRefetchNotes] = useState<boolean>(false);
   const [refetchContacts, setRefetchContacts] = useState<boolean>(false);
   const [refetchHabits, setRefetchHabits] = useState<boolean>(false);
-
+  const [refetchNotifications, setRefetchNotifications] = useState<boolean>(false);
   useEffect(() => {
     const check = async () => {
       setIsLoading(true);
@@ -65,7 +65,7 @@ const MainContent = () => {
       setPermissionStatus(result);
       const wssUrl = new URL(updStoragePref);
       wssUrl.protocol = 'wss';
-      //const inboxUrl = `${updStoragePref}inbox/`;
+      const inboxUrl = `${updStoragePref}inbox/`;
       const contactsUrl = `${updStoragePref}contacts/`;
       if (updPodType == 'acp') {
         const websocket3 = new WebsocketNotification(
@@ -95,6 +95,7 @@ const MainContent = () => {
         socket.onopen = function () {
           this.send(`sub ${updPublicTypeIndexUrl}`);
           this.send(`sub ${contactsUrl}`);
+          this.send(`sub ${inboxUrl}`);
         };
         socket.onmessage = function (msg) {
           if (msg.data && msg.data.slice(0, 3) === 'pub') {
@@ -108,6 +109,11 @@ const MainContent = () => {
               setContactsFetched(false);
               setContactsFdrStatus(false);
               setRefetchContacts(!refetchContacts);
+            }
+
+            if (msg.data === `pub ${inboxUrl}`) {
+              setRefetchNotifications(!refetchNotifications);
+
             }
           }
         };
@@ -135,6 +141,8 @@ const MainContent = () => {
             links={links}
             active={active}
             setActive={setActive}
+            refetchNotifications={refetchNotifications}
+            podType={podType}
           />
           <ContentToRender
             refetchHabits={refetchHabits}

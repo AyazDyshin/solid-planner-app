@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { fetchAllEntries, thingToHabit, editHabit, deleteEntry } from '../services/SolidPod';
 import { BsCircle } from "react-icons/bs";
 import { Habit } from './types';
-import { capitalizeFirstLetter, extractCategories, filterByAccess, filterByCategory, setStreaks } from '../services/helpers';
+import { capitalizeFirstLetter, extractCategories, filterByAccess, filterByCategory, setStreaks, getHabitsToday } from '../services/helpers';
 import { OverlayTrigger, Popover, Badge, Spinner, Button, ButtonGroup, Container, Nav, Navbar, NavDropdown }
   from 'react-bootstrap';
 import { BiFolder } from 'react-icons/bi';
@@ -84,6 +84,7 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
         if (currentCategory) filteredHabits = filterByCategory(filteredHabits, currentCategory);
         if (currentAccess) filteredHabits = filterByAccess(filteredHabits, currentAccess);
         if (currentView === 'today') {
+          filteredHabits = getHabitsToday(filteredHabits);
           filteredHabits.forEach((habit) => {
             temp.map((habit2) => {
               if (habit.id === habit2.id) {

@@ -7,6 +7,7 @@ import { ACP } from "@inrupt/vocab-solid";
 import { accessObject, fetcher } from "../components/types";
 import { changeAccessAcp, getAcpAccess } from "./helperAccess";
 import { getAccessType } from "./podGetters";
+import { createEntryInInbox } from "./SolidPod";
 
 /* 
 this function is used to defaultAccessControlAgentMatcherAppendPolicyialize Acl for resources stored on PODs utilizing WAC access type that don't have acl attached,
@@ -95,13 +96,10 @@ export const setPubAccess = async (webId: string, accessObj: accessObject, url: 
 
 // this function is used to give read permission to specific Agents. Used for both WAC and ACP PODs
 export const shareWith = async (webId: string, url: string, fetch: fetcher, accessObj: accessObject,
-    shareWith: string, storagePref: string, prefFileLocation: string, podType: string) => {
-
+    shareWith: string, storagePref: string, prefFileLocation: string, podType: string, entry: string) => {
     const type = await getAccessType(webId, fetch, storagePref, prefFileLocation, podType);
-
     if (type === "wac") {
         try {
-
             const upd = await universalAccess.setAgentAccess(url, shareWith, {
                 read: accessObj.read,
                 append: accessObj.append,
@@ -129,12 +127,15 @@ export const shareWith = async (webId: string, url: string, fetch: fetcher, acce
                 throw new Error(`The current user does not have permission to change access rights to this resource, url: ${url}`);
             }
         }
+        if (accessObj.read) {
+            await createEntryInInbox(webId, shareWith, fetch, entry, accessObj, url);
+        }
     }
-
     else {
         await changeAccessAcp(url, accessObj, shareWith, fetch);
     }
 }
+
 
 export const getSharedList = async (webId: string, url: string, fetch: fetcher, storagePref: string, prefFileLocation: string,
     podType: string) => {

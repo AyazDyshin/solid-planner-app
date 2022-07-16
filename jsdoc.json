@@ -1,0 +1,35 @@
+{
+    "source": {
+        "include": [
+            "src",
+            "package.json",
+            "README.md"
+        ],
+        "includePattern": "\\.(jsx|js|ts|tsx)$",
+        "excludePattern": "(node_modules/|docs)"
+    },
+    "tags": {
+        "allowUnknownTags": [
+            "optional"
+        ]
+    },
+    "plugins": [
+        "plugins/markdown",
+        "node_modules/better-docs/typescript"
+    ],
+    "opts": {
+        "encoding": "utf8",
+        "readme": "./README.md",
+        "destination": "docs/",
+        "recurse": true,
+        "verbose": true,
+        "template": "node_modules/better-docs",
+        "theme_opts": {
+            "default_theme": "dark"
+        }
+    },
+    "markdown": {
+        "hardwrap": false,
+        "idInHeadings": true
+    }
+}

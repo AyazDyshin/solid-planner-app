@@ -41,10 +41,10 @@ const ContactsRender = ({ storagePref, publicTypeIndexUrl, prefFileLocation, pod
         const initialize = async () => {
             setIsLoading(true);
             if (!contactsFetched) {
-                const contactsStatus = await checkContacts(webId, fetch, storagePref);
+                const contactsStatus = await checkContacts(fetch, storagePref);
                 setContactsFdrStatus(contactsStatus);
                 if (contactsStatus) {
-                    const namesAndIds = await fetchContacts(webId, fetch, storagePref);
+                    const namesAndIds = await fetchContacts(fetch, storagePref);
                     setContactsArr(namesAndIds);
                     namesAndIds.map((pair) => pair[0] ? pair[0] : pair[1]);
                 }

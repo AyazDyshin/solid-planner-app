@@ -1,5 +1,9 @@
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
-
+/**
+ * Interface that represents a note
+ *
+ * @interface
+ */
 export interface Note {
   id: number | null;
   title: string | null;
@@ -30,6 +34,14 @@ export interface Habit {
   color: string;
   shareList?: Record<string, AccessModes>;
   custom?: number[] | number | null;
+}
+export interface appNotification {
+  id: number;
+  url: string;
+  status: boolean;
+  sender: string;
+  access: accessObject;
+  entryType: string;
 }
 
 export type withCategory = object & { category: string | null; };

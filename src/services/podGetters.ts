@@ -61,10 +61,8 @@ export const getInboxUrl = async (webId: string, fetch: fetcher) => {
         throw new Error("error occurred when trying to fetch user's webId");
     }
     const aThing = getThing(dataSet, webId);
-    console.log(aThing);
     if (aThing) {
         const firstData = getUrl(aThing, "http://www.w3.org/ns/ldp#inbox");
-        console.log(firstData);
         if (firstData) {
             return firstData;
         }

@@ -8,10 +8,10 @@ import { checkInsToObj } from '../services/helpers';
 interface Props {
     calendarModalState: boolean;
     setCalendarModalState: React.Dispatch<React.SetStateAction<boolean>>;
-    habitInp: Habit;
+    habitsInp: Habit[];
 }
 
-const CalendarModal = ({ calendarModalState, setCalendarModalState, habitInp }: Props) => {
+const CalendarModal = ({ calendarModalState, setCalendarModalState, habitsInp }: Props) => {
     const handleClose = () => {
         setCalendarModalState(false);
     }
@@ -22,7 +22,9 @@ const CalendarModal = ({ calendarModalState, setCalendarModalState, habitInp }: 
                 <FullCalendar
                     plugins={[dayGridPlugin]}
                     initialView="dayGridMonth"
-                    events={checkInsToObj(habitInp)}
+                    events={habitsInp.map((habit) => {
+                        return checkInsToObj(habit)
+                    }).flat()}
                 />
             </Modal.Body>
         </Modal>

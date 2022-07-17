@@ -1,5 +1,5 @@
 import "../styles.css";
-import { Button, ButtonGroup, Dropdown, DropdownButton, FormControl, InputGroup, Modal } from 'react-bootstrap';
+import { Button, ButtonGroup, Dropdown, DropdownButton, Form, FormControl, InputGroup, Modal } from 'react-bootstrap';
 import { accessObject, Habit } from './types';
 import { BsThreeDots, BsShare } from "react-icons/bs";
 import { FiEdit } from "react-icons/fi";
@@ -87,7 +87,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
   const [performDelete, setPerformDelete] = useState<boolean>(false);
   const [urlToDelete, setUrlToDelete] = useState<string | null>(null);
   const [deleteModalState, setDeleteModalState] = useState<boolean>(false);
-
+  const arrOfRec = ['daily', 'weekly', 'monthly', 'yearly', 'custom'];
   useEffect(() => {
     if (habitChanged) {
       handleSave();
@@ -262,6 +262,18 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
     setHabitChanged(true);
   };
 
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    if (e.target.value === 'custom') {
+      setHabitInp(prevState => ({ ...prevState, recurrence: 'custom' }))
+      setCustomHabitModalState(true);
+      setHabitChanged(true);
+    }
+    else {
+      setHabitInp(prevState => ({ ...prevState, recurrence: e.target.value }));
+      setHabitInp(prevState => ({ ...prevState, custom: null }));
+      setHabitChanged(true);
+    }
+  }
   const handleEdit = () => {
     isEdit ? setIsEdit(false) : setIsEdit(true);
   };
@@ -305,7 +317,18 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
           <InputGroup className="w-100">
             <InputGroup.Text id="basic-addon1" style={{ 'width': '60%' }}>Repeat:</InputGroup.Text>
             <div className="d-grid">
-              <DropdownButton
+              <Form.Select
+                value={habitInp.recurrence ? habitInp.recurrence : 'daily'}
+                onChange={handleSelectChange}
+              >
+                {
+                  arrOfRec.map((rec, index) => {
+                    return <option key={Date.now() + index + Math.floor(Math.random() * 1000)} value={rec}
+                    >{capitalizeFirstLetter(rec)}</option>
+                  })
+                }
+              </Form.Select>
+              {/* <DropdownButton
                 menuVariant="dark"
                 variant="outline-secondary"
                 title={capitalizeFirstLetter(habitInp.recurrence)}
@@ -338,7 +361,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
                   setCustomHabitModalState(true);
                   setHabitChanged(true);
                 }}>Custom</Dropdown.Item>
-              </DropdownButton>
+              </DropdownButton> */}
             </div>
           </InputGroup>
           {viewerStatus && <InputGroup className="w-100">
@@ -400,7 +423,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
       <CalendarModal
         calendarModalState={calendarModalState}
         setCalendarModalState={setCalendarModalState}
-        habitInp={habitInp}
+        habitsInp={[habitInp]}
       />
       <CustomHabitModal
         customHabitModalState={customHabitModalState}

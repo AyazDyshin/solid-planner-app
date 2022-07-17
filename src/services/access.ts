@@ -47,7 +47,6 @@ export const initializeAcl = async (url: string, fetch: fetcher) => {
 
 export const determineAccess = async (webId: string, url: string, fetch: fetcher, storagePref: string, prefFileLocation: string,
     podType: string) => {
-    console.log("in det Access");
     let accType;
     const pubAcc = await getPubAccess(webId, url, fetch, storagePref, prefFileLocation, podType);
     pubAcc.read ? accType = { "public": pubAcc } : accType = { "private": pubAcc };

@@ -256,8 +256,6 @@ export const getHabitsToday = (allHab: Habit[]) => {
     const allHabits = allHab;
     const today = new Date();
     const habitsToday = allHabits.filter((habit) => {
-        console.log("this is habit");
-        console.log(habit);
         let toCheckDate = habit.lastCheckInDate ? habit.lastCheckInDate : habit.startDate;
         if (!toCheckDate) {
             habit.startDate = new Date();
@@ -266,10 +264,7 @@ export const getHabitsToday = (allHab: Habit[]) => {
         if (toCheckDate === null) {
             throw new Error("error: on of the habits doesn't have an assigned start date");
         }
-        console.log("this is toCheckDate");
-        console.log(toCheckDate);
         if (!habit.stat) {
-            console.log("here 0");
             if (habit.currentStreak && habit.currentStreak !== 0) {
                 if (habit.recurrence === "daily") {
                     if (differenceInCalendarDays(toCheckDate, today) > 1) {
@@ -357,10 +352,8 @@ export const getHabitsToday = (allHab: Habit[]) => {
             }
         }
         else {
-            console.log("here 1");
             if (habit.currentStreak && habit.currentStreak !== 0) {
                 if (habit.recurrence === "daily") {
-                    console.log("here 2");
                     if (differenceInCalendarDays(toCheckDate, today) > 1) {
                         habit = habitUpdBest(habit);
                         habit.currentStreak = 0;
@@ -387,12 +380,10 @@ export const getHabitsToday = (allHab: Habit[]) => {
             }
             switch (habit.recurrence) {
                 case "daily": {
-                    console.log("here 3");
 
                     if (isSameDay(toCheckDate, today)) return true;
 
                     else {
-                        console.log("here 4");
                         habit.stat = false;
                         return true;
                     }

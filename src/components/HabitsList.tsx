@@ -71,8 +71,6 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
             filteredHabits.push(item);
           }
         }
-        console.log("this is filtered");
-        console.log(filteredHabits);
         setHabitsArray(filteredHabits);
         setHabitsFetched(true);
       }

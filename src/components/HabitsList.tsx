@@ -14,6 +14,7 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import DeleteModal from '../modals/DeleteModal';
 import { MdCreate } from 'react-icons/md';
 import { FiClock } from 'react-icons/fi';
+import CalendarModal from '../modals/CalendarModal';
 
 interface Props {
   setViewerStatus: React.Dispatch<React.SetStateAction<boolean>>;
@@ -59,6 +60,7 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
   const [performDelete, setPerformDelete] = useState<boolean>(false);
   const [urlToDelete, setUrlToDelete] = useState<string | null>(null);
   const [deleteModalState, setDeleteModalState] = useState<boolean>(false);
+  const [calendarModalState, setCalendarModalState] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchHabits = async () => {
@@ -287,6 +289,16 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
                     <OverlayTrigger placement="right" overlay={
                       <Popover>
                         <Popover.Body className="py-1 px-1">
+                          View current list of habits in calendar
+                        </Popover.Body>
+                      </Popover>}>
+                      <Nav.Link className="me-auto" onClick={()=>{
+                        setCalendarModalState(true)
+                      }}><MdCreate /> Calendar</Nav.Link>
+                    </OverlayTrigger>
+                    <OverlayTrigger placement="right" overlay={
+                      <Popover>
+                        <Popover.Body className="py-1 px-1">
                           Create a new habit
                         </Popover.Body>
                       </Popover>}>
@@ -445,6 +457,11 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
             setHabitsArray={setHabitsArray}
             setViewerStatus={setViewerStatus}
             setCreatorStatus={setCreatorStatus}
+          />
+          <CalendarModal
+            calendarModalState={calendarModalState}
+            setCalendarModalState={setCalendarModalState}
+            habitsInp={habitsToShow}
           />
         </div >
       )

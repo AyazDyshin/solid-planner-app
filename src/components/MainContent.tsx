@@ -6,7 +6,7 @@ import Test from "./Test";
 import { checkPermissions, isWacOrAcp } from "../services/access";
 import { useSession } from "@inrupt/solid-ui-react";
 import { Spinner } from "react-bootstrap";
-import { recordDefaultFolder } from "../services/SolidPod";
+import { checkPubTypeIndex, recordDefaultFolder } from "../services/SolidPod";
 import { Habit, Note } from "./types";
 import { getDefaultFolder, getPrefLink, getPublicTypeIndexUrl, getStoragePref } from "../services/podGetters";
 import NoPermissions from "./NoPermissions";
@@ -56,6 +56,7 @@ const MainContent = () => {
       const updPodType = await isWacOrAcp(updStoragePref, fetch);
       setPodType(updPodType);
       let defFolderUpd = await getDefaultFolder(webId, fetch, updPrefFileLocation);
+      await checkPubTypeIndex(updPublicTypeIndexUrl, fetch, updStoragePref);
       if (!defFolderUpd) {
         await recordDefaultFolder(webId, fetch, updStoragePref, updPrefFileLocation, updPublicTypeIndexUrl, updPodType);
       }

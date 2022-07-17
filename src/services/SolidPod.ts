@@ -943,7 +943,7 @@ export const getThingsFromInbox = async (webId: string, fetch: fetcher, update?:
   return updArr.filter((thing) => (getBoolean(thing, solid.read) === false) && (getIri(thing, RDF.type) === solid.Notification));
 }
 
-const checkPubTypeIndex = async (publicTypeIndexUrl: string, fetch: fetcher, storagePref: string) => {
+export const checkPubTypeIndex = async (publicTypeIndexUrl: string, fetch: fetcher, storagePref: string) => {
   let dataSet;
   try {
     dataSet = await getSolidDataset(publicTypeIndexUrl, {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Button, FormControl, InputGroup, DropdownButton, Dropdown, Form } from "react-bootstrap";
+import { Modal, Button, FormControl, InputGroup, Form } from "react-bootstrap";
 import { Note, Habit } from "../components/types";
 
 interface Props {
@@ -18,7 +18,6 @@ const CategoryModal = ({ categoryModalState, setCategoryModalState, setNoteInp,
     noteInp, viewerStatus, categoryArray, habitInp, setHabitInp, setEntryChanged }: Props) => {
     const [input, setInput] = useState<string>("");
     const [areaValue, setAreaValue] = useState<string>("");
-    const [selectValue, setSelectValue] = useState<string>("");
 
     useEffect(() => {
         if (noteInp) {
@@ -31,7 +30,7 @@ const CategoryModal = ({ categoryModalState, setCategoryModalState, setNoteInp,
                 setInput(habitInp.category);
             }
         }
-    },[habitInp, noteInp]);
+    }, [habitInp, noteInp]);
     const handleSave = () => {
         if (noteInp && setNoteInp) {
             if (noteInp.category !== input.trim()) {
@@ -54,7 +53,7 @@ const CategoryModal = ({ categoryModalState, setCategoryModalState, setNoteInp,
             setInput("");
         }
         else {
-        setInput(e.target.value);
+            setInput(e.target.value);
         }
     }
     return (

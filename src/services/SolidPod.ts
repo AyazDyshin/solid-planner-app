@@ -918,7 +918,15 @@ export const getThingsFromInbox = async (webId: string, fetch: fetcher, update?:
   }
   const allUrl = getContainedResourceUrlAll(dataSet);
   const arrOfThings = await Promise.all(allUrl.map(async (url) => {
-    let ds = await getSolidDataset(url, { fetch: fetch });
+    let ds: SolidDataset;
+    try {
+      ds = await getSolidDataset(url, { fetch: fetch });
+    }
+    catch (error) {
+      let message = 'Unknown Error';
+      if (error instanceof Error) message = error.message;
+      throw new Error(`error when fetching a dataset with inbox file, it either doesn't exist,or it was a server error, error: ${message}`);
+    }
     const allThings = getThingAll(ds);
     if (update) {
       await Promise.all(allThings.map(async (thing) => {
@@ -933,4 +941,26 @@ export const getThingsFromInbox = async (webId: string, fetch: fetcher, update?:
   }));
   const updArr = arrOfThings.flat();
   return updArr.filter((thing) => (getBoolean(thing, solid.read) === false) && (getIri(thing, RDF.type) === solid.Notification));
+}
+
+const checkPubTypeIndex = async (publicTypeIndexUrl: string, fetch: fetcher, storagePref: string) => {
+  let dataSet;
+  try {
+    dataSet = await getSolidDataset(publicTypeIndexUrl, {
+      fetch: fetch
+    });
+  }
+  catch (error) {
+    let message = 'Unknown Error';
+    if (error instanceof Error) message = error.message;
+    throw new Error(`error when fetching public type index file, it either doesn't exist, or has different location from the one specified in the webId, error: ${message}`);
+  }
+
+  const allThings = getThingAll(dataSet);
+  const newArr = allThings.map((thing) => {
+    return getIri(thing, solid.forClass);
+  });
+  if (!newArr.includes(schema.TextDigitalDocument)) await createEntriesInTypeIndex(fetch, "note", storagePref, publicTypeIndexUrl);
+  if (!newArr.includes(voc.Habit)) await createEntriesInTypeIndex(fetch, "habit", storagePref, publicTypeIndexUrl);
+
 }

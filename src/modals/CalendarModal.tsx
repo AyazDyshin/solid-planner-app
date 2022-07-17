@@ -18,11 +18,13 @@ const CalendarModal = ({ calendarModalState, setCalendarModalState, habitInp }: 
 
     return (
         <Modal show={calendarModalState} onHide={handleClose}>
-            <FullCalendar
-                plugins={[dayGridPlugin]}
-                initialView="dayGridMonth"
-                events={checkInsToObj(habitInp)}
-            />
+            <Modal.Body>
+                <FullCalendar
+                    plugins={[dayGridPlugin]}
+                    initialView="dayGridMonth"
+                    events={checkInsToObj(habitInp)}
+                />
+            </Modal.Body>
         </Modal>
     )
 }

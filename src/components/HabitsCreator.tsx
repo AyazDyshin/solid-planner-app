@@ -374,7 +374,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
           </InputGroup>}
           <InputGroup className="w-100">
             <InputGroup.Text className="text-center" id="basic-addon1" style={{ 'width': '60%' }}>Color:</InputGroup.Text>
-            <Button onClick={() => setShowColorPicker(true)} style={{ "backgroundColor": habitInp.color, 'width': '25%' }}>
+            <Button {...(!isEdit && { disabled: true })} onClick={() => setShowColorPicker(true)} style={{ "backgroundColor": habitInp.color, 'width': '25%' }}>
             </Button>
           </InputGroup>
         </div>
@@ -386,9 +386,11 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
           onChange={handleChange}
         />
       </div>
-      <div className="d-flex justify-content-center my-1">
-        <Button onClick={() => setCalendarModalState(true)}> View in a calendar</Button>
-      </div>
+      {
+        viewerStatus && <div className="d-flex justify-content-center my-1">
+          <Button onClick={() => setCalendarModalState(true)}> View in a calendar</Button>
+        </div>
+      }
       <Modal show={showColorPicker} onHide={() => { setShowColorPicker(false) }}>
         <Modal.Header closeButton>
           <Modal.Title>Pick a color</Modal.Title>

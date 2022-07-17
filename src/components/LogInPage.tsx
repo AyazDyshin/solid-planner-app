@@ -38,7 +38,7 @@ const LogInPage = () => {
               setIssuer("https://solidweb.org")
             }}>Solidweb.org</Dropdown.Item>
           </DropdownButton>
-          <FormControl aria-label="Text input with dropdown button" value={issuer}
+          <FormControl className="provider-input" aria-label="Text input with dropdown button" value={issuer}
             onChange={(e) => {
               setIssuer(e.target.value);
             }} />
@@ -48,7 +48,7 @@ const LogInPage = () => {
             oidcIssuer={issuer}
             redirectUrl={window.location.href}
           >
-            <Button className="w-100">Log in</Button></LoginButton>
+            <Button className="login-button w-100">Log in</Button></LoginButton>
         </div>
         <div className="d-flex justify-content-center mt-3">
           <a href="https://solidproject.org/" target="_blank"

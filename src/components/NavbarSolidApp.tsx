@@ -65,8 +65,8 @@ const NavbarSolidApp = ({ links, active, setActive, refetchNotifications, podTyp
     }
     const popover = (
         <Popover id="popover-basic">
-            <Popover.Header className="d-flex" as="h3">Inbox <Button onClick={handleDismiss}
-                className="ms-auto" variant="outline-info" size="sm">Dismiss all</Button></Popover.Header>
+            <Popover.Header className="d-flex" as="h3">Inbox {inboxArray.length !== 0 && <Button onClick={handleDismiss}
+                className="ms-auto" variant="outline-info" size="sm">Dismiss all</Button>}</Popover.Header>
             <Popover.Body style={{ "overflowY": "scroll", "maxHeight": "70vh" }}>
                 {
                     inboxArray.length === 0 && <div>
@@ -121,8 +121,8 @@ const NavbarSolidApp = ({ links, active, setActive, refetchNotifications, podTyp
                                 </Nav.Link>
                             </OverlayTrigger >
                         }
-                        <LogoutButton onError={onError} >
-                            <Nav.Link><FiLogOut /> Log out</Nav.Link>
+                        <LogoutButton onError={onError}>
+                            <Nav.Link className="logout-button"><FiLogOut /> Log out</Nav.Link>
                         </LogoutButton>
                     </Nav>
                 </Navbar.Collapse>

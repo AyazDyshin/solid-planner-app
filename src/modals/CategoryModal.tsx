@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Modal, Button, FormControl, InputGroup, DropdownButton, Dropdown } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Modal, Button, FormControl, InputGroup, DropdownButton, Dropdown, Form } from "react-bootstrap";
 import { Note, Habit } from "../components/types";
 
 interface Props {
@@ -17,7 +17,21 @@ interface Props {
 const CategoryModal = ({ categoryModalState, setCategoryModalState, setNoteInp,
     noteInp, viewerStatus, categoryArray, habitInp, setHabitInp, setEntryChanged }: Props) => {
     const [input, setInput] = useState<string>("");
+    const [areaValue, setAreaValue] = useState<string>("");
+    const [selectValue, setSelectValue] = useState<string>("");
 
+    useEffect(() => {
+        if (noteInp) {
+            if (noteInp.category !== null && noteInp.category !== '') {
+                setInput(noteInp.category);
+            }
+        }
+        if (habitInp) {
+            if (habitInp.category !== null && habitInp.category !== '') {
+                setInput(habitInp.category);
+            }
+        }
+    },[habitInp, noteInp]);
     const handleSave = () => {
         if (noteInp && setNoteInp) {
             if (noteInp.category !== input.trim()) {
@@ -35,7 +49,14 @@ const CategoryModal = ({ categoryModalState, setCategoryModalState, setNoteInp,
         }
         setCategoryModalState(false);
     }
-
+    const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        if (e.target.value === 'no category') {
+            setInput("");
+        }
+        else {
+        setInput(e.target.value);
+        }
+    }
     return (
         <Modal show={categoryModalState}>
             <Modal.Header closeButton onClick={() => { setCategoryModalState(false) }}>
@@ -44,31 +65,33 @@ const CategoryModal = ({ categoryModalState, setCategoryModalState, setNoteInp,
             <Modal.Body>
                 <div className="d-flex justify-content-center mb-3">
                     {
-                        categoryArray.length !== 0 && <DropdownButton
-                            variant="outline-secondary"
-                            title="choose existing category"
-                            menuVariant="dark"
+                        categoryArray.length !== 0 && <Form.Select
+                            value={input}
+                            onChange={handleSelectChange}
                         >
+                            <option value="no category">No category</option>
                             {
                                 categoryArray.map((category, index) => {
-                                    return <Dropdown.Item href="" key={Date.now() + index + Math.floor(Math.random() * 1000)}
-                                        onClick={() => setInput(category)}>{category}</Dropdown.Item>
+                                    return <option key={Date.now() + index + Math.floor(Math.random() * 1000)} value={category}
+                                    >{category}</option>
                                 })
                             }
-
-                        </DropdownButton>
+                        </Form.Select>
                     }
                 </div>
                 <InputGroup>
                     <InputGroup.Text>
                         New:
                     </InputGroup.Text>
-                    <FormControl aria-describedby="basic-addon3" value={input} onChange={e => setInput(e.target.value)} />
+                    <FormControl aria-describedby="basic-addon3" value={areaValue} onChange={e => {
+                        setInput(e.target.value)
+                        setAreaValue(e.target.value);
+                    }} />
                 </InputGroup>
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="secondary" value={input} onClick={() => setCategoryModalState(false)}>Go Back</Button>
-                <Button variant="primary" onClick={handleSave}>save</Button>
+                <Button variant="secondary" onClick={() => setCategoryModalState(false)}>Go Back</Button>
+                <Button variant="primary" onClick={handleSave}>set</Button>
             </Modal.Footer>
         </Modal>
     );

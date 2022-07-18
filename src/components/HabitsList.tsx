@@ -15,6 +15,7 @@ import DeleteModal from '../modals/DeleteModal';
 import { MdCreate } from 'react-icons/md';
 import { FiClock } from 'react-icons/fi';
 import CalendarModal from '../modals/CalendarModal';
+import { BsCalendar3Event } from 'react-icons/bs';
 
 interface Props {
   setViewerStatus: React.Dispatch<React.SetStateAction<boolean>>;
@@ -292,9 +293,9 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
                           View current list of habits in calendar
                         </Popover.Body>
                       </Popover>}>
-                      <Nav.Link className="me-auto" onClick={()=>{
+                      <Nav.Link className="me-auto" onClick={() => {
                         setCalendarModalState(true)
-                      }}><MdCreate /> Calendar</Nav.Link>
+                      }}><BsCalendar3Event /> Calendar</Nav.Link>
                     </OverlayTrigger>
                     <OverlayTrigger placement="right" overlay={
                       <Popover>

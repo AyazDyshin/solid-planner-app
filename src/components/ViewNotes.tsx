@@ -1,6 +1,8 @@
 import React, { useState } from "react";
-import { Badge, Button } from "react-bootstrap";
+import { Badge, Container, Nav, Navbar } from "react-bootstrap";
 import { Note } from "./types";
+import { MdOutlineArrowBackIosNew } from 'react-icons/md';
+
 interface Props {
     setOtherWebId: React.Dispatch<React.SetStateAction<string | null>>;
     notesArray: (Note | null)[];
@@ -17,14 +19,23 @@ const ViewNotes = ({ setOtherWebId, notesArray, setNoteToView, setViewerStatus, 
     return (
         <div className="w-100 h-100">
             <div className="d-flex">
-                <Button onClick={() => {
-                    setIsLoading(true);
-                    setViewerStatus(false);
-                    setNoteToView(null);
-                    setOtherWebId(null);
-                }}>Go Back</Button>
+                <Navbar expand="lg" bg="warning" variant="light" className="w-100">
+                    <Container>
+                        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                        <Navbar.Collapse id="basic-navbar-nav">
+                            <Nav className="me-auto">
+                                <Nav.Link onClick={() => {
+                                    setIsLoading(true);
+                                    setViewerStatus(false);
+                                    setNoteToView(null);
+                                    setOtherWebId(null);
+                                }}><MdOutlineArrowBackIosNew /> Go Back</Nav.Link>
+                            </Nav>
+                        </Navbar.Collapse>
+                    </Container>
+                </Navbar>
             </div>
-            <div className="list-group w-100 h-100">
+            <div className="list-group w-100 h-80">
                 {
                     notesArray.map((note, index) => {
                         if (note) {

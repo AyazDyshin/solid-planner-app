@@ -19,6 +19,7 @@ import SharedModal from "../modals/SharedModal";
 import { ColorResult, TwitterPicker } from "react-color";
 import CalendarModal from "../modals/CalendarModal";
 import DeleteModal from "../modals/DeleteModal";
+import { BsCalendar3Event } from 'react-icons/bs';
 
 interface Props {
   habitInp: Habit;
@@ -317,7 +318,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
           <InputGroup className="w-100">
             <InputGroup.Text id="basic-addon1" style={{ 'width': '60%' }}>Repeat:</InputGroup.Text>
             <div className="d-grid">
-              <Form.Select
+              <Form.Select {...(!isEdit && { disabled: true })}
                 value={habitInp.recurrence ? habitInp.recurrence : 'daily'}
                 onChange={handleSelectChange}
               >
@@ -328,40 +329,6 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
                   })
                 }
               </Form.Select>
-              {/* <DropdownButton
-                menuVariant="dark"
-                variant="outline-secondary"
-                title={capitalizeFirstLetter(habitInp.recurrence)}
-                id="input-group-dropdown-1"
-                className="w-100"
-                {...(!isEdit && { disabled: true })}
-              >
-                <Dropdown.Item onClick={() => {
-                  setHabitInp(prevState => ({ ...prevState, recurrence: 'daily' }));
-                  setHabitInp(prevState => ({ ...prevState, custom: null }));
-                  setHabitChanged(true);
-                }}>Daily</Dropdown.Item>
-                <Dropdown.Item onClick={() => {
-                  setHabitInp(prevState => ({ ...prevState, recurrence: 'weekly' }));
-                  setHabitInp(prevState => ({ ...prevState, custom: null }));
-                  setHabitChanged(true);
-                }}>Weekly</Dropdown.Item>
-                <Dropdown.Item onClick={() => {
-                  setHabitInp(prevState => ({ ...prevState, recurrence: 'monthly' }));
-                  setHabitInp(prevState => ({ ...prevState, custom: null }));
-                  setHabitChanged(true);
-                }}>Monthly</Dropdown.Item>
-                <Dropdown.Item onClick={() => {
-                  setHabitInp(prevState => ({ ...prevState, recurrence: 'yearly' }));
-                  setHabitInp(prevState => ({ ...prevState, custom: null }));
-                  setHabitChanged(true);
-                }}>Yearly</Dropdown.Item>
-                <Dropdown.Item onClick={() => {
-                  setHabitInp(prevState => ({ ...prevState, recurrence: 'custom' }))
-                  setCustomHabitModalState(true);
-                  setHabitChanged(true);
-                }}>Custom</Dropdown.Item>
-              </DropdownButton> */}
             </div>
           </InputGroup>
           {viewerStatus && <InputGroup className="w-100">
@@ -411,7 +378,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
       </div>
       {
         viewerStatus && <div className="d-flex justify-content-center my-1">
-          <Button onClick={() => setCalendarModalState(true)}> View in a calendar</Button>
+          <Button {...(!isEdit && { disabled: true })} variant="outline-secondary" onClick={() => setCalendarModalState(true)}><BsCalendar3Event /> View in a calendar</Button>
         </div>
       }
       <Modal show={showColorPicker} onHide={() => { setShowColorPicker(false) }}>

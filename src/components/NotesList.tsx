@@ -99,6 +99,7 @@ const NotesList = ({ notesArray, setNotesArray, setNoteToView, storagePref,
     setUrlToDelete(url);
     setDeleteModalState(true);
   }
+
   if (!notesFetched || isLoading) {
     return (
       <Spinner animation="border" role="status">
@@ -134,8 +135,6 @@ const NotesList = ({ notesArray, setNotesArray, setNoteToView, storagePref,
                     {
                       (podType !== "acp") &&
                       <NavDropdown
-                        as={ButtonGroup}
-                        variant="secondary"
                         menuVariant="dark"
                         title={<div><VscTypeHierarchySuper />
                           {capitalizeFirstLetter(currentAccess ? currentAccess : "access type")} <RiArrowDropDownLine /></div>}

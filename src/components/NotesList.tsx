@@ -118,7 +118,7 @@ const NotesList = ({ notesArray, setNotesArray, setNoteToView, storagePref,
               setCreatorStatus(true);
               setViewerStatus(false);
               setNoteModalState(true);
-            }}>create</a>
+            }}>Create</a>
           </div>
         </div>
       );
@@ -205,7 +205,7 @@ const NotesList = ({ notesArray, setNotesArray, setNoteToView, storagePref,
                           Create a new note
                         </Popover.Body>
                       </Popover>}>
-                      <Nav.Link className="me-auto" onClick={handleCreate}><MdCreate /> Create</Nav.Link>
+                      <Nav.Link className="create-note-button me-auto" onClick={handleCreate}><MdCreate /> Create</Nav.Link>
                     </OverlayTrigger>
                   </Nav>
                 </Navbar.Collapse>

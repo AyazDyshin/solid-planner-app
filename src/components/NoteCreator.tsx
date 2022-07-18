@@ -217,6 +217,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
             <InputGroup className="mb-2 mt-2">
                 <InputGroup.Text id="basic-addon1">Title:</InputGroup.Text>
                 <FormControl
+                    className="note-title-input"
                     name="title"
                     aria-label="title"
                     value={NoteInp.title === null ? "" : NoteInp.title}
@@ -224,7 +225,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
                     onChange={handleChange} />
 
                 <ButtonGroup>
-                    <Button variant="secondary" onClick={handleSave}><MdSaveAlt /> Save</Button>
+                    <Button className="save-note-button" variant="secondary" onClick={handleSave}><MdSaveAlt /> Save</Button>
                     <DropdownButton className="dropNoIcon"
                         variant="outline-secondary"
                         menuVariant="dark"
@@ -247,7 +248,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
                     </DropdownButton>
                 </ButtonGroup>
             </InputGroup>
-            <FormControl {...(!isEdit && { disabled: true })} as="textarea" aria-label="textarea"
+            <FormControl className="note-content-input" {...(!isEdit && { disabled: true })} as="textarea" aria-label="textarea"
                 style={{ 'resize': 'none', 'height': '90%' }}
                 name="content"
                 value={NoteInp.content === null ? "" : NoteInp.content}

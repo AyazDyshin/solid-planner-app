@@ -6,6 +6,6 @@ export const config = {
         webId: "https://fortest.inrupt.net/profile/card#me",
         username: "forTest",
         password: "AccForTest123!@",
-        provider: "https://inrupt.net/"
+        provider: "inrupt.net/"
     }
 };  

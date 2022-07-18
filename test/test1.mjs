@@ -1,17 +1,16 @@
 import webdriver, { Builder, By, until } from 'selenium-webdriver';
-import chrome from 'selenium-webdriver/chrome';
+import chrome from 'selenium-webdriver/chrome.js';
 import path from 'path';
-const serviceBuilder = new chrome.ServiceBuilder(path.dirname(__dirname) + "/node_modules/chromedriver/bin/chromedriver");
-import { before, after } from "mocha";
-import { suite } from 'selenium-webdriver/testing';
-import { config } from './config';
+//const serviceBuilder = new chrome.ServiceBuilder(path.dirname(__dirname) + "/node_modules/chromedriver/bin/chromedriver");
+import { before, after, describe, it } from "mocha";
+import { suite } from 'selenium-webdriver/testing/index.js';
+import { config } from './config.mjs';
 
 suite(function () {
     describe('Main test suite', function () {
         this.timeout(50000);
 
         let driver;
-
         const waitThenClick = async (selector) => {
             await driver.wait(
                 until.elementLocated(selector)
@@ -24,11 +23,7 @@ suite(function () {
             const options = new chrome.Options();
             options.setAcceptInsecureCerts(true);
 
-            driver = await new Builder()
-                .forBrowser('chrome')
-                .setChromeService(serviceBuilder)
-                .setChromeOptions(options)
-                .build();
+            driver = await new Builder().forBrowser('chrome').build();
 
             await driver.get(config.appSettings.url);
             await driver.findElement(By.css(".provider-input"))
@@ -63,6 +58,22 @@ suite(function () {
             );
         });
         after(() => driver.quit());
+
+        it('testing', async function () {
+            await driver.get(config.appSettings.url);
+            await driver.wait(
+                until.elementLocated(By.css(".logout-button"))
+            );
+            await waitThenClick(By.css(".create-note-button"));
+            const titleInput = await driver.findElement(By.css(".note-title-input"));
+            await titleInput.sendKeys("Test title(created by Selenium)");
+            const contentInput = await driver.findElement(By.css(".note-content-input"));
+            await contentInput.sendKeys("Test content(created by Selenium)");
+            await waitThenClick(By.css(".save-note-button"));
+            await driver.wait(
+                until.elementLocated(By.textContent("Test title(created by Selenium)"))
+            );
+        })
     })
 });
 

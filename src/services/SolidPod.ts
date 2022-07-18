@@ -193,8 +193,8 @@ export const repairDefaultFolder = async (fetch: fetcher, storagePref: string, p
 }
 
 /**
-* wrapper function that calls @see repairDefaultFolder @see createDefFolder @see createEntriesInTypeIndex would create folders to 
-* store notes and habit as records in the user's public type index file for habits and notes
+* wrapper function that calls @see repairDefaultFolder @see createDefFolder would create folders to 
+* store notes and habit 
 * @param   {string} webId webId of the user
 * @param   {fetcher} fetch fetch function
 * @param   {string} storagePref url of user's preferred storage location
@@ -207,8 +207,6 @@ export const recordDefaultFolder = async (webId: string, fetch: fetcher, storage
   publicTypeIndexUrl: string, podType: string): Promise<void> => {
   await repairDefaultFolder(fetch, storagePref, prefFileLocation);
   await createDefFolder(webId, fetch, storagePref, prefFileLocation, podType);
-  await createEntriesInTypeIndex(fetch, "note", storagePref, publicTypeIndexUrl);
-  await createEntriesInTypeIndex(fetch, "habit", storagePref, publicTypeIndexUrl);
 }
 
 /**
@@ -783,6 +781,8 @@ export const editNote = async (webId: string, fetch: fetcher, noteToEdit: Note, 
 */
 export const deleteEntry = async (webId: string, fetch: fetcher, urlToDelete: string, entry: string, storagePref: string,
   publicTypeIndexUrl: string): Promise<void> => {
+    console.log("we are here ");
+    console.log(urlToDelete);
   const urlsArr = await getAllUrlFromPublicIndex(webId, fetch, entry, storagePref, publicTypeIndexUrl);
   await Promise.all(urlsArr.map(async (url) => {
     const data = await getSolidDataset(url, { fetch: fetch });

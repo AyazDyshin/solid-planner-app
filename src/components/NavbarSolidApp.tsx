@@ -115,7 +115,7 @@ const NavbarSolidApp = ({ links, active, setActive, refetchNotifications, podTyp
                             >{getIcon(link)} {capitalizeFirstLetter(link)}</Nav.Link>
                         ))}
                         {
-                            podType === 'wac' && <OverlayTrigger trigger="click" placement="bottom" overlay={popover}>
+                            podType === 'wac' && <OverlayTrigger rootClose trigger="click" placement="bottom" overlay={popover}>
                                 <Nav.Link>
                                     <AiOutlineInbox /> Inbox {inboxArray.length !== 0 && <Badge pill bg="danger">new</Badge>}
                                 </Nav.Link>

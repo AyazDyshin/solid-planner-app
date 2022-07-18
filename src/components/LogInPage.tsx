@@ -5,6 +5,8 @@ import { LoginButton } from "@inrupt/solid-ui-react";
 import { Button, InputGroup, Dropdown, DropdownButton, FormControl, Form } from 'react-bootstrap';
 import { AiOutlineLink } from "react-icons/ai";
 import ProviderModal from "../modals/ProviderModal";
+import { RiArrowDropDownLine } from 'react-icons/ri';
+
 import "../styles.css";
 
 // Login page, Dropdown menu for the user to choose the issuer
@@ -20,7 +22,7 @@ const LogInPage = () => {
         <InputGroup>
           <DropdownButton
             variant="secondary"
-            title="Choose a provider"
+            title={<div>Choose a provider <RiArrowDropDownLine /></div>}
             id="input-group-dropdown-1">
             <Dropdown.Item onClick={() => {
               setIssuer("https://inrupt.net")
@@ -28,9 +30,6 @@ const LogInPage = () => {
             <Dropdown.Item onClick={() => {
               setIssuer("https://broker.pod.inrupt.com")
             }}>Broker Pod Inrupt</Dropdown.Item>
-            <Dropdown.Item onClick={() => {
-              setIssuer("https://dev.inrupt.net")
-            }}>Dev.inrupt.net</Dropdown.Item>
             <Dropdown.Item onClick={() => {
               setIssuer("https://solidcommunity.net")
             }}>SolidCommunity.net</Dropdown.Item>
@@ -48,7 +47,8 @@ const LogInPage = () => {
             oidcIssuer={issuer}
             redirectUrl={window.location.href}
           >
-            <Button className="login-button w-100">Log in</Button></LoginButton>
+            <Button variant="secondary"
+              className="login-button w-100">Log in</Button></LoginButton>
         </div>
         <div className="d-flex justify-content-center mt-3">
           <a href="https://solidproject.org/" target="_blank"

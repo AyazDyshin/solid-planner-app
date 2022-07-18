@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Container, Modal, Nav, Navbar, OverlayTrigger, Popover } from "react-bootstrap";
-import { BsPlusLg } from "react-icons/bs";
+import { MdAdd } from "react-icons/md";
 
 interface Props {
     contactsArr: (string | null)[][],
@@ -32,7 +32,7 @@ const ContactsList = ({ contactsArr, setOtherWebId, setIsLoading }: Props) => {
                                         </Popover.Body>
                                     </Popover>}>
                                     <Nav.Link onClick={() => { setShowModal(true) }}>
-                                        <BsPlusLg /> Add</Nav.Link>
+                                        <MdAdd /> Add</Nav.Link>
                                 </OverlayTrigger>
                             </Nav>
                         </Navbar.Collapse>

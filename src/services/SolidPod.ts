@@ -900,7 +900,14 @@ export const createEntryInInbox = async (webId: string, otherWebId: string, fetc
     aThing = addStringNoLocale(aThing, "http://purl.org/dc/terms/accessRights", "write");
   }
   dataSet = setThing(dataSet, aThing);
+  try {
   await saveSolidDatasetInContainer(otherInboxUrl, dataSet, { fetch: fetch });
+  }
+  catch (error){
+    let message = 'Unknown Error';
+    if (error instanceof Error) message = error.message;
+    throw new Error(`couldn't append a message to the ${otherInboxUrl}, this might be due to the fact that it either doesn't exist or is set to private. Your entry was shared, but the user won't be notified about this, error: ${message}`);
+  }
 }
 
 export const getThingsFromInbox = async (webId: string, fetch: fetcher, update?: boolean) => {

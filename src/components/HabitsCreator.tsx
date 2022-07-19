@@ -280,25 +280,27 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
   };
 
   return (
-    <div style={{ "height": "40vh" }}>
+    <div style={{ "height": "50vh" }}>
       <InputGroup className="mb-2 mt-2">
         <InputGroup.Text id="basic-addon1">Title:</InputGroup.Text>
         <FormControl
+        className="habit-title-input"
           name="title"
           aria-label="title"
           value={habitInp.title === null ? "" : habitInp.title}
           {...(!isEdit && { disabled: true })}
           onChange={handleChange} />
         <ButtonGroup>
-          <Button variant="secondary" onClick={handleSave}><MdSaveAlt /> Save</Button>
-          <DropdownButton className="dropNoIcon"
+          <Button className="save-habit-button" variant="secondary" onClick={handleSave}><MdSaveAlt /> Save</Button>
+          <div className="habit-menu">
+          <DropdownButton style={{"height":"100%"}} className="dropNoIcon h-100"
             menuVariant="dark"
             variant="outline-secondary"
             title={<BsThreeDots />}
             id="input-group-dropdown-1"
           >
-            {viewerStatus && <Dropdown.Item onClick={handleEdit}><FiEdit /> edit</Dropdown.Item>}
-            <Dropdown.Item onClick={() => (setCategoryModalState(true))}>
+            {viewerStatus && <Dropdown.Item className="habit-edit" onClick={handleEdit}><FiEdit /> edit</Dropdown.Item>}
+            <Dropdown.Item className="habit-set-category" onClick={() => (setCategoryModalState(true))}>
               <BiFolderPlus /> Set category
             </Dropdown.Item>
             {viewerStatus && (podType !== "acp") &&
@@ -311,6 +313,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
               style={{ color: "red" }}
             ><RiDeleteBin6Line /> Delete</Dropdown.Item>}
           </DropdownButton>
+          </div>
         </ButtonGroup>
       </InputGroup>
       <div className="d-flex">
@@ -371,7 +374,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
         <FormControl {...(!isEdit && { disabled: true })} as="textarea" aria-label="textarea"
           style={{ 'resize': 'none', 'height': '80%', 'boxSizing': 'border-box', 'width': '40%' }}
           name="content"
-          className="ms-2 p-1"
+          className="habit-content-input ms-2 p-1"
           value={habitInp.content === null ? "" : habitInp.content}
           onChange={handleChange}
         />

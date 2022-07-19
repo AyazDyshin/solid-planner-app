@@ -106,7 +106,7 @@ const NavbarSolidApp = ({ links, active, setActive, refetchNotifications, podTyp
                         {links.map((link, index) => (
                             <Nav.Link
                                 key={Date.now() + index}
-                                className={`nav-link ${active === link ? 'active' : ''} cursor`}
+                                className={`${link} nav-link ${active === link ? 'active' : ''} cursor`}
                                 onClick={(e) => {
                                     e.preventDefault();
                                     setActive(link);
@@ -122,7 +122,7 @@ const NavbarSolidApp = ({ links, active, setActive, refetchNotifications, podTyp
                             </OverlayTrigger >
                         }
                         <LogoutButton onError={onError}>
-                            <Nav.Link className="logout-button"><FiLogOut /> Log out</Nav.Link>
+                            <Nav.Link id="logout-button" className="logout-button"><FiLogOut /> Log out</Nav.Link>
                         </LogoutButton>
                     </Nav>
                 </Navbar.Collapse>

@@ -82,7 +82,7 @@ const CategoryModal = ({ categoryModalState, setCategoryModalState, setNoteInp,
                     <InputGroup.Text>
                         New:
                     </InputGroup.Text>
-                    <FormControl aria-describedby="basic-addon3" value={areaValue} onChange={e => {
+                    <FormControl className="category-input" aria-describedby="basic-addon3" value={areaValue} onChange={e => {
                         setInput(e.target.value)
                         setAreaValue(e.target.value);
                     }} />
@@ -90,7 +90,7 @@ const CategoryModal = ({ categoryModalState, setCategoryModalState, setNoteInp,
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" onClick={() => setCategoryModalState(false)}>Go Back</Button>
-                <Button variant="primary" onClick={handleSave}>set</Button>
+                <Button className="set-category" variant="primary" onClick={handleSave}>Set</Button>
             </Modal.Footer>
         </Modal>
     );

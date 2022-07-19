@@ -17,15 +17,20 @@ const CalendarModal = ({ calendarModalState, setCalendarModalState, habitsInp }:
     }
 
     return (
-        <Modal show={calendarModalState} onHide={handleClose}>
+        <Modal show={calendarModalState} onHide={handleClose} >
+            <Modal.Header closeButton onClick={() => { setCalendarModalState(false) }}>
+            </Modal.Header>
             <Modal.Body>
-                <FullCalendar
-                    plugins={[dayGridPlugin]}
-                    initialView="dayGridMonth"
-                    events={habitsInp.map((habit) => {
-                        return checkInsToObj(habit)
-                    }).flat()}
-                />
+                <div>
+                    <FullCalendar
+                        height={"60vh"}
+                        plugins={[dayGridPlugin]}
+                        initialView="dayGridMonth"
+                        events={habitsInp.map((habit) => {
+                            return checkInsToObj(habit)
+                        }).flat()}
+                    />
+                </div>
             </Modal.Body>
         </Modal>
     )

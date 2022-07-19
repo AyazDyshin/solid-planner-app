@@ -286,7 +286,9 @@ const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, contactsL
                                 setAccUpdObj({});
                                 setAccessModalState(false);
                             }}>Go back</Button>
-                        <Button variant="primary" onClick={() => {
+                        <Button 
+                        className="set-access"
+                        variant="primary" onClick={() => {
                             setAccessModalState(false);
                         }}>Set</Button>
                     </Modal.Footer>

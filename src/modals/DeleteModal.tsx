@@ -73,7 +73,7 @@ const DeleteModal = ({ deleteModalState, setDeleteModalState, urlToDelete, setUr
                         <Button variant="secondary" onClick={handleClose}>
                             Go back
                         </Button>
-                        <Button variant="danger" onClick={handleDelete}>
+                        <Button className="confirm-delete" variant="danger" onClick={handleDelete}>
                             Delete
                         </Button>
                     </Modal.Footer>

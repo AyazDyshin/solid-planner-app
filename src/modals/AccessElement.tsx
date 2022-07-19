@@ -18,7 +18,7 @@ const AccessElement = ({ title, readOnChange, appendOnChange, writeOnChange, rea
                 <div className="form-check form-switch">
                     <label className="form-check-label"
                         htmlFor="flexSwitchCheckDefault1">Read</label>
-                    <input className="form-check-input" type="checkbox"
+                    <input className="set-read form-check-input" type="checkbox"
                         onChange={readOnChange}
                         checked={readStatus}
                         role="switch" id="flexSwitchCheckDefault" />

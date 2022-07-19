@@ -44,6 +44,7 @@ const MainContent = () => {
   const [refetchContacts, setRefetchContacts] = useState<boolean>(false);
   const [refetchHabits, setRefetchHabits] = useState<boolean>(false);
   const [refetchNotifications, setRefetchNotifications] = useState<boolean>(false);
+
   useEffect(() => {
     const check = async () => {
       setIsLoading(true);
@@ -51,7 +52,7 @@ const MainContent = () => {
       setStoragePref(updStoragePref);
       const updPrefFileLocation: string = await getPrefLink(webId, fetch);
       setPrefFileLocation(updPrefFileLocation);
-      const updPublicTypeIndexUrl = await getPublicTypeIndexUrl(webId, fetch);
+      const updPublicTypeIndexUrl: string = await getPublicTypeIndexUrl(webId, fetch);
       setPublicTypeIndexUrl(updPublicTypeIndexUrl);
       const updPodType = await isWacOrAcp(updStoragePref, fetch);
       setPodType(updPodType);

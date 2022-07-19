@@ -166,11 +166,11 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
           <div className="card-body">
             <h5 className="card-title">You don&apos;t have any habits yet!</h5>
             <p className="card-text">Let&apos;s fix this</p>
-            <a className="btn btn-primary" onClick={() => {
+            <a className="create-habit-button btn btn-primary" onClick={() => {
               setCreatorStatus(true);
               setViewerStatus(false);
               setHabitModalState(true);
-            }}>create</a>
+            }}>Create</a>
           </div>
         </div>
       );
@@ -200,16 +200,19 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
                       }}><GoPrimitiveDot /> All habits</NavDropdown.Item>
                     </NavDropdown>
                     <NavDropdown
+                      className="habit-status-filter"
                       as={ButtonGroup}
                       menuVariant="dark"
                       variant="secondary"
                       title={<div><BsCircle /> {capitalizeFirstLetter(currentStatus)} <RiArrowDropDownLine /></div>}
                     >
-                      <NavDropdown.Item onClick={() => {
-                        setViewerStatus(false);
-                        setCreatorStatus(false);
-                        setCurrentStatus('done');
-                      }}><GoPrimitiveDot /> Done</NavDropdown.Item>
+                      <NavDropdown.Item
+                        className="habit-status-done-filter"
+                        onClick={() => {
+                          setViewerStatus(false);
+                          setCreatorStatus(false);
+                          setCurrentStatus('done');
+                        }}><GoPrimitiveDot /> Done</NavDropdown.Item>
                       <NavDropdown.Item onClick={() => {
                         setViewerStatus(false);
                         setCreatorStatus(false);
@@ -293,7 +296,9 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
                           View current list of habits in calendar
                         </Popover.Body>
                       </Popover>}>
-                      <Nav.Link className="me-auto" onClick={() => {
+                      <Nav.Link
+                       className="calendar-view-button me-auto"
+                        onClick={() => {
                         setCalendarModalState(true)
                       }}><BsCalendar3Event /> Calendar</Nav.Link>
                     </OverlayTrigger>
@@ -303,7 +308,7 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
                           Create a new habit
                         </Popover.Body>
                       </Popover>}>
-                      <Nav.Link className="me-auto" onClick={handleCreate}><MdCreate /> Create</Nav.Link>
+                      <Nav.Link className="create-habit-button me-auto" onClick={handleCreate}><MdCreate /> Create</Nav.Link>
                     </OverlayTrigger>
                   </Nav>
                 </Navbar.Collapse>
@@ -335,7 +340,7 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
                           <div className="ms-2 me-3 mt-0 mb-1"
                             key={Date.now() + key + Math.floor(Math.random() * 1000)}
                             style={{ display: "inline-block" }}>
-                            <input className="form-check-input secondary"
+                            <input className="habit-check form-check-input secondary"
                               {...(!(currentView === 'today') && { disabled: true })}
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -348,7 +353,8 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
                                 setObjOfStates((prevState) => ({ ...prevState, [key]: !objOfStates[key] }));
                                 handleSave(toSave);
                               }}
-                              type="checkbox" checked={
+                              type="checkbox"
+                              checked={
                                 (objOfStates[key]) ? true : false
                               }
                               style={{ "transform": "scale(1.7)" }} />
@@ -423,7 +429,7 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
                         {
                           habit.id &&
                           <Button variant="outline-danger"
-                            className="px-1 py-1 ms-auto"
+                            className="delete-habit px-1 py-1 ms-auto"
                             style={{ color: "red" }}
                             onClick={(e) => { handleDelete(e, habit.url) }}
                           ><RiDeleteBin6Line /></Button>

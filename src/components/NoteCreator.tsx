@@ -226,26 +226,27 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
 
                 <ButtonGroup>
                     <Button className="save-note-button" variant="secondary" onClick={handleSave}><MdSaveAlt /> Save</Button>
-                    <DropdownButton className="dropNoIcon"
-                        variant="outline-secondary"
-                        menuVariant="dark"
-                        title={<BsThreeDots />}
-                        id="input-group-dropdown-1"
-                    >
-                        {viewerStatus && <Dropdown.Item onClick={handleEdit}><FiEdit /> Edit</Dropdown.Item>}
-                        <Dropdown.Item onClick={() => (setCategoryModalState(true))}>
-                            <BiFolderPlus /> Set category
-                        </Dropdown.Item>
-                        {viewerStatus && (podType !== "acp") && <Dropdown.Item onClick={() => (setAccessModalState(true))}>
-                            <BsShare /> Share</Dropdown.Item>}
-                        {viewerStatus && noteToView?.shareList && (podType !== "acp") &&
-                            <Dropdown.Item onClick={() => (setSharedModalState(true))}>
-                                <RiUserSharedLine /> Shared list
-                            </Dropdown.Item>}
-                        {viewerStatus && <Dropdown.Item onClick={handleDelete}
-                            style={{ color: "red" }}
-                        ><RiDeleteBin6Line /> Delete</Dropdown.Item>}
-                    </DropdownButton>
+
+                        <DropdownButton className="dropNoIcon"
+                            variant="outline-secondary"
+                            menuVariant="dark"
+                            title={<BsThreeDots />}
+                            id="input-group-dropdown-1"
+                        >
+                            {viewerStatus && <Dropdown.Item className="note-edit" onClick={handleEdit}><FiEdit /> Edit</Dropdown.Item>}
+                            <Dropdown.Item className="note-set-category" onClick={() => (setCategoryModalState(true))}>
+                                <BiFolderPlus /> Set category
+                            </Dropdown.Item>
+                            {viewerStatus && (podType !== "acp") && <Dropdown.Item className="share-note" onClick={() => (setAccessModalState(true))}>
+                                <BsShare /> Share</Dropdown.Item>}
+                            {viewerStatus && noteToView?.shareList && (podType !== "acp") &&
+                                <Dropdown.Item onClick={() => (setSharedModalState(true))}>
+                                    <RiUserSharedLine /> Shared list
+                                </Dropdown.Item>}
+                            {viewerStatus && <Dropdown.Item onClick={handleDelete}
+                                style={{ color: "red" }}
+                            ><RiDeleteBin6Line /> Delete</Dropdown.Item>}
+                        </DropdownButton>
                 </ButtonGroup>
             </InputGroup>
             <FormControl className="note-content-input" {...(!isEdit && { disabled: true })} as="textarea" aria-label="textarea"

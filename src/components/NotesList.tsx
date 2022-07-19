@@ -114,7 +114,7 @@ const NotesList = ({ notesArray, setNotesArray, setNoteToView, storagePref,
           <div className="card-body">
             <h5 className="card-title">You don&apos;t have any notes yet!</h5>
             <p className="card-text">Let&apos;s fix this</p>
-            <a className="btn btn-primary" onClick={() => {
+            <a className="create-note-button btn btn-primary" onClick={() => {
               setCreatorStatus(true);
               setViewerStatus(false);
               setNoteModalState(true);
@@ -296,7 +296,7 @@ const NotesList = ({ notesArray, setNotesArray, setNoteToView, storagePref,
                       {
                         note.id &&
                         <Button variant="outline-danger"
-                          className="ms-auto me-2 px-1 py-1"
+                          className="delete-note ms-auto me-2 px-1 py-1"
                           style={{ color: "red" }}
                           onClick={(e) => { handleDelete(e, note.url) }}
                         ><RiDeleteBin6Line /></Button>

@@ -149,7 +149,7 @@ suite(function () {
             const contentInput2 = await driver.findElement(By.css(".habit-content-input"));
             contentInput2.clear();
             await contentInput2.sendKeys("Test content upd(created by Selenium)");
-            await waitThenClick(By.css(".habit-menu"))
+            await waitThenClick(By.id("input-group-dropdown-1"))
             await waitThenClick(By.css(".habit-set-category"));
             const categoryInput = await driver.findElement(By.css(".category-input"));
             await categoryInput.sendKeys("Test category(created by Selenium)");
@@ -166,7 +166,7 @@ suite(function () {
 
         it('Set habit as done then view it in done filter category', async function () {
             await waitThenClick(By.xpath("//*[text()='Test title upd(created by Selenium)']"));
-            await waitThenClick(By.css(".habit-menu"))
+            await waitThenClick(By.id("input-group-dropdown-1"))
             await waitThenClick(By.css(".habit-edit"))
             await waitThenClick(By.css(".form-check"));
             await waitThenClick(By.css(".save-habit-button"));

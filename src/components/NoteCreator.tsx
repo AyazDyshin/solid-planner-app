@@ -226,7 +226,6 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
 
                 <ButtonGroup>
                     <Button className="save-note-button" variant="secondary" onClick={handleSave}><MdSaveAlt /> Save</Button>
-
                         <DropdownButton className="dropNoIcon"
                             variant="outline-secondary"
                             menuVariant="dark"

@@ -284,38 +284,37 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
       <InputGroup className="mb-2 mt-2">
         <InputGroup.Text id="basic-addon1">Title:</InputGroup.Text>
         <FormControl
-        className="habit-title-input"
+          className="habit-title-input"
           name="title"
           aria-label="title"
           value={habitInp.title === null ? "" : habitInp.title}
           {...(!isEdit && { disabled: true })}
           onChange={handleChange} />
         <ButtonGroup>
-          <Button className="save-habit-button" variant="secondary" onClick={handleSave}><MdSaveAlt /> Save</Button>
-          <div className="habit-menu">
-          <DropdownButton style={{"height":"100%"}} className="dropNoIcon h-100"
-            menuVariant="dark"
-            variant="outline-secondary"
-            title={<BsThreeDots />}
-            id="input-group-dropdown-1"
-          >
-            {viewerStatus && <Dropdown.Item className="habit-edit" onClick={handleEdit}><FiEdit /> edit</Dropdown.Item>}
-            <Dropdown.Item className="habit-set-category" onClick={() => (setCategoryModalState(true))}>
-              <BiFolderPlus /> Set category
-            </Dropdown.Item>
-            {viewerStatus && (podType !== "acp") &&
-              <Dropdown.Item onClick={() => { setAccessModalState(true) }} ><BsShare /> Share</Dropdown.Item>}
-            {viewerStatus && habitInp.shareList && (podType !== "acp") &&
-              <Dropdown.Item onClick={() => (setSharedModalState(true))} >
-                <RiUserSharedLine /> Shared list
-              </Dropdown.Item>}
-            {viewerStatus && <Dropdown.Item onClick={handleDelete}
-              style={{ color: "red" }}
-            ><RiDeleteBin6Line /> Delete</Dropdown.Item>}
-          </DropdownButton>
-          </div>
+            <Button className="save-habit-button" variant="secondary" onClick={handleSave}><MdSaveAlt /> Save</Button>
+            <DropdownButton className="dropNoIcon"
+              menuVariant="dark"
+              variant="outline-secondary"
+              title={<BsThreeDots />}
+              id="input-group-dropdown-1"
+            >
+              {viewerStatus && <Dropdown.Item className="habit-edit" onClick={handleEdit}><FiEdit /> edit</Dropdown.Item>}
+              <Dropdown.Item className="habit-set-category" onClick={() => (setCategoryModalState(true))}>
+                <BiFolderPlus /> Set category
+              </Dropdown.Item>
+              {viewerStatus && (podType !== "acp") &&
+                <Dropdown.Item onClick={() => { setAccessModalState(true) }} ><BsShare /> Share</Dropdown.Item>}
+              {viewerStatus && habitInp.shareList && (podType !== "acp") &&
+                <Dropdown.Item onClick={() => (setSharedModalState(true))} >
+                  <RiUserSharedLine /> Shared list
+                </Dropdown.Item>}
+              {viewerStatus && <Dropdown.Item onClick={handleDelete}
+                style={{ color: "red" }}
+              ><RiDeleteBin6Line /> Delete</Dropdown.Item>}
+            </DropdownButton>
         </ButtonGroup>
-      </InputGroup>
+
+      </InputGroup >
       <div className="d-flex">
         <div className="d-flex-column w-50">
           <InputGroup className="w-100">
@@ -452,7 +451,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
         setViewerStatus={setViewerStatus}
         setCreatorStatus={setCreatorStatus}
       />
-    </div>
+    </div >
   );
 }
 

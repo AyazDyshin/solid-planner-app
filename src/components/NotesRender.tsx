@@ -5,7 +5,7 @@ import { accessObject, Note } from "./types";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import NoteCreator from "./NoteCreator";
 import NotesList from "./NotesList";
-import { Modal } from "react-bootstrap";
+import { Modal, Spinner } from "react-bootstrap";
 
 interface Props {
     viewerStatus: boolean;
@@ -86,7 +86,12 @@ const NotesRender = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorS
                         {creatorStatus ? "Create a note" : "Edit a note"}
                     </Modal.Header>
                     <Modal.Body id="viewerModal">
-                        <NoteCreator
+                        {noteUpdInProgress && !creatorStatus && <div className="h-100 d-flex justify-content-center align-items-center" style={{ minHeight: "200px" }}>
+                            <Spinner animation="border" role="status">
+                                <span className="visually-hidden">Loading...</span>
+                            </Spinner>
+                        </div>}
+                        {(!noteUpdInProgress || creatorStatus) && <NoteCreator
                             contactsArr={contactsArr}
                             setContactsArr={setContactsArr}
                             contactsFetched={contactsFetched}
@@ -119,7 +124,7 @@ const NotesRender = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorS
                             categoryArray={categoryArray}
                             NoteInp={NoteInp}
                             setNoteInp={setNoteInp}
-                        />
+                        />}
                     </Modal.Body>
                 </Modal>
             }

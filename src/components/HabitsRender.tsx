@@ -1,6 +1,6 @@
 import { AccessModes } from '@inrupt/solid-client/dist/acp/policy';
 import React, { useState } from 'react'
-import { Modal } from 'react-bootstrap';
+import { Modal, Spinner } from 'react-bootstrap';
 import HabitsCreator from './HabitsCreator'
 import HabitsList from './HabitsList'
 import { accessObject, Habit } from './types';
@@ -81,7 +81,12 @@ const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsA
                         {creatorStatus ? "Create a habit" : "Edit a habit"}
                     </Modal.Header>
                     <Modal.Body id="viewerModal">
-                        <HabitsCreator
+                        {habitUpdInProgress && !creatorStatus && <div className="h-100 d-flex justify-content-center align-items-center" style={{ minHeight: "200px" }}>
+                            <Spinner animation="border" role="status">
+                                <span className="visually-hidden">Loading...</span>
+                            </Spinner>
+                        </div>}
+                        {(!habitUpdInProgress || creatorStatus) && <HabitsCreator
                             contactsArr={contactsArr}
                             setContactsArr={setContactsArr}
                             contactsFetched={contactsFetched}
@@ -115,7 +120,7 @@ const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsA
                             setViewerStatus={setViewerStatus}
                             isEdit={isEdit}
                             setIsEdit={setIsEdit}
-                        />
+                        />}
                     </Modal.Body>
                 </Modal>
             }

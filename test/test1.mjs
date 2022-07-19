@@ -1,5 +1,5 @@
 import pkg from 'selenium-webdriver';
-const { Builder, By, until, ExpectedConditions } = pkg;
+const { Builder, By, until } = pkg;
 import chrome from 'selenium-webdriver/chrome.js';
 import { before, after, describe, it } from "mocha";
 import { suite } from 'selenium-webdriver/testing/index.js';

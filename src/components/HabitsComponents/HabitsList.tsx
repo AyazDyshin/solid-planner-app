@@ -62,7 +62,7 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
   const [urlToDelete, setUrlToDelete] = useState<string | null>(null);
   const [deleteModalState, setDeleteModalState] = useState<boolean>(false);
   const [calendarModalState, setCalendarModalState] = useState<boolean>(false);
-
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   useEffect(() => {
     const fetchHabits = async () => {
       let filteredHabits: Habit[] = [];
@@ -130,18 +130,22 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
     }
   }, [habitUpdInProgress, performDelete]);
 
+
   const handleCreate = () => {
     setViewerStatus(false);
     setCreatorStatus(true);
     setHabitModalState(true);
   };
 
+
+
   const handleSave = async (toSave: Habit) => {
     const updHabit = setStreaks(toSave);
     setNewEntryCr(!newEntryCr);
+    setIsSaving(true);
     await editHabit(webId, fetch, updHabit, storagePref, defFolder, prefFileLocation, publicTypeIndexUrl, podType);
+    setIsSaving(false);
   };
-
   const handleDelete = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, url: string | null) => {
     e.stopPropagation();
     if (url) {
@@ -297,10 +301,10 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
                         </Popover.Body>
                       </Popover>}>
                       <Nav.Link
-                       className="calendar-view-button me-auto"
+                        className="calendar-view-button me-auto"
                         onClick={() => {
-                        setCalendarModalState(true)
-                      }}><BsCalendar3Event /> Calendar</Nav.Link>
+                          setCalendarModalState(true)
+                        }}><BsCalendar3Event /> Calendar</Nav.Link>
                     </OverlayTrigger>
                     <OverlayTrigger placement="right" overlay={
                       <Popover>
@@ -349,14 +353,15 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
                                 const tempArr = habitsToShow;
                                 tempArr[key].stat = !habit.stat;
                                 setHabitsToShow(tempArr);
-                                const toSave = tempArr[key];
+                                const updToSave = tempArr[key];
                                 setObjOfStates((prevState) => ({ ...prevState, [key]: !objOfStates[key] }));
-                                handleSave(toSave);
+                                handleSave(updToSave);
                               }}
                               type="checkbox"
                               checked={
                                 (objOfStates[key]) ? true : false
                               }
+                              {...(isSaving && { disabled: true })}
                               style={{ "transform": "scale(1.7)" }} />
                           </div>
                         }

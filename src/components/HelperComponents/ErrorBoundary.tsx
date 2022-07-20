@@ -1,6 +1,8 @@
 import * as React from "react";
 import 'bootstrap/dist/css/bootstrap.css';
 import { Button, Card } from "react-bootstrap";
+import { FiLogOut } from "react-icons/fi";
+import { LogoutButton } from "@inrupt/solid-ui-react";
 
 interface Props {
     children: JSX.Element;
@@ -33,8 +35,12 @@ const ErrorBoundary = ({ children }: Props) => {
                         <Card.Title>Error!</Card.Title>
 
                         <div style={{ color: "red" }}>{error.toString()}</div>
-
-                        <Button onClick={resetError} variant="info">reset</Button>
+                        <div className="d-flex justify-content-around">
+                            <Button onClick={resetError} variant="info">reset</Button>
+                            <LogoutButton>
+                                <Button id="logout-button" className="logout-button"><FiLogOut /> Log out</Button>
+                            </LogoutButton>
+                        </div>
                     </Card.Body>
                 </Card>
             </div>

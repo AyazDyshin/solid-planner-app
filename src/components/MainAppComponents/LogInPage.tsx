@@ -4,10 +4,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { LoginButton } from "@inrupt/solid-ui-react";
 import { Button, InputGroup, Dropdown, DropdownButton, FormControl, Form } from 'react-bootstrap';
 import { AiOutlineLink } from "react-icons/ai";
-import ProviderModal from "../modals/ProviderModal";
+import ProviderModal from "../../modals/ProviderModal";
 import { RiArrowDropDownLine } from 'react-icons/ri';
-
-import "../styles.css";
+import "../../styles.css";
 
 // Login page, Dropdown menu for the user to choose the issuer
 // The login functionality itself is done by LoginButton component from @inrupt/solid-ui-react

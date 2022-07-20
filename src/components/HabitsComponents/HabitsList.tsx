@@ -1,9 +1,9 @@
 import { useSession } from '@inrupt/solid-ui-react';
 import React, { useEffect, useState } from 'react';
-import { fetchAllEntries, thingToHabit, editHabit, deleteEntry } from '../services/SolidPod';
+import { fetchAllEntries, thingToHabit, editHabit, deleteEntry } from '../../services/SolidPod';
 import { BsCircle } from "react-icons/bs";
-import { Habit } from './types';
-import { capitalizeFirstLetter, extractCategories, filterByAccess, filterByCategory, setStreaks, getHabitsToday } from '../services/helpers';
+import { Habit } from '../../services/types';
+import { capitalizeFirstLetter, extractCategories, filterByAccess, filterByCategory, setStreaks, getHabitsToday } from '../../services/helpers';
 import { OverlayTrigger, Popover, Badge, Spinner, Button, ButtonGroup, Container, Nav, Navbar, NavDropdown }
   from 'react-bootstrap';
 import { BiFolder } from 'react-icons/bi';
@@ -11,10 +11,10 @@ import { GoPrimitiveDot, GoCheck, GoX } from 'react-icons/go';
 import { RiArrowDropDownLine, RiArrowGoBackFill } from 'react-icons/ri';
 import { VscTypeHierarchySuper } from 'react-icons/vsc';
 import { RiDeleteBin6Line } from "react-icons/ri";
-import DeleteModal from '../modals/DeleteModal';
+import DeleteModal from '../../modals/DeleteModal';
 import { MdCreate } from 'react-icons/md';
 import { FiClock } from 'react-icons/fi';
-import CalendarModal from '../modals/CalendarModal';
+import CalendarModal from '../../modals/CalendarModal';
 import { BsCalendar3Event } from 'react-icons/bs';
 
 interface Props {

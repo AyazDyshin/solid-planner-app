@@ -1,6 +1,6 @@
-import "../styles.css";
+import "../../styles.css";
 import { Button, ButtonGroup, Dropdown, DropdownButton, Form, FormControl, InputGroup, Modal } from 'react-bootstrap';
-import { accessObject, Habit } from './types';
+import { accessObject, Habit } from '../../services/types';
 import { BsThreeDots, BsShare } from "react-icons/bs";
 import { FiEdit } from "react-icons/fi";
 import { RiDeleteBin6Line, RiUserSharedLine } from "react-icons/ri";
@@ -8,17 +8,17 @@ import { BiFolderPlus } from "react-icons/bi";
 import { MdSaveAlt } from "react-icons/md";
 import React, { useEffect, useState } from "react";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
-import { setPubAccess, shareWith } from "../services/access";
-import { saveHabit, deleteEntry, editHabit } from "../services/SolidPod";
+import { setPubAccess, shareWith } from "../../services/access";
+import { saveHabit, deleteEntry, editHabit } from "../../services/SolidPod";
 import { useSession } from "@inrupt/solid-ui-react";
-import { capitalizeFirstLetter, constructDate, setStreaks } from "../services/helpers";
-import AccessModal from "../modals/AccessModal";
-import CustomHabitModal from "../modals/CustomHabitModal";
-import CategoryModal from "../modals/CategoryModal";
-import SharedModal from "../modals/SharedModal";
+import { capitalizeFirstLetter, constructDate, setStreaks } from "../../services/helpers";
+import AccessModal from "../../modals/AccessModal";
+import CustomHabitModal from "../../modals/CustomHabitModal";
+import CategoryModal from "../../modals/CategoryModal";
+import SharedModal from "../../modals/SharedModal";
 import { ColorResult, TwitterPicker } from "react-color";
-import CalendarModal from "../modals/CalendarModal";
-import DeleteModal from "../modals/DeleteModal";
+import CalendarModal from "../../modals/CalendarModal";
+import DeleteModal from "../../modals/DeleteModal";
 import { BsCalendar3Event } from 'react-icons/bs';
 
 interface Props {

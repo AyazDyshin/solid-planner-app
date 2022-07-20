@@ -1,7 +1,7 @@
 import FullCalendar from '@fullcalendar/react';
 import React from 'react'
 import { Modal } from 'react-bootstrap';
-import { Habit } from '../components/types';
+import { Habit } from '../services/types';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import { checkInsToObj } from '../services/helpers';
 

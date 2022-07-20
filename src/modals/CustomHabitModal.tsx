@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Button, Form, InputGroup, Collapse } from "react-bootstrap";
-import { Habit } from "../components/types";
+import { Habit } from "../services/types";
 import { getNumberFromDay } from "../services/helpers";
 
 interface Props {

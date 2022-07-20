@@ -1,7 +1,7 @@
 import { useState } from "react";
-import "../styles.css";
+import "../../styles.css";
 import React from 'react';
-import { accessObject, Note } from "./types";
+import { accessObject, Note } from "../../services/types";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import NoteCreator from "./NoteCreator";
 import NotesList from "./NotesList";

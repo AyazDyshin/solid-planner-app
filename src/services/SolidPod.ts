@@ -10,7 +10,7 @@ import {
 } from '@inrupt/solid-client';
 import { DCTERMS, RDF } from '@inrupt/vocab-common-rdf';
 import { solid, schema, foaf, vcard } from 'rdf-namespaces';
-import { Note, fetcher, Habit, voc, otherV, accessObject, appNotification } from '../components/types';
+import { Note, fetcher, Habit, voc, otherV, accessObject, appNotification } from './types';
 import { determineAccess, initializeAcl, setPubAccess } from './access';
 import { updUrlForFolder } from './helpers';
 import { getAllUrlFromPublicIndex, getInboxUrl } from './podGetters';

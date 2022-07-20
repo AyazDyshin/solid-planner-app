@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import ContactsRender from "./ContactsRender";
-import HabitsRender from "./HabitsRender";
-import NotesRender from "./NotesRender";
-import { Habit, Note } from "./types";
+import ContactsRender from "../ContactsComponents/ContactsRender";
+import HabitsRender from "../HabitsComponents/HabitsRender";
+import NotesRender from "../NotesComponents/NotesRender";
+import { Habit, Note } from "../../services/types";
 
 interface Props {
     active: string;

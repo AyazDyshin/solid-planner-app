@@ -2,12 +2,12 @@ import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import { useSession } from "@inrupt/solid-ui-react";
 import React, { useState, useEffect } from "react";
 import { Modal, Button, FormControl, InputGroup, Collapse, Spinner } from "react-bootstrap";
-import { Habit, Note } from "../components/types";
+import { Habit, Note } from "../services/types";
 import { checkContacts, fetchContacts } from "../services/SolidPod";
 import "../styles.css";
 import AccessElement from "./AccessElement";
-import { accessObject } from "../components/types";
-import NoContacts from "../components/NoContacts";
+import { accessObject } from "../services/types";
+import NoContacts from "../components/ContactsComponents/NoContacts";
 
 interface Props {
     accessModalState: boolean;

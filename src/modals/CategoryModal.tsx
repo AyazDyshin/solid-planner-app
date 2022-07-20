@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Button, FormControl, InputGroup, Form } from "react-bootstrap";
-import { Note, Habit } from "../components/types";
+import { Note, Habit } from "../services/types";
 
 interface Props {
     setEntryChanged: React.Dispatch<React.SetStateAction<boolean>>;

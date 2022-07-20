@@ -1,7 +1,7 @@
 import { useSession } from '@inrupt/solid-ui-react';
 import React from 'react'
 import { Modal, Button, Spinner } from 'react-bootstrap';
-import { Habit, Note } from '../components/types';
+import { Habit, Note } from '../services/types';
 import { deleteEntry } from '../services/SolidPod';
 
 interface Props {

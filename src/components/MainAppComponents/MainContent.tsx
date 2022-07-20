@@ -2,14 +2,14 @@ import React from 'react';
 import { useEffect, useState } from "react";
 import NavbarSolidApp from "./NavbarSolidApp";
 import ContentToRender from "./ContentToRender";
-import Test from "./Test";
-import { checkPermissions, isWacOrAcp } from "../services/access";
+import Test from "../Test";
+import { checkPermissions, isWacOrAcp } from "../../services/access";
 import { useSession } from "@inrupt/solid-ui-react";
 import { Spinner } from "react-bootstrap";
-import { checkPubTypeIndex, recordDefaultFolder } from "../services/SolidPod";
-import { Habit, Note } from "./types";
-import { getDefaultFolder, getPrefLink, getPublicTypeIndexUrl, getStoragePref } from "../services/podGetters";
-import NoPermissions from "./NoPermissions";
+import { checkPubTypeIndex, recordDefaultFolder } from "../../services/SolidPod";
+import { Habit, Note } from "../../services/types";
+import { getDefaultFolder, getPrefLink, getPublicTypeIndexUrl, getStoragePref } from "../../services/podGetters";
+import NoPermissions from "../HelperComponents/NoPermissions";
 import {
   WebsocketNotification,
 } from "@inrupt/solid-client-notifications";

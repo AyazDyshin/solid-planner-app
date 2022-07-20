@@ -1,6 +1,6 @@
 import { CombinedDataProvider, useSession, Image, Text, useDataset } from '@inrupt/solid-ui-react';
 import { Button, Form } from 'react-bootstrap';
-import { Habit, Note } from './types';
+import { Habit, Note } from '../services/types';
 import { useEffect, useState } from 'react';
 import {
   buildThing, createContainerInContainer, createSolidDataset, createThing, getContainedResourceUrlAll, getDatetime,
@@ -43,11 +43,8 @@ const Test = () => {
   const [stat, setStat] = useState<string | null>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const gets = async () => {
-    let prevDate = new Date();
-    prevDate.setDate(10);
-    let today = new Date();
-    let b = differenceInCalendarDays(today, prevDate);
 
+    // await setPubAccess(webId, { read: true, append: false, write: false }, NoteInp.url, fetch, storagePref, prefFileLocation, podType);
     // let habToTest: Habit = {
     //   id: null, title: "biba", content: null, startDate: null, lastCheckInDate: null, recurrence: "daily", bestStreak: null,
     //   currentStreak: null, stat: true, category: null, url: null, access: null, prevBestStreak: null, prevLastCheckIn: null,
@@ -106,7 +103,7 @@ const Test = () => {
   }
 
 
-  //gets();
+  gets();
 
 
   return (

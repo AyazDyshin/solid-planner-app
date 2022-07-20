@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Badge, Container, Nav, Navbar } from "react-bootstrap";
-import { Note } from "./types";
+import { Note } from "../../services/types";
 import { MdOutlineArrowBackIosNew } from 'react-icons/md';
 
 interface Props {

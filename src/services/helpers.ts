@@ -1,5 +1,5 @@
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
-import { Habit } from "../components/types";
+import { Habit } from "./types";
 import {
     isSameDay, isSameWeek, isSameMonth, isSameYear, differenceInCalendarDays, getDay, format,
     differenceInCalendarWeeks, differenceInCalendarMonths, differenceInCalendarYears

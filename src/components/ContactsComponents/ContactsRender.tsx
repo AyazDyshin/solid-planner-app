@@ -1,11 +1,11 @@
 import { useSession } from "@inrupt/solid-ui-react";
 import React, { useEffect, useState } from "react";
 import { Button, Modal, Spinner } from "react-bootstrap";
-import { checkContacts, fetchAllEntries, fetchContacts, thingToNote } from "../services/SolidPod";
+import { checkContacts, fetchAllEntries, fetchContacts, thingToNote } from "../../services/SolidPod";
 import ContactsList from "./ContactsList";
 import NoContacts from "./NoContacts";
 import NoteViewer from "./NoteViewer";
-import { Note } from "./types";
+import { Note } from "../../services/types";
 import ViewNotes from "./ViewNotes";
 
 interface Props {

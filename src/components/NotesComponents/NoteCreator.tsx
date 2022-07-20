@@ -1,21 +1,21 @@
-import "../styles.css";
+import "../../styles.css";
 import { useSession } from "@inrupt/solid-ui-react";
 import { useEffect, useState } from "react";
 import { InputGroup, FormControl, Button, ButtonGroup, DropdownButton, Dropdown } from "react-bootstrap";
-import CategoryModal from "../modals/CategoryModal";
-import { editNote, saveNote } from "../services/SolidPod";
-import { accessObject, Note } from "./types";
+import CategoryModal from "../../modals/CategoryModal";
+import { editNote, saveNote } from "../../services/SolidPod";
+import { accessObject, Note } from "../../services/types";
 import { BsThreeDots, BsShare } from "react-icons/bs";
 import { FiEdit } from "react-icons/fi";
 import { RiDeleteBin6Line, RiUserSharedLine } from "react-icons/ri";
 import { BiFolderPlus } from "react-icons/bi";
 import { MdSaveAlt } from "react-icons/md";
-import AccessModal from "../modals/AccessModal";
+import AccessModal from "../../modals/AccessModal";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
-import SharedModal from "../modals/SharedModal";
-import { setPubAccess, shareWith } from "../services/access";
+import SharedModal from "../../modals/SharedModal";
+import { setPubAccess, shareWith } from "../../services/access";
 import React from 'react';
-import DeleteModal from "../modals/DeleteModal";
+import DeleteModal from "../../modals/DeleteModal";
 
 interface Props {
     newEntryCr: boolean;
@@ -226,6 +226,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
 
                 <ButtonGroup>
                     <Button className="save-note-button" variant="secondary" onClick={handleSave}><MdSaveAlt /> Save</Button>
+
                         <DropdownButton className="dropNoIcon"
                             variant="outline-secondary"
                             menuVariant="dark"

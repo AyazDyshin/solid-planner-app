@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { Modal, Spinner } from 'react-bootstrap';
 import HabitsCreator from './HabitsCreator'
 import HabitsList from './HabitsList'
-import { accessObject, Habit } from './types';
+import { accessObject, Habit } from '../../services/types';
 
 interface Props {
     habitsFetched: boolean;

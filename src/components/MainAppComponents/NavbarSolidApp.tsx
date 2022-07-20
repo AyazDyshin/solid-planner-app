@@ -1,16 +1,16 @@
 import React, { useEffect } from 'react';
 import { LogoutButton, useSession } from "@inrupt/solid-ui-react";
 import { Badge, Button, Container, Nav, Navbar, OverlayTrigger, Popover } from "react-bootstrap";
-import "../styles.css";
+import "../../styles.css";
 import { CgNotes } from "react-icons/cg";
 import { FiLogOut } from "react-icons/fi";
 import { RiContactsLine } from "react-icons/ri";
 import { TbListCheck } from "react-icons/tb";
 import { useState } from "react";
-import { capitalizeFirstLetter } from '../services/helpers';
+import { capitalizeFirstLetter } from '../../services/helpers';
 import { AiOutlineInbox } from 'react-icons/ai';
-import { appNotification } from './types';
-import { getThingsFromInbox, thingToNotification } from '../services/SolidPod';
+import { appNotification } from '../../services/types';
+import { getThingsFromInbox, thingToNotification } from '../../services/SolidPod';
 
 interface Props {
     links: string[];

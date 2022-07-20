@@ -2,18 +2,18 @@ import 'bootstrap/dist/css/bootstrap.css';
 import React from 'react';
 import { useSession } from "@inrupt/solid-ui-react";
 import { useEffect, useState } from "react";
-import "../styles.css";
+import "../../styles.css";
 import { Badge, OverlayTrigger, Popover, Button, Spinner, ButtonGroup, Container, Nav, Navbar, NavDropdown }
   from "react-bootstrap";
-import { Note } from "./types";
+import { Note } from "../../services/types";
 import { RiArrowDropDownLine, RiArrowGoBackFill } from "react-icons/ri";
 import { BiFolder } from "react-icons/bi";
 import { VscTypeHierarchySuper } from "react-icons/vsc";
 import { GoPrimitiveDot, GoCheck, GoX } from "react-icons/go";
 import { RiDeleteBin6Line } from "react-icons/ri";
-import { fetchAllEntries, thingToNote } from '../services/SolidPod';
-import DeleteModal from '../modals/DeleteModal';
-import { capitalizeFirstLetter, extractCategories, filterByAccess, filterByCategory } from '../services/helpers';
+import { fetchAllEntries, thingToNote } from '../../services/SolidPod';
+import DeleteModal from '../../modals/DeleteModal';
+import { capitalizeFirstLetter, extractCategories, filterByAccess, filterByCategory } from '../../services/helpers';
 import { MdCreate } from 'react-icons/md';
 
 interface Props {

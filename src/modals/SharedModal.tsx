@@ -2,7 +2,7 @@ import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import { useSession } from "@inrupt/solid-ui-react";
 import React, { useEffect, useState } from "react";
 import { Modal, Button, Spinner } from "react-bootstrap";
-import { accessObject, Note, Habit } from "../components/types";
+import { accessObject, Note, Habit } from "../services/types";
 import AccessElement from "./AccessElement";
 
 interface Props {

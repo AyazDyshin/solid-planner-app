@@ -4,7 +4,7 @@ import {
 } from "@inrupt/solid-client";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import { ACP } from "@inrupt/vocab-solid";
-import { accessObject, fetcher } from "../components/types";
+import { accessObject, fetcher } from "./types";
 import { changeAccessAcp, getAcpAccess } from "./helperAccess";
 import { getAccessType } from "./podGetters";
 import { createEntryInInbox } from "./SolidPod";

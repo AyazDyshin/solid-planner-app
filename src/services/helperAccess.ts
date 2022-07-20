@@ -3,7 +3,7 @@ import { WithAccessibleAcr } from "@inrupt/solid-client/dist/acp/acp";
 import { AccessControlResource } from "@inrupt/solid-client/dist/acp/control";
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import { ACL, ACP } from "@inrupt/vocab-solid";
-import { accessObject, fetcher } from "../components/types";
+import { accessObject, fetcher } from "./types";
 
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

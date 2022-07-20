@@ -1,6 +1,6 @@
 import { getSolidDataset, getThing, getUrl, getStringNoLocale, getThingAll } from "@inrupt/solid-client";
 import { space, solid, schema } from "rdf-namespaces";
-import { fetcher, voc } from "../components/types";
+import { fetcher, voc } from "./types";
 import { createEntriesInTypeIndex, recordAccessType } from "./SolidPod";
 export const getPrefLink = async (webId: string, fetch: fetcher) => {
     let dataSet;

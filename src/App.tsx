@@ -1,10 +1,10 @@
 import "regenerator-runtime/runtime";
 import React from "react";
-import LogInPage from "./components/LogInPage";
-import MainContent from "./components/MainContent";
+import LogInPage from "./components/MainAppComponents/LogInPage";
+import MainContent from "./components/MainAppComponents/MainContent";
 import { useSession } from "@inrupt/solid-ui-react";
 import { Spinner } from "react-bootstrap";
-import ErrorBoundary from "./components/ErrorBoundary";
+import ErrorBoundary from "./components/HelperComponents/ErrorBoundary";
 const App: React.FC = () => {
   const { session, sessionRequestInProgress } = useSession();
   const render = () => {

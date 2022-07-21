@@ -154,7 +154,7 @@ const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, contactsL
                                     }}
                                     aria-controls="example-collapse-text"
                                 >
-                                    By Contacts:
+                                    Contacts:
                                 </Button>
                             </div>
                             <Collapse in={contactsOpen}>

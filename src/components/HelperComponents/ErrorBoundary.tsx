@@ -38,7 +38,7 @@ const ErrorBoundary = ({ children }: Props) => {
                         <div className="d-flex justify-content-around">
                             <Button onClick={resetError} variant="info">reset</Button>
                             <LogoutButton>
-                                <Button id="logout-button" className="logout-button"><FiLogOut /> Log out</Button>
+                                <Button id="logout-button" onClick={resetError} className="logout-button"><FiLogOut /> Log out</Button>
                             </LogoutButton>
                         </div>
                     </Card.Body>

@@ -1,7 +1,7 @@
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import { useSession } from "@inrupt/solid-ui-react";
 import React, { useState, useEffect } from "react";
-import { Modal, Button, FormControl, InputGroup, Collapse, Spinner } from "react-bootstrap";
+import { Modal, Button, Collapse, Spinner } from "react-bootstrap";
 import { Habit, Note } from "../services/types";
 import { checkContacts, fetchContacts } from "../services/SolidPod";
 import "../styles.css";
@@ -47,20 +47,13 @@ const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, contactsL
         throw new Error(`Error, couldn't get user's WebId`);
     }
     const [contactsOpen, setContactsOpen] = useState<boolean>(false);
-    const [webIdOpen, setWebIdOpen] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [currentWebId, setCurrentWebId] = useState<string>("");
-    const [webIdReady, setWebIdReady] = useState<boolean>(false);
-    const [workingWebId, setWorkingWebId] = useState<string>("");
-    const [webIdToSave, setWebIdToSave] = useState<{ [x: string]: AccessModes; }>({});
     const [fullContacts, setFullContacts] = useState<{ [x: string]: string | null; }>({});
-    const [sharedList, setSharedList] = useState<Record<string, AccessModes>>({});
 
     useEffect(() => {
         const fetchAccess = async () => {
             setIsLoading(true);
             setContactsOpen(false);
-            setWebIdOpen(false);
             const inputToUse = NoteInp ? NoteInp : habitInp;
             if (!inputToUse) {
                 throw new Error("Error, entry to set access for wasn't provided");
@@ -74,7 +67,6 @@ const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, contactsL
             let shList: Record<string, AccessModes>;
             if (inputToUse.shareList) shList = inputToUse.shareList;
             else shList = {};
-            setSharedList(shList);
             let namesAndIds: (string | null)[][] = [];
             let contactsStatus = false;
             if (!contactsFetched) {
@@ -159,20 +151,10 @@ const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, contactsL
                                 <Button
                                     onClick={() => {
                                         setContactsOpen(!contactsOpen);
-                                        setWebIdOpen(false);
                                     }}
                                     aria-controls="example-collapse-text"
                                 >
                                     By Contacts:
-                                </Button>
-                                <Button
-                                    onClick={() => {
-                                        setWebIdOpen(!webIdOpen);
-                                        setContactsOpen(false);
-                                    }}
-                                    aria-controls="example-collapse-text"
-                                >
-                                    By  WebId:
                                 </Button>
                             </div>
                             <Collapse in={contactsOpen}>
@@ -236,45 +218,6 @@ const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, contactsL
                                     </div>}
                                     {
                                         !contactsFdrStatus && <NoContacts />
-                                    }
-                                </div>
-                            </Collapse>
-                            <Collapse in={webIdOpen}>
-                                <div>
-
-                                    <InputGroup>
-                                        <FormControl aria-label="Text input with dropdown button" value={currentWebId}
-                                            onChange={(e) => {
-                                                setCurrentWebId(e.target.value);
-                                            }} />
-                                        <Button onClick={() => {
-                                            setWorkingWebId(currentWebId);
-                                            if (sharedList[currentWebId]) {
-                                                setWebIdToSave({ [currentWebId]: sharedList[currentWebId] });
-                                            }
-                                            else setWebIdToSave({ [currentWebId]: { read: false, append: false, write: false } });
-                                            setCurrentWebId("");
-                                            setWebIdReady(true);
-                                        }}>Ok</Button>
-                                    </InputGroup>
-                                    {
-                                        webIdReady &&
-                                        <div>
-                                            <AccessElement
-                                                title={workingWebId}
-                                                readOnChange={() => setWebIdToSave(prevState => ({ ...prevState, [workingWebId]: { read: !webIdToSave[workingWebId].read, append: webIdToSave[workingWebId].append, write: webIdToSave[workingWebId].write } }))}
-                                                appendOnChange={() => setWebIdToSave(prevState => ({ ...prevState, [workingWebId]: { read: webIdToSave[workingWebId].read, append: !webIdToSave[workingWebId].append, write: webIdToSave[workingWebId].write } }))}
-                                                writeOnChange={() => setWebIdToSave(prevState => ({ ...prevState, [workingWebId]: { read: webIdToSave[workingWebId].read, append: webIdToSave[workingWebId].append, write: !webIdToSave[workingWebId].write } }))}
-                                                readStatus={webIdToSave[workingWebId].read}
-                                                appendStatus={webIdToSave[workingWebId].append}
-                                                writeStatus={webIdToSave[workingWebId].write}
-                                            />
-                                            <Button onClick={() => {
-                                                setAgentsToUpd(prevState => ({ ...prevState, ...webIdToSave }));
-                                                setAccUpdObj(prevState => ({ ...prevState, "agent": true }));
-                                                setWebIdReady(false);
-                                            }}>Save</Button>
-                                        </div>
                                     }
                                 </div>
                             </Collapse>

@@ -78,7 +78,7 @@ const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsA
                     size="lg"
                     onHide={() => { setHabitModalState(false) }}>
                     <Modal.Header closeButton>
-                        {creatorStatus ? "Create a habit" : "Edit a habit"}
+                        {creatorStatus ? "Create a habit" : "Habit viewer"}
                     </Modal.Header>
                     <Modal.Body id="viewerModal">
                         {habitUpdInProgress && !creatorStatus && <div className="h-100 d-flex justify-content-center align-items-center" style={{ minHeight: "200px" }}>

@@ -380,7 +380,7 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
       </div>
       {
         viewerStatus && <div className="d-flex justify-content-center my-1">
-          <Button {...(!isEdit && { disabled: true })} variant="outline-secondary" onClick={() => setCalendarModalState(true)}><BsCalendar3Event /> View in a calendar</Button>
+          <Button variant="outline-secondary" onClick={() => setCalendarModalState(true)}><BsCalendar3Event /> View in a calendar</Button>
         </div>
       }
       <Modal show={showColorPicker} onHide={() => { setShowColorPicker(false) }}>

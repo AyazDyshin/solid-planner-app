@@ -54,7 +54,6 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
   const [currentAccess, setCurrentAccess] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [habitsToShow, setHabitsToShow] = useState<Habit[]>([]);
-  const [activeHabit, setActiveHabit] = useState<number | null>(null);
   const accessArray = ["public", "private", "shared"];
   const [currentStatus, setCurrentStatus] = useState<string | null>("undone");
   const [objOfStates, setObjOfStates] = useState<{ [x: number]: boolean | null; }>({});
@@ -164,7 +163,7 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
     )
   }
   else {
-    if ((habitsToShow.length === 0) && !(currentAccess || currentCategory || currentView)) {
+    if (habitsArray.length === 0) {
       return (
         <div className="card text-center">
           <div className="card-body">
@@ -328,11 +327,10 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
                       <a
                         key={`${habit.id}${Date.now() + key + Math.floor(Math.random() * 1000)}`}
                         className={`list-group-item px-1 align-items-center 
-                        d-flex list-group-item-action ${activeHabit === habit.id ? 'active' : ''}`}
+                        d-flex list-group-item-action`}
                         onClick={(e) => {
                           e.preventDefault();
                           setIsEdit(false);
-                          setActiveHabit(habit.id);
                           setHabitToView(habit);
                           setViewerStatus(true);
                           setCreatorStatus(false);

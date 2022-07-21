@@ -83,7 +83,7 @@ const NotesRender = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorS
                     size="lg"
                     onHide={() => { setNoteModalState(false) }}>
                     <Modal.Header closeButton>
-                        {creatorStatus ? "Create a note" : "Edit a note"}
+                        {creatorStatus ? "Create a note" : "Note viewer"}
                     </Modal.Header>
                     <Modal.Body id="viewerModal">
                         {noteUpdInProgress && !creatorStatus && <div className="h-100 d-flex justify-content-center align-items-center" style={{ minHeight: "200px" }}>

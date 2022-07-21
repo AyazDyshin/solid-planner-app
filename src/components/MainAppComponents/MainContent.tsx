@@ -138,7 +138,7 @@ const MainContent = () => {
     if (permissionStatus) {
       return (
         <div>
-          <Test />
+          {/* <Test /> */}
           <NavbarSolidApp
             links={links}
             active={active}

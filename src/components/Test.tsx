@@ -43,7 +43,7 @@ const Test = () => {
   const [stat, setStat] = useState<string | null>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const gets = async () => {
-
+    await checkPermissions(webId??"", fetch ,"https://inrtester3.inrupt.net/","wac");
     // await setPubAccess(webId, { read: true, append: false, write: false }, NoteInp.url, fetch, storagePref, prefFileLocation, podType);
     // let habToTest: Habit = {
     //   id: null, title: "biba", content: null, startDate: null, lastCheckInDate: null, recurrence: "daily", bestStreak: null,

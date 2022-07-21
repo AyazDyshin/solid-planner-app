@@ -52,7 +52,6 @@ const NotesList = ({ notesArray, setNotesArray, setNoteToView, storagePref,
   const [currentAccess, setCurrentAccess] = useState<string | null>(null);
   const [notesToShow, setNotesToShow] = useState<Note[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [activeNote, setActiveNote] = useState<number | null>(null);
   const accessArray = ["public", "private", "shared"];
   const [deleteModalState, setDeleteModalState] = useState<boolean>(false);
   const [urlToDelete, setUrlToDelete] = useState<string | null>(null);
@@ -220,11 +219,10 @@ const NotesList = ({ notesArray, setNotesArray, setNoteToView, storagePref,
                     return <a
                       key={`${note.id}${Date.now() + index + Math.floor(Math.random() * 1000)}`}
                       className={`list-group-item align-items-center 
-                  px-1 d-flex list-group-item-action ${activeNote === note.id ? 'active' : ''}`}
+                  px-1 d-flex list-group-item-action`}
                       onClick={(e) => {
                         e.preventDefault();
                         setIsEdit(false);
-                        setActiveNote(note.id);
                         setNoteToView(note);
                         setViewerStatus(true);
                         setCreatorStatus(false);

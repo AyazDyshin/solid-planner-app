@@ -84,8 +84,7 @@ const NavbarSolidApp = ({ links, active, setActive, refetchNotifications, podTyp
                                     <div>the <strong>{link.entryType}</strong> has the following url:</div>
                                     <div><strong>{link.url}</strong></div>
                                     <div>your access rights to this  <strong>{link.entryType}</strong> are: </div>
-                                    <strong>{link.access.read && "read"}</strong>
-                                    <strong>{link.access.append && "append"}</strong>
+                                    <strong>{link.access.read && "read"}</strong> <strong>{link.access.append && "append"}</strong> 
                                     <strong> {link.access.write && "write"}</strong>
                                 </div>
                             ))

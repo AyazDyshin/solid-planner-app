@@ -781,8 +781,6 @@ export const editNote = async (webId: string, fetch: fetcher, noteToEdit: Note, 
 */
 export const deleteEntry = async (webId: string, fetch: fetcher, urlToDelete: string, entry: string, storagePref: string,
   publicTypeIndexUrl: string): Promise<void> => {
-    console.log("we are here ");
-    console.log(urlToDelete);
   const urlsArr = await getAllUrlFromPublicIndex(webId, fetch, entry, storagePref, publicTypeIndexUrl);
   await Promise.all(urlsArr.map(async (url) => {
     const data = await getSolidDataset(url, { fetch: fetch });
@@ -877,8 +875,18 @@ export const fetchContacts = async (fetch: fetcher, storagePref: string): Promis
   return ret;
 }
 
+/**
+* creates a notification in the provided user's inbox
+* @param   {string} webId webId of the user
+* @param   {string} otherWebId webId of the user for which the notification is sent
+* @param   {fetcher} fetch fetch function
+* @param   {string} entry type of an entry that was shared, can be a note or a habit
+* @param   {accessObject} acessObj access rights that are shared for the given entry
+* @param   {string} url url of the shared entry
+* @return  {Promise<void>}
+*/
 export const createEntryInInbox = async (webId: string, otherWebId: string, fetch: fetcher, entry: string,
-  accessObj: accessObject, url: string) => {
+  accessObj: accessObject, url: string): Promise<void> => {
   const otherInboxUrl = await getInboxUrl(otherWebId, fetch);
   let dataSet = createSolidDataset();
   const id = Date.now() + Math.floor(Math.random() * 1000);
@@ -901,16 +909,23 @@ export const createEntryInInbox = async (webId: string, otherWebId: string, fetc
   }
   dataSet = setThing(dataSet, aThing);
   try {
-  await saveSolidDatasetInContainer(otherInboxUrl, dataSet, { fetch: fetch });
+    await saveSolidDatasetInContainer(otherInboxUrl, dataSet, { fetch: fetch });
   }
-  catch (error){
+  catch (error) {
     let message = 'Unknown Error';
     if (error instanceof Error) message = error.message;
     throw new Error(`couldn't append a message to the ${otherInboxUrl}, this might be due to the fact that it either doesn't exist or is set to private. Your entry was shared, but the user won't be notified about this, error: ${message}`);
   }
 }
 
-export const getThingsFromInbox = async (webId: string, fetch: fetcher, update?: boolean) => {
+/**
+* returns an array of thing from the user's inbox container 
+* @param   {string} webId webId of the user
+* @param   {fetcher} fetch fetch function
+* @param   {boolean} [update] if true, then the update of existing entries is performed
+* @return  {Promise<ThingPersisted[]>} returns an array of things from the user's inbox that were created by this application
+*/
+export const getThingsFromInbox = async (webId: string, fetch: fetcher, update?: boolean): Promise<ThingPersisted[]> => {
   const inboxUrl = await getInboxUrl(webId, fetch);
   let dataSet;
   try {
@@ -950,7 +965,14 @@ export const getThingsFromInbox = async (webId: string, fetch: fetcher, update?:
   return updArr.filter((thing) => (getBoolean(thing, solid.read) === false) && (getIri(thing, RDF.type) === solid.Notification));
 }
 
-export const checkPubTypeIndex = async (publicTypeIndexUrl: string, fetch: fetcher, storagePref: string) => {
+/**
+* checks public type index file and creates application's entries if those are missing
+* @param   {string} publicTypeIndexUrl url of user's public type index file
+* @param   {fetcher} fetch fetch function
+ * @param   {string} storagePref url of user's preferred storage location
+* @return  {Promise<void>}
+*/
+export const checkPubTypeIndex = async (publicTypeIndexUrl: string, fetch: fetcher, storagePref: string): Promise<void> => {
   let dataSet;
   try {
     dataSet = await getSolidDataset(publicTypeIndexUrl, {

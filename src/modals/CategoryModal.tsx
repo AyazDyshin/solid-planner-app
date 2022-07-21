@@ -13,7 +13,13 @@ interface Props {
     viewerStatus: boolean;
     categoryArray: string[];
 }
-//a popup window to prompt user to pick a folder
+
+/**
+ * Component that renders category picker modal
+ *
+ * @category Modals
+ * @component
+ */
 const CategoryModal = ({ categoryModalState, setCategoryModalState, setNoteInp,
     noteInp, viewerStatus, categoryArray, habitInp, setHabitInp, setEntryChanged }: Props) => {
     const [input, setInput] = useState<string>("");

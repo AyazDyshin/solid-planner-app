@@ -1,6 +1,11 @@
 import React, { useState } from 'react'
 import { Button, Collapse } from "react-bootstrap";
 
+/**
+ * Is rendered when user does not have contacts in their POD, gives explanation on to add those
+ *
+ * @category Contacts components
+ */
 const NoContacts = () => {
     const [open, setOpen] = useState(false);
 

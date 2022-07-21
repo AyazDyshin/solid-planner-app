@@ -23,6 +23,11 @@ interface Props {
     refetchHabits: boolean;
 }
 
+/**
+ * renders components of habits tab
+ *
+ * @category Habits components
+ */
 const HabitsRender = ({ habitsFetched, setHabitsFetched, habitsArray, setHabitsArray, storagePref, prefFileLocation,
     publicTypeIndexUrl, podType, defFolder, contactsFdrStatus, setContactsFdrStatus, refetchHabits,
     contactsArr, setContactsArr, contactsFetched }: Props) => {

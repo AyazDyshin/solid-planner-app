@@ -8,6 +8,11 @@ interface Props {
     children: JSX.Element;
 }
 
+/**
+ * Fallback component that is render when an error occurs. Gives information about error and renders logout and refresh buttons.
+ *
+ * @category Helper components
+ */
 const ErrorBoundary = ({ children }: Props) => {
     const [error, setError] = React.useState("");
 

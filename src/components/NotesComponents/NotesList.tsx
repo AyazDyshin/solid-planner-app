@@ -38,6 +38,11 @@ interface Props {
   refetchNotes: boolean;
 }
 
+/**
+ * Fetches user's notes list if not fetched and renders it
+ *
+* @category Notes components
+ */
 const NotesList = ({ notesArray, setNotesArray, setNoteToView, storagePref,
   setViewerStatus, setCreatorStatus, setIsEdit, categoryArray, setCategoryArray, publicTypeIndexUrl,
   newEntryCr, setNewEntryCr, noteUpdInProgress, notesFetched, setNotesFetched, podType,

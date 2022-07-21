@@ -41,6 +41,12 @@ interface Props {
   setHabitModalState: React.Dispatch<React.SetStateAction<boolean>>;
   refetchHabits: boolean;
 }
+
+/**
+ * Fetches user's habits list if not fetched and renders it
+ *
+ * @category Habits components
+ */
 const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabitsFetched, habitsArray, setHabitsArray,
   setIsEdit, setHabitToView, newEntryCr, setNewEntryCr, storagePref, categoryArray, setCategoryArray, currentView,
   setCurrentView, prefFileLocation, publicTypeIndexUrl, podType, defFolder, habitUpdInProgress, setHabitModalState, refetchHabits
@@ -289,6 +295,9 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
                           onClick={() => {
                             setCurrentCategory(null);
                             setCurrentAccess(null);
+                            setCurrentStatus("undone");
+                            setCurrentView("today");
+
                           }
                           }><RiArrowGoBackFill /> Reset all</Nav.Link>
                       </OverlayTrigger>

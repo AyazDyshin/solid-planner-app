@@ -7,6 +7,12 @@ interface Props {
     setProviderModalState: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+/**
+ * Component that renders information about which provider to pick modal
+ *
+ * @category Modals
+ * @component
+ */
 const ProviderModal = ({ providerModalState, setProviderModalState }: Props) => {
 
     return (

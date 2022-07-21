@@ -21,6 +21,11 @@ interface Props {
     setContactsFdrStatus: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+/**
+ *  renders components of contacts tab
+ *
+ * @category Contacts components
+ */
 const ContactsRender = ({ storagePref, publicTypeIndexUrl, prefFileLocation, podType, contactsArr, setContactsArr,
     contactsFetched, setContactsFetched, contactsFdrStatus, setContactsFdrStatus
 }: Props) => {

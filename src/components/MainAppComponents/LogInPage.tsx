@@ -8,8 +8,11 @@ import ProviderModal from "../../modals/ProviderModal";
 import { RiArrowDropDownLine } from 'react-icons/ri';
 import "../../styles.css";
 
-// Login page, Dropdown menu for the user to choose the issuer
-// The login functionality itself is done by LoginButton component from @inrupt/solid-ui-react
+/**
+ * Component that renders Log in page of the application
+ *
+ * @category Main app components
+ */
 const LogInPage = () => {
   const [issuer, setIssuer] = useState<string>("https://");
   const [providerModalState, setProviderModalState] = useState<boolean>(false);

@@ -6,6 +6,11 @@ interface Props {
     noteToView: Note | null;
 }
 
+/**
+ * A view of a note entry of a contact
+ *
+ * @category Contacts components
+ */
 const NoteViewer = ({ noteToView }: Props) => {
     if (!noteToView) {
         throw new Error("Error, note to view wasn't provided");

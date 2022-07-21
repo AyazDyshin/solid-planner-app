@@ -11,6 +11,12 @@ interface Props {
     habitsInp: Habit[];
 }
 
+/**
+ * Component that renders calendar modal
+ *
+ * @category Modals
+ * @component
+ */
 const CalendarModal = ({ calendarModalState, setCalendarModalState, habitsInp }: Props) => {
     const handleClose = () => {
         setCalendarModalState(false);

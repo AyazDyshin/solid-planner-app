@@ -12,6 +12,11 @@ interface Props {
     setContactModalState: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+/**
+ * Renders a list of notes of selected contacts
+ *
+ * @category Contacts components
+ */
 const ViewNotes = ({ setOtherWebId, notesArray, setNoteToView, setViewerStatus, setIsLoading, setContactModalState
 }: Props) => {
     const [activeNote, setActiveNote] = useState<number | null>(null);

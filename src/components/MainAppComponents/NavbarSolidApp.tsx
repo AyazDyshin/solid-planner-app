@@ -19,9 +19,11 @@ interface Props {
     refetchNotifications: boolean;
     podType: string;
 }
-// this component renders NavBar, it iterates over "links" array and creates corresponding links
-// clicking on the links sets "active" to the links value
-// logout functionality is implemented using "LogoutButton" component from @inrupt/solid-ui-react
+/**
+ * Component that renders navigation menu of the application
+ *
+ * @category Main app components
+ */
 const NavbarSolidApp = ({ links, active, setActive, refetchNotifications, podType }: Props) => {
     const { session, fetch } = useSession();
     const { webId } = session.info;
@@ -84,7 +86,7 @@ const NavbarSolidApp = ({ links, active, setActive, refetchNotifications, podTyp
                                     <div>the <strong>{link.entryType}</strong> has the following url:</div>
                                     <div><strong>{link.url}</strong></div>
                                     <div>your access rights to this  <strong>{link.entryType}</strong> are: </div>
-                                    <strong>{link.access.read && "read"}</strong> <strong>{link.access.append && "append"}</strong> 
+                                    <strong>{link.access.read && "read"}</strong> <strong>{link.access.append && "append"}</strong>
                                     <strong> {link.access.write && "write"}</strong>
                                 </div>
                             ))

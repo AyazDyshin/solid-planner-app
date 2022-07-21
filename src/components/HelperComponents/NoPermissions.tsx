@@ -9,6 +9,11 @@ interface Props {
     setRefresh: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+/**
+ * Fallback component that is render when the application does not have required permissions. Gives information on how to fix this.
+ *
+ * @category Helper components
+ */
 const NoPermissions = ({ refresh, setRefresh }: Props) => {
     const { session } = useSession();
     const { webId } = session.info;

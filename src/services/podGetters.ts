@@ -2,6 +2,14 @@ import { getSolidDataset, getThing, getUrl, getStringNoLocale, getThingAll } fro
 import { space, solid, schema } from "rdf-namespaces";
 import { fetcher, voc } from "./types";
 import { createEntriesInTypeIndex, recordAccessType } from "./SolidPod";
+
+/**
+* Returns user's preference application folder location
+* @category Pod getter functions
+* @param   {string} webId webId of the user
+* @param   {fetcher} fetch fetch function
+* @return  {Promise<string>} returns url of the preference folder location
+*/
 export const getPrefLink = async (webId: string, fetch: fetcher) => {
     let dataSet;
     try {
@@ -26,8 +34,14 @@ export const getPrefLink = async (webId: string, fetch: fetcher) => {
 }
 
 
-//returns user's storage preference url
-export const getStoragePref = async (webId: string, fetch: fetcher) => {
+/**
+* Returns user's preference storage location
+* @category Pod getter functions
+* @param   {string} webId webId of the user
+* @param   {fetcher} fetch fetch function
+* @return  {Promise<string>} url of the preference storage location
+*/
+export const getStoragePref = async (webId: string, fetch: fetcher): Promise<string> => {
     let dataSet;
     try {
         dataSet = await getSolidDataset(webId, {
@@ -50,7 +64,14 @@ export const getStoragePref = async (webId: string, fetch: fetcher) => {
     }
 }
 
-export const getInboxUrl = async (webId: string, fetch: fetcher) => {
+/**
+* Returns user's inbox folder location
+* @category Pod getter functions
+* @param   {string} webId webId of the user
+* @param   {fetcher} fetch fetch function
+* @return  {Promise<string>} url of the inbox folder location
+*/
+export const getInboxUrl = async (webId: string, fetch: fetcher): Promise<string> => {
     let dataSet;
     try {
         dataSet = await getSolidDataset(webId, {
@@ -73,6 +94,13 @@ export const getInboxUrl = async (webId: string, fetch: fetcher) => {
     }
 }
 
+/**
+* Returns user's public type index file location
+* @category Pod getter functions
+* @param   {string} webId webId of the user
+* @param   {fetcher} fetch fetch function
+* @return  {Promise<string>} url of the user's public type index file
+*/
 export const getPublicTypeIndexUrl = async (webId: string, fetch: fetcher) => {
     let dataSet;
     try {
@@ -96,7 +124,13 @@ export const getPublicTypeIndexUrl = async (webId: string, fetch: fetcher) => {
     }
 }
 
-
+/**
+* Returns user's preference storage location
+* @category Pod getter functions
+* @param   {string} webId webId of the user
+* @param   {fetcher} fetch fetch function
+* @return  {Promise<string>} url of the preference storage location
+*/
 export const getDefaultFolder = async (webId: string, fetch: fetcher, prefFileLocation: string): Promise<string | null> => {
 
     let dataSet
@@ -118,9 +152,18 @@ export const getDefaultFolder = async (webId: string, fetch: fetcher, prefFileLo
     return defFolderUrl;
 }
 
-
+/**
+ * returns POD's access mechanism's type
+ * @category Pod getter functions
+ * @param   {string} webId webId of the user
+ * @param   {fetcher} fetch fetch function
+ * @param   {string} storagePref url of user's preferred storage location
+ * @param   {string} prefFileLocation url of user's preference file location
+ * @param   {string} podType denotes what access control mechanism user's POD uses, can be wac or acp
+ * @return  {Promise<string>} POD's access mechanism type, can be 'wac' or 'acp
+ */
 export const getAccessType = async (webId: string, fetch: fetcher, storagePref: string, prefFileLocation: string,
-    podType: string) => {
+    podType: string): Promise<string> => {
     let dataSet
     try {
         dataSet = await getSolidDataset(prefFileLocation, {
@@ -161,10 +204,19 @@ export const getAccessType = async (webId: string, fetch: fetcher, storagePref: 
     return type;
 }
 
-
+/**
+ * returns all urls contained in the user's public type index file for a given entry type
+ * @category Pod getter functions
+ * @param   {string} webId webId of the user
+ * @param   {fetcher} fetch fetch function
+ * @param   {string} entry entry type to get urls for
+ * @param   {string} storagePref url of user's preferred storage location
+ * @param   {string} publicTypeIndexUrl url of the user's public type index file location
+ * @return  {Promise<Array>} an array of urls of locations of files of the given entry's type
+ */
 export const getAllUrlFromPublicIndex = async (webId: string, fetch: fetcher, entry: string, storagePref: string,
     publicTypeIndexUrl: string, other?: boolean
-) => {
+): Promise<string[]> => {
     if (other) {
         let newPublicTypeUrl = "";
         try {

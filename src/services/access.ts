@@ -9,12 +9,14 @@ import { changeAccessAcp, getAcpAccess } from "./helperAccess";
 import { getAccessType } from "./podGetters";
 import { createEntryInInbox } from "./SolidPod";
 
-/* 
-this function is used to defaultAccessControlAgentMatcherAppendPolicyialize Acl for resources stored on PODs utilizing WAC access type that don't have acl attached,
-once getPublicAccess function from universalAccess module will be fixed, this function won't be needed.
-ref: https://github.com/inrupt/solid-client-js/issues/1549
+/**
+* initialzes ACL for resources contained in a WAC POD
+* @category Access functions
+* @param   {string} url url of the resource to initialze ACL for
+* @param   {fetcher} fetch fetch function
+* @return  {Promise<void>}
 */
-export const initializeAcl = async (url: string, fetch: fetcher) => {
+export const initializeAcl = async (url: string, fetch: fetcher): Promise<void> => {
     let myDatasetWithAcl
     try {
         myDatasetWithAcl = await getSolidDatasetWithAcl(url, { fetch: fetch });
@@ -45,8 +47,19 @@ export const initializeAcl = async (url: string, fetch: fetcher) => {
     await saveAclFor(myDatasetWithAcl, resourceAcl, { fetch: fetch });
 }
 
+/**
+* Wrapper function that calls @see getPubAccess and @see getSharedList to get public access and agents access of a given resource
+* @category Access functions
+* @param   {string} webId webId of the user
+* @param   {string} url url of the resource to get access for
+* @param   {fetcher} fetch fetch function
+* @param   {string} storagePref url of user's preferred storage location
+* @param   {string} prefFileLocation url of user's preference file location
+* @param   {string} podType denotes what access control mechanism user's POD uses, can be wac or acp
+* @return  {Promise<Array>} returns an array of object containing information about resource's public and agents access or null
+*/
 export const determineAccess = async (webId: string, url: string, fetch: fetcher, storagePref: string, prefFileLocation: string,
-    podType: string) => {
+    podType: string): Promise<(Record<string, AccessModes> | null)[]> => {
     let accType;
     const pubAcc = await getPubAccess(webId, url, fetch, storagePref, prefFileLocation, podType);
     pubAcc.read ? accType = { "public": pubAcc } : accType = { "private": pubAcc };
@@ -55,8 +68,19 @@ export const determineAccess = async (webId: string, url: string, fetch: fetcher
     if (!(Object.keys(sharedList).length === 0)) retShared = sharedList;
     return [accType, retShared];
 }
-// This function is used to set public Access type for both WAC and ACP PODs, sets access type to either public or private
-// ie give read permission to general public or not.
+
+/**
+* Sets given public access rights for a given resource
+* @category Access functions
+* @param   {string} webId webId of the user
+* @param   {accessObject} accessObj the access rights to set 
+* @param   {string} url url of the resource to set public access for
+* @param   {fetcher} fetch fetch function
+* @param   {string} storagePref url of user's preferred storage location
+* @param   {string} prefFileLocation url of user's preference file location
+* @param   {string} podType denotes what access control mechanism user's POD uses, can be wac or acp
+* @return  {Promise<void>}
+*/
 export const setPubAccess = async (webId: string, accessObj: accessObject, url: string, fetch: fetcher,
     storagePref: string, prefFileLocation: string, podType: string) => {
     const type = await getAccessType(webId, fetch, storagePref, prefFileLocation, podType);
@@ -93,7 +117,20 @@ export const setPubAccess = async (webId: string, accessObj: accessObject, url: 
     }
 }
 
-// this function is used to give read permission to specific Agents. Used for both WAC and ACP PODs
+/**
+* Sets given access rights for a given agent for a given resource
+* @category Access functions
+* @param   {string} webId webId of the user
+* @param   {string} url url of the resource to set agent access for
+* @param   {fetcher} fetch fetch function
+* @param   {accessObject} accessObj the access rights to set 
+* @param   {string} shareWith agent's WebID to set the access right for
+* @param   {string} storagePref url of user's preferred storage location
+* @param   {string} prefFileLocation url of user's preference file location
+* @param   {string} podType denotes what access control mechanism user's POD uses, can be wac or acp
+* @param   {string} entry entry type to set the access rights for, can be note or habit
+* @return  {Promise<void>}
+*/
 export const shareWith = async (webId: string, url: string, fetch: fetcher, accessObj: accessObject,
     shareWith: string, storagePref: string, prefFileLocation: string, podType: string, entry: string) => {
     const type = await getAccessType(webId, fetch, storagePref, prefFileLocation, podType);
@@ -135,9 +172,19 @@ export const shareWith = async (webId: string, url: string, fetch: fetcher, acce
     }
 }
 
-
+/**
+* Function that returns a list of agents that for whom access rights are defined for a give resource
+* @category Access functions
+* @param   {string} webId webId of the user
+* @param   {string} url url of the resource to get the agent's access for
+* @param   {fetcher} fetch fetch function
+* @param   {string} storagePref url of user's preferred storage location
+* @param   {string} prefFileLocation url of user's preference file location
+* @param   {string} podType denotes what access control mechanism user's POD uses, can be wac or acp
+* @return  {Promise<Record<string, AccessModes>>} returns an object with all agents and their access rights to the given resource
+*/
 export const getSharedList = async (webId: string, url: string, fetch: fetcher, storagePref: string, prefFileLocation: string,
-    podType: string) => {
+    podType: string): Promise<Record<string, AccessModes>> => {
 
     if (podType === "wac") {
         try {
@@ -178,11 +225,24 @@ export const getSharedList = async (webId: string, url: string, fetch: fetcher, 
     }
 }
 
-
-
-
+/**
+* Function that returns public access rights of a given resource
+* @category Access functions
+* @param   {string} webId webId of the user
+* @param   {string} url url of the resource to get the agent's access for
+* @param   {fetcher} fetch fetch function
+* @param   {accessObject} accessObj the access rights to set 
+* @param   {string} storagePref url of user's preferred storage location
+* @param   {string} prefFileLocation url of user's preference file location
+* @param   {string} podType denotes what access control mechanism user's POD uses, can be wac or acp
+* @return  {Promise<Object>} returns an object with public access rights for a given resource
+*/
 export const getPubAccess = async (webId: string, url: string, fetch: fetcher, storagePref: string, prefFileLocation: string,
-    podType: string) => {
+    podType: string): Promise<AccessModes | {
+        read: boolean;
+        append: boolean;
+        write: boolean;
+    }> => {
     if (podType === "wac") {
         try {
             const pubAcc = await universalAccess.getPublicAccess(url, { fetch: fetch });
@@ -212,7 +272,14 @@ export const getPubAccess = async (webId: string, url: string, fetch: fetcher, s
     }
 }
 
-export const isWacOrAcp = async (url: string, fetch: fetcher) => {
+/**
+* Function that gets the PODs access mechanism
+* @category Access functions
+* @param   {string} url url of the resource to get the agent's access for
+* @param   {fetcher} fetch fetch function
+* @return  {Promise<"wac" | "acp">} returns "wac" or "acp"
+*/
+export const isWacOrAcp = async (url: string, fetch: fetcher): Promise<"wac" | "acp"> => {
     let dataSetWithAcr;
     try {
         dataSetWithAcr = await acp_ess_2.getSolidDatasetWithAcr(url, { fetch: fetch });
@@ -231,7 +298,16 @@ export const isWacOrAcp = async (url: string, fetch: fetcher) => {
     return "acp";
 }
 
-export const checkPermissions = async (webId: string, fetch: fetcher, storage: string, type: string) => {
+/**
+* Checks application's permission for the user's POD
+* @category Access functions
+* @param   {string} webId webId of the user
+* @param   {fetcher} fetch fetch function
+* @param   {string} storage url of user's preferred storage location
+* @param   {string} type denotes what access control mechanism user's POD uses, can be wac or acp
+* @return  {Promise<boolean>} returns true if the application has all the needed rights and false otherwise
+*/
+export const checkPermissions = async (webId: string, fetch: fetcher, storage: string, type: string): Promise<boolean> => {
 
     try {
         if (type === "acp") {

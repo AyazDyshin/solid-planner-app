@@ -36,7 +36,13 @@ interface Props {
     setContactsArr: React.Dispatch<React.SetStateAction<(string | null)[][]>>;
     contactsFetched: boolean;
 }
-//a popup window to prompt user to set access type
+
+/**
+ * Component that renders access rights setting modal
+ *
+ * @category Modals
+ * @component
+ */
 const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, contactsList, setContactsList,
     setAccUpdObj, publicAccess, setPublicAccess, habitInp, storagePref, contactsFdrStatus, setContactsFdrStatus,
     setAgentsToUpd, contactsArr, setContactsArr, contactsFetched
@@ -229,11 +235,11 @@ const AccessModal = ({ accessModalState, setAccessModalState, NoteInp, contactsL
                                 setAccUpdObj({});
                                 setAccessModalState(false);
                             }}>Go back</Button>
-                        <Button 
-                        className="set-access"
-                        variant="primary" onClick={() => {
-                            setAccessModalState(false);
-                        }}>Set</Button>
+                        <Button
+                            className="set-access"
+                            variant="primary" onClick={() => {
+                                setAccessModalState(false);
+                            }}>Set</Button>
                     </Modal.Footer>
                 </div>
             }

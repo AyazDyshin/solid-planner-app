@@ -5,15 +5,26 @@ import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 import { ACL, ACP } from "@inrupt/vocab-solid";
 import { accessObject, fetcher } from "./types";
 
-
+/**
+* Function that returns true if a given resource has accessible acr
+* @category helper access functions
+* @param   {Object} resource object with internal_acp property
+* @return  {boolean} true if resource has accessible acr, false otherwise
+*/
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function hasAccessibleAcr(resource: { internal_acp: any; }) {
+export function hasAccessibleAcr(resource: { internal_acp: any; }): boolean {
     return (typeof resource.internal_acp === "object" &&
         resource.internal_acp !== null &&
         typeof resource.internal_acp.acr === "object" &&
         resource.internal_acp.acr !== null);
 }
 
+/**
+* Function that returns given resource's acr
+* @category helper access functions
+* @param   {Object} resource object with internal_acp property
+* @return  { AccessControlResource} resource's acr
+*/
 export function getAcr(
     resource: { internal_acp: { acr: AccessControlResource; }; }
 ): AccessControlResource {
@@ -23,7 +34,16 @@ export function getAcr(
     return resource.internal_acp.acr;
 }
 
-export const changeAccessAcp = async (url: string, access: accessObject, agent: string, fetch: fetcher) => {
+/**
+* Function that changes ACP access for a given agent for a given resource
+* @category helper access functions
+* @param   {string} url url of the resource to change access for
+* @param   {accessObject} access access rights to apply
+* @param   {string} agent agent to set the access rights for
+* @param   {fetcher} fetch fetch function
+* @return  {Promise<void>}
+*/
+export const changeAccessAcp = async (url: string, access: accessObject, agent: string, fetch: fetcher): Promise<void> => {
     let resourceWithAcr;
     try {
         resourceWithAcr = await acp_ess_2.getSolidDatasetWithAcr(
@@ -88,7 +108,12 @@ export const changeAccessAcp = async (url: string, access: accessObject, agent: 
     }
 }
 
-//used
+/**
+* Function that returns an array of arrays. First array contains read, append, write matchers for a given resource, second array contains read, append, write policies for a given resource
+* @category helper access functions
+* @param   {string} url url of the resource to get matchers and polices for 
+* @param   {fetcher} fetch fetch function
+*/
 export const getAcpMatchersAndPolices = async (url: string, fetch: fetcher) => {
     let resourceWithAcr;
     try {
@@ -129,8 +154,16 @@ export const getAcpMatchersAndPolices = async (url: string, fetch: fetcher) => {
     ];
 }
 
-//used
-export const getAcpAccess = async (webId: string, url: string, fetch: fetcher, acc: string) => {
+/**
+* Function that get list of agents and their access rights or public access rights for a given ACP resource
+* @category helper access functions
+* @param   {string} webId webId of the user
+* @param   {string} url url of the resource to get agents access for
+* @param   {fetcher} fetch fetch function
+* @param   {string} acc type of access to get, agent or public 
+* @return  {Promise<Record<string, AccessModes>>} object with access rights
+*/
+export const getAcpAccess = async (webId: string, url: string, fetch: fetcher, acc: string): Promise<Record<string, AccessModes>> => {
     const [[readMatcher, appendMatcher, writeMatcher]] = await getAcpMatchersAndPolices(url, fetch);
     const accObj: Record<string, AccessModes> = {};
 

@@ -23,6 +23,12 @@ interface Props {
     setHabitsArray?: React.Dispatch<React.SetStateAction<Habit[]>>;
 }
 
+/**
+ * Component that renders delete modal
+ *
+ * @category Modals
+ * @component
+ */
 const DeleteModal = ({ deleteModalState, setDeleteModalState, urlToDelete, setUrlToDelete, entryType, storagePref, setNewEntryCr,
     publicTypeIndexUrl, setNotesArray, newEntryCr, setViewerStatus, setCreatorStatus, notesArray, progressCheck,
     habitsArray, setHabitsArray
@@ -56,7 +62,7 @@ const DeleteModal = ({ deleteModalState, setDeleteModalState, urlToDelete, setUr
         }
         await deleteEntry(webId, fetch, urlToDelete, entryType, storagePref, publicTypeIndexUrl);
     }
-    
+
     return (
         <Modal show={deleteModalState} onHide={handleClose}>
             {progressCheck && <div className="h-100 d-flex justify-content-center align-items-center" style={{ minHeight: "200px" }}>

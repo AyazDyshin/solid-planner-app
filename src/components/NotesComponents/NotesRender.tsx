@@ -30,13 +30,12 @@ interface Props {
     contactsFetched: boolean;
     refetchNotes: boolean;
 }
-// Component that is responsible for rendering content of notes and habits tab
-// splits the content in two halves, left half: "FolderPickerOrContent"
-// right half: "CreatorToRender"
-// "newEntryCr" and "setNewEntryCr" are indicating if a new entry was created
-// this is needed to update the left side view, ie list of entries existing in the user's pod
-// "creatorStatus" and "setCreatorStatus" are hooks to monitor if create button was pressed,
-// this is needed to render the respective creator component
+
+/**
+ * renders components of notes tab
+ *
+* @category Notes components
+ */
 const NotesRender = ({ viewerStatus, setViewerStatus, creatorStatus, setCreatorStatus, isEdit, storagePref, defFolder,
     setIsEdit, notesArray, setNotesArray, notesFetched, setNotesFetched, podType,
     prefFileLocation, publicTypeIndexUrl, contactsFdrStatus, setContactsFdrStatus, contactsArr, setContactsArr,

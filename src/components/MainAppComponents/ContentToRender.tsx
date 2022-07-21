@@ -32,8 +32,11 @@ interface Props {
     refetchNotes: boolean;
     refetchHabits: boolean;
 }
-// this component decides what to render based on "active" property ie clicked tab
-// while seems redundant at the moment will be useful once other tabs will be implemented
+/**
+ * Component that renders other components based on the tab in the main menu selected
+ *
+ * @category Main app components
+ */
 const ContentToRender = ({ active, viewerStatus, setViewerStatus, habitsFetched, setHabitsFetched, habitsArray, setHabitsArray,
     creatorStatus, setCreatorStatus, isEdit, setIsEdit, notesArray, storagePref, defFolder, prefFileLocation, podType,
     setNotesArray, notesFetched, setNotesFetched, publicTypeIndexUrl,

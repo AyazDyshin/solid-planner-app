@@ -8,6 +8,11 @@ interface Props {
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+/**
+ * Fetches contacts list from the user's POD if not fetched and renders contacts list
+ *
+ * @category Contacts components
+ */
 const ContactsList = ({ contactsArr, setOtherWebId, setIsLoading }: Props) => {
     contactsArr.map((item) => item[0]);
     const [activeContact, setActiveContact] = useState<string | null>(null);

@@ -10,6 +10,12 @@ interface Props {
     writeStatus: boolean;
 }
 
+/**
+ * helper component for AccessModal that renders access rights setting UI
+ *
+ * @category Modals
+ * @component
+ */
 const AccessElement = ({ title, readOnChange, appendOnChange, writeOnChange, readStatus, appendStatus, writeStatus }: Props) => {
     return (
         <div className="my-2" key={Date.now() + Math.floor(Math.random() * 1000)}>

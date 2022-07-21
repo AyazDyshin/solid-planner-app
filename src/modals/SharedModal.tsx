@@ -19,7 +19,13 @@ interface Props {
         [x: string]: AccessModes;
     }>>;
 }
-//a popup window to prompt user to pick a folder
+
+/**
+ * Component that renders shared list of a given entry modal
+ *
+ * @category Modals
+ * @component
+ */
 const SharedModal = ({ sharedModalState, setSharedModalState, NoteInp, publicAccess, setAccUpdObj, setAgentsToUpd, setPublicAccess,
     habitInp }: Props) => {
     const { session } = useSession();

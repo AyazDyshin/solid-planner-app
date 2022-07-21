@@ -56,6 +56,7 @@ export const thingToNotification = (toChange: Thing) => {
 }
 /**
  * returns a note from a given thing
+ * @category Main solid POD functions
  * @param   {Thing | null} toChange thing to transform
  * @param   {string} webId webId of the user
  * @param   {fetcher} fetch fetch function
@@ -95,6 +96,7 @@ export const thingToNote = async (toChange: Thing | null, webId: string, fetch: 
 
 /**
  * returns a habit from a given thing
+* @category Main solid POD functions
  * @param   {Thing | null} toChange thing to transform
  * @param   {string} webId webId of the user
  * @param   {fetcher} fetch fetch function
@@ -165,6 +167,7 @@ export const thingToHabit = async (toChange: Thing | null, webId: string, fetch:
 
 /**
  * creates folders used by the application, in case if they are missing
+ * @category Main solid POD functions
  * @param   {fetcher} fetch fetch function
  * @param   {string} storagePref url of user's preferred storage location
  * @param   {string} prefFileLocation url of user's preference file location
@@ -195,6 +198,7 @@ export const repairDefaultFolder = async (fetch: fetcher, storagePref: string, p
 /**
 * wrapper function that calls @see repairDefaultFolder @see createDefFolder would create folders to 
 * store notes and habit 
+* @category Main solid POD functions
 * @param   {string} webId webId of the user
 * @param   {fetcher} fetch fetch function
 * @param   {string} storagePref url of user's preferred storage location
@@ -211,6 +215,7 @@ export const recordDefaultFolder = async (webId: string, fetch: fetcher, storage
 
 /**
 * creates entries in user's public type index file, for voc.Habit or schema.TextDigitalDocument
+* @category Main solid POD functions
 * @param   {fetcher} fetch fetch function
 * @param   {string} entry type of entry to create a record for: note or habit
 * @param   {string} storagePref url of user's preferred storage location
@@ -249,6 +254,7 @@ export const createEntriesInTypeIndex = async (fetch: fetcher, entry: string, st
 
 /**
 * adds a record to user's preference file to denote what access control mechanism user's POD uses, can be wac or acp
+* @category Main solid POD functions
 * @param   {fetcher} fetch fetch function
 * @param   {string} prefFileLocation url of user's preference file location
 * @param   {string} podType denotes what access control mechanism user's POD uses, can be wac or acp
@@ -277,6 +283,7 @@ export const recordAccessType = async (fetch: fetcher, prefFileLocation: string,
 
 /**
 * creates the following containers in the user's POD: SolidPlannerApp/, SolidPlannerApp/Notes/, SolidPlannerApp/Habits/
+* @category Main solid POD functions
 * @param   {string} webId webId of the user
 * @param   {fetcher} fetch fetch function
 * @param   {string} storagePref url of user's preferred storage location
@@ -353,6 +360,7 @@ export const createDefFolder = async (webId: string, fetch: fetcher, storagePref
 
 /**
 * fetches all things of specified entry type of a user or other webId 
+* @category Main solid POD functions
 * @param   {string} webId webId of the user
 * @param   {fetcher} fetch fetch function
 * @param   {string} entry entry type to fetch
@@ -361,7 +369,7 @@ export const createDefFolder = async (webId: string, fetch: fetcher, storagePref
 * @param   {string} publicTypeIndexUrl url of user's public type index file
 * @param   {string} podType denotes what access control mechanisms user's POD uses, can be wac or acp
 * @param   {boolean} [other] indicates if a fetch is perform not on the user's webId
-* @return  {Promise<(ThingPersisted | null)[] | never[]>} an array of things of specified entry type or nulls, or empty array
+* @return  {Promise<Array>} an array of things of specified entry type or nulls, or empty array
 */
 export const fetchAllEntries = async (webId: string, fetch: fetcher, entry: string, storagePref: string, prefFileLocation: string,
   publicTypeIndexUrl: string, podType: string, other?: boolean): Promise<(ThingPersisted | null)[] | never[]> => {
@@ -441,6 +449,7 @@ export const fetchAllEntries = async (webId: string, fetch: fetcher, entry: stri
 
 /**
 * checks if a dataSet with given url exists on the user's POD, if it doesn't, creates it
+* @category Main solid POD functions
 * @param   {string} webId webId of the user
 * @param   {fetcher} fetch fetch function
 * @param   {string} storagePref url of user's preferred storage location
@@ -475,6 +484,7 @@ export const checkFolderExistence = async (webId: string, fetch: fetcher, storag
 
 /**
 * saves given note on the user's POD
+* @category Main solid POD functions
 * @param   {string} webId webId of the user
 * @param   {fetcher} fetch fetch function
 * @param   {Note} note note to save
@@ -510,6 +520,7 @@ export const saveNote = async (webId: string, fetch: fetcher, note: Note, storag
 
 /**
 * saves given habit on the user's POD
+* @category Main solid POD functions
 * @param   {string} webId webId of the user
 * @param   {fetcher} fetch fetch function
 * @param   {Habit} habit habit to save
@@ -569,6 +580,7 @@ export const saveHabit = async (webId: string, fetch: fetcher, habit: Habit, sto
 
 /**
 * adds data of a given habit to a given thing
+* @category Main solid POD functions
 * @param   {Habit} habitToSave habit to get data from
 * @param   {Thing} newThing a thing to update
 * @return  {ThingPersisted} a thing with updated data from a given habit
@@ -617,6 +629,7 @@ export const setHabitThing = (habitToSave: Habit, newThing: Thing): ThingPersist
 
 /**
 * updates a given habit on the user's POD
+* @category Main solid POD functions
 * @param   {string} webId webId of the user
 * @param   {fetcher} fetch fetch function
 * @param   {Habit} habitToEdit habit to edit
@@ -686,6 +699,7 @@ export const editHabit = async (webId: string, fetch: fetcher, habitToEdit: Habi
 
 /**
 * updates a given note on the user's POD
+* @category Main solid POD functions
 * @param   {string} webId webId of the user
 * @param   {fetcher} fetch fetch function
 * @param   {Note} noteToEdit note to edit
@@ -771,6 +785,7 @@ export const editNote = async (webId: string, fetch: fetcher, noteToEdit: Note, 
 
 /**
 * deletes an entry of a given type at a given url from the user's POD
+* @category Main solid POD functions
 * @param   {string} webId webId of the user
 * @param   {fetcher} fetch fetch function
 * @param   {string} urlToDelete url of entry to delete
@@ -810,6 +825,7 @@ export const deleteEntry = async (webId: string, fetch: fetcher, urlToDelete: st
 
 /**
 * checks if user's POD has contacts/ container that contains contacts that can be fetched
+* @category Main solid POD functions
 * @param   {fetcher} fetch fetch function
 * @param   {string} storagePref url of user's preferred storage location
 * @return  {Promise<boolean>}  true if user has contacts in contacts/ container that can be fetched and false otherwise
@@ -828,9 +844,10 @@ export const checkContacts = async (fetch: fetcher, storagePref: string): Promis
 
 /**
 * fetches all user's contacts
+* @category Main solid POD functions
 * @param   {fetcher} fetch fetch function
 * @param   {string} storagePref url of user's preferred storage location
-* @return  {Promise<(string | null)[][]>}an array of arrays, each representing a contact, contains contact's name in the 0 index and contact's webId in the 1 index
+* @return  {Promise<Array>} an array of arrays, each representing a contact, contains contact's name in the 0 index and contact's webId in the 1 index
 */
 export const fetchContacts = async (fetch: fetcher, storagePref: string): Promise<(string | null)[][]> => {
   let newDs
@@ -877,6 +894,7 @@ export const fetchContacts = async (fetch: fetcher, storagePref: string): Promis
 
 /**
 * creates a notification in the provided user's inbox
+* @category Main solid POD functions
 * @param   {string} webId webId of the user
 * @param   {string} otherWebId webId of the user for which the notification is sent
 * @param   {fetcher} fetch fetch function
@@ -920,10 +938,11 @@ export const createEntryInInbox = async (webId: string, otherWebId: string, fetc
 
 /**
 * returns an array of thing from the user's inbox container 
+* @category Main solid POD functions
 * @param   {string} webId webId of the user
 * @param   {fetcher} fetch fetch function
 * @param   {boolean} [update] if true, then the update of existing entries is performed
-* @return  {Promise<ThingPersisted[]>} returns an array of things from the user's inbox that were created by this application
+* @return  {Promise<Array>} returns an array of things from the user's inbox that were created by this application
 */
 export const getThingsFromInbox = async (webId: string, fetch: fetcher, update?: boolean): Promise<ThingPersisted[]> => {
   const inboxUrl = await getInboxUrl(webId, fetch);
@@ -967,9 +986,10 @@ export const getThingsFromInbox = async (webId: string, fetch: fetcher, update?:
 
 /**
 * checks public type index file and creates application's entries if those are missing
+* @category Main solid POD functions
 * @param   {string} publicTypeIndexUrl url of user's public type index file
 * @param   {fetcher} fetch fetch function
- * @param   {string} storagePref url of user's preferred storage location
+* @param   {string} storagePref url of user's preferred storage location
 * @return  {Promise<void>}
 */
 export const checkPubTypeIndex = async (publicTypeIndexUrl: string, fetch: fetcher, storagePref: string): Promise<void> => {

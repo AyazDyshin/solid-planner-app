@@ -10,6 +10,12 @@ interface Props {
     habitInp: Habit;
 }
 
+/**
+ * Component that renders custom habits recurrence picker modal
+ *
+ * @category Modals
+ * @component
+ */
 const CustomHabitModal = ({ customHabitModalState, setCustomHabitModalState, habitInp, setHabitInp }: Props) => {
     const [weekOpen, setWeekOpen] = useState<boolean>(false);
     const [dayOpen, setDayOpen] = useState<boolean>(false);
@@ -77,7 +83,7 @@ const CustomHabitModal = ({ customHabitModalState, setCustomHabitModalState, hab
             daysArr.forEach((day) => {
                 if (objOfDays[day]) {
                     const num = getNumberFromDay(day);
-                    if (num !== undefined) newCustom.push(num);
+                    if (num !== null) newCustom.push(num);
                 }
             });
             if (newCustom.length !== 0) {

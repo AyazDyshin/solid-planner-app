@@ -1,7 +1,7 @@
 import { AccessModes } from "@inrupt/solid-client/dist/acp/policy";
 /**
  * Interface that represents a note
- *
+ * @category definitions
  * @interface
  */
 export interface Note {
@@ -15,6 +15,11 @@ export interface Note {
   //  [key: string]: string | number;
 }
 
+/**
+ * Interface that represents a habit
+ * @category definitions
+ * @interface
+ */
 export interface Habit {
   id: number | null;
   title: string | null;
@@ -35,6 +40,13 @@ export interface Habit {
   shareList?: Record<string, AccessModes>;
   custom?: number[] | number | null;
 }
+
+/**
+ * Interface that represents an app notification 
+ * @category definitions
+ *
+ * @interface
+ */
 export interface appNotification {
   id: number;
   url: string;
@@ -44,12 +56,32 @@ export interface appNotification {
   entryType: string;
 }
 
+/**
+ * type that represents an object with category
+ * @category definitions
+ * @typedef
+ */
 export type withCategory = object & { category: string | null; };
 
+/**
+ * type that represents a fetch function
+ * @category definitions
+ * @typedef
+ */
 export type fetcher = (((input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>) & ((input: RequestInfo | URL, init?: RequestInit | undefined) => Promise<Response>)) | undefined;
 
+/**
+ * type that represents an access object
+ * @category definitions
+ * @typedef
+ */
 export type accessObject = { read: boolean, append: boolean, write: boolean };
 
+/**
+ * enum that list vocabulary defined for this application
+ * @category definitions
+ * @enum
+ */
 export enum voc {
   Habit = "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#Habit",
   //DatesList = "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#DatesList",
@@ -63,8 +95,11 @@ export enum voc {
   checkInDate = "https://ayazdyshin.inrupt.net/plannerApp/vocab.ttl#checkInDate",
 }
 
+/**
+ * enum that represents other vocabularies used
+ * @category definitions
+ * @enum
+ */
 export enum otherV {
   category = "http://dbpedia.org/ontology/category",
 }
-
-export type returnCheckIn = { action: string; url: string | null; date: Date; } | number;

@@ -2,7 +2,6 @@ import React from 'react';
 import { useEffect, useState } from "react";
 import NavbarSolidApp from "./NavbarSolidApp";
 import ContentToRender from "./ContentToRender";
-import Test from "../Test";
 import { checkPermissions, isWacOrAcp } from "../../services/access";
 import { useSession } from "@inrupt/solid-ui-react";
 import { Spinner } from "react-bootstrap";
@@ -13,8 +12,12 @@ import NoPermissions from "../HelperComponents/NoPermissions";
 import {
   WebsocketNotification,
 } from "@inrupt/solid-client-notifications";
-// This is the root component that first renders NavBar and then other content
-// Passes active and setActive hooks, which represent the currently clicked tab
+
+/**
+ * Component that renders navigation menu and the main content of the application
+ *
+ * @category Main app components
+ */
 const MainContent = () => {
   const { session, fetch } = useSession();
   const { webId } = session.info;

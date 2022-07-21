@@ -1,6 +1,6 @@
 export const config = {
     appSettings: {
-        url: "http://localhost:8080/"
+        url: "https://ayazdyshin.github.io/solid-planner-app/"
     },
     mainPodSettings: {
         webId: "https://fortest.inrupt.net/profile/card#me",

@@ -219,7 +219,12 @@ const HabitsCreator = ({ habitInp, setHabitInp, isEdit, setIsEdit, creatorStatus
           setHabitUpdInProgress(false);
         }
         else {
+          if (habitUpdInProgress){
+            setTimeout(editHabit(webId, fetch, newHabit, storagePref, defFolder, prefFileLocation, publicTypeIndexUrl, podType),3000);
+          }
+          else {
           await editHabit(webId, fetch, newHabit, storagePref, defFolder, prefFileLocation, publicTypeIndexUrl, podType);
+          }
         }
       }
     }

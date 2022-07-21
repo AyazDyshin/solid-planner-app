@@ -171,7 +171,12 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
                     setNoteUpdInProgress(false);
                 }
                 else {
-                    await editNote(webId, fetch, newNote, storagePref, publicTypeIndexUrl);
+                    if (noteUpdInProgress) {
+                        setTimeout(editNote(webId, fetch, newNote, storagePref, publicTypeIndexUrl), 3000);
+                    }
+                    else {
+                        await editNote(webId, fetch, newNote, storagePref, publicTypeIndexUrl);
+                    }
                 }
             }
         }

@@ -368,7 +368,7 @@ const HabitsList = ({ setViewerStatus, setCreatorStatus, habitsFetched, setHabit
                               checked={
                                 (objOfStates[key]) ? true : false
                               }
-                              {...(isSaving && { disabled: true })}
+                              {...((isSaving || habitUpdInProgress) && { disabled: true })}
                               style={{ "transform": "scale(1.7)" }} />
                           </div>
                         }

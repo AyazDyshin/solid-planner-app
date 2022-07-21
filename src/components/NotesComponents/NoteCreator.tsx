@@ -172,7 +172,7 @@ const NoteCreator = ({ newEntryCr, setNewEntryCr, noteToView, storagePref, defFo
                 }
                 else {
                     if (noteUpdInProgress) {
-                        setTimeout(editNote(webId, fetch, newNote, storagePref, publicTypeIndexUrl), 3000);
+                        setTimeout(async () => { await editNote(webId, fetch, newNote, storagePref, publicTypeIndexUrl) }, 3000);
                     }
                     else {
                         await editNote(webId, fetch, newNote, storagePref, publicTypeIndexUrl);
